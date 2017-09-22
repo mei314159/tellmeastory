@@ -33,7 +33,7 @@ namespace TellMe.Core.Services
             {
                 string message = null;
 
-                if (!ValidationResult.IsValid)
+                if (ValidationResult?.IsValid == false)
                 {
                     message = string.Join(Environment.NewLine, ValidationResult.Errors.Select(x => x.ErrorMessage));
                 }
@@ -76,4 +76,27 @@ namespace TellMe.Core.Services
             }
         }
     }
+
+	public class ServiceResult<T, TError> : ServiceResult
+	{
+		public ServiceResult()
+		{
+		}
+
+		public ServiceResult(ValidationResult validationResult, Result<T, TError> result = null) : base(validationResult, result)
+		{
+		}
+
+		public new Result<T, TError> Result
+		{
+			get
+			{
+				return (Result<T, TError>)base.Result;
+			}
+			set
+			{
+				base.Result = value;
+			}
+		}
+	}
 }

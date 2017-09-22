@@ -32,6 +32,7 @@ namespace TellMe.iOS
             var result = await accountService.SignInAsync(this);
             if (result.IsValid)
             {
+                App.Instance.DataStorage.AuthInfo = result.Result.Data;
                 this.View.Window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController());
                 return;
             }

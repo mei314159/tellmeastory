@@ -7,17 +7,12 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
-using UIKit;
 
 namespace TellMe.iOS
 {
-    [Register ("FriendsListViewController")]
-    partial class FriendsListViewController
+    [Register ("TextInput")]
+    partial class TextInput
     {
-        [Action ("UIButton559_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void UIButton559_TouchUpInside (UIKit.UIButton sender);
-
         void ReleaseDesignerOutlets ()
         {
         }

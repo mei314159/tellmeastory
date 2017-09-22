@@ -15,7 +15,10 @@ namespace TellMe.Core.Dto
 
     public class AuthenticationErrorDto : ErrorDTO
     {
-        [JsonProperty(PropertyName = "error_description")]
-        public override string ErrorMessage { get; set; }
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+		[JsonProperty(PropertyName = "data")]
+        public object Data { get; set; }
     }
 }

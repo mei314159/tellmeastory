@@ -33,5 +33,7 @@
 	<string>Assets.xcassets/AppIcon.appiconset</string>
 	<key>CFBundleName</key>
 	<string>Tell Me a Story</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Tell Me a Story need an access to your contacts to find your friends</string>
 </dict>
 </plist>

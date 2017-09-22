@@ -14,4 +14,9 @@ namespace TellMe.Core.DTO
     {
         public T Data { get; set; }
     }
+
+	public class Result<T, TError> : Result<T>
+	{
+        public TError Error { get; set; }
+	}
 }

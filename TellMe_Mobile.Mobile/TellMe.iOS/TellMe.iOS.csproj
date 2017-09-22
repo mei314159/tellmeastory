@@ -98,12 +98,16 @@
     <ImageAsset Include="Assets.xcassets\Second.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Second.imageset\vector.pdf" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Contacts.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Core\" />
     <Folder Include="Core\UI\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Assets.xcassets\Contacts.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -136,6 +140,14 @@
     <Compile Include="FriendsListViewController.cs" />
     <Compile Include="FriendsListViewController.designer.cs">
       <DependentUpon>FriendsListViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SignUpPhoneController.cs" />
+    <Compile Include="SignUpPhoneController.designer.cs">
+      <DependentUpon>SignUpPhoneController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImportContactsController.cs" />
+    <Compile Include="ImportContactsController.designer.cs">
+      <DependentUpon>ImportContactsController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

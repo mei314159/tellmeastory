@@ -34,12 +34,15 @@ namespace TellMe.iOS
             var result = await accountService.SignUpAsync(this);
             if (result.IsValid)
             {
-                result = await accountService.SignInAsync(this);
-                if (result.IsValid)
+				var authResult = await accountService.SignInAsync(this);
+				if (authResult.IsValid)
                 {
+                    App.Instance.DataStorage.AuthInfo = authResult.Result.Data;
                     this.View.Window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController());
                     return;
                 }
+
+                result = authResult;
             }
 
             UIAlertController alert = UIAlertController

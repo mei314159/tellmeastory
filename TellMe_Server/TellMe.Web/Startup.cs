@@ -48,12 +48,17 @@ namespace TellMe.Web
                 b => { }));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
+                    options.User.RequireUniqueEmail = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 4;
+                    options.Password.RequireLowercase = false;
                 }).AddEntityFrameworkStores<AppDbContext>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IContactService, ContactService>();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             ConfigureJwtAuthService(services);
             services.AddMvc();

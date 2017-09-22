@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using Newtonsoft.Json;
 using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Types.Domain;
 using TellMe.Web.DTO;
+using TellMe.DAL;
 
 namespace TellMe.Web.Controllers
 {
@@ -35,7 +37,7 @@ namespace TellMe.Web.Controllers
         {
             if (parameters == null)
             {
-                return Json(new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "901",
                     Message = "null of parameters",
@@ -43,17 +45,21 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            if (parameters.grant_type == "password")
+            if (parameters.grant_type == "phone_number")
             {
-                return Json(await DoPasswordAsync(parameters));
+                return await DoPhoneNumberAsync(parameters);
             }
+            // else if (parameters.grant_type == "password")
+            // {
+            //     return Json(await DoPasswordAsync(parameters));
+            // }
             else if (parameters.grant_type == "refresh_token")
             {
-                return Json(DoRefreshToken(parameters));
+                return DoRefreshToken(parameters);
             }
             else
             {
-                return Json(new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "904",
                     Message = "bad request",
@@ -63,21 +69,71 @@ namespace TellMe.Web.Controllers
         }
 
         //scenario 1 get the access-token by username and password  
-        private async Task<ResponseData> DoPasswordAsync(TokenAuthParams parameters)
+        // private async Task<ResponseData> DoPasswordAsync(TokenAuthParams parameters)
+        // {
+        //     //validate the client_id/client_secret/username/password
+        //     var user = await _userManager.FindByEmailAsync(parameters.username);
+        //     //todo validate clientId and client secret
+        //     var isValidated = await _userManager.CheckPasswordAsync(user, parameters.password);
+
+        //     if (!isValidated)
+        //     {
+        //         return new ResponseData
+        //         {
+        //             Code = "902",
+        //             Message = "invalid user infomation",
+        //             Data = null
+        //         };
+        //     }
+
+        //     var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+        //     var rToken = new RefreshToken
+        //     {
+        //         ClientId = parameters.client_id,
+        //         Token = refresh_token,
+        //         Expired = false,
+        //         UserId = user.Id
+        //     };
+
+        //     //store the refresh_token   
+        //     if (_userService.AddToken(rToken))
+        //     {
+        //         return new ResponseData
+        //         {
+        //             Code = "999",
+        //             Message = "OK",
+        //             Data = GetJwt(parameters.client_id, refresh_token, user.Id)
+        //         };
+        //     }
+        //     else
+        //     {
+        //         return new ResponseData
+        //         {
+        //             Code = "909",
+        //             Message = "can not add token to database",
+        //             Data = null
+        //         };
+        //     }
+        // }
+
+        private async Task<IActionResult> DoPhoneNumberAsync(TokenAuthParams parameters)
         {
+            var formattedPhoneNumber = new Regex(Constants.PhoneNumberCleanupRegex).Replace(parameters.phone_number, string.Empty);
+                
             //validate the client_id/client_secret/username/password
-            var user = await _userManager.FindByEmailAsync(parameters.username);
+            var user = await _userManager.FindByNameAsync(formattedPhoneNumber); //phone number used as username
             //todo validate clientId and client secret
-            var isValidated = await _userManager.CheckPasswordAsync(user, parameters.password);
+            var isValidated = await _userManager.CheckPasswordAsync(user, parameters.confirmation_code);
 
             if (!isValidated)
             {
-                return new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "902",
                     Message = "invalid user infomation",
                     Data = null
-                };
+                });
             }
 
             var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
@@ -93,47 +149,42 @@ namespace TellMe.Web.Controllers
             //store the refresh_token   
             if (_userService.AddToken(rToken))
             {
-                return new ResponseData
-                {
-                    Code = "999",
-                    Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token, user.Id)
-                };
+                return Ok(GetJwt(parameters.client_id, refresh_token, user.Id));
             }
             else
             {
-                return new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "909",
                     Message = "can not add token to database",
                     Data = null
-                };
+                });
             }
         }
 
         //scenario 2 ï¼š get the access_token by refresh_token  
-        private ResponseData DoRefreshToken(TokenAuthParams parameters)
+        private IActionResult DoRefreshToken(TokenAuthParams parameters)
         {
             var token = _userService.GetToken(parameters.refresh_token, parameters.client_id);
 
             if (token == null)
             {
-                return new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "905",
                     Message = "can not refresh token",
                     Data = null
-                };
+                });
             }
 
             if (token.Expired == true)
             {
-                return new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "906",
                     Message = "refresh token has expired",
                     Data = null
-                };
+                });
             }
 
             var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
@@ -152,21 +203,16 @@ namespace TellMe.Web.Controllers
 
             if (updateFlag && addFlag)
             {
-                return new ResponseData
-                {
-                    Code = "999",
-                    Message = "OK",
-                    Data = GetJwt(parameters.client_id, refresh_token, token.UserId)
-                };
+                return Ok(GetJwt(parameters.client_id, refresh_token, token.UserId));
             }
             else
             {
-                return new ResponseData
+                return BadRequest(new ResponseData
                 {
                     Code = "910",
                     Message = "can not expire token or a new token",
                     Data = null
-                };
+                });
             }
         }
 
@@ -177,7 +223,7 @@ namespace TellMe.Web.Controllers
 
             var claims = new Claim[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, client_id),
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64)
             };

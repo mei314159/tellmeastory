@@ -48,6 +48,24 @@ namespace TellMe.Core.Services
             return new ServiceResult<AuthenticationInfoDTO>(validationResult, result);
         }
 
+		public async Task<ServiceResult<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInPhoneAsync(ISigninPhoneView viewModel)
+		{
+			var validationResult = await new SignInPhoneValidator().ValidateAsync(viewModel).ConfigureAwait(false);
+			Result<AuthenticationInfoDTO, AuthenticationErrorDto> result = null;
+			if (validationResult.IsValid)
+			{
+				var data = new Dictionary<string, string>();
+				data.Add("grant_type", "phone_number");
+                data.Add("phone_number", viewModel.PhoneNumber);
+                data.Add("confirmation_code", viewModel.ConfirmationCode);
+				data.Add("client_id", "ios_app");
+                result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
+								   .ConfigureAwait(false);
+			}
+
+			return new ServiceResult<AuthenticationInfoDTO, AuthenticationErrorDto>(validationResult, result);
+		}
+
         //public async Task<Result> ResetPasswordAsync(ResetPasswordDto dto)
         //{
         //    return await PostAsync<object>("Account/ResetPassword", dto, true);
@@ -76,6 +94,23 @@ namespace TellMe.Core.Services
             ServiceResult serviceResult = new ServiceResult(validationResult, result);
             return serviceResult;
         }
+
+        public async Task<ServiceResult> SignUpPhoneAsync(ISignUpPhoneView viewModel)
+		{
+			var validationResult = await new SignUpPhoneValidator().ValidateAsync(viewModel).ConfigureAwait(false);
+			Result<object> result = null;
+
+			if (validationResult.IsValid)
+			{
+				result = await this.PostAsync<object>("account/signup-phone", new SignUpPhoneDTO
+				{
+                    PhoneNumber = viewModel.PhoneNumberField.Text
+				}, true).ConfigureAwait(false);
+			}
+
+			ServiceResult serviceResult = new ServiceResult(validationResult, result);
+			return serviceResult;
+		}
 
         public void SignOut()
         {

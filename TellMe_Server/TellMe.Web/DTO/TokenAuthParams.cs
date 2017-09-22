@@ -7,6 +7,8 @@ namespace TellMe.Web.DTO
         public string client_id { get; set; }
         public string client_secret { get; set; }
         public string username { get; set; }
+        public string phone_number { get; set; }
+        public string confirmation_code { get; set; }
         public string password { get; set; }
     }
 }

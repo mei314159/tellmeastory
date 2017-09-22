@@ -129,6 +129,15 @@ namespace TellMe.Core.Services
 
         public async Task<Result<TResult>> SendDataAsync<TResult>(string uri, HttpMethod method, HttpContent content, bool anonymously = false, bool refreshExpiredToken = true)
         {
+            var result = await SendDataAsync<TResult, Dictionary<string, string[]>>(uri, method, content, anonymously, refreshExpiredToken)
+                .ConfigureAwait(false);
+            if(!result.IsSuccess)
+                result.ModelState = result.Error;
+            return result;
+        }
+
+        public async Task<Result<TResult, TErrorResult>> SendDataAsync<TResult, TErrorResult>(string uri, HttpMethod method, HttpContent content, bool anonymously = false, bool refreshExpiredToken = true)
+        {
             var requestUri = new Uri($"{Constants.ApiHost}/api/{uri}");
 
             using (var webClient = new HttpClient())
@@ -148,7 +157,7 @@ namespace TellMe.Core.Services
                     if (method == HttpMethod.Put)
                         response = await webClient.PutAsync(requestUri, content).ConfigureAwait(false);
                     else if (method == HttpMethod.Post)
-                        response = await webClient.PostAsync(requestUri, content).ConfigureAwait(false);
+                        response = await webClient.PostAsync(requestUri, content);
                     else if (method == HttpMethod.Delete)
                         response = await webClient.DeleteAsync(requestUri).ConfigureAwait(false);
                     else
@@ -161,7 +170,7 @@ namespace TellMe.Core.Services
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         var messageDto = JsonConvert.DeserializeObject<TResult>(responseString);
-                        return new Result<TResult>
+                        return new Result<TResult, TErrorResult>
                         {
                             IsSuccess = true,
                             Data = messageDto,
@@ -172,21 +181,21 @@ namespace TellMe.Core.Services
                     if (response.StatusCode == HttpStatusCode.Unauthorized && !anonymously && refreshExpiredToken)
 					{
 						await this.RefreshAuthTokenAsync().ConfigureAwait(false);
-                        return await this.SendDataAsync<TResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
+                        return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
 					}
 
-                    var modelState = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(responseString);
-                    return new Result<TResult>
+                    var error = JsonConvert.DeserializeObject<TErrorResult>(responseString);
+                    return new Result<TResult, TErrorResult>
                     {
                         IsSuccess = false,
-                        ModelState = modelState
+                        Error = error
                     };
 
                 }
                 catch (HttpRequestException ex)
                 {
                     App.Instance.LogNetworkException(ex);
-                    return new Result<TResult>
+                    return new Result<TResult, TErrorResult>
                     {
                         IsSuccess = false,
                         ErrorMessage = "No internet connection."
@@ -195,7 +204,7 @@ namespace TellMe.Core.Services
                 catch (Exception ex)
                 {
                     App.Instance.LogNetworkException(ex);
-                    return new Result<TResult>
+                    return new Result<TResult, TErrorResult>
                     {
                         IsSuccess = false,
                         ErrorMessage = ex.Message
@@ -208,12 +217,11 @@ namespace TellMe.Core.Services
         {
             if (App.Instance.DataStorage.AuthInfo != null)
             {
-                var uri = Constants.ApiHost + "/api/token/auth";
                 var data = new Dictionary<string, string>();
                 data.Add("grant_type", "refresh_token");
                 data.Add("refresh_token", App.Instance.DataStorage.AuthInfo.RefreshToken);
                 data.Add("client_id", "ios_app");
-                var result = await this.SendDataAsync<AuthenticationInfoDTO>(uri, HttpMethod.Post, new FormUrlEncodedContent(data), true)
+                var result = await this.SendDataAsync<AuthenticationInfoDTO>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
                                    .ConfigureAwait(false);
 
                 if (result.IsSuccess)

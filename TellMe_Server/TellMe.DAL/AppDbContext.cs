@@ -12,5 +12,11 @@ namespace TellMe.DAL
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            base.OnModelCreating(builder);
+        }
     }
 }
