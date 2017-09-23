@@ -51,8 +51,8 @@ namespace TellMe.Web.Controllers
         {
             if (dto != null && ModelState.IsValid)
             {
-                var formattedPhoneNuimber = new Regex(Constants.PhoneNumberCleanupRegex).Replace(dto.PhoneNumber, string.Empty);
-                var existingUser = await _userManager.FindByNameAsync(formattedPhoneNuimber);
+                var formattedPhoneNumber = new Regex(Constants.PhoneNumberCleanupRegex).Replace(dto.PhoneNumber, string.Empty);
+                var existingUser = await _userManager.FindByNameAsync(formattedPhoneNumber);
                 if (existingUser != null){
                     // TODO Set new confirmation code and send to user by sms
                     return Ok();
@@ -60,9 +60,10 @@ namespace TellMe.Web.Controllers
 
                 var result = await _userManager.CreateAsync(new ApplicationUser
                 {
-                    PhoneNumber = formattedPhoneNuimber,
+                    PhoneNumber = dto.PhoneNumber,
+                    PhoneNumberDigits = long.Parse(formattedPhoneNumber),
                     PhoneNumberConfirmed = true, //Must be false and confirmed separately by sms
-                    UserName = formattedPhoneNuimber,
+                    UserName = formattedPhoneNumber,
                     Email = null,
                 }, "0000" // temporary used instead of sms-code
                 );

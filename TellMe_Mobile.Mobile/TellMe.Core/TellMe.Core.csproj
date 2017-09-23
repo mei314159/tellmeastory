@@ -12,6 +12,7 @@
     <Folder Include="Contracts\UI\Components\" />
     <Folder Include="Contracts\UI\Views\" />
     <Folder Include="Validation\" />
+    <Folder Include="Contracts\Providers\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

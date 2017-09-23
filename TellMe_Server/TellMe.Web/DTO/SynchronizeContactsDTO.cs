@@ -5,6 +5,6 @@ namespace TellMe.Web.DTO
 {
     public class SynchronizeContactsDTO
     {
-        public List<ContactDTO> Contacts { get; set; }
+        public List<PhoneContactDTO> Contacts { get; set; }
     }
 }

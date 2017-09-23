@@ -101,6 +101,9 @@
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%402x.png" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%403x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%402x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%403x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-referencecase.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -108,11 +111,15 @@
     <Folder Include="Core\UI\" />
     <Folder Include="Extensions\" />
     <Folder Include="Assets.xcassets\Contacts.imageset\" />
+    <Folder Include="Core\Providers\" />
+    <Folder Include="Views\" />
+    <Folder Include="Views\Cells\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
+    <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -137,10 +144,6 @@
     <Compile Include="ProfileViewController.designer.cs">
       <DependentUpon>ProfileViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="FriendsListViewController.cs" />
-    <Compile Include="FriendsListViewController.designer.cs">
-      <DependentUpon>FriendsListViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="SignUpPhoneController.cs" />
     <Compile Include="SignUpPhoneController.designer.cs">
       <DependentUpon>SignUpPhoneController.cs</DependentUpon>
@@ -149,12 +152,24 @@
     <Compile Include="ImportContactsController.designer.cs">
       <DependentUpon>ImportContactsController.cs</DependentUpon>
     </Compile>
+    <Compile Include="ContactsViewController.cs" />
+    <Compile Include="ContactsViewController.designer.cs">
+      <DependentUpon>ContactsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Providers\ContactsProvider.cs" />
+    <Compile Include="Views\Cells\ContactsListCell.cs" />
+    <Compile Include="Views\Cells\ContactsListCell.designer.cs">
+      <DependentUpon>ContactsListCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">
       <Project>{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}</Project>
       <Name>TellMe.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ITunesArtwork Include="iTunesArtwork%402x" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

@@ -30,11 +30,11 @@ namespace TellMe.Web.Controllers
             return Ok();
         }
 
-        [HttpPost("app-users")]
-        public async Task<IActionResult> GetContactsUsingAppAsync([FromBody] SynchronizeContactsDTO dto)
+        [HttpGet("")]
+        public async Task<IActionResult> GetContactsAsync()
         {
-            await _contactsService.GetAllAsync(this.UserId);
-            return Ok();
+            var contacts = await _contactsService.GetAllAsync(this.UserId);
+            return Ok(contacts);
         }
     }
 }

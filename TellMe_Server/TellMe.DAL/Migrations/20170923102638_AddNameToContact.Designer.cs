@@ -11,9 +11,10 @@ using TellMe.DAL;
 namespace TellMe.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170923102638_AddNameToContact")]
+    partial class AddNameToContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,8 +160,6 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
-                    b.Property<long>("PhoneNumberDigits");
-
                     b.Property<string>("SecurityStamp");
 
                     b.Property<bool>("TwoFactorEnabled");
@@ -189,8 +188,6 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("Name");
 
                     b.Property<string>("PhoneNumber");
-
-                    b.Property<long>("PhoneNumberDigits");
 
                     b.Property<string>("UserId");
 

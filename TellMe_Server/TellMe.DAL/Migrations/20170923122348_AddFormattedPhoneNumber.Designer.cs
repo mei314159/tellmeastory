@@ -11,9 +11,10 @@ using TellMe.DAL;
 namespace TellMe.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170923122348_AddFormattedPhoneNumber")]
+    partial class AddFormattedPhoneNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,7 +160,7 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
-                    b.Property<long>("PhoneNumberDigits");
+                    b.Property<int>("PhoneNumberDigits");
 
                     b.Property<string>("SecurityStamp");
 
@@ -190,7 +191,7 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<string>("PhoneNumber");
 
-                    b.Property<long>("PhoneNumberDigits");
+                    b.Property<int>("PhoneNumberDigits");
 
                     b.Property<string>("UserId");
 

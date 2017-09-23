@@ -8,14 +8,17 @@ using System.Linq;
 using TellMe.Core;
 using TellMe.Core.Services;
 using TellMe.iOS.Extensions;
+using TellMe.Core.Contracts.Providers;
+using TellMe.iOS.Core.Providers;
 
 namespace TellMe.iOS
 {
     public partial class ImportContactsController : UIViewController
     {
         private ContactsService contactsService;
+		private IContactsProvider contactsProvider;
 
-        public ImportContactsController(IntPtr handle) : base(handle)
+		public ImportContactsController(IntPtr handle) : base(handle)
         {
         }
 
@@ -24,12 +27,14 @@ namespace TellMe.iOS
             base.ViewDidLoad();
 
             this.contactsService = new ContactsService(App.Instance.DataStorage);
+            this.contactsProvider = new ContactsProvider();
         }
 
         async partial void ProvideAccessButton_TouchUpInside(UIButton sender)
         {
-            if (CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts) == CNAuthorizationStatus.Denied
-            || CNContactStore.GetAuthorizationStatus(CNEntityType.Contacts) == CNAuthorizationStatus.Restricted)
+            var status = contactsProvider.GetPermissions();
+            if (status == Permissions.Denied
+            || status == Permissions.Restricted)
             {
                 UIAlertController alert = UIAlertController
                 .Create("Access denied",
@@ -42,7 +47,7 @@ namespace TellMe.iOS
                 return;
             }
 
-            var contacts = GetAllContacts();
+            var contacts = contactsProvider.GetContacts();
 
             var syncResult = await contactsService.SynchronizeContactsAsync(contacts);
             if (syncResult.IsValid)
@@ -60,44 +65,6 @@ namespace TellMe.iOS
 
                 this.PresentViewController(alert, true, null);
             }
-        }
-
-
-        private List<ContactDTO> GetAllContacts()
-        {
-            var keysTOFetch = new[] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers };
-
-            NSError error;
-            CNContact[] contactList;
-            var ContainerId = new CNContactStore().DefaultContainerIdentifier;
-            using (var predicate = CNContact.GetPredicateForContactsInContainer(ContainerId))
-            {
-                using (var store = new CNContactStore())
-                {
-                    contactList = store.GetUnifiedContacts(predicate, keysTOFetch, out error);
-                }
-            }
-
-            var contacts = new List<ContactDTO>();
-
-            foreach (var item in contactList)
-            {
-                var numbers = item.PhoneNumbers;
-                if (numbers != null)
-                {
-                    foreach (var number in numbers)
-                    {
-                        contacts.Add(new ContactDTO
-                        {
-                            //LocalName = item.GivenName,
-                            //LocalId = number.Value.ValueForKey(new NSString("digits")).ToString(),
-                            PhoneNumber = number.Value.StringValue
-                        });
-                    }
-                }
-            }
-
-            return contacts;
         }
     }
 }

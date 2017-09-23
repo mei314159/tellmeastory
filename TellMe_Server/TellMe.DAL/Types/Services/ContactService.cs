@@ -25,38 +25,48 @@ namespace TellMe.DAL.Types.Services
         public async Task<ICollection<ContactDTO>> GetAllAsync(string userId)
         {
             var usersQuery = _userRepository.GetQueryable().AsNoTracking();
-            var result = await _contactRepository
+            var contactsQuery = _contactRepository
             .GetQueryable()
             .AsNoTracking()
-            .Where(x => x.UserId == userId)
-            .Join(usersQuery, x => x.PhoneNumber, x => x.PhoneNumber, (c, u) => new ContactDTO
-            {
-                Id = c.Id,
-                PhoneNumber = c.PhoneNumber,
-                UserId = u.Id
-            }).ToListAsync().ConfigureAwait(false);
+            .Where(x => x.UserId == userId);
+
+            var result = await (from contact in contactsQuery
+                                join user in usersQuery on contact.PhoneNumberDigits equals user.PhoneNumberDigits into gj
+                                from x in gj.DefaultIfEmpty()
+                                select new ContactDTO
+                                {
+                                    Id = contact.Id,
+                                    PhoneNumber = contact.PhoneNumber,
+                                    PhoneNumberDigits = contact.PhoneNumberDigits,
+                                    Name = contact.Name,
+                                    UserId = x != null ? x.Id : null
+                                }).ToListAsync().ConfigureAwait(false);
 
             return result;
         }
 
-        public async Task SaveContactsAsync(string userId, IReadOnlyCollection<ContactDTO> contacts)
+        public async Task SaveContactsAsync(string userId, IReadOnlyCollection<PhoneContactDTO> contacts)
         {
             var userContacts = await _contactRepository
             .GetQueryable()
             .AsNoTracking()
             .Where(x => x.UserId == userId)
-            .Select(x => x.PhoneNumber)
+            .Select(x => x.PhoneNumberDigits)
             .ToListAsync()
             .ConfigureAwait(false);
 
             var regex = new Regex(Constants.PhoneNumberCleanupRegex);
-            var newContacts = contacts.Select(x => regex.Replace(x.PhoneNumber, string.Empty)).Where(x=> !userContacts.Contains(x));
+            var newContacts = contacts
+            .Select(x => new { x.Name, PhoneNumber = x.PhoneNumber, PhoneNumberDigits = long.Parse(regex.Replace(x.PhoneNumber, string.Empty)) })
+            .Where(x => !userContacts.Contains(x.PhoneNumberDigits));
             foreach (var number in newContacts)
             {
                 var entity = new Contact
                 {
                     UserId = userId,
-                    PhoneNumber = number
+                    PhoneNumber = number.PhoneNumber,
+                    PhoneNumberDigits = number.PhoneNumberDigits,
+                    Name = number.Name
                 };
 
                 _contactRepository.Save(entity);
