@@ -103,7 +103,7 @@
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%403x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%402x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-referencecase.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-referencecase copy.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
