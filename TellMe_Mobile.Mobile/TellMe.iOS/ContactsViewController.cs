@@ -29,11 +29,16 @@ namespace TellMe.iOS
             this.contactsService = new ContactsService(App.Instance.DataStorage);
             this.TableView.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
             this.TableView.RowHeight = 64;
+            this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             Task.Run(LoadContacts);
         }
 
         private async Task LoadContacts()
         {
+			InvokeOnMainThread(() =>
+			{
+                this.TableView.RefreshControl.BeginRefreshing();
+			});
             var contacts = await contactsService.GetContactsAsync();
             if (contacts.IsSuccess)
             {
@@ -53,8 +58,17 @@ namespace TellMe.iOS
                     if (groups.ContainsKey(false))
                         otherContacts.AddRange(groups[false]);
                 }
-                InvokeOnMainThread(() => TableView.ReloadData());
+                InvokeOnMainThread(() =>
+                {
+                    TableView.ReloadData();
+                    this.TableView.RefreshControl.EndRefreshing();
+                });
             }
+        }
+
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            Task.Run(LoadContacts);
         }
 
         partial void ImportButton_Activated(UIBarButtonItem sender)
