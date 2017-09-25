@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TellMe.Core.DTO
+namespace TellMe.Core.Contracts.DTO
 {
     public class Result
     {

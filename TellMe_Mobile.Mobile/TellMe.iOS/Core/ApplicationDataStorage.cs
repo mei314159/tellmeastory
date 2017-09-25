@@ -1,7 +1,7 @@
-using Foundation;
+﻿using Foundation;
 using Newtonsoft.Json;
 using TellMe.Core.Contracts;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.iOS.Core
 {

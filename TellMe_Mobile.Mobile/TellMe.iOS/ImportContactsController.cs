@@ -1,70 +1,41 @@
-using Foundation;
-using System;
-using UIKit;
-using System.Collections.Generic;
-using Contacts;
-using TellMe.Core.DTO;
-using System.Linq;
+﻿using System;
 using TellMe.Core;
-using TellMe.Core.Services;
-using TellMe.iOS.Extensions;
-using TellMe.Core.Contracts.Providers;
+using TellMe.Core.Contracts.UI.Views;
+using TellMe.Core.Types.BusinessLogic;
+using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Core.Providers;
+using UIKit;
 
 namespace TellMe.iOS
 {
-    public partial class ImportContactsController : UIViewController
+    public partial class ImportContactsController : UIViewController, IImportContactsView
     {
-        private ContactsService contactsService;
-		private IContactsProvider contactsProvider;
-
-		public ImportContactsController(IntPtr handle) : base(handle)
+        private ImportContactsBusinessLogic _businessLogic;
+        public ImportContactsController(IntPtr handle) : base(handle)
         {
         }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
-            this.contactsService = new ContactsService(App.Instance.DataStorage);
-            this.contactsProvider = new ContactsProvider();
+            _businessLogic = new ImportContactsBusinessLogic(App.Instance.Router, new ContactsProvider(), new ContactsService(App.Instance.DataStorage), this);
         }
 
         async partial void ProvideAccessButton_TouchUpInside(UIButton sender)
         {
-            var status = contactsProvider.GetPermissions();
-            if (status == Permissions.Denied
-            || status == Permissions.Restricted)
+            await _businessLogic.SynchronizeContacts();
+        }
+
+        public void ShowErrorMessage(string title, string message = null)
+        {
+            InvokeOnMainThread(() =>
             {
                 UIAlertController alert = UIAlertController
-                .Create("Access denied",
-                        "Please provide an access to your contacts list manually in Settings > Privacy > Contacts",
-                        UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, (obj) =>
-                {
-                }));
+                    .Create(title,
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
                 this.PresentViewController(alert, true, null);
-                return;
-            }
-
-            var contacts = contactsProvider.GetContacts();
-
-            var syncResult = await contactsService.SynchronizeContactsAsync(contacts);
-            if (syncResult.IsValid)
-            {
-                this.View.Window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController());
-            }
-            else{
-				UIAlertController alert = UIAlertController
-				.Create("Error",
-                        syncResult.ErrorsString,
-						UIAlertControllerStyle.Alert);
-				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, (obj) =>
-				{
-				}));
-
-                this.PresentViewController(alert, true, null);
-            }
+            });
         }
     }
 }

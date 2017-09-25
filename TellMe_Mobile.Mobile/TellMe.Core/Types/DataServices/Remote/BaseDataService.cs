@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net;
 using System.Diagnostics;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts;
-using TellMe.Core.Dto;
+using TellMe.Core.Contracts.DTO;
 using System.Collections.Generic;
 
-namespace TellMe.Core.Services
+namespace TellMe.Core.Types.DataServices.Remote
 {
     public class BaseDataService
     {

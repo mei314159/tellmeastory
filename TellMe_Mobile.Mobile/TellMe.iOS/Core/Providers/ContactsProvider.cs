@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Contacts;
 using TellMe.Core.Contracts.Providers;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.iOS.Core.Providers
 {

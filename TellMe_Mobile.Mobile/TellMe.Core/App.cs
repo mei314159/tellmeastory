@@ -1,8 +1,5 @@
 ﻿using System;
 using TellMe.Core.Contracts;
-using TellMe.Core.DTO;
-using TellMe.Core.Services;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core
 {
@@ -15,12 +12,14 @@ namespace TellMe.Core
         {
         }
 
-        public void Initialize(IApplicationDataStorage dataStorage)
+        public void Initialize(IApplicationDataStorage dataStorage, IRouter router)
         {
             DataStorage = dataStorage;
+            Router = router;
         }
 
         public IApplicationDataStorage DataStorage { get; private set; }
+        public IRouter Router { get; set; }
 
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;

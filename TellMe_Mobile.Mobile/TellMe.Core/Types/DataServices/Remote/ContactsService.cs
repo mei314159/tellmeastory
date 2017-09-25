@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 
-namespace TellMe.Core.Services
+namespace TellMe.Core.Types.DataServices.Remote
 {
     public class ContactsService : BaseDataService
     {

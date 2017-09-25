@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace TellMe.Core.Dto
+namespace TellMe.Core.Contracts.DTO
 {
 
     public class ErrorDTO

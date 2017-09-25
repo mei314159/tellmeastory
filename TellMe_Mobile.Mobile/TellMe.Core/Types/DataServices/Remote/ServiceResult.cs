@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using FluentValidation.Results;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Validation;
 
-namespace TellMe.Core.Services
+namespace TellMe.Core.Types.DataServices.Remote
 {
     public class ServiceResult
     {

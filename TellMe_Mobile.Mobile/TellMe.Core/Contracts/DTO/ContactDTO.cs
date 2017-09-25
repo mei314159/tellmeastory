@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TellMe.Core.DTO
+namespace TellMe.Core.Contracts.DTO
 {
     public class ContactDTO
     {

@@ -1,10 +1,10 @@
-using Foundation;
+﻿using Foundation;
 using System;
 using UIKit;
 using TellMe.iOS.Extensions;
 using TellMe.Core;
-using TellMe.Core.Services;
-using TellMe.Core.DTO;
+using TellMe.Core.Types.DataServices.Remote;
+using TellMe.Core.Contracts.DTO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections;

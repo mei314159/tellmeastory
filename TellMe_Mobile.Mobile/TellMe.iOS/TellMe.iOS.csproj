@@ -129,14 +129,6 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="SignInController.cs" />
-    <Compile Include="SignInController.designer.cs">
-      <DependentUpon>SignInController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SignUpController.cs" />
-    <Compile Include="SignUpController.designer.cs">
-      <DependentUpon>SignUpController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\ApplicationDataStorage.cs" />
     <Compile Include="Core\UI\TextInput.cs" />
     <Compile Include="Extensions\ViewExtensions.cs" />
@@ -161,6 +153,7 @@
     <Compile Include="Views\Cells\ContactsListCell.designer.cs">
       <DependentUpon>ContactsListCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\Router.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

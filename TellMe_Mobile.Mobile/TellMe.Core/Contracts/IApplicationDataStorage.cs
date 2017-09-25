@@ -1,4 +1,4 @@
-using TellMe.Core.DTO;
+﻿using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts
 {

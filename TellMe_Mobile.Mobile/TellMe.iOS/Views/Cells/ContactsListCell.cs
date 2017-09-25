@@ -1,7 +1,7 @@
 ﻿using System;
 using Contacts;
 using Foundation;
-using TellMe.Core.DTO;
+using TellMe.Core.Contracts.DTO;
 using UIKit;
 
 namespace TellMe.iOS.Views.Cells

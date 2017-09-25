@@ -20,11 +20,10 @@ namespace TellMe.iOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            App.Instance.Initialize(new ApplicationDataStorage());
-			this.Window = new UIWindow(UIScreen.MainScreen.Bounds);
-			this.Window.RootViewController = GetInitialViewController(launchOptions);
-			this.Window.MakeKeyAndVisible();
-
+            this.Window = new UIWindow(UIScreen.MainScreen.Bounds);
+			App.Instance.Initialize(new ApplicationDataStorage(), new Router(this.Window));
+            this.Window.RootViewController = GetInitialViewController(launchOptions);
+            this.Window.MakeKeyAndVisible();
             return true;
         }
 

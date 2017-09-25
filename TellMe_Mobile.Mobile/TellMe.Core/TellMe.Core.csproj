@@ -5,17 +5,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="DTO\" />
     <Folder Include="Contracts\" />
     <Folder Include="Contracts\UI\" />
     <Folder Include="Contracts\UI\Components\" />
     <Folder Include="Contracts\UI\Views\" />
     <Folder Include="Validation\" />
     <Folder Include="Contracts\Providers\" />
+    <Folder Include="Types\" />
+    <Folder Include="Types\DataServices\" />
+    <Folder Include="Contracts\DTO\" />
+    <Folder Include="Types\DataServices\Local\" />
+    <Folder Include="Types\DataServices\Remote\" />
+    <Folder Include="Types\BusinessLogic\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="FluentValidation" Version="7.1.1" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.4.118" />
   </ItemGroup>
 </Project>
