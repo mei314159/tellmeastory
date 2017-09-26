@@ -16,6 +16,9 @@ namespace TellMe.DAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            builder.Entity<ApplicationUser>().HasMany(x => x.PushNotificationClients).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
+            builder.Entity<Story>().HasOne(x => x.Receiver).WithMany(x => x.ReceivedStories).HasForeignKey(x => x.ReceiverId);
             base.OnModelCreating(builder);
         }
     }

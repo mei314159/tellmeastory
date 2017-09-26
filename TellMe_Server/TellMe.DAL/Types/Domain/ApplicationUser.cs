@@ -8,5 +8,11 @@ namespace TellMe.DAL.Types.Domain
     {
         public long PhoneNumberDigits { get; set; }
         public virtual ICollection<Contact> Contacts { get; set; }
+
+        public virtual ICollection<PushNotificationClient> PushNotificationClients { get; set; }
+
+        public virtual ICollection<Story> SentStories { get; set; }
+
+        public virtual ICollection<Story> ReceivedStories { get; set; }
     }
 }

@@ -58,6 +58,13 @@ namespace TellMe.iOS
             return 2;
         }
 
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var dto = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
+
+
+        }
+
         public override string TitleForHeader(UITableView tableView, nint section)
         {
             return section == 0 ? "App users" : "Other contacts";

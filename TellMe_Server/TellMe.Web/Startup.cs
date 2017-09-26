@@ -22,7 +22,7 @@ using TellMe.DAL.Types.Services;
 using TellMe.Web.DTO;
 using TellMe.DAL.Types.Domain;
 using Microsoft.AspNetCore.Identity;
-
+using Hangfire;
 namespace TellMe.Web
 {
     public class Startup
@@ -60,7 +60,10 @@ namespace TellMe.Web
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IContactService, ContactService>();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
+            services.Configure<PushSettings>(Configuration.GetSection("Push"));
             ConfigureJwtAuthService(services);
+
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
         }
 
@@ -73,9 +76,11 @@ namespace TellMe.Web
             {
                 //app.UseDeveloperExceptionPage();
             }
-
+            app.UseHangfireServer();
             app.UseAuthentication();
             app.UseMvc();
+
+            RecurringJob.AddOrUpdate<PushFeedbackService>(x => x.CheckExpiredTokens(), Cron.Daily);
         }
 
         public void ConfigureJwtAuthService(IServiceCollection services)
