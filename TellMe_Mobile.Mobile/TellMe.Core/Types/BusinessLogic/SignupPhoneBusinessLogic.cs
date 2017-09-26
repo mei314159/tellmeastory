@@ -6,6 +6,7 @@ using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Remote;
+using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
@@ -15,7 +16,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly AccountService _accountService;
         private readonly ISignUpPhoneView _view;
         private readonly IRouter _router;
-		private readonly SignUpPhoneValidator signUpPhoneValidator;
+        private readonly SignUpPhoneValidator signUpPhoneValidator;
         private readonly SignInPhoneValidator signInPhoneValidator;
 
         public SignupPhoneBusinessLogic(IRouter router, AccountService accountService, ISignUpPhoneView view)
@@ -23,7 +24,7 @@ namespace TellMe.Core.Types.BusinessLogic
             _router = router;
             _accountService = accountService;
             _view = view;
-			signUpPhoneValidator = new SignUpPhoneValidator();
+            signUpPhoneValidator = new SignUpPhoneValidator();
             signInPhoneValidator = new SignInPhoneValidator();
         }
 
@@ -56,42 +57,13 @@ namespace TellMe.Core.Types.BusinessLogic
                         }
                     }
                 }
+                else
+                {
+                    result.ShowResultError(this._view);
+                }
             }
 
-            ShowValidationResult(validationResult);
-        }
-
-        private void ShowValidationResult(ValidationResult validationResult)
-        {
-            string message = string.Join(Environment.NewLine, validationResult.Errors.Select(x => x.ErrorMessage));
-            if (!string.IsNullOrWhiteSpace(message))
-            {
-                this._view.ShowErrorMessage("Validation error", message);
-            }
-            else
-            {
-                this._view.ShowErrorMessage("Error");
-            }
-        }
-
-        private void ShowValidationResult(Result result)
-        {
-
-            if (result.ModelState != null)
-            {
-                this._view.ShowErrorMessage("Error", string.Join(Environment.NewLine, result.ModelState.SelectMany(x => x.Value)));
-                return;
-            }
-
-            var authResult = result as Result<AuthenticationInfoDTO, AuthenticationErrorDto>;
-            if (authResult?.Error != null)
-            {
-                this._view.ShowErrorMessage("Error", authResult.Error.ErrorMessage);
-            }
-            else
-            {
-                this._view.ShowErrorMessage("Error", result.ErrorMessage);
-            }
+            validationResult.ShowValidationResult(this._view);
         }
     }
 }

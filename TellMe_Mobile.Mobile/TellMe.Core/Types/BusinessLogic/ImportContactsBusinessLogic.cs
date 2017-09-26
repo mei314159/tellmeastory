@@ -4,6 +4,7 @@ using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.Providers;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Remote;
+using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
@@ -11,9 +12,9 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private IContactsProvider _contactsProvider;
         private IImportContactsView _view;
-        private ContactsService _contactsService;
+        private RemoteContactsDataService _contactsService;
         private IRouter _router;
-        public ImportContactsBusinessLogic(IRouter _router, IContactsProvider _contactsProvider, ContactsService _contactsService, IImportContactsView _view)
+        public ImportContactsBusinessLogic(IRouter _router, IContactsProvider _contactsProvider, RemoteContactsDataService _contactsService, IImportContactsView _view)
         {
 			this._router = _router;
             this._contactsProvider = _contactsProvider;
@@ -33,15 +34,15 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             var contacts = _contactsProvider.GetContacts();
-            var syncResult = await _contactsService.SynchronizeContactsAsync(contacts).ConfigureAwait(false);
-            if (syncResult.IsValid)
+            var result = await _contactsService.SynchronizeContactsAsync(contacts).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
                 _router.NavigateMain();
-            }
-            else
-            {
-                _view.ShowErrorMessage("Error", syncResult.ErrorsString);
-            }
+			}
+			else
+			{
+				result.ShowResultError(this._view);
+			}
         }
     }
 }

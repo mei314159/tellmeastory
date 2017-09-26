@@ -1,7 +1,6 @@
 ﻿namespace TellMe.Core.Contracts.UI.Views
 {
-    public interface IImportContactsView
+    public interface IImportContactsView : IView
     {
-        void ShowErrorMessage(string title, string message = null);
     }
 }

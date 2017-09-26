@@ -17,6 +17,8 @@
     <Folder Include="Types\DataServices\Local\" />
     <Folder Include="Types\DataServices\Remote\" />
     <Folder Include="Types\BusinessLogic\" />
+    <Folder Include="Types\Extensions\" />
+    <Folder Include="Contracts\DataServices\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

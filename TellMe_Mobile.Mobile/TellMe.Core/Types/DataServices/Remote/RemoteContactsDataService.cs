@@ -6,22 +6,21 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
-    public class ContactsService : BaseDataService
+    public class RemoteContactsDataService : BaseDataService
     {
         
-        public ContactsService(IApplicationDataStorage applicationDataStorage) : base(applicationDataStorage)
+        public RemoteContactsDataService(IApplicationDataStorage applicationDataStorage) : base(applicationDataStorage)
         {
         }
 
-        public async Task<ServiceResult> SynchronizeContactsAsync(IReadOnlyCollection<PhoneContactDTO> contacts)
+        public async Task<Result> SynchronizeContactsAsync(IReadOnlyCollection<PhoneContactDTO> contacts)
         {
             var result = await this.PostAsync<List<ContactDTO>>("contacts/synchronize", new SynchronizeContactsDTO
             {
                 Contacts = contacts.ToList()
             }).ConfigureAwait(false);
 
-            var serviceResult = new ServiceResult(null, result);
-            return serviceResult;
+            return result;
         }
 
         public async Task<Result<List<ContactDTO>>> GetContactsAsync()

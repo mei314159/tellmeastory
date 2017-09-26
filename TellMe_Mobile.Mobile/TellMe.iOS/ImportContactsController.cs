@@ -17,7 +17,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            _businessLogic = new ImportContactsBusinessLogic(App.Instance.Router, new ContactsProvider(), new ContactsService(App.Instance.DataStorage), this);
+            _businessLogic = new ImportContactsBusinessLogic(App.Instance.Router, new ContactsProvider(), new RemoteContactsDataService(App.Instance.DataStorage), this);
         }
 
         async partial void ProvideAccessButton_TouchUpInside(UIButton sender)

@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.Collections;
 using TellMe.iOS.Views.Cells;
 using System.Linq;
+using TellMe.Core.Types.BusinessLogic;
+using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.iOS
 {
-    public partial class ContactsViewController : UITableViewController
+    public partial class ContactsViewController : UITableViewController, IContactsView
     {
-        private ContactsService contactsService;
+        private ContactsBusinessLogic businessLogic;
         private List<ContactDTO> appUsers = new List<ContactDTO>();
         private List<ContactDTO> otherContacts = new List<ContactDTO>();
 
@@ -26,49 +28,24 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this.contactsService = new ContactsService(App.Instance.DataStorage);
+            this.businessLogic = new ContactsBusinessLogic(new RemoteContactsDataService(App.Instance.DataStorage), this);
             this.TableView.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
             this.TableView.RowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-            Task.Run(LoadContacts);
+
+            Task.Run(() => LoadContacts(false));
         }
 
-        private async Task LoadContacts()
+        private async Task LoadContacts(bool forceRefresh)
         {
-			InvokeOnMainThread(() =>
-			{
-                this.TableView.RefreshControl.BeginRefreshing();
-			});
-            var contacts = await contactsService.GetContactsAsync();
-            if (contacts.IsSuccess)
-            {
-                var groups = contacts.Data.GroupBy(x => x.IsAppUser)
-                                     .ToDictionary(x => x.Key, x => x.ToList());
-
-                lock (((ICollection)appUsers).SyncRoot)
-                {
-                    appUsers.Clear();
-                    if (groups.ContainsKey(true))
-                        appUsers.AddRange(groups[true]);
-                }
-
-                lock (((ICollection)otherContacts).SyncRoot)
-                {
-                    otherContacts.Clear();
-                    if (groups.ContainsKey(false))
-                        otherContacts.AddRange(groups[false]);
-                }
-                InvokeOnMainThread(() =>
-                {
-                    TableView.ReloadData();
-                    this.TableView.RefreshControl.EndRefreshing();
-                });
-            }
+            InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
+            await businessLogic.LoadContactsAsync(forceRefresh);
+            InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
         }
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            Task.Run(LoadContacts);
+            Task.Run(() => LoadContacts(true));
         }
 
         partial void ImportButton_Activated(UIBarButtonItem sender)
@@ -96,6 +73,43 @@ namespace TellMe.iOS
             var cell = tableView.DequeueReusableCell(ContactsListCell.Key, indexPath) as ContactsListCell;
             cell.Contact = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
             return cell;
+        }
+
+        public void ShowErrorMessage(string title, string message = null)
+        {
+            InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create(title,
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
+                this.PresentViewController(alert, true, null);
+            });
+        }
+
+        public void DisplayContacts(ICollection<ContactDTO> contacts)
+        {
+            var groups = contacts.GroupBy(x => x.IsAppUser)
+                                 .ToDictionary(x => x.Key, x => x.ToList());
+            lock (((ICollection)appUsers).SyncRoot)
+            {
+                appUsers.Clear();
+                if (groups.ContainsKey(true))
+                    appUsers.AddRange(groups[true]);
+            }
+
+            lock (((ICollection)otherContacts).SyncRoot)
+            {
+                otherContacts.Clear();
+                if (groups.ContainsKey(false))
+                    otherContacts.AddRange(groups[false]);
+            }
+
+            InvokeOnMainThread(() =>
+            {
+                TableView.ReloadData();
+            });
         }
     }
 }

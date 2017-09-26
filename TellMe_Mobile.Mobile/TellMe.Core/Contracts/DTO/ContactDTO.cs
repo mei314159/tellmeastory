@@ -2,8 +2,10 @@
 
 namespace TellMe.Core.Contracts.DTO
 {
+    [SQLite.Table("Contacts")]
     public class ContactDTO
     {
+        [SQLite.PrimaryKey]
         public string Id { get; set; }
 
         public string PhoneNumber { get; set; }
