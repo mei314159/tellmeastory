@@ -14,7 +14,7 @@ namespace TellMe.iOS
 
         partial void SignOutButton_TouchUpInside(UIButton sender)
         {
-            App.Instance.DataStorage.AuthInfo = null;
+            App.Instance.AuthInfo = null;
             var initialController = UIStoryboard
                 .FromName("Auth", null).InstantiateInitialViewController();
             View.Window.SwapController(initialController);

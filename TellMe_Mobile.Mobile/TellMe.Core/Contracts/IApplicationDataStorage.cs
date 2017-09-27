@@ -4,8 +4,16 @@ namespace TellMe.Core.Contracts
 {
     public interface IApplicationDataStorage
     {
-        AuthenticationInfoDTO AuthInfo { get; set; }
+        OsType OsType { get; }
+
+        string AppVersion { get; }
+
         T Get<T>(string key);
-        void Set<T>(string key, T result) where T : class;
+
+        bool GetBool(string key);
+
+        void Set<T>(string key, T value) where T : class;
+
+        void SetBool(string key, bool value);
     }
 }

@@ -5,6 +5,7 @@ using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core;
 using TellMe.Core.Types.BusinessLogic;
+using TellMe.Core.Types.DataServices.Local;
 
 namespace TellMe.iOS
 {
@@ -23,7 +24,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this._businessLogic = new SignupPhoneBusinessLogic(App.Instance.Router, new AccountService(App.Instance.DataStorage), this);
+            this._businessLogic = new SignupPhoneBusinessLogic(App.Instance.Router, new RemoteAccountDataService(), new AccountService(), this);
         }
 
         async partial void ContinueButton_TouchUpInside(UIButton sender)

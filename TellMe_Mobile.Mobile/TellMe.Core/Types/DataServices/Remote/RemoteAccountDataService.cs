@@ -2,33 +2,13 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Net;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
-    public class AccountService : BaseDataService
+    public class RemoteAccountDataService : BaseDataService
     {
-        public AccountService(IApplicationDataStorage applicationDataStorage) : base(applicationDataStorage)
-        {
-        }
-
-        public AuthenticationInfoDTO AuthInfo
-        {
-            get { return this.ApplicationDataStorage.AuthInfo; }
-        }
-
-        public event Action<AuthenticationInfoDTO> Authenticated;
-
-        public bool IsAuthenticated()
-        {
-            return this.ApplicationDataStorage.AuthInfo != null && (DateTime.Now - this.ApplicationDataStorage.AuthInfo.AuthDate).TotalSeconds < this.ApplicationDataStorage.AuthInfo.ExpiresIn;
-        }
-
         public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInPhoneAsync(string phoneNumber, string confirmationCode)
         {
             var data = new Dictionary<string, string>();
@@ -55,11 +35,6 @@ namespace TellMe.Core.Types.DataServices.Remote
         {
             var result = await this.PostAsync<object>("account/signup-phone", dto, true).ConfigureAwait(false);
             return result;
-        }
-
-        public void SignOut()
-        {
-            this.ApplicationDataStorage.AuthInfo = null;
         }
     }
 }

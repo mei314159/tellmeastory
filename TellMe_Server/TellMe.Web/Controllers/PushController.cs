@@ -8,6 +8,7 @@ using TellMe.Web.DTO;
 
 namespace TellMe.Web.Controllers
 {
+    [Route("api/push")]
     public class PushController : AuthorizedController
     {
         private readonly IPushNotificationsService _pushNotificationService;

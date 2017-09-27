@@ -5,62 +5,49 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.iOS.Core
 {
-	public class ApplicationDataStorage : IApplicationDataStorage
-	{
-		public AuthenticationInfoDTO AuthInfo
-		{
-			get
-			{
-				var data = NSUserDefaults.StandardUserDefaults.StringForKey(nameof(IApplicationDataStorage.AuthInfo));
+    public class ApplicationDataStorage : IApplicationDataStorage
+    {
+        public OsType OsType => OsType.iOS;
 
-				if (!string.IsNullOrWhiteSpace(data))
-				{
-					var result = JsonConvert.DeserializeObject<AuthenticationInfoDTO>(data);
-					return result;
-				}
+        public string AppVersion => NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
 
-				return null;
-			}
-			set
-			{
-				if (value == null)
-				{
-					NSUserDefaults.StandardUserDefaults.RemoveObject(nameof(IApplicationDataStorage.AuthInfo));
-				}
-				else
-				{
-					var data = JsonConvert.SerializeObject(value);
-					NSUserDefaults.StandardUserDefaults.SetString(data, nameof(IApplicationDataStorage.AuthInfo));
-					NSUserDefaults.StandardUserDefaults.Synchronize();
-				}
-			}
-		}
+        public T Get<T>(string key)
+        {
+            var data = NSUserDefaults.StandardUserDefaults.StringForKey(key);
 
-		public T Get<T>(string key)
-		{
-			var data = NSUserDefaults.StandardUserDefaults.StringForKey(key);
+            if (!string.IsNullOrWhiteSpace(data))
+            {
+                var result = JsonConvert.DeserializeObject<T>(data);
+                return result;
+            }
 
-			if (!string.IsNullOrWhiteSpace(data))
-			{
-				var result = JsonConvert.DeserializeObject<T>(data);
-				return result;
-			}
+            return default(T);
+        }
 
-			return default(T);
-		}
+        public void Set<T>(string key, T value) where T : class
+        {
+            if (value == null)
+            {
+                NSUserDefaults.StandardUserDefaults.RemoveObject(key);
+            }
+            else
+            {
+                var data = JsonConvert.SerializeObject(value);
+                NSUserDefaults.StandardUserDefaults.SetString(data, key);
+                NSUserDefaults.StandardUserDefaults.Synchronize();
+            }
+        }
 
-		public void Set<T>(string key, T value) where T : class
-		{
-			if (value == null)
-			{
-				NSUserDefaults.StandardUserDefaults.RemoveObject(key);
-			}
-			else
-			{
-				var data = JsonConvert.SerializeObject(value);
-				NSUserDefaults.StandardUserDefaults.SetString(data, key);
-				NSUserDefaults.StandardUserDefaults.Synchronize();
-			}
-		}
-	}
+
+        public bool GetBool(string key)
+        {
+            return NSUserDefaults.StandardUserDefaults.BoolForKey(key);
+        }
+
+        public void SetBool(string key, bool value)
+        {
+            NSUserDefaults.StandardUserDefaults.SetBool(value, key);
+            NSUserDefaults.StandardUserDefaults.Synchronize();
+        }
+    }
 }

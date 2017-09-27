@@ -129,6 +129,7 @@
     <Folder Include="Core\Providers\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Cells\" />
+    <Folder Include="Core\DTO\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -173,6 +174,9 @@
     <Compile Include="ContactDetailsViewController.designer.cs">
       <DependentUpon>ContactDetailsViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\DTO\PushNotification.cs" />
+    <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
+    <Compile Include="Core\DTO\IosNotificationAPS.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

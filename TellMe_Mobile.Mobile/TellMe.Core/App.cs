@@ -1,10 +1,15 @@
 ﻿using System;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Types.DataServices.Local;
 
 namespace TellMe.Core
 {
     public sealed class App
     {
+		private AccountService _localAccountService;
+        private IApplicationDataStorage _dataStorage;
+
         private static readonly Lazy<App> lazy = new Lazy<App>(() => new App());
         public static App Instance => lazy.Value;
 
@@ -12,14 +17,32 @@ namespace TellMe.Core
         {
         }
 
-        public void Initialize(IApplicationDataStorage dataStorage, IRouter router)
+        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router)
         {
-            DataStorage = dataStorage;
+            _localAccountService = localAccountService;
+            _dataStorage = dataStorage;
             Router = router;
         }
 
-        public IApplicationDataStorage DataStorage { get; private set; }
+
+
         public IRouter Router { get; set; }
+
+        public OsType OsType => _dataStorage.OsType;
+
+        public string AppVersion => _dataStorage.AppVersion;
+
+        public AuthenticationInfoDTO AuthInfo
+        {
+            get
+            {
+                return _localAccountService.GetAuthInfo();
+            }
+            set
+            {
+                _localAccountService.SaveAuthInfo(value);
+            }
+        }
 
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;
@@ -30,9 +53,9 @@ namespace TellMe.Core
             OnException?.Invoke(ex);
         }
 
-		public void LogNetworkException(Exception ex)
-		{
+        public void LogNetworkException(Exception ex)
+        {
             OnNetworkException?.Invoke(ex);
-		}
+        }
     }
 }

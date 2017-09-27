@@ -28,7 +28,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this.businessLogic = new ContactsBusinessLogic(new RemoteContactsDataService(App.Instance.DataStorage), this);
+            this.businessLogic = new ContactsBusinessLogic(new RemoteContactsDataService(), this);
             this.TableView.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
             this.TableView.RowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;

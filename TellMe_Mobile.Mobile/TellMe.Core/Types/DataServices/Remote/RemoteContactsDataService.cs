@@ -8,11 +8,6 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteContactsDataService : BaseDataService
     {
-        
-        public RemoteContactsDataService(IApplicationDataStorage applicationDataStorage) : base(applicationDataStorage)
-        {
-        }
-
         public async Task<Result> SynchronizeContactsAsync(IReadOnlyCollection<PhoneContactDTO> contacts)
         {
             var result = await this.PostAsync<List<ContactDTO>>("contacts/synchronize", new SynchronizeContactsDTO
