@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Foundation;
 using Newtonsoft.Json;
 using TellMe.Core;
@@ -15,7 +16,7 @@ namespace TellMe.iOS
     // The UIApplicationDelegate for the application. This class is responsible for launching the
     // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
     [Register("AppDelegate")]
-    public class AppDelegate : UIApplicationDelegate
+    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
         // class-level declarations
 
@@ -49,6 +50,7 @@ namespace TellMe.iOS
                 }
             }
 
+            UNUserNotificationCenter.Current.Delegate = this;
             return true;
         }
 
@@ -93,7 +95,13 @@ namespace TellMe.iOS
             }
         }
 
-        public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+		[Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
+		public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+		{
+			completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound);
+		}
+
+		public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
         {
             ProcessNotification(userInfo, application.ApplicationState == UIApplicationState.Active);
         }

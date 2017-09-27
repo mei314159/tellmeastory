@@ -36,7 +36,7 @@ namespace TellMe.DAL.Types.Repositories
         {
             if (Equals(entity.Id, default(TKey)))
             {
-                Set.AddAsync(entity);
+                Set.Add(entity);
             }
             else
             {

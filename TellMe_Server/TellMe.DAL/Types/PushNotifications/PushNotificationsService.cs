@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using PushSharp.Apple;
 using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.DTO;
+using TellMe.DAL.Contracts.PushNotification;
 using TellMe.DAL.Contracts.Repositories;
 using TellMe.DAL.Types.Domain;
 using TellMe.DAL.Types.PushNotifications;
@@ -16,7 +17,7 @@ using TellMe.DAL.Types.Repositories;
 
 namespace TellMe.DAL.Types.Services
 {
-    public class PushNotificationsService
+    public class PushNotificationsService : IPushNotificationsService
     {
         private readonly IRepository<ApplicationUser, string> _applicationUserRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
@@ -34,20 +35,23 @@ namespace TellMe.DAL.Types.Services
 
         public async Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId, string appVersion)
         {
-            var user = await _applicationUserRepository.GetQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId).ConfigureAwait(false);
             PushNotificationClient deviceToken = null;
             if (oldToken != null)
             {
-                deviceToken = user.PushNotificationClients.FirstOrDefault(a => a.OsType == osType && a.Token.ToUpper() == oldToken.ToUpper());
+                deviceToken = await _pushTokenRepository
+                .GetQueryable()
+                .FirstOrDefaultAsync(a => a.UserId == userId && a.OsType == osType && a.Token.ToUpper() == oldToken.ToUpper())
+                .ConfigureAwait(false);
             }
 
             if (deviceToken == null)
             {
-                user.PushNotificationClients.Add(new PushNotificationClient
+                _pushTokenRepository.Save(new PushNotificationClient
                 {
                     OsType = osType,
                     Token = token,
-                    AppVersion = appVersion
+                    AppVersion = appVersion,
+                    UserId = userId
                 });
             }
             else
@@ -56,7 +60,7 @@ namespace TellMe.DAL.Types.Services
                 deviceToken.AppVersion = appVersion;
             }
 
-            _applicationUserRepository.PreCommitSave();
+            _pushTokenRepository.PreCommitSave();
         }
 
         public async Task SendStoryRequestPushNotificationAsync(StoryDTO story, string senderName)

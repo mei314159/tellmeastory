@@ -23,6 +23,8 @@ using TellMe.Web.DTO;
 using TellMe.DAL.Types.Domain;
 using Microsoft.AspNetCore.Identity;
 using Hangfire;
+using TellMe.DAL.Contracts.PushNotification;
+
 namespace TellMe.Web
 {
     public class Startup
@@ -59,6 +61,7 @@ namespace TellMe.Web
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
             ConfigureJwtAuthService(services);

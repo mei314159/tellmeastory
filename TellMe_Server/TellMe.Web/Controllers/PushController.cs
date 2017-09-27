@@ -22,8 +22,8 @@ namespace TellMe.Web.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> RegisterToken(PushTokenDTO dto)
+        [HttpPost("register-token")]
+        public async Task<IActionResult> RegisterToken([FromBody] PushTokenDTO dto)
         {
             await this._pushNotificationService.RegisterPushTokenAsync(dto.Token, dto.OldToken, dto.OsType, this.UserId, dto.AppVersion);
             return this.Ok();
