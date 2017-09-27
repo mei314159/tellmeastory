@@ -5,6 +5,6 @@ namespace TellMe.DAL.Contracts.Services
 {
     public interface IStoryService : IService
     {
-        Task RequestStoryAsync(string userId, StoryRequestDTO dto);
+        Task RequestStoryAsync(string senderId, StoryRequestDTO dto);
     }
 }

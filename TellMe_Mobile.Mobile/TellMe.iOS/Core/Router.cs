@@ -31,7 +31,8 @@ namespace TellMe.iOS.Core
             {
                 var controller = (ContactDetailsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactDetailsViewController");
                 controller.ContactDTO = dto;
-                this.window.FindVisibleViewController().PresentViewController(controller, true, null);
+                var visibleController = this.window.FindVisibleViewController();
+                visibleController.PresentViewController(controller, true, null);
             });
         }
     }

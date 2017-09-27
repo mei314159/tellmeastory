@@ -36,7 +36,7 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 Title = title,
                 Description = description,
-                ReceiverId = _view.ContactDTO.Id
+                ReceiverId = _view.ContactDTO.UserId
             };
 
             var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);

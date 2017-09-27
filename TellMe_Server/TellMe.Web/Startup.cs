@@ -24,6 +24,7 @@ using TellMe.DAL.Types.Domain;
 using Microsoft.AspNetCore.Identity;
 using Hangfire;
 using TellMe.DAL.Contracts.PushNotification;
+using TellMe.Web.AutoMapper;
 
 namespace TellMe.Web
 {
@@ -33,12 +34,15 @@ namespace TellMe.Web
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
+                .AddEnvironmentVariables()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-            builder.AddEnvironmentVariables();
+            Environment = env;
             Configuration = builder.Build();
+            AutomapperConfig.Initialize();
         }
 
+        public IHostingEnvironment Environment { get; }
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -63,6 +67,7 @@ namespace TellMe.Web
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
+            services.AddSingleton<IHostingEnvironment>(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
             ConfigureJwtAuthService(services);

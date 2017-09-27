@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -23,14 +25,18 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
         private readonly PushSettings _pushSettings;
 
+        private readonly IHostingEnvironment _environment;
+
         public PushNotificationsService(
             IRepository<ApplicationUser, string> applicationUserRepository,
             IRepository<PushNotificationClient, int> pushTokenRepository,
-            IOptions<PushSettings> pushSettings)
+            IOptions<PushSettings> pushSettings,
+            IHostingEnvironment environment)
         {
             _applicationUserRepository = applicationUserRepository;
             _pushTokenRepository = pushTokenRepository;
-            this._pushSettings = pushSettings.Value;
+            _pushSettings = pushSettings.Value;
+            _environment = environment;
         }
 
         public async Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId, string appVersion)
@@ -96,7 +102,7 @@ namespace TellMe.DAL.Types.Services
             var environment = _pushSettings.IsProductionMode
                                ? ApnsConfiguration.ApnsServerEnvironment.Production
                                : ApnsConfiguration.ApnsServerEnvironment.Sandbox;
-            var config = new ApnsConfiguration(environment, _pushSettings.Certificate, _pushSettings.Password);
+            var config = new ApnsConfiguration(environment, Path.Combine(_environment.ContentRootPath, _pushSettings.Certificate), _pushSettings.Password);
             return config;
         }
 

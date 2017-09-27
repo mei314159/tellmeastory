@@ -16,29 +16,48 @@ namespace TellMe.DAL.Types.Services
     public class StoryService : IStoryService
     {
         private readonly IRepository<Story, int> _storyRepository;
+        private readonly IRepository<Contact, int> _contactRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+
         private readonly IPushNotificationsService _pushNotificationsService;
         public StoryService(
             IRepository<Story, int> storyRepository,
+            IRepository<Contact, int> contactRepository,
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService)
         {
             _storyRepository = storyRepository;
+            _contactRepository = contactRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
         }
 
-        public async Task RequestStoryAsync(string userId, StoryRequestDTO dto)
+        public async Task RequestStoryAsync(string senderId, StoryRequestDTO dto)
         {
-            var user = await _userRepository.GetQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId).ConfigureAwait(false);
+            string senderName;
+            var user = await _userRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == senderId)
+            .ConfigureAwait(false);
+
+            var contact = await _contactRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x =>
+                    x.UserId == dto.ReceiverId
+                    && x.PhoneNumberDigits == user.PhoneNumberDigits)
+            .ConfigureAwait(false);
+
+            senderName = contact?.Name ?? user.PhoneNumber;
             var entity = Mapper.Map<Story>(dto);
-            entity.SenderId = userId;
+            entity.SenderId = senderId;
             entity.RequestDateUtc = DateTime.UtcNow;
             entity.Status = StoryStatus.Requested;
             _storyRepository.Save(entity, true);
 
             var storyDTO = Mapper.Map<StoryDTO>(entity);
-            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTO, user.UserName).ConfigureAwait(false);
+            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTO, senderName).ConfigureAwait(false);
         }
     }
 }
