@@ -24,8 +24,6 @@ namespace TellMe.Core
             Router = router;
         }
 
-
-
         public IRouter Router { get; set; }
 
         public OsType OsType => _dataStorage.OsType;

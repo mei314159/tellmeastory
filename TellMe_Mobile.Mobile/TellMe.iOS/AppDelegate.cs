@@ -1,4 +1,5 @@
-﻿using Foundation;
+﻿using System.Threading.Tasks;
+using Foundation;
 using Newtonsoft.Json;
 using TellMe.Core;
 using TellMe.Core.Types.BusinessLogic;
@@ -7,6 +8,7 @@ using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.DTO;
 using UIKit;
+using UserNotifications;
 
 namespace TellMe.iOS
 {
@@ -22,6 +24,7 @@ namespace TellMe.iOS
             get;
             set;
         }
+
         public AccountBusinessLogic AccountBusinessLogic { get; private set; }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
@@ -80,13 +83,13 @@ namespace TellMe.iOS
             // Called when the application is about to terminate. Save data, if needed. See also DidEnterBackground.
         }
 
-        public override async void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+        public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
             // Get current device token
             var newDeviceToken = deviceToken.Description?.Trim('<').Trim('>').Replace(" ", string.Empty);
             if (!string.IsNullOrWhiteSpace(newDeviceToken))
             {
-                await this.AccountBusinessLogic.RegisteredForRemoteNotificationsAsync(newDeviceToken);
+                Task.Run(() => this.AccountBusinessLogic.RegisteredForRemoteNotificationsAsync(newDeviceToken));
             }
         }
 
@@ -95,45 +98,44 @@ namespace TellMe.iOS
             ProcessNotification(userInfo, application.ApplicationState == UIApplicationState.Active);
         }
 
-        //public static void CheckPushNotificationsPermissions()
-        //{
-        //    if (this.PushBusinessLogic.PushIsEnabled)
-        //    {
-        //        RegisterPushNotifications();
-        //    }
-        //    else
-        //    {
-        //        UIAlertController alert = UIAlertController.Create(
-        //                                    "Enable push notifications",
-        //            "Do you want to get notified about unread messages?",
-        //            UIAlertControllerStyle.Alert);
-        //        alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-        //        alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default, (e) =>
-        //        {
-        //            App.Instance.DataStorage.PushIsEnabled = true;
-
-        //            RegisterPushNotifications();
-
-        //        }));
-
-        //        UIApplication
-        //            .SharedApplication
-        //            .KeyWindow
-        //            .RootViewController
-        //            .PresentViewController(alert, true, null);
-        //    }
-        //}
-
-        private static void RegisterPushNotifications()
+        public void CheckPushNotificationsPermissions()
         {
-            var pushSettings = UIUserNotificationSettings
-                                        .GetSettingsForTypes(
-                                            UIUserNotificationType.Alert |
-                                            UIUserNotificationType.Badge |
-                                            UIUserNotificationType.Sound, new NSSet());
+            if (this.AccountBusinessLogic.PushIsEnabled)
+            {
+                RegisterPushNotifications();
+            }
+            else
+            {
+                UIAlertController alert = UIAlertController.Create(
+                                            "Enable push notifications",
+                    "Do you want to get notified about unread messages?",
+                    UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default, (e) =>
+                {
+                    this.AccountBusinessLogic.PushIsEnabled = true;
 
-            UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
-            UIApplication.SharedApplication.RegisterForRemoteNotifications();
+                    RegisterPushNotifications();
+
+                }));
+
+                UIApplication
+                    .SharedApplication
+                    .KeyWindow
+                    .RootViewController
+                    .PresentViewController(alert, true, null);
+            }
+        }
+
+        private void RegisterPushNotifications()
+        {
+            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound | UNAuthorizationOptions.Badge, (granted, error) =>
+            {
+                if (granted)
+                {
+                    this.InvokeOnMainThread(() => UIApplication.SharedApplication.RegisterForRemoteNotifications());
+                }
+            });
         }
 
         private void ProcessNotification(NSDictionary userInfo, bool quiet = true)

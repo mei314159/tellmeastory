@@ -10,6 +10,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private const string PushTokenKey = "PushToken";
         private const string OldPushTokenKey = "OldPushToken";
         private const string PushTokenSentToBackendKey = "PushTokenSentToBackend";
+        private const string PushIsEnabledKey = "PushIsEnabled";
 
 
         private readonly IApplicationDataStorage _appDataStorage;
@@ -24,6 +25,18 @@ namespace TellMe.Core.Types.BusinessLogic
         }
 
         public bool IsAuthenticated => _accountService.GetAuthInfo() != null;
+
+        public bool PushIsEnabled
+        {
+            get
+            {
+                return _appDataStorage.GetBool(PushIsEnabledKey);
+            }
+            set
+            {
+                _appDataStorage.SetBool(PushIsEnabledKey, value);
+            }
+        }
 
         public async Task RegisteredForRemoteNotificationsAsync(string pushToken)
         {
@@ -45,7 +58,7 @@ namespace TellMe.Core.Types.BusinessLogic
             string pushToken = _appDataStorage.Get<string>(PushTokenKey);
             if (!string.IsNullOrWhiteSpace(pushToken) && this.IsAuthenticated && !_appDataStorage.GetBool(PushTokenSentToBackendKey))
             {
-				string oldDeviceToken = _appDataStorage.Get<string>(OldPushTokenKey);
+                string oldDeviceToken = _appDataStorage.Get<string>(OldPushTokenKey);
                 var result = await _remotePushDataService.RegisterAsync(oldDeviceToken, pushToken).ConfigureAwait(false);
                 _appDataStorage.SetBool(PushTokenSentToBackendKey, result.IsSuccess);
             }

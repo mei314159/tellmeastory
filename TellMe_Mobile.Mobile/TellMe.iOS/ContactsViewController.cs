@@ -34,6 +34,8 @@ namespace TellMe.iOS
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
 
             Task.Run(() => LoadContacts(false));
+
+            ((AppDelegate) UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
         }
 
         private async Task LoadContacts(bool forceRefresh)
