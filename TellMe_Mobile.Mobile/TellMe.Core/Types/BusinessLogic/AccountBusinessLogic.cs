@@ -48,9 +48,9 @@ namespace TellMe.Core.Types.BusinessLogic
                 _appDataStorage.SetBool(PushTokenSentToBackendKey, false);
                 _appDataStorage.Set(OldPushTokenKey, oldDeviceToken);
                 _appDataStorage.Set(PushTokenKey, pushToken);
-
-                await SyncPushTokenAsync().ConfigureAwait(false);
             }
+
+			await SyncPushTokenAsync().ConfigureAwait(false);
         }
 
         public async Task SyncPushTokenAsync()

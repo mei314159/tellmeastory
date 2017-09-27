@@ -179,7 +179,8 @@ namespace TellMe.Core.Types.DataServices.Remote
                     return new Result<TResult, TErrorResult>
                     {
                         IsSuccess = false,
-                        Error = error
+                        Error = error,
+                        ErrorMessage = response.ReasonPhrase
                     };
 
                 }
