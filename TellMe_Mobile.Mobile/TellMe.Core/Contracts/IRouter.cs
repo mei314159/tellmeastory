@@ -1,4 +1,6 @@
 ﻿using System;
+using TellMe.Core.Contracts.DTO;
+
 namespace TellMe.Core.Contracts
 {
     public interface IRouter
@@ -6,5 +8,6 @@ namespace TellMe.Core.Contracts
         void NavigateImportContacts();
 
         void NavigateMain();
+        void NavigateContactDetails(ContactDTO dto);
     }
 }

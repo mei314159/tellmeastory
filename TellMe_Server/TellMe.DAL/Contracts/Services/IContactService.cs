@@ -10,5 +10,5 @@ namespace TellMe.DAL.Contracts.Services
         Task<ICollection<ContactDTO>> GetAllAsync(string userId);
 
         Task SaveContactsAsync(string userId, IReadOnlyCollection<PhoneContactDTO> contacts);
-    }    
+    }
 }

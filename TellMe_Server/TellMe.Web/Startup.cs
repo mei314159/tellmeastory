@@ -61,6 +61,7 @@ namespace TellMe.Web
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IContactService, ContactService>();
+            services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));

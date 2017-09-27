@@ -6,7 +6,7 @@ namespace TellMe.DAL.Types.Domain
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime CreateDateUtc { get; set; }
+        public DateTime RequestDateUtc { get; set; }
         public DateTime UpdateDateUtc { get; set; }
         public StoryStatus Status { get; set; }
         public string SenderId { get; set; }

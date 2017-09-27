@@ -149,7 +149,7 @@
         </scene>
         <scene sceneID="1770">
             <objects>
-                <viewController id="1771" sceneMemberID="viewController" customClass="ContactDetailsViewController">
+                <viewController id="1771" sceneMemberID="viewController" customClass="ContactDetailsViewController" storyboardIdentifier="ContactDetailsViewController" useStoryboardIdentifierAsRestorationIdentifier="YES">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="1768"/>
                         <viewControllerLayoutGuide type="bottom" id="1769"/>
