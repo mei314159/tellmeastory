@@ -1,4 +1,5 @@
-﻿using TellMe.Core.Contracts.DTO;
+﻿using System.Collections.Generic;
+using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
@@ -9,5 +10,6 @@ namespace TellMe.Core.Contracts.UI.Views
         void DisplayContactDetails(ContactDTO dto);
         void DisplayStoryDetailsPrompt();
         void ShowSuccessMessage(string message);
+        void DisplayStories(ICollection<StoryDTO> stories);
     }
 }

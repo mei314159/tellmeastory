@@ -12,5 +12,11 @@ namespace TellMe.Core.Types.DataServices.Remote
 
             return result;
         }
+
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId)
+		{
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/{userId}").ConfigureAwait(false);
+			return result;
+		}
     }
 }

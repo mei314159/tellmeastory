@@ -1,5 +1,6 @@
 ﻿using System;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.Core.Contracts
 {
@@ -8,6 +9,6 @@ namespace TellMe.Core.Contracts
         void NavigateImportContacts();
 
         void NavigateMain();
-        void NavigateContactDetails(ContactDTO dto);
+        void NavigateContactDetails(IView view, ContactDTO dto);
     }
 }

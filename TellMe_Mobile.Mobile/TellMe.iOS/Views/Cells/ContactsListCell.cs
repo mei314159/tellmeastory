@@ -20,8 +20,8 @@ namespace TellMe.iOS.Views.Cells
         {
             // Note: this .ctor should not contain any initialization logic.
         }
-        ContactDTO contact;
 
+        ContactDTO contact;
         public ContactDTO Contact
         {
             get

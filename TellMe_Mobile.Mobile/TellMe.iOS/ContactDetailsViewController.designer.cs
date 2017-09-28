@@ -22,6 +22,10 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton RequestStoryButton { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITableView StoriesTableView { get; set; }
+
         [Action ("RequestStoryButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void RequestStoryButton_TouchUpInside (UIKit.UIButton sender);
@@ -36,6 +40,11 @@ namespace TellMe.iOS
             if (RequestStoryButton != null) {
                 RequestStoryButton.Dispose ();
                 RequestStoryButton = null;
+            }
+
+            if (StoriesTableView != null) {
+                StoriesTableView.Dispose ();
+                StoriesTableView = null;
             }
         }
     }

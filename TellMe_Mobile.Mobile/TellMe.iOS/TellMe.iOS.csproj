@@ -137,6 +137,7 @@
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
     <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -178,6 +179,10 @@
     <Compile Include="Core\DTO\PushNotification.cs" />
     <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
     <Compile Include="Core\DTO\IosNotificationAPS.cs" />
+    <Compile Include="Views\Cells\StoriesListCell.cs" />
+    <Compile Include="Views\Cells\StoriesListCell.designer.cs">
+      <DependentUpon>StoriesListCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

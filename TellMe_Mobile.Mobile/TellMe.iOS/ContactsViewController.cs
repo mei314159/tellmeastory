@@ -63,7 +63,8 @@ namespace TellMe.iOS
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var dto = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
-            businessLogic.ContactSelected(dto);
+            if (dto.IsAppUser)
+                businessLogic.ContactSelected(dto);
         }
 
         public override string TitleForHeader(UITableView tableView, nint section)

@@ -2,6 +2,7 @@
 {
     public class StoryRequestDTO
     {
+        [SQLite.PrimaryKey]
         public int Id { get; set; }
 
         public string Title { get; set; }

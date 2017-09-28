@@ -57,7 +57,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ContactSelected(ContactDTO dto)
         {
-            this._router.NavigateContactDetails(dto);
+            this._router.NavigateContactDetails(this._view, dto);
         }
     }
 }

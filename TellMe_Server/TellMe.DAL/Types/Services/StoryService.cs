@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using AutoMapper;
 using TellMe.DAL.Contracts.PushNotification;
 using System;
+using AutoMapper.QueryableExtensions;
 
 namespace TellMe.DAL.Types.Services
 {
@@ -30,6 +31,19 @@ namespace TellMe.DAL.Types.Services
             _contactRepository = contactRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
+        }
+
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, string userId)
+        {
+            var stories = await _storyRepository
+                            .GetQueryable()
+                            .AsNoTracking()
+                            .Where(x => (x.SenderId == currentUserId && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == currentUserId))
+                            .ProjectTo<StoryDTO>()
+                            .ToListAsync()
+                            .ConfigureAwait(false);
+
+            return stories;
         }
 
         public async Task RequestStoryAsync(string senderId, StoryRequestDTO dto)

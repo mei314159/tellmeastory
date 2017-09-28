@@ -1,9 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
+using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
@@ -11,18 +14,45 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private RemoteStoriesDataService _remoteStoriesService;
         private LocalContactsDataService _localContactsService;
+        private LocalStoriesDataService _localStoriesService;
         private IContactDetailsView _view;
+        private StoryRequestValidator _validator;
 
         public ContactDetailsBusinessLogic(RemoteStoriesDataService remoteStoriesService, IContactDetailsView view)
         {
             _remoteStoriesService = remoteStoriesService;
             _localContactsService = new LocalContactsDataService();
+            _localStoriesService = new LocalStoriesDataService();
             _view = view;
+            _validator = new StoryRequestValidator();
         }
 
-        public void LoadContactDetails()
+        public async Task LoadContactDetails(bool forceRefresh = false)
         {
             this._view.DisplayContactDetails(_view.ContactDTO);
+
+            ICollection<StoryDTO> stories;
+            var localContacts = await _localStoriesService.GetAllAsync(this._view.ContactDTO.UserId).ConfigureAwait(false);
+            if (localContacts.Expired || forceRefresh)
+            {
+                var result = await _remoteStoriesService.GetStoriesAsync(this._view.ContactDTO.UserId);
+                if (result.IsSuccess)
+                {
+                    await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
+                    stories = result.Data;
+                }
+                else
+                {
+                    result.ShowResultError(this._view);
+                    return;
+                }
+            }
+            else
+            {
+                stories = localContacts.Data;
+            }
+
+            this._view.DisplayStories(stories.OrderByDescending(x => x.RequestDateUtc).ToList());
         }
 
         public void RequestStory()
@@ -32,6 +62,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task RequestStoryAsync(string title, string description)
         {
+
             var dto = new StoryRequestDTO
             {
                 Title = title,
@@ -39,14 +70,22 @@ namespace TellMe.Core.Types.BusinessLogic
                 ReceiverId = _view.ContactDTO.UserId
             };
 
-            var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);
-            if (result.IsSuccess)
+            var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
+            if (validationResult.IsValid)
             {
-                _view.ShowSuccessMessage("Story requested.");
+                var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    _view.ShowSuccessMessage("Story requested.");
+                }
+                else
+                {
+                    result.ShowResultError(this._view);
+                }
             }
             else
             {
-                result.ShowResultError(this._view);
+                validationResult.ShowValidationResult(this._view);
             }
         }
     }

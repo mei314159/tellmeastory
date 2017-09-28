@@ -26,11 +26,11 @@ namespace TellMe.Web.Controllers
             return Ok();
         }
 
-        // [HttpGet("")]
-        // public async Task<IActionResult> GetContactsAsync()
-        // {
-        //     var contacts = await _contactsService.GetAllAsync(this.UserId);
-        //     return Ok(contacts);
-        // }
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetStoriesAsync(string userId)
+        {
+            var stories = await _storyService.GetAllAsync(this.UserId, userId);
+            return Ok(stories);
+        }
     }
 }

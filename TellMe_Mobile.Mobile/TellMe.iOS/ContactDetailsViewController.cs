@@ -4,12 +4,18 @@ using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Remote;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections;
+using Foundation;
+using TellMe.iOS.Views.Cells;
 
 namespace TellMe.iOS
 {
-    public partial class ContactDetailsViewController : UIViewController, IContactDetailsView
+    public partial class ContactDetailsViewController : UIViewController, IUITableViewDataSource, IContactDetailsView
     {
         private ContactDetailsBusinessLogic businessLogic;
+        private List<StoryDTO> storiesList = new List<StoryDTO>();
 
         public ContactDetailsViewController(IntPtr handle) : base(handle)
         {
@@ -21,13 +27,16 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
             this.businessLogic = new ContactDetailsBusinessLogic(new RemoteStoriesDataService(), this);
-            LoadContactDetails();
+			this.StoriesTableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
+			this.StoriesTableView.RowHeight = 64;
+            this.StoriesTableView.DataSource = this;
+            Task.Run(() => LoadContactDetails(false));
         }
 
-        private void LoadContactDetails()
+        private async Task LoadContactDetails(bool forceRefresh)
         {
             // TODO Show Spinner
-            businessLogic.LoadContactDetails();
+            await businessLogic.LoadContactDetails(forceRefresh);
             // TODO Hide Spinner
         }
 
@@ -38,6 +47,17 @@ namespace TellMe.iOS
                 this.NavItem.Title = dto.Name;
             });
         }
+
+		public void DisplayStories(ICollection<StoryDTO> stories)
+		{
+			lock (((ICollection)storiesList).SyncRoot)
+			{
+				storiesList.Clear();
+                storiesList.AddRange(stories);
+			}
+
+			InvokeOnMainThread(() => StoriesTableView.ReloadData());
+		}
 
         public void ShowErrorMessage(string title, string message = null)
         {
@@ -94,6 +114,18 @@ namespace TellMe.iOS
                 alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
 				this.PresentViewController(alert, true, null);
 			});
+        }
+
+        public nint RowsInSection(UITableView tableView, nint section)
+        {
+            return this.storiesList.Count;
+        }
+
+        public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+			var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
+            cell.Story = this.storiesList[indexPath.Row];
+			return cell;
         }
     }
 }
