@@ -20,4 +20,8 @@
   <ItemGroup>
     <ProjectReference Include="..\TellMe.DAL\TellMe.DAL.csproj"/>
   </ItemGroup>
+  <ItemGroup>
+  <!-- CopyToOutputDirectory = { Always, PreserveNewest, Never } -->
+  <Content Include="*.p12" CopyToPublishDirectory="Always" />
+</ItemGroup>
 </Project>

@@ -76,6 +76,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
+                    await this.LoadContactDetails(true).ConfigureAwait(false);
                     _view.ShowSuccessMessage("Story requested.");
                 }
                 else

@@ -27,17 +27,25 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
             this.businessLogic = new ContactDetailsBusinessLogic(new RemoteStoriesDataService(), this);
-			this.StoriesTableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
-			this.StoriesTableView.RowHeight = 64;
+            this.StoriesTableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
+            this.StoriesTableView.RowHeight = 64;
             this.StoriesTableView.DataSource = this;
+            this.StoriesTableView.RefreshControl = new UIRefreshControl();
+            this.StoriesTableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             Task.Run(() => LoadContactDetails(false));
+        }
+
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            Task.Run(() => LoadContactDetails(true));
         }
 
         private async Task LoadContactDetails(bool forceRefresh)
         {
-            // TODO Show Spinner
+            InvokeOnMainThread(() => this.StoriesTableView.RefreshControl.BeginRefreshing());
             await businessLogic.LoadContactDetails(forceRefresh);
-            // TODO Hide Spinner
+            InvokeOnMainThread(() => this.StoriesTableView.RefreshControl.EndRefreshing());
+
         }
 
         public void DisplayContactDetails(ContactDTO dto)
@@ -48,16 +56,16 @@ namespace TellMe.iOS
             });
         }
 
-		public void DisplayStories(ICollection<StoryDTO> stories)
-		{
-			lock (((ICollection)storiesList).SyncRoot)
-			{
-				storiesList.Clear();
+        public void DisplayStories(ICollection<StoryDTO> stories)
+        {
+            lock (((ICollection)storiesList).SyncRoot)
+            {
+                storiesList.Clear();
                 storiesList.AddRange(stories);
-			}
+            }
 
-			InvokeOnMainThread(() => StoriesTableView.ReloadData());
-		}
+            InvokeOnMainThread(() => StoriesTableView.ReloadData());
+        }
 
         public void ShowErrorMessage(string title, string message = null)
         {
@@ -105,15 +113,15 @@ namespace TellMe.iOS
 
         public void ShowSuccessMessage(string message)
         {
-			InvokeOnMainThread(() =>
-			{
-				UIAlertController alert = UIAlertController
-					.Create("Success",
-							message ?? string.Empty,
-							UIAlertControllerStyle.Alert);
+            InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create("Success",
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-				this.PresentViewController(alert, true, null);
-			});
+                this.PresentViewController(alert, true, null);
+            });
         }
 
         public nint RowsInSection(UITableView tableView, nint section)
@@ -123,9 +131,9 @@ namespace TellMe.iOS
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-			var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
+            var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
-			return cell;
+            return cell;
         }
     }
 }
