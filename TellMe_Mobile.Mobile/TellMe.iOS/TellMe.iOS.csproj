@@ -138,6 +138,7 @@
     <InterfaceDefinition Include="Auth.storyboard" />
     <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
+    <InterfaceDefinition Include="Storyboard.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
