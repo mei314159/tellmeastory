@@ -1,14 +1,22 @@
-﻿using Foundation;
+﻿using System;
+using System.Threading.Tasks;
+using Foundation;
+using Newtonsoft.Json;
 using TellMe.Core;
+using TellMe.Core.Types.BusinessLogic;
+using TellMe.Core.Types.DataServices.Local;
+using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.DTO;
 using UIKit;
+using UserNotifications;
 
 namespace TellMe.iOS
 {
     // The UIApplicationDelegate for the application. This class is responsible for launching the
     // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
     [Register("AppDelegate")]
-    public class AppDelegate : UIApplicationDelegate
+    public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
         // class-level declarations
 
@@ -18,12 +26,31 @@ namespace TellMe.iOS
             set;
         }
 
+        public AccountBusinessLogic AccountBusinessLogic { get; private set; }
+
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            this.Window = new UIWindow(UIScreen.MainScreen.Bounds);
-			App.Instance.Initialize(new ApplicationDataStorage(), new Router(this.Window));
+            UIWindow window = new UIWindow(UIScreen.MainScreen.Bounds);
+            var accountService = new AccountService();
+            var applicationDataStorage = new ApplicationDataStorage();
+            var remotePushDataService = new RemotePushDataService();
+            this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
+            App.Instance.Initialize(accountService, applicationDataStorage, new Router(window));
+
+            this.Window = window;
             this.Window.RootViewController = GetInitialViewController(launchOptions);
             this.Window.MakeKeyAndVisible();
+
+            if (launchOptions != null)
+            {
+                var notification = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
+                if (notification != null)
+                {
+                    ProcessNotification(notification, false);
+                }
+            }
+
+            UNUserNotificationCenter.Current.Delegate = this;
             return true;
         }
 
@@ -58,16 +85,102 @@ namespace TellMe.iOS
             // Called when the application is about to terminate. Save data, if needed. See also DidEnterBackground.
         }
 
-		private UIViewController GetInitialViewController(NSDictionary launchOptions)
-		{
-            bool isAuthenticated = App.Instance.DataStorage.AuthInfo != null;
-            if (!isAuthenticated)
-			{
-                return UIStoryboard.FromName("Auth", null).InstantiateInitialViewController();
-			}
+        public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+        {
+            // Get current device token
+            var newDeviceToken = deviceToken.Description?.Trim('<').Trim('>').Replace(" ", string.Empty);
+            if (!string.IsNullOrWhiteSpace(newDeviceToken))
+            {
+                Task.Run(() => this.AccountBusinessLogic.RegisteredForRemoteNotificationsAsync(newDeviceToken));
+            }
+        }
 
-			return UIStoryboard.FromName("Main", null).InstantiateInitialViewController();
+		[Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
+		public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+		{
+			completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound);
 		}
+
+		public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+        {
+            ProcessNotification(userInfo, application.ApplicationState == UIApplicationState.Active);
+        }
+
+        public void CheckPushNotificationsPermissions()
+        {
+            if (this.AccountBusinessLogic.PushIsEnabled)
+            {
+                RegisterPushNotifications();
+            }
+            else
+            {
+                UIAlertController alert = UIAlertController.Create(
+                                            "Enable push notifications",
+                    "Do you want to get notified about unread messages?",
+                    UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default, (e) =>
+                {
+                    this.AccountBusinessLogic.PushIsEnabled = true;
+
+                    RegisterPushNotifications();
+
+                }));
+
+                UIApplication
+                    .SharedApplication
+                    .KeyWindow
+                    .RootViewController
+                    .PresentViewController(alert, true, null);
+            }
+        }
+
+        private void RegisterPushNotifications()
+        {
+            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound | UNAuthorizationOptions.Badge, (granted, error) =>
+            {
+                if (granted)
+                {
+                    this.InvokeOnMainThread(() => UIApplication.SharedApplication.RegisterForRemoteNotifications());
+                }
+            });
+        }
+
+        private void ProcessNotification(NSDictionary userInfo, bool quiet = true)
+        {
+            NSError error = new NSError();
+            var pushJson = new NSString(NSJsonSerialization.Serialize(userInfo, 0, out error), NSStringEncoding.UTF8).ToString();
+            var notification = JsonConvert.DeserializeObject<PushNotification>(pushJson);
+
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = notification.Data.Badge ?? 1;
+            var tabBarController = Window.RootViewController as UITabBarController;
+            if (tabBarController == null)
+                return;
+
+            foreach (var c in tabBarController.ViewControllers)
+            {
+                var rootController = c as UINavigationController;
+                if (rootController == null)
+                {
+                    continue;
+                }
+
+                if (notification.NotificationType == NotificationTypeEnum.StoryRequest)
+                {
+                    //TODO Process request
+                }
+            }
+        }
+
+        private UIViewController GetInitialViewController(NSDictionary launchOptions)
+        {
+            if (!this.AccountBusinessLogic.IsAuthenticated)
+            {
+                return UIStoryboard.FromName("Auth", null).InstantiateInitialViewController();
+            }
+
+            return UIStoryboard.FromName("Main", null).InstantiateInitialViewController();
+        }
     }
 }
 

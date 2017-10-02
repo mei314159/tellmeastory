@@ -14,8 +14,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public LocalContactsDataService()
         {
-            string folder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            this._dbPath = Path.Combine(folder, "TellMeAStory.db");
+            this._dbPath = Constants.LocalDbPath;
             using (var conn = new SQLiteConnection(_dbPath))
             {
                 conn.CreateTable<ContactDTO>();

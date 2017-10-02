@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using TellMe.DAL;
+using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Migrations
 {
@@ -201,6 +202,26 @@ namespace TellMe.DAL.Migrations
                     b.ToTable("Contact");
                 });
 
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.PushNotificationClient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AppVersion");
+
+                    b.Property<int>("OsType");
+
+                    b.Property<string>("Token");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PushNotificationClient");
+                });
+
             modelBuilder.Entity("TellMe.DAL.Types.Domain.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -217,6 +238,34 @@ namespace TellMe.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Story", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("ReceiverId");
+
+                    b.Property<DateTime>("RequestDateUtc");
+
+                    b.Property<string>("SenderId");
+
+                    b.Property<int>("Status");
+
+                    b.Property<string>("Title");
+
+                    b.Property<DateTime>("UpdateDateUtc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Story");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -269,6 +318,24 @@ namespace TellMe.DAL.Migrations
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
                         .WithMany("Contacts")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.PushNotificationClient", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
+                        .WithMany("PushNotificationClients")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Story", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Receiver")
+                        .WithMany("ReceivedStories")
+                        .HasForeignKey("ReceiverId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Sender")
+                        .WithMany("SentStories")
+                        .HasForeignKey("SenderId");
                 });
 #pragma warning restore 612, 618
         }

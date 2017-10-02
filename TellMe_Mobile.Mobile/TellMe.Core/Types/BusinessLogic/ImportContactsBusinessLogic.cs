@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.Providers;
 using TellMe.Core.Contracts.UI.Views;

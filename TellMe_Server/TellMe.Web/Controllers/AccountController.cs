@@ -9,6 +9,7 @@ using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Types.Domain;
 using TellMe.Web.DTO;
 using TellMe.DAL;
+using Microsoft.AspNetCore.Hosting;
 
 namespace TellMe.Web.Controllers
 {
@@ -16,9 +17,17 @@ namespace TellMe.Web.Controllers
     public class AccountController : Controller
     {
         private UserManager<ApplicationUser> _userManager;
-        public AccountController(UserManager<ApplicationUser> userManager)
+        private readonly IHostingEnvironment _environment;
+        public AccountController(UserManager<ApplicationUser> userManager, IHostingEnvironment environment)
         {
             this._userManager = userManager;
+            _environment = environment;
+        }
+
+        [HttpGet("env")]
+        public IActionResult GetEnvironment()
+        {
+            return Ok(_environment.EnvironmentName);
         }
 
         // [HttpPost("signup")]

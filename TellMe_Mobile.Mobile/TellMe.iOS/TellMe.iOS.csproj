@@ -63,7 +63,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: Vitaly Dubnovitsky (27Z797D283)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
@@ -75,6 +75,7 @@
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <CodesignProvision>TellMeAStory Dev</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -129,12 +130,15 @@
     <Folder Include="Core\Providers\" />
     <Folder Include="Views\" />
     <Folder Include="Views\Cells\" />
+    <Folder Include="Core\DTO\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
     <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
+    <InterfaceDefinition Include="Storyboard.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -169,6 +173,17 @@
       <DependentUpon>ContactsListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Router.cs" />
+    <Compile Include="ContactDetailsViewController.cs" />
+    <Compile Include="ContactDetailsViewController.designer.cs">
+      <DependentUpon>ContactDetailsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\DTO\PushNotification.cs" />
+    <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
+    <Compile Include="Core\DTO\IosNotificationAPS.cs" />
+    <Compile Include="Views\Cells\StoriesListCell.cs" />
+    <Compile Include="Views\Cells\StoriesListCell.designer.cs">
+      <DependentUpon>StoriesListCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

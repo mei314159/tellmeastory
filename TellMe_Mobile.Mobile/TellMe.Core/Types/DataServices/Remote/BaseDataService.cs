@@ -7,21 +7,12 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Diagnostics;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Contracts;
-using TellMe.Core.Contracts.DTO;
 using System.Collections.Generic;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
     public class BaseDataService
     {
-        protected readonly IApplicationDataStorage ApplicationDataStorage;
-
-        public BaseDataService(IApplicationDataStorage applicationDataStorage)
-        {
-            ApplicationDataStorage = applicationDataStorage;
-        }
-
         public async Task<Result<T>> GetAsync<T>(string uri)
         {
             var result = await this.GetAsync(uri, typeof(T));
@@ -43,7 +34,7 @@ namespace TellMe.Core.Types.DataServices.Remote
             {
                 try
                 {
-                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.ApplicationDataStorage.AuthInfo.AccessToken);
+                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", App.Instance.AuthInfo.AccessToken);
                     var response = await webClient.GetAsync(requestUri).ConfigureAwait(false);
                     var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -131,7 +122,7 @@ namespace TellMe.Core.Types.DataServices.Remote
         {
             var result = await SendDataAsync<TResult, Dictionary<string, string[]>>(uri, method, content, anonymously, refreshExpiredToken)
                 .ConfigureAwait(false);
-            if(!result.IsSuccess)
+            if (!result.IsSuccess)
                 result.ModelState = result.Error;
             return result;
         }
@@ -146,7 +137,7 @@ namespace TellMe.Core.Types.DataServices.Remote
                 {
                     if (!anonymously)
                     {
-                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.ApplicationDataStorage.AuthInfo.AccessToken);
+                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", App.Instance.AuthInfo.AccessToken);
                     }
                     else
                     {
@@ -179,16 +170,17 @@ namespace TellMe.Core.Types.DataServices.Remote
                     }
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && !anonymously && refreshExpiredToken)
-					{
-						await this.RefreshAuthTokenAsync().ConfigureAwait(false);
+                    {
+                        await this.RefreshAuthTokenAsync().ConfigureAwait(false);
                         return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
-					}
+                    }
 
                     var error = JsonConvert.DeserializeObject<TErrorResult>(responseString);
                     return new Result<TResult, TErrorResult>
                     {
                         IsSuccess = false,
-                        Error = error
+                        Error = error,
+                        ErrorMessage = response.ReasonPhrase
                     };
 
                 }
@@ -215,18 +207,18 @@ namespace TellMe.Core.Types.DataServices.Remote
 
         private async Task<bool> RefreshAuthTokenAsync()
         {
-            if (App.Instance.DataStorage.AuthInfo != null)
+            if (App.Instance.AuthInfo != null)
             {
                 var data = new Dictionary<string, string>();
                 data.Add("grant_type", "refresh_token");
-                data.Add("refresh_token", App.Instance.DataStorage.AuthInfo.RefreshToken);
+                data.Add("refresh_token", App.Instance.AuthInfo.RefreshToken);
                 data.Add("client_id", "ios_app");
                 var result = await this.SendDataAsync<AuthenticationInfoDTO>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
                                    .ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {
-                    App.Instance.DataStorage.AuthInfo = result.Data;
+                    App.Instance.AuthInfo = result.Data;
                 }
             }
 

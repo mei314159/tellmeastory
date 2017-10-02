@@ -28,12 +28,14 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this.businessLogic = new ContactsBusinessLogic(new RemoteContactsDataService(App.Instance.DataStorage), this);
+            this.businessLogic = new ContactsBusinessLogic(App.Instance.Router, new RemoteContactsDataService(), this);
             this.TableView.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
             this.TableView.RowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
 
             Task.Run(() => LoadContacts(false));
+
+            ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
         }
 
         private async Task LoadContacts(bool forceRefresh)
@@ -50,12 +52,19 @@ namespace TellMe.iOS
 
         partial void ImportButton_Activated(UIBarButtonItem sender)
         {
-            this.View.Window.SwapController(UIStoryboard.FromName("Auth", null).InstantiateViewController("ImportContactsController"));
+            this.businessLogic.GoToImportContacts();
         }
 
         public override nint NumberOfSections(UITableView tableView)
         {
             return 2;
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var dto = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
+            if (dto.IsAppUser)
+                businessLogic.ContactSelected(dto);
         }
 
         public override string TitleForHeader(UITableView tableView, nint section)
@@ -106,10 +115,7 @@ namespace TellMe.iOS
                     otherContacts.AddRange(groups[false]);
             }
 
-            InvokeOnMainThread(() =>
-            {
-                TableView.ReloadData();
-            });
+            InvokeOnMainThread(() => TableView.ReloadData());
         }
     }
 }

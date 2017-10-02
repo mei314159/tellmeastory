@@ -1,8 +1,18 @@
+using System;
+using System.IO;
+
 namespace TellMe.Core
 {
-    public class Constants
+    public static class Constants
     {
         //public const string ApiHost = "http://localhost:5000";
+        //public const string ApiHost = "http://192.168.1.73:5000";
+        //public const string ApiHost = "http://192.168.0.100:5000";
         public const string ApiHost = "http://tellme-server.azurewebsites.net";
+
+        public static string LocalDbPath =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Personal),
+                "TellMeAStory.db");
     }
 }

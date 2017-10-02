@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
@@ -15,9 +14,11 @@ namespace TellMe.Core.Types.BusinessLogic
         private RemoteContactsDataService _remoteContactsService;
         private LocalContactsDataService _localContactsService;
         private IContactsView _view;
+        private IRouter _router;
 
-        public ContactsBusinessLogic(RemoteContactsDataService contactsService, IContactsView view)
+        public ContactsBusinessLogic(IRouter router, RemoteContactsDataService contactsService, IContactsView view)
         {
+            _router = router;
             _remoteContactsService = contactsService;
             _localContactsService = new LocalContactsDataService();
             _view = view;
@@ -47,6 +48,16 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             this._view.DisplayContacts(contacts);
+        }
+
+        public void GoToImportContacts()
+        {
+            this._router.NavigateImportContacts();
+        }
+
+        public void ContactSelected(ContactDTO dto)
+        {
+            this._router.NavigateContactDetails(this._view, dto);
         }
     }
 }

@@ -6,6 +6,4 @@ namespace TellMe.Core.Validation
     public class SignInPhoneValidator : AbstractValidator<ISignUpPhoneView>
     {
     }
-
-
 }
