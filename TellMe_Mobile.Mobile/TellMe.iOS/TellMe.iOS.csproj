@@ -138,7 +138,6 @@
     <InterfaceDefinition Include="Auth.storyboard" />
     <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
-    <InterfaceDefinition Include="Storyboard.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -184,6 +183,13 @@
     <Compile Include="Views\Cells\StoriesListCell.designer.cs">
       <DependentUpon>StoriesListCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\Providers\LocaleProvider.cs" />
+    <Compile Include="Views\CustomPicker\CustomPickerModel.cs" />
+    <Compile Include="Views\CustomPicker\ModalPickerAnimatedDismissed.cs" />
+    <Compile Include="Views\CustomPicker\ModalPickerAnimatedTransitioning.cs" />
+    <Compile Include="Views\CustomPicker\ModalPickerTransitionDelegate.cs" />
+    <Compile Include="Views\CustomPicker\ModalPickerViewController.cs" />
+    <Compile Include="Core\UI\Button.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

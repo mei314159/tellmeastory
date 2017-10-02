@@ -30,31 +30,6 @@ namespace TellMe.Web.Controllers
             return Ok(_environment.EnvironmentName);
         }
 
-        // [HttpPost("signup")]
-        // public async Task<IActionResult> SignupAsync([FromBody] SignUpDTO dto)
-        // {
-        //     if (dto != null && ModelState.IsValid)
-        //     {
-        //         var result = await _userManager.CreateAsync(new ApplicationUser
-        //         {
-        //             UserName = dto.Email,
-        //             Email = dto.Email,
-        //         }, dto.Password);
-        //         if (result.Succeeded)
-        //         {
-        //             return Ok();
-        //         } 
-
-        //         foreach (var error in result.Errors){
-        //             ModelState.AddModelError(error.Code, error.Description);
-        //         }
-
-        //         return BadRequest(ModelState);
-        //     }
-
-        //     return BadRequest();
-        // }
-
         [HttpPost("signup-phone")]
         public async Task<IActionResult> SignupPhoneAsync([FromBody] SignUpPhoneDTO dto)
         {
@@ -74,6 +49,8 @@ namespace TellMe.Web.Controllers
                     PhoneNumberConfirmed = true, //Must be false and confirmed separately by sms
                     UserName = formattedPhoneNumber,
                     Email = null,
+                    PhoneCountryCode = dto.PhoneCountryCode,
+                    CountryCode = dto.CountryCode
                 }, "0000" // temporary used instead of sms-code
                 );
                 if (result.Succeeded)

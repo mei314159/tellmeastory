@@ -41,12 +41,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="My Phone Number" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="17014" customClass="TextInput">
-                                <rect key="frame" x="20" y="79" width="335" height="44"/>
+                                <rect key="frame" x="99" y="129" width="257" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="17021"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <textInputTraits key="textInputTraits" keyboardType="phonePad" returnKeyType="continue"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="continue"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                         <real key="value" value="4"/>
@@ -54,7 +54,7 @@
                                 </userDefinedRuntimeAttributes>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="17018">
-                                <rect key="frame" x="87.5" y="201" width="200" height="44"/>
+                                <rect key="frame" x="88" y="251" width="200" height="44"/>
                                 <color key="backgroundColor" red="0.25490196078431371" green="0.44313725490196076" blue="0.90980392156862744" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="17023"/>
@@ -84,7 +84,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="By clicking continue button you agree with terms and conditions" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="17554">
-                                <rect key="frame" x="20" y="131" width="335" height="50"/>
+                                <rect key="frame" x="21" y="181" width="335" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="17555"/>
                                 </constraints>
@@ -92,20 +92,55 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="15" id="25605" translatesAutoresizingMaskIntoConstraints="NO" borderStyle="roundedRect" textAlignment="center" adjustsFontForContentSizeCategory="YES" customClass="TextInput" placeholder="+1">
+                                <rect key="frame" x="21" y="129" width="70" height="44"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="continue"/>
+                                <constraints>
+                                    <constraint id="25648" firstItem="25605" firstAttribute="height" constant="44"/>
+                                    <constraint id="25775" firstItem="25605" firstAttribute="width" constant="70"/>
+                                </constraints>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="26188" translatesAutoresizingMaskIntoConstraints="NO" buttonType="roundedRect" customClass="Button">
+                                <rect key="frame" x="98" y="79" width="257" height="44"/>
+                                <state key="normal" title="United States">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <constraints>
+                                    <constraint id="26190" firstItem="26188" firstAttribute="height" constant="44"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="CountryButton_TouchUpInside:" destination="17010" id="27173" eventType="touchUpInside"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Country" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" id="26189" translatesAutoresizingMaskIntoConstraints="NO" minimumScaleFactor="0.5">
+                                <rect key="frame" x="21" y="91" width="70" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" colorSpace="calibratedWhite" white="0.333333333333333" alpha="1"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="17014" firstAttribute="leading" secondItem="17020" secondAttribute="leadingMargin" constant="4" id="17032"/>
                             <constraint firstAttribute="trailingMargin" secondItem="17014" secondAttribute="trailing" constant="4" id="17033"/>
                             <constraint firstItem="17018" firstAttribute="centerX" secondItem="17020" secondAttribute="centerX" id="17043"/>
                             <constraint firstItem="17434" firstAttribute="top" secondItem="17047" secondAttribute="bottom" constant="21" id="17435"/>
                             <constraint firstItem="17434" firstAttribute="leading" secondItem="17020" secondAttribute="leadingMargin" constant="4" id="17436"/>
                             <constraint firstAttribute="trailingMargin" secondItem="17434" secondAttribute="trailing" constant="4" id="17437"/>
-                            <constraint firstItem="17014" firstAttribute="top" secondItem="17434" secondAttribute="bottom" constant="8" id="17495"/>
                             <constraint firstItem="17554" firstAttribute="top" secondItem="17014" secondAttribute="bottom" constant="8" id="17583"/>
                             <constraint firstItem="17554" firstAttribute="leading" secondItem="17020" secondAttribute="leadingMargin" constant="4" id="17584"/>
                             <constraint firstAttribute="trailingMargin" secondItem="17554" secondAttribute="trailing" constant="4" id="17585"/>
                             <constraint firstItem="17018" firstAttribute="top" secondItem="17554" secondAttribute="bottom" constant="20" id="17589"/>
+                            <constraint id="25606" firstItem="25605" firstAttribute="leading" secondItem="17434" secondAttribute="leading"/>
+                            <constraint id="25820" firstItem="17014" firstAttribute="leading" secondItem="25605" secondAttribute="trailing" constant="8"/>
+                            <constraint id="26191" firstItem="26189" firstAttribute="centerY" secondItem="26188" secondAttribute="centerY"/>
+                            <constraint id="26192" firstItem="26189" firstAttribute="leading" secondItem="17434" secondAttribute="leading" constant="1"/>
+                            <constraint id="27117" firstItem="26188" firstAttribute="top" secondItem="17434" secondAttribute="bottom" constant="8"/>
+                            <constraint id="27118" firstItem="17014" firstAttribute="top" secondItem="26188" secondAttribute="bottom" constant="6"/>
+                            <constraint id="27119" firstItem="26188" firstAttribute="trailing" secondItem="17014" secondAttribute="trailing"/>
+                            <constraint id="27120" firstItem="26188" firstAttribute="leading" secondItem="17014" secondAttribute="leading"/>
+                            <constraint id="27121" firstItem="26188" firstAttribute="leading" secondItem="26189" secondAttribute="trailing" constant="7"/>
+                            <constraint id="27740" firstItem="25605" firstAttribute="top" secondItem="17014" secondAttribute="top"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
@@ -113,6 +148,8 @@
                     <connections>
                         <outlet property="ContinueButton" destination="17018" id="name-outlet-17018"/>
                         <outlet property="PhoneNumber" destination="17014" id="name-outlet-17014"/>
+                        <outlet property="CountryCode" destination="25605" id="name-outlet-25605"/>
+                        <outlet property="CountryButton" destination="26188" id="name-outlet-26188"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="17049" userLabel="First Responder" sceneMemberID="firstResponder"/>

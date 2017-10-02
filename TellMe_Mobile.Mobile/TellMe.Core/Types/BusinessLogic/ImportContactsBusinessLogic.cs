@@ -15,9 +15,9 @@ namespace TellMe.Core.Types.BusinessLogic
         private IRouter _router;
         public ImportContactsBusinessLogic(IRouter _router, IContactsProvider _contactsProvider, RemoteContactsDataService _contactsService, IImportContactsView _view)
         {
-			this._router = _router;
+            this._router = _router;
             this._contactsProvider = _contactsProvider;
-			this._contactsService = _contactsService;
+            this._contactsService = _contactsService;
             this._view = _view;
         }
 
@@ -37,11 +37,11 @@ namespace TellMe.Core.Types.BusinessLogic
             if (result.IsSuccess)
             {
                 _router.NavigateMain();
-			}
-			else
-			{
-				result.ShowResultError(this._view);
-			}
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+            }
         }
     }
 }
