@@ -139,6 +139,9 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<string>("CountryCode")
+                        .HasMaxLength(2);
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
@@ -155,6 +158,10 @@ namespace TellMe.DAL.Migrations
                         .HasMaxLength(256);
 
                     b.Property<string>("PasswordHash");
+
+                    b.Property<int>("PhoneCountryCode")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(1);
 
                     b.Property<string>("PhoneNumber");
 
