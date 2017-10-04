@@ -18,5 +18,7 @@ namespace TellMe.Core.Contracts.UI.Views
         void DisplayRecipients(ICollection<ContactDTO> selectedItems);
         void ShowSuccessMessage(string message, Action complete);
         void Close();
+
+        void InvokeOnMainThread(Action action);
     }
 }

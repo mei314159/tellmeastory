@@ -43,6 +43,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task SendAsync()
         {
+            this._view.SendButton.Enabled = false;
             var title = this._view.StoryName.Text;
             var videoStream = File.OpenRead(this._view.VideoPath);
             var previewImageStream = File.OpenRead(this._view.PreviewImagePath);
@@ -74,6 +75,8 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 uploadResult.ShowResultError(this._view);
             }
+
+            _view.InvokeOnMainThread(() => this._view.SendButton.Enabled = true);
         }
     }
 }
