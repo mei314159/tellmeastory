@@ -106,6 +106,7 @@
     <Reference Include="SQLite-net">
       <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
     </Reference>
+    <Reference Include="MonoTouch.Dialog-1" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -131,6 +132,7 @@
     <Folder Include="Views\" />
     <Folder Include="Views\Cells\" />
     <Folder Include="Core\DTO\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -138,6 +140,7 @@
     <InterfaceDefinition Include="Auth.storyboard" />
     <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
+    <InterfaceDefinition Include="Story.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -150,32 +153,12 @@
     <Compile Include="Core\ApplicationDataStorage.cs" />
     <Compile Include="Core\UI\TextInput.cs" />
     <Compile Include="Extensions\ViewExtensions.cs" />
-    <Compile Include="ProfileViewController.cs" />
-    <Compile Include="ProfileViewController.designer.cs">
-      <DependentUpon>ProfileViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SignUpPhoneController.cs" />
-    <Compile Include="SignUpPhoneController.designer.cs">
-      <DependentUpon>SignUpPhoneController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ImportContactsController.cs" />
-    <Compile Include="ImportContactsController.designer.cs">
-      <DependentUpon>ImportContactsController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ContactsViewController.cs" />
-    <Compile Include="ContactsViewController.designer.cs">
-      <DependentUpon>ContactsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\Providers\ContactsProvider.cs" />
     <Compile Include="Views\Cells\ContactsListCell.cs" />
     <Compile Include="Views\Cells\ContactsListCell.designer.cs">
       <DependentUpon>ContactsListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Router.cs" />
-    <Compile Include="ContactDetailsViewController.cs" />
-    <Compile Include="ContactDetailsViewController.designer.cs">
-      <DependentUpon>ContactDetailsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\DTO\PushNotification.cs" />
     <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
     <Compile Include="Core\DTO\IosNotificationAPS.cs" />
@@ -190,6 +173,44 @@
     <Compile Include="Views\CustomPicker\ModalPickerTransitionDelegate.cs" />
     <Compile Include="Views\CustomPicker\ModalPickerViewController.cs" />
     <Compile Include="Core\UI\Button.cs" />
+    <Compile Include="Core\UI\Label.cs" />
+    <Compile Include="Controllers\ContactDetailsViewController.cs" />
+    <Compile Include="Controllers\ContactDetailsViewController.designer.cs">
+      <DependentUpon>ContactDetailsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\ContactsViewController.cs" />
+    <Compile Include="Controllers\ContactsViewController.designer.cs">
+      <DependentUpon>ContactsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\OutputDelegate.cs" />
+    <Compile Include="Controllers\PreviewVideoController.cs" />
+    <Compile Include="Controllers\PreviewVideoController.designer.cs">
+      <DependentUpon>PreviewVideoController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\ProfileViewController.cs" />
+    <Compile Include="Controllers\ProfileViewController.designer.cs">
+      <DependentUpon>ProfileViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\RecordVideoController.cs" />
+    <Compile Include="Controllers\RecordVideoController.designer.cs">
+      <DependentUpon>RecordVideoController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SendStoryDetailsViewController.cs" />
+    <Compile Include="Controllers\SendStoryDetailsViewController.designer.cs">
+      <DependentUpon>SendStoryDetailsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SignUpPhoneController.cs" />
+    <Compile Include="Controllers\SignUpPhoneController.designer.cs">
+      <DependentUpon>SignUpPhoneController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\StoriesListViewController.cs" />
+    <Compile Include="Controllers\StoriesListViewController.designer.cs">
+      <DependentUpon>StoriesListViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\ImportContactsController.cs" />
+    <Compile Include="Controllers\ImportContactsController.designer.cs">
+      <DependentUpon>ImportContactsController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

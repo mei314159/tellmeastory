@@ -33,16 +33,74 @@ namespace TellMe.iOS.Core
 
                 var targetController = (ContactDetailsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactDetailsViewController");
                 targetController.ContactDTO = dto;
-				var controller = (UIViewController)view;
-                if (controller.NavigationController != null)
-                {
-                    controller.NavigationController.PushViewController(targetController, true);
-                }
-                else
-                {
-                    controller.PresentViewController(controller, true, null);
-                }
+				this.Present(targetController, view);
             });
         }
+
+
+		public void NavigateRequestStory(IView view)
+		{
+			//this.window.InvokeOnMainThread(() =>
+			//{
+   //             var targetController = new RequestStoryViewController();
+			//	this.Present(targetController, view);
+			//});
+		}
+
+        public void NavigateRecordStory(IView view)
+        {
+			this.window.InvokeOnMainThread(() =>
+			{
+				var targetController = UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
+				var controller = (UIViewController)view;
+				controller.PresentViewController(targetController, true, null);
+			});
+        }
+
+        public void NavigatePreviewStory(IView view, string videoPath)
+		{
+			this.window.InvokeOnMainThread(() =>
+			{
+				var targetController = (PreviewVideoController)UIStoryboard.FromName("Story", null).InstantiateViewController("PreviewVideoController");
+                targetController.VideoPath = videoPath;
+				this.Present(targetController, view);
+			});
+		}
+
+
+
+		public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath)
+		{
+			this.window.InvokeOnMainThread(() =>
+			{
+				var targetController = (SendStoryDetailsViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("SendStoryDetailsViewController");
+				targetController.VideoPath = videoPath;
+                targetController.PreviewImagePath = previewImagePath;
+				this.Present(targetController, view);
+			});
+		}
+
+		public void NavigateChooseRecipients(IView view, ContactsSelectedEventHandler e)
+		{
+			this.window.InvokeOnMainThread(() =>
+			{
+                var targetController = (ContactsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactsViewController");
+                targetController.ContactsSelected += e;
+				this.Present(targetController, view);
+			});
+		}
+
+		private void Present(UIViewController targetController, IView view)
+		{
+			var controller = (UIViewController)view;
+			if (controller.NavigationController != null)
+			{
+				controller.NavigationController.PushViewController(targetController, true);
+			}
+			else
+			{
+				controller.PresentViewController(targetController, true, null);
+			}
+		}
     }
 }

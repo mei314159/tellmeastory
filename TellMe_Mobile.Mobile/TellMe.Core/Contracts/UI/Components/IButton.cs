@@ -3,6 +3,6 @@
     public interface IButton
     {
         string TitleString { get; set; }
+        bool Enabled { get; set; }
     }
-
 }

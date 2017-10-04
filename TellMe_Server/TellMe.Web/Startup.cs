@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Identity;
 using Hangfire;
 using TellMe.DAL.Contracts.PushNotification;
 using TellMe.Web.AutoMapper;
+using TellMe.DAL.Types.AzureBlob;
 
 namespace TellMe.Web
 {
@@ -66,10 +67,12 @@ namespace TellMe.Web
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IStoryService, StoryService>();
+            services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddSingleton<IHostingEnvironment>(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
+            services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
             ConfigureJwtAuthService(services);
 
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));

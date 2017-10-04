@@ -21,20 +21,27 @@ namespace TellMe.DAL.Types.Services
 {
     public class PushNotificationsService : IPushNotificationsService
     {
-        private readonly IRepository<ApplicationUser, string> _applicationUserRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
+
+        private readonly IRepository<Contact, int> _contactRepository;
+
+
+
         private readonly PushSettings _pushSettings;
 
         private readonly IHostingEnvironment _environment;
 
         public PushNotificationsService(
-            IRepository<ApplicationUser, string> applicationUserRepository,
+            IRepository<ApplicationUser, string> UserRepository,
             IRepository<PushNotificationClient, int> pushTokenRepository,
+            IRepository<Contact, int> contactRepository,
             IOptions<PushSettings> pushSettings,
             IHostingEnvironment environment)
         {
-            _applicationUserRepository = applicationUserRepository;
+            _userRepository = UserRepository;
             _pushTokenRepository = pushTokenRepository;
+            _contactRepository = contactRepository;
             _pushSettings = pushSettings.Value;
             _environment = environment;
         }
@@ -74,7 +81,7 @@ namespace TellMe.DAL.Types.Services
             var pushNotificationClients = await _pushTokenRepository
                             .GetQueryable()
                             .AsNoTracking()
-                            .Where(a => a.UserId == story.ReceiverId)
+                            .Where(a => a.UserId == story.SenderId && a.OsType == OsType.iOS)
                             .ToListAsync()
                             .ConfigureAwait(false);
 
@@ -88,31 +95,59 @@ namespace TellMe.DAL.Types.Services
                 NotificationType = NotificationTypeEnum.StoryRequest,
             };
 
-            Task.Run(() => SendStoryRequestNotification(notification, pushNotificationClients));
+            Task.Run(() =>
+                SendIosPushNotification(
+                    new Tuple<IosNotification<StoryDTO>, IReadOnlyCollection<PushNotificationClient>>(notification, pushNotificationClients)));
         }
 
-        private void SendStoryRequestNotification(IosNotification<StoryDTO> notification, List<PushNotificationClient> pushNotificationClients)
+        public async Task SendStoryPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string senderId)
         {
-            var iosTokens = pushNotificationClients.Where(a => a.OsType == OsType.iOS).ToList();
-            SendIosPushNotification(iosTokens, notification);
-        }
+            var receiverIds = storyDTOs.Select(x => x.ReceiverId).ToArray();
+            var pushNotificationClients = await _pushTokenRepository
+                                        .GetQueryable()
+                                        .AsNoTracking()
+                                        .Where(a => receiverIds.Contains(a.UserId) && a.OsType == OsType.iOS)
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
 
-        private ApnsConfiguration GetApnsConfig()
-        {
-            var environment = _pushSettings.IsProductionMode
-                               ? ApnsConfiguration.ApnsServerEnvironment.Production
-                               : ApnsConfiguration.ApnsServerEnvironment.Sandbox;
-            var config = new ApnsConfiguration(environment, Path.Combine(_environment.ContentRootPath, _pushSettings.Certificate), _pushSettings.Password);
-            return config;
-        }
+            var user = await _userRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == senderId)
+            .ConfigureAwait(false);
+            var senderContacts = await _contactRepository
+                        .GetQueryable()
+                        .AsNoTracking()
+                        .Where(x =>
+                        receiverIds.Contains(x.UserId)
+                        && x.PhoneNumberDigits == user.PhoneNumberDigits)
+                        .Select(x => new { x.UserId, x.Name })
+                        .ToListAsync()
+                        .ConfigureAwait(false);
 
-        public void SendIosPushNotification<T>(List<PushNotificationClient> pushNotificationClient, IosNotification<T> notification)
-        {
-            var payload = JObject.FromObject(notification, new JsonSerializer
+            var notifications = storyDTOs.Select(storyDTO =>
             {
-                NullValueHandling = NullValueHandling.Ignore
-            });
+                var contact = senderContacts.FirstOrDefault(x => x.UserId == storyDTO.ReceiverId);
+                string senderName = contact?.Name ?? user.PhoneNumber;
 
+                var notification = new IosNotification<StoryDTO>
+                {
+                    Data = new IosNotificationAPS
+                    {
+                        Message = $"{senderName} sent a story: {storyDTO.Title}"
+                    },
+                    Extra = storyDTO,
+                    NotificationType = NotificationTypeEnum.Story,
+                };
+                var pushClients = pushNotificationClients.Where(x => x.UserId == storyDTO.ReceiverId).ToArray();
+                return new Tuple<IosNotification<StoryDTO>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients);
+            }).ToArray();
+
+            Task.Run(() => SendIosPushNotification<StoryDTO>(notifications));
+        }
+
+        public void SendIosPushNotification<T>(params Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>[] notifications)
+        {
             var config = GetApnsConfig();
             var broker = new ApnsServiceBroker(config);
             broker.OnNotificationFailed += (n, exception) =>
@@ -148,15 +183,33 @@ namespace TellMe.DAL.Types.Services
 
             broker.Start();
 
-            foreach (var token in pushNotificationClient)
+            foreach (var notification in notifications)
             {
-                broker.QueueNotification(new ApnsNotification
+                var payload = JObject.FromObject(notification.Item1, new JsonSerializer
                 {
-                    DeviceToken = token.Token,
-                    Payload = payload
+                    NullValueHandling = NullValueHandling.Ignore
                 });
+
+                foreach (var token in notification.Item2)
+                {
+                    broker.QueueNotification(new ApnsNotification
+                    {
+                        DeviceToken = token.Token,
+                        Payload = payload
+                    });
+                }
             }
+
             broker.Stop();
+        }
+
+        private ApnsConfiguration GetApnsConfig()
+        {
+            var environment = _pushSettings.IsProductionMode
+                               ? ApnsConfiguration.ApnsServerEnvironment.Production
+                               : ApnsConfiguration.ApnsServerEnvironment.Sandbox;
+            var config = new ApnsConfiguration(environment, Path.Combine(_environment.ContentRootPath, _pushSettings.Certificate), _pushSettings.Password);
+            return config;
         }
     }
 }

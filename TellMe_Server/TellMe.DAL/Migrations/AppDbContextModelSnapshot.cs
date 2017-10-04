@@ -252,11 +252,13 @@ namespace TellMe.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Description");
+                    b.Property<DateTime?>("CreateDateUtc");
+
+                    b.Property<string>("PreviewUrl");
 
                     b.Property<string>("ReceiverId");
 
-                    b.Property<DateTime>("RequestDateUtc");
+                    b.Property<DateTime?>("RequestDateUtc");
 
                     b.Property<string>("SenderId");
 
@@ -265,6 +267,8 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("Title");
 
                     b.Property<DateTime>("UpdateDateUtc");
+
+                    b.Property<string>("VideoUrl");
 
                     b.HasKey("Id");
 

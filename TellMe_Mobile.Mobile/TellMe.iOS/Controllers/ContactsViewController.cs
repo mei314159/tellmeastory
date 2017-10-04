@@ -1,7 +1,6 @@
 ﻿using Foundation;
 using System;
 using UIKit;
-using TellMe.iOS.Extensions;
 using TellMe.Core;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
@@ -20,6 +19,8 @@ namespace TellMe.iOS
         private ContactsBusinessLogic businessLogic;
         private List<ContactDTO> appUsers = new List<ContactDTO>();
         private List<ContactDTO> otherContacts = new List<ContactDTO>();
+
+        public event ContactsSelectedEventHandler ContactsSelected;
 
         public ContactsViewController(IntPtr handle) : base(handle)
         {
@@ -63,8 +64,8 @@ namespace TellMe.iOS
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var dto = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
-            if (dto.IsAppUser)
-                businessLogic.ContactSelected(dto);
+            var cell = tableView.CellAt(indexPath);
+            businessLogic.ContactSelected(dto, cell);
         }
 
         public override string TitleForHeader(UITableView tableView, nint section)
@@ -82,6 +83,12 @@ namespace TellMe.iOS
             var cell = tableView.DequeueReusableCell(ContactsListCell.Key, indexPath) as ContactsListCell;
             cell.Contact = (indexPath.Section == 0 ? appUsers : otherContacts)[indexPath.Row];
             return cell;
+        }
+
+        public void SelectCell(object cell, bool selected)
+        {
+            var c = (ContactsListCell)cell;
+            c.Accessory = selected ? UITableViewCellAccessory.Checkmark : UITableViewCellAccessory.None;
         }
 
         public void ShowErrorMessage(string title, string message = null)
@@ -116,6 +123,17 @@ namespace TellMe.iOS
             }
 
             InvokeOnMainThread(() => TableView.ReloadData());
+        }
+
+        partial void DoneButtonTouched(UIBarButtonItem sender)
+        {
+            this.businessLogic.DoneButtonTouched();
+        }
+
+        public void Done(List<ContactDTO> selectedItems)
+        {
+			this.ContactsSelected?.Invoke(selectedItems);
+            this.NavigationController.PopViewController(true);
         }
     }
 }

@@ -39,8 +39,7 @@ namespace TellMe.iOS.Views.Cells
         private void Initialize()
 		{
             this.Title.Text = Story.Title;
-            this.Description.Text = Story.Description;
-            this.Date.Text = Story.RequestDateUtc.ToShortDateString();
+            this.Date.Text = Story.RequestDateUtc?.ToShortDateString();
 		}
     }
 }

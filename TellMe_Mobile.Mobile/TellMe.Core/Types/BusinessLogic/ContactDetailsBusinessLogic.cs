@@ -60,13 +60,11 @@ namespace TellMe.Core.Types.BusinessLogic
             this._view.DisplayStoryDetailsPrompt();
         }
 
-        public async Task RequestStoryAsync(string title, string description)
+        public async Task RequestStoryAsync(string title)
         {
-
             var dto = new StoryRequestDTO
             {
                 Title = title,
-                Description = description,
                 ReceiverId = _view.ContactDTO.UserId
             };
 

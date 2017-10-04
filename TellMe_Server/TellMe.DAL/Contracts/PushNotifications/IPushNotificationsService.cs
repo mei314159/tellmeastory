@@ -10,5 +10,6 @@ namespace TellMe.DAL.Contracts.PushNotification
         Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId, string appVersion);
         
 		Task SendStoryRequestPushNotificationAsync(StoryDTO story, string senderName);
-	}
+        Task SendStoryPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string senderId);
+    }
 }

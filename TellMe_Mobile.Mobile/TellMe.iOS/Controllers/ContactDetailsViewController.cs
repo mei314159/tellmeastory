@@ -45,7 +45,6 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => this.StoriesTableView.RefreshControl.BeginRefreshing());
             await businessLogic.LoadContactDetails(forceRefresh);
             InvokeOnMainThread(() => this.StoriesTableView.RefreshControl.EndRefreshing());
-
         }
 
         public void DisplayContactDetails(ContactDTO dto)
@@ -108,7 +107,7 @@ namespace TellMe.iOS
             var title = alert.TextFields[0].Text;
             var description = alert.TextFields[1].Text;
 
-            await this.businessLogic.RequestStoryAsync(title, description);
+            await this.businessLogic.RequestStoryAsync(title);
         }
 
         public void ShowSuccessMessage(string message)

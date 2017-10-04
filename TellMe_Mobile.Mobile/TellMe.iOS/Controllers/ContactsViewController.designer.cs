@@ -16,7 +16,15 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIBarButtonItem DoneButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIBarButtonItem ImportButton { get; set; }
+
+        [Action ("DoneButtonTouched:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void DoneButtonTouched (UIKit.UIBarButtonItem sender);
 
         [Action ("ImportButton_Activated:")]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -24,6 +32,11 @@ namespace TellMe.iOS
 
         void ReleaseDesignerOutlets ()
         {
+            if (DoneButton != null) {
+                DoneButton.Dispose ();
+                DoneButton = null;
+            }
+
             if (ImportButton != null) {
                 ImportButton.Dispose ();
                 ImportButton = null;

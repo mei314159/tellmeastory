@@ -34,5 +34,9 @@
 	<string>Tell Me a Story</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Tell Me a Story need an access to your contacts to find your friends</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Tell Me a Story need an access to your camera to record the stories</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Tell Me a Story need an access to your microphone to record the stories</string>
 </dict>
 </plist>

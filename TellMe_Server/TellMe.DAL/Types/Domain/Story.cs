@@ -5,9 +5,11 @@ namespace TellMe.DAL.Types.Domain
     public class Story : EntityBase<int>
     {
         public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime RequestDateUtc { get; set; }
+        public DateTime? RequestDateUtc { get; set; }
         public DateTime UpdateDateUtc { get; set; }
+        public DateTime? CreateDateUtc { get; set; }
+        public string VideoUrl { get; set; }
+        public string PreviewUrl { get; set; }
         public StoryStatus Status { get; set; }
         public string SenderId { get; set; }
         public string ReceiverId { get; set; }
