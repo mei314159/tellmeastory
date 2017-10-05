@@ -15,87 +15,102 @@ namespace TellMe.iOS
 {
     public partial class StoriesListViewController : UITableViewController, IStoriesListView //, IUITableViewDataSourcePrefetching
     {
-		private StoriesBusinessLogic businessLogic;
-		private List<StoryDTO> storiesList = new List<StoryDTO>();
+        private StoriesBusinessLogic businessLogic;
+        private List<StoryDTO> storiesList = new List<StoryDTO>();
 
-		public StoriesListViewController (IntPtr handle) : base (handle)
+        public StoriesListViewController(IntPtr handle) : base(handle)
         {
         }
 
 
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
             this.businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
-            this.TableView.RowHeight = 64;
-			this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
-			Task.Run(() => LoadStories(false));
+            this.TableView.RowHeight = UITableView.AutomaticDimension;
+            this.TableView.EstimatedRowHeight = 44;
+            this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+            this.TableView.TableFooterView = new UIView();
+            Task.Run(() => LoadStories(false, true));
 
-			((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
-		}
+            ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
+        }
 
-		public void DisplayStories(ICollection<StoryDTO> stories)
-		{
-			lock (((ICollection)storiesList).SyncRoot)
-			{
-				storiesList.Clear();
-				storiesList.AddRange(stories);
-			}
+        public void DisplayStories(ICollection<StoryDTO> stories)
+        {
+            lock (((ICollection)storiesList).SyncRoot)
+            {
+                storiesList.Clear();
+                storiesList.AddRange(stories);
+            }
 
             InvokeOnMainThread(() => TableView.ReloadData());
-		}
+        }
 
         public void ShowErrorMessage(string title, string message = null)
-		{
-			InvokeOnMainThread(() =>
-			{
-				UIAlertController alert = UIAlertController
-					.Create(title,
-							message ?? string.Empty,
-							UIAlertControllerStyle.Alert);
-				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-				this.PresentViewController(alert, true, null);
-			});
-		}
+        {
+            InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create(title,
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
+                this.PresentViewController(alert, true, null);
+            });
+        }
 
-		public void ShowSuccessMessage(string message)
-		{
-			InvokeOnMainThread(() =>
-			{
-				UIAlertController alert = UIAlertController
-					.Create("Success",
-							message ?? string.Empty,
-							UIAlertControllerStyle.Alert);
-				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-				this.PresentViewController(alert, true, null);
-			});
-		}
+        public void ShowSuccessMessage(string message)
+        {
+            InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create("Success",
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+                this.PresentViewController(alert, true, null);
+            });
+        }
 
         public override nint RowsInSection(UITableView tableView, nint section)
-		{
-			return this.storiesList.Count;
-		}
+        {
+            return this.storiesList.Count;
+        }
 
-		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-		{
-			var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
-			cell.Story = this.storiesList[indexPath.Row];
-			return cell;
-		}
+        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = storiesList[indexPath.Row];
+            if (cell.Status == StoryStatus.Sent)
+            {
+                return tableView.Frame.Width + 44;
+            }
+            else
+            {
+                return 44;
+            }
+        }
 
-        private async Task LoadStories(bool forceRefresh)
-		{
+        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
+            cell.Story = this.storiesList[indexPath.Row];
+            return cell;
+        }
+
+        private async Task LoadStories(bool forceRefresh, bool clearCache = false)
+        {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
-			await businessLogic.LoadStories(forceRefresh);
-			InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
+            await businessLogic.LoadStories(forceRefresh, clearCache);
+            InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
 
-		}
+        }
 
-		void RefreshControl_ValueChanged(object sender, EventArgs e)
-		{
-			Task.Run(() => LoadStories(true));
-		}
+        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        {
+            Task.Run(() => LoadStories(true));
+        }
 
         partial void SendStoryButtonTouched(UIBarButtonItem sender)
         {

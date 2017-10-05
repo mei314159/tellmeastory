@@ -31,13 +31,16 @@ namespace TellMe.Core.Types.BusinessLogic
             _validator = new StoryRequestValidator();
         }
 
-        public async Task LoadStories(bool forceRefresh = false)
+        public async Task LoadStories(bool forceRefresh = false, bool clearCache = false)
         {
             ICollection<StoryDTO> stories;
             var localContacts = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
-            if (localContacts.Expired || forceRefresh)
+            if (localContacts.Expired || forceRefresh || clearCache)
             {
-                var result = await _remoteStoriesService.GetStoriesAsync();
+                if (clearCache){
+                    await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
+                }
+                var result = await _remoteStoriesService.GetStoriesAsync().ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
@@ -54,7 +57,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 stories = localContacts.Data;
             }
 
-            this._view.DisplayStories(stories.OrderByDescending(x => x.RequestDateUtc).ToList());
+            this._view.DisplayStories(stories.OrderByDescending(x => x.UpdateDateUtc).ToList());
         }
 
         public void SendStory()

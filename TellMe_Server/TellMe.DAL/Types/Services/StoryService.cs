@@ -49,9 +49,33 @@ namespace TellMe.DAL.Types.Services
                 stories = stories.Where(x => x.SenderId == currentUserId || x.ReceiverId == currentUserId);
             }
 
-            var result = await stories.ProjectTo<StoryDTO>()
+            var result = await stories
+            .ProjectTo<StoryDTO>()
             .ToListAsync()
             .ConfigureAwait(false);
+
+            var ids = result
+                    .Select(x => x.SenderId)
+                    .Union(result.Select(x => x.ReceiverId)).ToArray();
+            var users = _userRepository.GetQueryable().AsNoTracking().Where(x => ids.Contains(x.Id));
+
+            var contacts = _contactRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .Where(x => x.UserId == currentUserId);
+
+            var nm = await (from user in users
+                            join contact in contacts
+                            on user.PhoneNumberDigits
+                            equals contact.PhoneNumberDigits into gj
+                            from x in gj.DefaultIfEmpty()
+                            select new { Name = x != null ? x.Name : user.PhoneNumber, user.Id })
+            .ToDictionaryAsync(x => x.Id, x => x.Name).ConfigureAwait(false);
+            foreach (var item in result)
+            {
+                item.SenderName = nm[item.SenderId];
+                item.ReceiverName = nm[item.ReceiverId];
+            }
 
             return result;
         }
@@ -96,7 +120,7 @@ namespace TellMe.DAL.Types.Services
             var entities = new List<Story>();
             if (dto.Id.HasValue)
             {
-                var entity = await _storyRepository.GetQueryable().FirstOrDefaultAsync(x=>x.Id == dto.Id).ConfigureAwait(false);
+                var entity = await _storyRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == dto.Id).ConfigureAwait(false);
                 entity.VideoUrl = dto.VideoUrl;
                 entity.PreviewUrl = dto.PreviewUrl;
                 entity.Status = StoryStatus.Sent;
@@ -106,7 +130,7 @@ namespace TellMe.DAL.Types.Services
             }
             else
             {
-                
+
                 foreach (var receiverId in dto.ReceiverIds)
                 {
                     var entity = new Story()
@@ -126,7 +150,7 @@ namespace TellMe.DAL.Types.Services
                 }
 
             }
-
+            _storyRepository.PreCommitSave();
             var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
 
             await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, senderId).ConfigureAwait(false);

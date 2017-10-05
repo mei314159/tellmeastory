@@ -19,11 +19,15 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel Description { get; set; }
+        UIKit.UIImageView Preview { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UILabel Title { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIView Video { get; set; }
 
         void ReleaseDesignerOutlets ()
         {
@@ -32,14 +36,19 @@ namespace TellMe.iOS.Views.Cells
                 Date = null;
             }
 
-            if (Description != null) {
-                Description.Dispose ();
-                Description = null;
+            if (Preview != null) {
+                Preview.Dispose ();
+                Preview = null;
             }
 
             if (Title != null) {
                 Title.Dispose ();
                 Title = null;
+            }
+
+            if (Video != null) {
+                Video.Dispose ();
+                Video = null;
             }
         }
     }

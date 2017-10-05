@@ -21,6 +21,17 @@ namespace TellMe.Core.Types.DataServices.Local
             }
         }
 
+
+        public async Task DeleteAllAsync()
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath);
+            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            {
+                c.DeleteAll<StoryDTO>();
+                c.Table<UpdateInfo>().Delete(x => x.TableName == "Stories");
+            }).ConfigureAwait(false);
+        }
+
         public async Task SaveStoriesAsync(ICollection<StoryDTO> stories)
         {
             var conn = new SQLiteAsyncConnection(this._dbPath);

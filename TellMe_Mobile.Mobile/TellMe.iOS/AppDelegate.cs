@@ -177,6 +177,10 @@ namespace TellMe.iOS
                 {
                     //TODO Process request
                 }
+                else if (notification.NotificationType == NotificationTypeEnum.Story)
+				{
+					//TODO Process request
+				}
             }
         }
 

@@ -25,5 +25,9 @@ namespace TellMe.Core.Contracts.DTO
 		public string VideoUrl { get; set; }
 
         public string PreviewUrl { get; set; }
+
+        public string SenderName { get; set; }
+
+        public string ReceiverName { get; set; }
     }
 }
