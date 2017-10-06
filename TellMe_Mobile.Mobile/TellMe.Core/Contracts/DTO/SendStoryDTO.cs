@@ -2,9 +2,11 @@
 {
     public class SendStoryDTO
     {
-        public string Title { get; set; }
+        public int? Id { get; set; }
 
-        public int? RequestId { get; set; }
+        public string ReceiverId { get; set; }
+
+        public string Title { get; set; }
 
         public string[] ReceiverIds { get; set; }
 

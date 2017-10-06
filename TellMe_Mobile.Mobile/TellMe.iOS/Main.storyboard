@@ -250,7 +250,7 @@
                             <outlet property="delegate" destination="3077" id="3080"/>
                         </connections>
                     </tableView>
-                    <navigationItem title="Title" id="3128" key="navigationItem">
+                    <navigationItem title="Stories" id="3128" key="navigationItem">
                         <rightBarButtonItems>
                             <barButtonItem title="Send" id="3698">
                                 <connections>

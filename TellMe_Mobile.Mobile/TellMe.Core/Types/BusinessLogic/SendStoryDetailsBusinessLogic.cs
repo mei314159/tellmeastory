@@ -28,6 +28,23 @@ namespace TellMe.Core.Types.BusinessLogic
             this.recipientsList = new List<ContactDTO>();
         }
 
+        public void Init()
+        {
+            if (_view.RequestedStory != null)
+            {
+                this._view.StoryName.Text = _view.RequestedStory.Title;
+                this._view.StoryName.Enabled = false;
+                this._view.ChooseRecipientsButton.Enabled = false;
+                this._view.SendButton.Enabled = true;
+
+                this.RecipientsSelected(new[]{new ContactDTO
+                {
+                    Name = _view.RequestedStory.ReceiverName,
+                    UserId = _view.RequestedStory.ReceiverId
+                }});
+            }
+        }
+
         public void ChooseRecipients()
         {
             _router.NavigateChooseRecipients(_view, RecipientsSelected);
@@ -56,8 +73,10 @@ namespace TellMe.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (uploadResult.IsSuccess)
             {
+
                 var dto = new SendStoryDTO();
                 dto.Title = title;
+                dto.Id = _view.RequestedStory?.Id;
                 dto.ReceiverIds = recipientsList.Select(x => x.UserId).ToArray();
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
                 dto.PreviewUrl = uploadResult.Data.PreviewImageUrl;

@@ -7,6 +7,7 @@ using CoreMedia;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.iOS
 {
@@ -37,6 +38,8 @@ namespace TellMe.iOS
         }
 
         IButton IRecordVideoView.RecordButton => this.RecordButton;
+
+        public StoryDTO RequestedStory { get; set; }
 
         public override void ViewDidLoad()
         {

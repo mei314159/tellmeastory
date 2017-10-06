@@ -29,9 +29,11 @@ namespace TellMe.iOS
             this.businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
-            this.TableView.EstimatedRowHeight = 44;
+            this.TableView.EstimatedRowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
+            this.TableView.DelaysContentTouches = false;
+
             Task.Run(() => LoadStories(false, true));
 
             ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
@@ -84,11 +86,24 @@ namespace TellMe.iOS
             var cell = storiesList[indexPath.Row];
             if (cell.Status == StoryStatus.Sent)
             {
-                return tableView.Frame.Width + 44;
+                return tableView.Frame.Width + 64;
             }
             else
             {
-                return 44;
+                return 64;
+            }
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var dto = this.storiesList[indexPath.Row];
+            if (dto.Status != StoryStatus.Requested || dto.ReceiverId == App.Instance.AuthInfo.UserId)
+            {
+                tableView.DeselectRow(indexPath, false);
+            }
+            else
+            {
+                businessLogic.SendStory(dto);
             }
         }
 

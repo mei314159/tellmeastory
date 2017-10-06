@@ -50,33 +50,36 @@ namespace TellMe.iOS.Core
 			});
 		}
 
-        public void NavigateRecordStory(IView view)
+        public void NavigateRecordStory(IView view, StoryDTO requestedStory = null)
         {
 			this.window.InvokeOnMainThread(() =>
 			{
-				var targetController = UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
+				var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
+                ((RecordVideoController)targetController.ViewControllers.First()).RequestedStory = requestedStory;
 				var controller = (UIViewController)view;
 				controller.PresentViewController(targetController, true, null);
 			});
         }
 
-        public void NavigatePreviewStory(IView view, string videoPath)
+        public void NavigatePreviewStory(IView view, string videoPath, StoryDTO requestedStory = null)
 		{
 			this.window.InvokeOnMainThread(() =>
 			{
 				var targetController = (PreviewVideoController)UIStoryboard.FromName("Story", null).InstantiateViewController("PreviewVideoController");
                 targetController.VideoPath = videoPath;
+                targetController.RequestedStory = requestedStory;
 				this.Present(targetController, view);
 			});
 		}
 
-		public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath)
+		public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryDTO requestedStory = null)
 		{
 			this.window.InvokeOnMainThread(() =>
 			{
 				var targetController = (SendStoryDetailsViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("SendStoryDetailsViewController");
 				targetController.VideoPath = videoPath;
                 targetController.PreviewImagePath = previewImagePath;
+                targetController.RequestedStory = requestedStory;
 				this.Present(targetController, view);
 			});
 		}

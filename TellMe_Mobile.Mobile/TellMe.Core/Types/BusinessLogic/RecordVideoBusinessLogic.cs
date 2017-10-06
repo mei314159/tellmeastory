@@ -26,7 +26,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void PreviewStory()
         {
-            _router.NavigatePreviewStory(_view, this.videoPath);
+            _router.NavigatePreviewStory(_view, this.videoPath, _view.RequestedStory);
         }
 
         public void ToggleRecording()

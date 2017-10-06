@@ -7,6 +7,8 @@ namespace TellMe.Core.Contracts.UI.Views
 {
     public interface ISendStoryDetailsView : IView
     {
+        StoryDTO RequestedStory { get; }
+
         string VideoPath { get; }
 
         string PreviewImagePath { get; }
@@ -14,6 +16,7 @@ namespace TellMe.Core.Contracts.UI.Views
         ITextInput StoryName { get; }
 
         IButton SendButton { get; }
+        IButton ChooseRecipientsButton { get; }
 
         void DisplayRecipients(ICollection<ContactDTO> selectedItems);
         void ShowSuccessMessage(string message, Action complete);

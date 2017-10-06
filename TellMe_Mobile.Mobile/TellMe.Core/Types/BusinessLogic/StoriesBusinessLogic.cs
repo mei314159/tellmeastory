@@ -60,9 +60,10 @@ namespace TellMe.Core.Types.BusinessLogic
             this._view.DisplayStories(stories.OrderByDescending(x => x.UpdateDateUtc).ToList());
         }
 
-        public void SendStory()
-        {
-            _router.NavigateRecordStory(this._view);
+
+        public void SendStory(StoryDTO requestedStory = null)
+		{
+            _router.NavigateRecordStory(this._view, requestedStory);
         }
 
         public void RequestStory()

@@ -6,6 +6,7 @@ using TellMe.Core.Contracts;
 using TellMe.Core;
 using TellMe.Core.Contracts.UI.Views;
 using System.IO;
+using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.iOS
 {
@@ -26,6 +27,7 @@ namespace TellMe.iOS
         }
 
         public string VideoPath { get; set; }
+        public StoryDTO RequestedStory { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -57,7 +59,7 @@ namespace TellMe.iOS
         partial void SendButtonTouched(Button sender)
         {
             goNext = true;
-            _router.NavigateStoryDetails(this, VideoPath, previewImagePath);
+            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, RequestedStory);
         }
 
         public override void ViewWillDisappear(bool animated)

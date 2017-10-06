@@ -27,8 +27,10 @@ namespace TellMe.iOS
 
         ITextInput ISendStoryDetailsView.StoryName => this.StoryName;
         IButton ISendStoryDetailsView.SendButton => this.SendButton;
+        IButton ISendStoryDetailsView.ChooseRecipientsButton => this.ChooseRecipientsButton;
 
         public string PreviewImagePath { get; set; }
+        public StoryDTO RequestedStory { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -39,6 +41,7 @@ namespace TellMe.iOS
             this.RecipientsTable.DataSource = this;
             this.RecipientsTable.TableFooterView = new UIView();
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
+            this._businessLogic.Init();
         }
 
         public void ShowErrorMessage(string title, string message = null)

@@ -111,7 +111,7 @@ namespace TellMe.DAL.Types.Services
             .ConfigureAwait(false);
 
             
-            await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
+            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
 
             return storyDTOs;
         }
@@ -127,12 +127,12 @@ namespace TellMe.DAL.Types.Services
                 entity.PreviewUrl = dto.PreviewUrl;
                 entity.Status = StoryStatus.Sent;
                 entity.UpdateDateUtc = now;
+                entity.CreateDateUtc = now;
                 _storyRepository.Save(entity, false);
                 entities.Add(entity);
             }
             else
             {
-
                 foreach (var receiverId in dto.ReceiverIds)
                 {
                     var entity = new Story()
