@@ -26,9 +26,9 @@ namespace TellMe.Web.Controllers
         [HttpPost("request")]
         public async Task<IActionResult> RequestStoryAsync([FromBody] StoryRequestDTO dto)
         {
-            await _storyService.RequestStoryAsync(this.UserId, dto);
+            var result = await _storyService.RequestStoryAsync(this.UserId, dto);
 
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPost("")]

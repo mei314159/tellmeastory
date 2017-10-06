@@ -102,7 +102,7 @@ namespace TellMe.iOS
         private async Task LoadStories(bool forceRefresh, bool clearCache = false)
         {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
-            await businessLogic.LoadStories(forceRefresh, clearCache);
+            await businessLogic.LoadStoriesAsync(forceRefresh, clearCache);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
 
         }

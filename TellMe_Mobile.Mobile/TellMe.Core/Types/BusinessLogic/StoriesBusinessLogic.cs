@@ -19,7 +19,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private LocalStoriesDataService _localStoriesService;
         private IStoriesListView _view;
         private IRouter _router;
-        private StoryRequestValidator _validator;
+        private RequestStoryValidator _validator;
 
         public StoriesBusinessLogic(RemoteStoriesDataService remoteStoriesService, IStoriesListView view, IRouter router)
         {
@@ -28,10 +28,10 @@ namespace TellMe.Core.Types.BusinessLogic
             _localStoriesService = new LocalStoriesDataService();
             _view = view;
             _router = router;
-            _validator = new StoryRequestValidator();
+            _validator = new RequestStoryValidator();
         }
 
-        public async Task LoadStories(bool forceRefresh = false, bool clearCache = false)
+        public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
             ICollection<StoryDTO> stories;
             var localContacts = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
@@ -67,42 +67,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void RequestStory()
         {
-            _router.NavigateRequestStory(this._view);
+            _router.NavigateRequestStory(this._view, (requestedStories) => this.LoadStoriesAsync(true, false));
         }
-
-        //public void RequestStory()
-        //{
-        //    this._view.DisplayStoryDetailsPrompt();
-        //}
-
-        //public async Task RequestStoryAsync(string title, string description)
-        //{
-
-        //    var dto = new StoryRequestDTO
-        //    {
-        //        Title = title,
-        //        Description = description,
-        //        ReceiverId = _view.ContactDTO.UserId
-        //    };
-
-        //    var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
-        //    if (validationResult.IsValid)
-        //    {
-        //        var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);
-        //        if (result.IsSuccess)
-        //        {
-        //            await this.LoadContactDetails(true).ConfigureAwait(false);
-        //            _view.ShowSuccessMessage("Story requested.");
-        //        }
-        //        else
-        //        {
-        //            result.ShowResultError(this._view);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        validationResult.ShowValidationResult(this._view);
-        //    }
-        //}
     }
 }

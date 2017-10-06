@@ -6,7 +6,6 @@ using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
@@ -16,7 +15,6 @@ namespace TellMe.Core.Types.BusinessLogic
         private LocalContactsDataService _localContactsService;
         private LocalStoriesDataService _localStoriesService;
         private IContactDetailsView _view;
-        private StoryRequestValidator _validator;
 
         public ContactDetailsBusinessLogic(RemoteStoriesDataService remoteStoriesService, IContactDetailsView view)
         {
@@ -24,7 +22,6 @@ namespace TellMe.Core.Types.BusinessLogic
             _localContactsService = new LocalContactsDataService();
             _localStoriesService = new LocalStoriesDataService();
             _view = view;
-            _validator = new StoryRequestValidator();
         }
 
         public async Task LoadContactDetails(bool forceRefresh = false)
@@ -53,39 +50,6 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             this._view.DisplayStories(stories.OrderByDescending(x => x.RequestDateUtc).ToList());
-        }
-
-        public void RequestStory()
-        {
-            this._view.DisplayStoryDetailsPrompt();
-        }
-
-        public async Task RequestStoryAsync(string title)
-        {
-            var dto = new StoryRequestDTO
-            {
-                Title = title,
-                ReceiverId = _view.ContactDTO.UserId
-            };
-
-            var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
-            if (validationResult.IsValid)
-            {
-                var result = await this._remoteStoriesService.RequestStoryAsync(dto).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await this.LoadContactDetails(true).ConfigureAwait(false);
-                    _view.ShowSuccessMessage("Story requested.");
-                }
-                else
-                {
-                    result.ShowResultError(this._view);
-                }
-            }
-            else
-            {
-                validationResult.ShowValidationResult(this._view);
-            }
         }
     }
 }

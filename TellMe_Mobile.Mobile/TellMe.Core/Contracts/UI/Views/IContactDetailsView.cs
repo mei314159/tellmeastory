@@ -8,7 +8,6 @@ namespace TellMe.Core.Contracts.UI.Views
         ContactDTO ContactDTO { get; set; }
 
         void DisplayContactDetails(ContactDTO dto);
-        void DisplayStoryDetailsPrompt();
         void ShowSuccessMessage(string message);
         void DisplayStories(ICollection<StoryDTO> stories);
     }

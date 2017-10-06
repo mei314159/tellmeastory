@@ -5,18 +5,15 @@ using TellMe.Core.Contracts.UI.Components;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
-    public interface ISendStoryDetailsView : IView
+    public delegate void RequestStoryEventHandler(ICollection<StoryDTO> requestedStories);
+    public interface IRequestStoryView : IView
     {
-        string VideoPath { get; }
-
-        string PreviewImagePath { get; }
-
         ITextInput StoryName { get; }
 
         IButton SendButton { get; }
 
         void DisplayRecipients(ICollection<ContactDTO> selectedItems);
         void ShowSuccessMessage(string message, Action complete);
-        void Close();
+        void Close(ICollection<StoryDTO> requestedStories);
     }
 }

@@ -62,7 +62,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4057" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-26" y="-945"/>
+            <point key="canvasLocation" x="-1053" y="-910"/>
         </scene>
         <!--Send Story Details View Controller-->
         <scene sceneID="8072">
@@ -161,7 +161,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8075" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="481" y="-970"/>
+            <point key="canvasLocation" x="-607" y="-900"/>
         </scene>
         <scene sceneID="14510">
             <objects>
@@ -176,7 +176,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="14514" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1072" y="-198"/>
+            <point key="canvasLocation" x="-2025" y="-901"/>
         </scene>
         <scene sceneID="14768">
             <objects>
@@ -254,11 +254,133 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="14771" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-585" y="-181"/>
+            <point key="canvasLocation" x="-1503" y="-913"/>
+        </scene>
+        <scene sceneID="16497">
+            <objects>
+                <viewController id="16498" customClass="RequestStoryViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="16524"/>
+                        <viewControllerLayoutGuide type="bottom" id="16533"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="16507">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Text" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="16506" customClass="TextInput">
+                                <rect key="frame" x="20" y="117" width="335" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="16508"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Story Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="16509">
+                                <rect key="frame" x="20" y="86" width="91" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="16510"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="16500" customClass="Button">
+                                <rect key="frame" x="88" y="176" width="200" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="16512"/>
+                                    <constraint firstAttribute="width" constant="200" id="16513"/>
+                                </constraints>
+                                <state key="normal" title="Choose Recipient">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="ChooseRecipientsButton_TouchUpInside:" destination="16498" id="17912" eventType="touchUpInside"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="16504" customClass="Button" enabled="NO">
+                                <rect key="frame" x="88" y="617" width="200" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="16515"/>
+                                    <constraint firstAttribute="width" constant="200" id="16516"/>
+                                </constraints>
+                                <state key="normal" title="Send Request">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="SendButton_TouchUpInside:" destination="16498" id="17987" eventType="touchUpInside"/>
+                                </connections>
+                            </button>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="16502" allowsSelection="NO">
+                                <rect key="frame" x="0.0" y="221" width="375" height="381"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="16517">
+                                        <rect key="frame" x="0.0" y="1" width="375" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="16517" id="16518">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="16506" firstAttribute="leading" secondItem="16507" secondAttribute="leadingMargin" constant="4" id="16519"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="16506" secondAttribute="trailing" constant="4" id="16520"/>
+                            <constraint firstItem="16509" firstAttribute="leading" secondItem="16506" secondAttribute="leading" id="16521"/>
+                            <constraint firstItem="16506" firstAttribute="top" secondItem="16509" secondAttribute="bottom" constant="10" id="16522"/>
+                            <constraint firstItem="16506" firstAttribute="top" secondItem="16524" secondAttribute="bottom" constant="53" id="16523"/>
+                            <constraint firstItem="16500" firstAttribute="centerX" secondItem="16507" secondAttribute="centerX" id="16525"/>
+                            <constraint firstItem="16500" firstAttribute="top" secondItem="16506" secondAttribute="bottom" constant="15" id="16526"/>
+                            <constraint firstItem="16504" firstAttribute="centerX" secondItem="16507" secondAttribute="centerX" id="16527"/>
+                            <constraint firstAttribute="bottom" secondItem="16504" secondAttribute="bottom" constant="20" id="16528"/>
+                            <constraint firstItem="16502" firstAttribute="top" secondItem="16500" secondAttribute="bottom" constant="15" id="16529"/>
+                            <constraint firstItem="16504" firstAttribute="top" secondItem="16502" secondAttribute="bottom" constant="15" id="16530"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="16502" secondAttribute="leading" constant="16" id="16531"/>
+                            <constraint firstItem="16502" firstAttribute="trailing" secondItem="16507" secondAttribute="trailingMargin" constant="16" id="16532"/>
+                        </constraints>
+                    </view>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="ChooseRecipientsButton" destination="16500" id="16499"/>
+                        <outlet property="RecipientsTable" destination="16502" id="name-outlet-16502"/>
+                        <outlet property="SendButton" destination="16504" id="16503"/>
+                        <outlet property="StoryName" destination="16506" id="16505"/>
+                        <outlet property="CloseButton" destination="19608" id="name-outlet-19608"/>
+                    </connections>
+                    <navigationItem title="Request a Story" id="19455" key="navigationItem">
+                        <barButtonItem key="leftBarButtonItem" id="19608" systemItem="stop">
+                            <connections>
+                                <action selector="CloseButton_Activated:" destination="16498" id="19684"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="16534" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1500" y="-180"/>
+        </scene>
+        <scene sceneID="19261">
+            <objects>
+                <navigationController id="19262" sceneMemberID="viewController" storyboardIdentifier="RequestStoryViewController" useStoryboardIdentifierAsRestorationIdentifier="YES">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="19264">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue id="19456" destination="16498" kind="relationship" relationship="rootViewController"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="19265" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2031" y="-167"/>
         </scene>
     </scenes>
     <resources>
         <image name="Contacts" width="192" height="192"/>
+        <image name="Play" width="64" height="64"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedScreenMetrics key="destination" type="retina47"/>

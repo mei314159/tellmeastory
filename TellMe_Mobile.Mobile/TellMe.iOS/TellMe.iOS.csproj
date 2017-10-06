@@ -218,6 +218,10 @@
     <Compile Include="Controllers\ImportContactsController.designer.cs">
       <DependentUpon>ImportContactsController.cs</DependentUpon>
     </Compile>
+    <Compile Include="RequestStoryViewController.cs" />
+    <Compile Include="RequestStoryViewController.designer.cs">
+      <DependentUpon>RequestStoryViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

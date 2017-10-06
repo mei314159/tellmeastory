@@ -9,9 +9,9 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteStoriesDataService : BaseDataService
     {
-        public async Task<Result> RequestStoryAsync(StoryRequestDTO dto)
+        public async Task<Result<List<StoryDTO>>> RequestStoryAsync(StoryRequestDTO dto)
         {
-            var result = await this.PostAsync<List<ContactDTO>>("stories/request", dto).ConfigureAwait(false);
+            var result = await this.PostAsync<List<StoryDTO>>("stories/request", dto).ConfigureAwait(false);
 
             return result;
         }

@@ -81,33 +81,6 @@ namespace TellMe.iOS
 
         partial void RequestStoryButton_TouchUpInside(UIButton sender)
         {
-            businessLogic.RequestStory();
-        }
-
-        public void DisplayStoryDetailsPrompt()
-        {
-            UIAlertController alert = UIAlertController.Create("Request Story", "Please enter title and description", UIAlertControllerStyle.Alert);
-            alert.AddTextField(titleField =>
-            {
-                titleField.Placeholder = "Story Title";
-            });
-            alert.AddTextField(titleField =>
-            {
-                titleField.Placeholder = "Story Description";
-            });
-
-            alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-            alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, alertAction => RequestStoryPromptSuccess(alert, alertAction)));
-
-            this.PresentViewController(alert, true, null);
-        }
-
-        private async void RequestStoryPromptSuccess(UIAlertController alert, UIAlertAction alertAction)
-        {
-            var title = alert.TextFields[0].Text;
-            var description = alert.TextFields[1].Text;
-
-            await this.businessLogic.RequestStoryAsync(title);
         }
 
         public void ShowSuccessMessage(string message)

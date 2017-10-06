@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
@@ -38,13 +39,15 @@ namespace TellMe.iOS.Core
         }
 
 
-		public void NavigateRequestStory(IView view)
+		public void NavigateRequestStory(IView view, RequestStoryEventHandler e)
 		{
-			//this.window.InvokeOnMainThread(() =>
-			//{
-   //             var targetController = new RequestStoryViewController();
-			//	this.Present(targetController, view);
-			//});
+			this.window.InvokeOnMainThread(() =>
+			{
+                var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RequestStoryViewController");
+                ((RequestStoryViewController)targetController.ViewControllers.First()).StoryRequested += e;
+				var controller = (UIViewController)view;
+				controller.PresentViewController(targetController, true, null);
+			});
 		}
 
         public void NavigateRecordStory(IView view)
@@ -66,8 +69,6 @@ namespace TellMe.iOS.Core
 				this.Present(targetController, view);
 			});
 		}
-
-
 
 		public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath)
 		{

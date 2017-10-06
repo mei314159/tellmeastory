@@ -80,21 +80,29 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task RequestStoryAsync(string requestSenderId, StoryRequestDTO dto)
+        public async Task<ICollection<StoryDTO>> RequestStoryAsync(string requestSenderId, StoryRequestDTO dto)
         {
             var now = DateTime.UtcNow;
-            var entity = new Story()
-            {
-                RequestDateUtc = now,
-                UpdateDateUtc = now,
-                Title = dto.Title,
-                SenderId = dto.ReceiverId, // story sender is request receiver
-                ReceiverId = requestSenderId, // story receiver is request sender
-                Status = StoryStatus.Requested,
-            };
+            var entities = new List<Story>();
 
-            _storyRepository.Save(entity, true);
-            var storyDTO = Mapper.Map<StoryDTO>(entity);
+            foreach (var receiverId in dto.ReceiverIds)
+            {
+                var entity = new Story()
+                {
+                    RequestDateUtc = now,
+                    UpdateDateUtc = now,
+                    Title = dto.Title,
+                    SenderId = receiverId, // story sender is request receiver
+                    ReceiverId = requestSenderId, // story receiver is request sender
+                    Status = StoryStatus.Requested,
+                };
+
+                entities.Add(entity);
+                _storyRepository.Save(entity, false);
+            }
+
+            _storyRepository.PreCommitSave();
+            var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
 
             var user = await _userRepository
             .GetQueryable()
@@ -102,16 +110,10 @@ namespace TellMe.DAL.Types.Services
             .FirstOrDefaultAsync(x => x.Id == requestSenderId)
             .ConfigureAwait(false);
 
-            var contact = await _contactRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x =>
-                    x.UserId == dto.ReceiverId
-                    && x.PhoneNumberDigits == user.PhoneNumberDigits)
-            .ConfigureAwait(false);
-            string senderName = contact?.Name ?? user.PhoneNumber;
+            
+            await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
 
-            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTO, senderName).ConfigureAwait(false);
+            return storyDTOs;
         }
 
         public async Task<ICollection<StoryDTO>> SendStoryAsync(string senderId, SendStoryDTO dto)
