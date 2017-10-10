@@ -12,6 +12,7 @@ using SharpMobileCode.ModalPicker;
 using TellMe.iOS.Views.CustomPicker;
 using System.Linq;
 using System.Collections.Generic;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
@@ -41,6 +42,7 @@ namespace TellMe.iOS
                 new LocaleProvider(),
                 this);
             this.CountryCode.ShouldChangeCharacters += CountryCode_ShouldChangeCharacters;
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             this._businessLogic.Init();
         }
 
