@@ -21,6 +21,17 @@ namespace TellMe.Core.Types.DataServices.Local
             }
         }
 
+
+        public async Task DeleteAllAsync()
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath);
+            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            {
+                c.DeleteAll<StoryDTO>();
+                c.Table<UpdateInfo>().Delete(x => x.TableName == "Stories");
+            }).ConfigureAwait(false);
+        }
+
         public async Task SaveStoriesAsync(ICollection<StoryDTO> stories)
         {
             var conn = new SQLiteAsyncConnection(this._dbPath);
@@ -34,10 +45,16 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
-        public async Task<DataResult<ICollection<StoryDTO>>> GetAllAsync(string userId)
+        public async Task<DataResult<ICollection<StoryDTO>>> GetAllAsync(string userId = null)
         {
             var conn = new SQLiteAsyncConnection(this._dbPath);
-            var result = await conn.Table<StoryDTO>().Where(x => x.SenderId == userId || x.ReceiverId == userId).ToListAsync().ConfigureAwait(false);
+            var query = conn.Table<StoryDTO>();
+            if (userId != null)
+            {
+                query = query.Where(x => x.SenderId == userId || x.ReceiverId == userId);
+            }
+
+            var result = await query.ToListAsync().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Stories").ConfigureAwait(false);
             return new DataResult<ICollection<StoryDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }

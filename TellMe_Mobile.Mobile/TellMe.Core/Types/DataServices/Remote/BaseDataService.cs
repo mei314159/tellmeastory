@@ -50,8 +50,18 @@ namespace TellMe.Core.Types.DataServices.Remote
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && refreshExpiredToken)
                     {
-                        await this.RefreshAuthTokenAsync().ConfigureAwait(false);
-                        return await this.GetAsync(uri, resultType, false).ConfigureAwait(false);
+                        var refreshTokenResult = await this.RefreshAuthTokenAsync().ConfigureAwait(false);
+                        if (refreshTokenResult.IsSuccess)
+                        {
+                            return await this.GetAsync(uri, resultType, false).ConfigureAwait(false);
+                        }
+
+                        return new Result<object>
+                        {
+                            IsSuccess = false,
+                            IsNetworkIssue = false,
+                            ErrorMessage = refreshTokenResult.Error?.ErrorMessage ?? refreshTokenResult.ErrorMessage
+                        };
                     }
 
                     var errorResponse = JsonConvert.DeserializeObject<ErrorDTO>(responseString);
@@ -171,8 +181,19 @@ namespace TellMe.Core.Types.DataServices.Remote
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && !anonymously && refreshExpiredToken)
                     {
-                        await this.RefreshAuthTokenAsync().ConfigureAwait(false);
-                        return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
+                        var refreshTokenResult = await this.RefreshAuthTokenAsync().ConfigureAwait(false);
+                        if (refreshTokenResult.IsSuccess)
+                        {
+                            return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
+                        }
+
+                        return new Result<TResult, TErrorResult>
+                        {
+                            IsSuccess = false,
+                            IsNetworkIssue = false,
+                            ErrorMessage = refreshTokenResult.Error?.ErrorMessage ?? refreshTokenResult.ErrorMessage
+                        };
+
                     }
 
                     var error = JsonConvert.DeserializeObject<TErrorResult>(responseString);
@@ -205,7 +226,7 @@ namespace TellMe.Core.Types.DataServices.Remote
             }
         }
 
-        private async Task<bool> RefreshAuthTokenAsync()
+        private async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> RefreshAuthTokenAsync()
         {
             if (App.Instance.AuthInfo != null)
             {
@@ -213,16 +234,21 @@ namespace TellMe.Core.Types.DataServices.Remote
                 data.Add("grant_type", "refresh_token");
                 data.Add("refresh_token", App.Instance.AuthInfo.RefreshToken);
                 data.Add("client_id", "ios_app");
-                var result = await this.SendDataAsync<AuthenticationInfoDTO>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
+                var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
                                    .ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {
                     App.Instance.AuthInfo = result.Data;
                 }
+                return result;
             }
 
-            return false;
+            return new Result<AuthenticationInfoDTO, AuthenticationErrorDto>
+            {
+                IsSuccess = false,
+                ErrorMessage = "You're not authenticated"
+            };
         }
     }
 }

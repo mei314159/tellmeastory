@@ -3,6 +3,7 @@ using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts.Domain;
+using System.Collections.Generic;
 
 namespace TellMe.DAL.Types.Repositories
 {
@@ -43,6 +44,15 @@ namespace TellMe.DAL.Types.Repositories
                 Set.Attach(entity);
             }
 
+            if (commit)
+            {
+                _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public void AddRange(IEnumerable<TEntity> entity, bool commit = false)
+        {
+            Set.AddRange(entity);
             if (commit)
             {
                 _unitOfWork.PreCommitSave();

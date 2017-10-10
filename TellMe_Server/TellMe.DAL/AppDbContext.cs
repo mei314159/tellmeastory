@@ -20,6 +20,7 @@ namespace TellMe.DAL
             builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
             builder.Entity<Story>().HasOne(x => x.Receiver).WithMany(x => x.ReceivedStories).HasForeignKey(x => x.ReceiverId);
             builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
+
             base.OnModelCreating(builder);
         }
     }

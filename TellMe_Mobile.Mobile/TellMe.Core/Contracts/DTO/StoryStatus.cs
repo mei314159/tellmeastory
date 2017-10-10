@@ -2,9 +2,9 @@
 {
     public enum StoryStatus
     {
-        Requested = 1,
-        RequestSeen = 2,
-        Accepted = 3,
-        Rejected = 4
+		Requested = 1,
+		RequestSeen = 2,
+		Sent = 3,
+		Ignored = 4
     }
 }

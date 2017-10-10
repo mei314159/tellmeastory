@@ -33,45 +33,131 @@ namespace TellMe.DAL.Types.Services
             _pushNotificationsService = pushNotificationsService;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, string userId)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, string userId = null)
         {
-            var stories = await _storyRepository
+            var stories = _storyRepository
                             .GetQueryable()
-                            .AsNoTracking()
-                            .Where(x => (x.SenderId == currentUserId && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == currentUserId))
-                            .ProjectTo<StoryDTO>()
-                            .ToListAsync()
-                            .ConfigureAwait(false);
+                            .AsNoTracking();
 
-            return stories;
+            if (userId != null)
+            {
+                stories = stories
+                .Where(x => (x.SenderId == currentUserId && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == currentUserId));
+            }
+            else
+            {
+                stories = stories.Where(x => x.SenderId == currentUserId || x.ReceiverId == currentUserId);
+            }
+
+            var result = await stories
+            .ProjectTo<StoryDTO>()
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+            var ids = result
+                    .Select(x => x.SenderId)
+                    .Union(result.Select(x => x.ReceiverId)).ToArray();
+            var users = _userRepository.GetQueryable().AsNoTracking().Where(x => ids.Contains(x.Id));
+
+            var contacts = _contactRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .Where(x => x.UserId == currentUserId);
+
+            var nm = await (from user in users
+                            join contact in contacts
+                            on user.PhoneNumberDigits
+                            equals contact.PhoneNumberDigits into gj
+                            from x in gj.DefaultIfEmpty()
+                            select new { Name = x != null ? x.Name : user.PhoneNumber, user.Id })
+            .ToDictionaryAsync(x => x.Id, x => x.Name).ConfigureAwait(false);
+            foreach (var item in result)
+            {
+                item.SenderName = nm[item.SenderId];
+                item.ReceiverName = nm[item.ReceiverId];
+            }
+
+            return result;
         }
 
-        public async Task RequestStoryAsync(string senderId, StoryRequestDTO dto)
+        public async Task<ICollection<StoryDTO>> RequestStoryAsync(string requestSenderId, StoryRequestDTO dto)
         {
-            string senderName;
+            var now = DateTime.UtcNow;
+            var entities = new List<Story>();
+
+            foreach (var receiverId in dto.ReceiverIds)
+            {
+                var entity = new Story()
+                {
+                    RequestDateUtc = now,
+                    UpdateDateUtc = now,
+                    Title = dto.Title,
+                    SenderId = receiverId, // story sender is request receiver
+                    ReceiverId = requestSenderId, // story receiver is request sender
+                    Status = StoryStatus.Requested,
+                };
+
+                entities.Add(entity);
+                _storyRepository.Save(entity, false);
+            }
+
+            _storyRepository.PreCommitSave();
+            var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
+
             var user = await _userRepository
             .GetQueryable()
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == senderId)
+            .FirstOrDefaultAsync(x => x.Id == requestSenderId)
             .ConfigureAwait(false);
 
-            var contact = await _contactRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x =>
-                    x.UserId == dto.ReceiverId
-                    && x.PhoneNumberDigits == user.PhoneNumberDigits)
-            .ConfigureAwait(false);
+            
+            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
 
-            senderName = contact?.Name ?? user.PhoneNumber;
-            var entity = Mapper.Map<Story>(dto);
-            entity.SenderId = senderId;
-            entity.RequestDateUtc = DateTime.UtcNow;
-            entity.Status = StoryStatus.Requested;
-            _storyRepository.Save(entity, true);
+            return storyDTOs;
+        }
 
-            var storyDTO = Mapper.Map<StoryDTO>(entity);
-            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTO, senderName).ConfigureAwait(false);
+        public async Task<ICollection<StoryDTO>> SendStoryAsync(string senderId, SendStoryDTO dto)
+        {
+            var now = DateTime.UtcNow;
+            var entities = new List<Story>();
+            if (dto.Id.HasValue)
+            {
+                var entity = await _storyRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == dto.Id).ConfigureAwait(false);
+                entity.VideoUrl = dto.VideoUrl;
+                entity.PreviewUrl = dto.PreviewUrl;
+                entity.Status = StoryStatus.Sent;
+                entity.UpdateDateUtc = now;
+                entity.CreateDateUtc = now;
+                _storyRepository.Save(entity, false);
+                entities.Add(entity);
+            }
+            else
+            {
+                foreach (var receiverId in dto.ReceiverIds)
+                {
+                    var entity = new Story()
+                    {
+                        CreateDateUtc = now,
+                        UpdateDateUtc = now,
+                        Title = dto.Title,
+                        SenderId = senderId,
+                        ReceiverId = receiverId,
+                        Status = StoryStatus.Sent,
+                        VideoUrl = dto.VideoUrl,
+                        PreviewUrl = dto.PreviewUrl
+                    };
+
+                    entities.Add(entity);
+                    _storyRepository.Save(entity, false);
+                }
+
+            }
+            _storyRepository.PreCommitSave();
+            var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
+
+            await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, senderId).ConfigureAwait(false);
+
+            return storyDTOs;
         }
     }
 }

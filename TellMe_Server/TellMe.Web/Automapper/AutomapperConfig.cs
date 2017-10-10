@@ -12,7 +12,6 @@ namespace TellMe.Web.AutoMapper
         {
             Mapper.Initialize(cfg =>
             {
-                cfg.CreateMap<StoryRequestDTO, Story>();
                 cfg.CreateMap<Story, StoryDTO>();
             });
         }

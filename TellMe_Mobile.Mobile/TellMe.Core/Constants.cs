@@ -14,5 +14,7 @@ namespace TellMe.Core
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.Personal),
                 "TellMeAStory.db");
+
+		public static string TempVideoStorage = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
     }
 }

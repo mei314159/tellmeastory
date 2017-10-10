@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TellMe.Core;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.DTO;
 using TellMe.iOS.Core.Providers;
+using TellMe.iOS.Extensions;
 using UIKit;
 using UserNotifications;
 
@@ -175,8 +180,12 @@ namespace TellMe.iOS
 
                 if (notification.NotificationType == NotificationTypeEnum.StoryRequest)
                 {
-                    //TODO Process request
+                    var controller = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
+                    App.Instance.Router.NavigateRecordStory(controller, ((JObject)notification.Extra).ToObject<StoryDTO>());
                 }
+                else if (notification.NotificationType == NotificationTypeEnum.Story)
+				{
+				}
             }
         }
 

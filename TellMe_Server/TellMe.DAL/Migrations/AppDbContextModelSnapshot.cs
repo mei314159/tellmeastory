@@ -3,11 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using TellMe.DAL;
-using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Migrations
 {
@@ -252,11 +249,13 @@ namespace TellMe.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Description");
+                    b.Property<DateTime?>("CreateDateUtc");
+
+                    b.Property<string>("PreviewUrl");
 
                     b.Property<string>("ReceiverId");
 
-                    b.Property<DateTime>("RequestDateUtc");
+                    b.Property<DateTime?>("RequestDateUtc");
 
                     b.Property<string>("SenderId");
 
@@ -265,6 +264,8 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("Title");
 
                     b.Property<DateTime>("UpdateDateUtc");
+
+                    b.Property<string>("VideoUrl");
 
                     b.HasKey("Id");
 

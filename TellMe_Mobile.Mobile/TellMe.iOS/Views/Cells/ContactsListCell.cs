@@ -46,6 +46,9 @@ namespace TellMe.iOS.Views.Cells
             this.Name.Text = Contact.Name;
             this.PhoneNumber.Text = Contact.PhoneNumber;
             this.InviteButton.Hidden = Contact.IsAppUser;
+            //if (Contact.IsAppUser){
+            //    this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+            //}
         }
     }
 }

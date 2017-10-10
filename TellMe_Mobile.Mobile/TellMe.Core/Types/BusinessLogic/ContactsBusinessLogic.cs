@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
@@ -15,6 +16,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private LocalContactsDataService _localContactsService;
         private IContactsView _view;
         private IRouter _router;
+        private List<ContactDTO> selectedItems;
 
         public ContactsBusinessLogic(IRouter router, RemoteContactsDataService contactsService, IContactsView view)
         {
@@ -22,6 +24,7 @@ namespace TellMe.Core.Types.BusinessLogic
             _remoteContactsService = contactsService;
             _localContactsService = new LocalContactsDataService();
             _view = view;
+            selectedItems = new List<ContactDTO>();
         }
 
         public async Task LoadContactsAsync(bool forceRefresh = false)
@@ -55,9 +58,24 @@ namespace TellMe.Core.Types.BusinessLogic
             this._router.NavigateImportContacts();
         }
 
-        public void ContactSelected(ContactDTO dto)
+        public void ContactSelected(ContactDTO dto, object cell)
         {
-            this._router.NavigateContactDetails(this._view, dto);
+            if (dto.IsAppUser)
+            {
+                var selected = selectedItems.Contains(dto);
+                if (selected)
+                    selectedItems.Remove(dto);
+                else
+                    selectedItems.Add(dto);
+                
+                this._view.SelectCell(cell, !selected);
+                //this._router.NavigateContactDetails(this._view, dto);
+            }
+        }
+
+        public void DoneButtonTouched()
+        {
+            _view.Done(this.selectedItems);
         }
     }
 }

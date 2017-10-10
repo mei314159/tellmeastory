@@ -4,7 +4,7 @@ namespace TellMe.DAL.Types.Domain
     {
         Requested = 1,
         RequestSeen = 2,
-        Accepted = 3,
-        Rejected = 4
+        Sent = 3,
+        Ignored = 4
     }
 }
