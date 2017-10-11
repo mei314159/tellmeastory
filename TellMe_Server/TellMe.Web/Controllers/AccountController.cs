@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using TellMe.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace TellMe.Web.Controllers
 {
@@ -83,17 +84,25 @@ namespace TellMe.Web.Controllers
                 return BadRequest("Picture is null");
 
             var user = await _userManager.FindByIdAsync(this.UserId);
-            if (user == null){
+            if (user == null)
+            {
                 return NotFound("User not found");
             }
 
             var blobName = dto.File.GetFilename();
             var fileStream = await dto.File.GetFileStream();
 
-            var result = await _storageService.UploadProfilePictureAsync(fileStream, blobName);
-            user.PictureUrl = result.PictureUrl;
-
-            return Ok(result);
+            var uploadResult = await _storageService.UploadProfilePictureAsync(fileStream, blobName);
+            user.PictureUrl = uploadResult.PictureUrl;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(uploadResult);
+            }
+            else
+            {
+                return this.StatusCode((int)HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

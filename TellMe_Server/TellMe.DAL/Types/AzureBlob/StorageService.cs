@@ -20,6 +20,7 @@ namespace TellMe.DAL.Types.AzureBlob
         {
             _settings = settings.Value;
         }
+        
         public async Task<UploadMediaDTO> UploadAsync(Stream videoStream, string videoBlobName, Stream previewImageStream, string previewImageBlobName)
         {
             CloudBlockBlob videoBlob = await GetBlockBlobAsync(_settings.VideoContainerName, videoBlobName);
@@ -38,8 +39,6 @@ namespace TellMe.DAL.Types.AzureBlob
 
             return result;
         }
-
-
 
         public async Task<ProfilePictureDTO> UploadProfilePictureAsync(Stream profilePictureStream, string profilePictureBlobName)
         {
