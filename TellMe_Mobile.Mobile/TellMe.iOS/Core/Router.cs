@@ -94,26 +94,37 @@ namespace TellMe.iOS.Core
 			});
 		}
 
-		private void Present(UIViewController targetController, IView view)
-		{
-			var controller = (UIViewController)view;
-			if (controller.NavigationController != null)
-			{
-				controller.NavigationController.PushViewController(targetController, true);
-			}
-			else
-			{
-				controller.PresentViewController(targetController, true, null);
-			}
-		}
-
-        public void NavigateAccountSettings(IStoriesListView view)
+        public void NavigateAccountSettings(IView view)
         {
             this.window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Main", null).InstantiateViewController("ProfileViewController");
                 this.Present(targetController, view);
             });
+        }
+
+        public void NavigateSetProfilePicture(IView view)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = UIStoryboard.FromName("Auth", null).InstantiateViewController("UploadPictureController");
+                this.Present(targetController, view);
+            });
+        }
+
+
+
+        private void Present(UIViewController targetController, IView view)
+        {
+            var controller = (UIViewController)view;
+            if (controller.NavigationController != null)
+            {
+                controller.NavigationController.PushViewController(targetController, true);
+            }
+            else
+            {
+                controller.PresentViewController(targetController, true, null);
+            }
         }
     }
 }

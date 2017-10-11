@@ -8,10 +8,10 @@ namespace TellMe.DAL.Contracts.Services
     {
         Task<ApplicationUser> GetAsync(string id);
 
-        bool AddToken(RefreshToken token);
+        Task<bool> AddTokenAsync(RefreshToken token);
 
-        bool ExpireToken(RefreshToken token);
+        Task<bool> ExpireTokenAsync(RefreshToken token);
 
-        RefreshToken GetToken(string refresh_token, string client_id);
+        Task<RefreshToken> GetTokenAsync(string token, string clientId);
     }
 }

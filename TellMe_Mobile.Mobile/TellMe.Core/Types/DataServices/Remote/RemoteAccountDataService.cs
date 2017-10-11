@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.DTO;
@@ -32,6 +34,17 @@ namespace TellMe.Core.Types.DataServices.Remote
         public async Task<Result> SignUpAsync(SignUpDTO dto)
         {
             var result = await this.PostAsync<object>("account/signup", dto, true).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<ProfilePictureDTO>> SetProfilePictureAsync(Stream profilePictureStream)
+        {
+            profilePictureStream.Position = 0;
+
+            var data = new MultipartFormDataContent();
+            data.Add(new StreamContent(profilePictureStream), "File", Guid.NewGuid().ToString() + ".jpg");
+
+            var result = await SendDataAsync<ProfilePictureDTO>("account/picture", HttpMethod.Post, data).ConfigureAwait(false);
             return result;
         }
     }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Foundation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
@@ -33,19 +34,22 @@ namespace TellMe.iOS
         }
 
         public AccountBusinessLogic AccountBusinessLogic { get; private set; }
-        public QuietContactsSyncBusinessLogic SyncContactsBusinessLogic
- { get; set; }
+        public QuietContactsSyncBusinessLogic SyncContactsBusinessLogic { get; set; }
+
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            SDWebImageManager.SharedManager.ImageDownloader.MaxConcurrentDownloads = 3;
+            SDWebImageManager.SharedManager.ImageCache.ShouldCacheImagesInMemory = false;
+            SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
+
             UIWindow window = new UIWindow(UIScreen.MainScreen.Bounds);
             var accountService = new AccountService();
             var applicationDataStorage = new ApplicationDataStorage();
             var remotePushDataService = new RemotePushDataService();
-			var remoteContactsDataService = new RemoteContactsDataService();
+            var remoteContactsDataService = new RemoteContactsDataService();
             var contactsProvider = new ContactsProvider();
             this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
-            this.SyncContactsBusinessLogic
- = new QuietContactsSyncBusinessLogic(contactsProvider, remoteContactsDataService);
+            this.SyncContactsBusinessLogic = new QuietContactsSyncBusinessLogic(contactsProvider, remoteContactsDataService);
             App.Instance.Initialize(accountService, applicationDataStorage, new Router(window));
 
             this.Window = window;
@@ -86,7 +90,7 @@ namespace TellMe.iOS
         }
 
         public override async void OnActivated(UIApplication application)
-		{
+        {
             if (this.AccountBusinessLogic.IsAuthenticated)
             {
                 await SyncContactsBusinessLogic.SynchronizeContacts();
@@ -108,13 +112,13 @@ namespace TellMe.iOS
             }
         }
 
-		[Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
-		public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
-		{
-			completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound);
-		}
+        [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
+        public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+        {
+            completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound);
+        }
 
-		public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+        public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
         {
             ProcessNotification(userInfo, application.ApplicationState == UIApplicationState.Active);
         }
@@ -184,8 +188,8 @@ namespace TellMe.iOS
                     App.Instance.Router.NavigateRecordStory(controller, ((JObject)notification.Extra).ToObject<StoryDTO>());
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.Story)
-				{
-				}
+                {
+                }
             }
         }
 

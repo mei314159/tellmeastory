@@ -23,21 +23,21 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public bool AddToken(RefreshToken token)
+        public async Task<bool> AddTokenAsync(RefreshToken token)
         {
-            _refreshTokenRepository.Save(token, true);
+            await _refreshTokenRepository.SaveAsync(token, true).ConfigureAwait(false);
             return true;
         }
 
-        public bool ExpireToken(RefreshToken token)
+        public async Task<bool> ExpireTokenAsync(RefreshToken token)
         {
-            _refreshTokenRepository.Save(token);
+            await _refreshTokenRepository.SaveAsync(token).ConfigureAwait(false);
             return true;
         }
 
-        public RefreshToken GetToken(string token, string clientId)
+        public Task<RefreshToken> GetTokenAsync(string token, string clientId)
         {
-            return _refreshTokenRepository.GetQueryable().FirstOrDefault(x => x.ClientId == clientId && x.Token == token);
+            return _refreshTokenRepository.GetQueryable().FirstOrDefaultAsync(x => x.ClientId == clientId && x.Token == token);
         }
     }
 }

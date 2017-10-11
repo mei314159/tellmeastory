@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using SQLiteNetExtensions.Attributes;
 
 namespace TellMe.Core.Contracts.DTO
 {
@@ -20,5 +21,11 @@ namespace TellMe.Core.Contracts.DTO
         public string RefreshToken { get; set; }
 
         public DateTime AuthDate { get; set; }
+
+        [JsonProperty(PropertyName = "account")]
+        [TextBlob("AccountBlobbed")]
+        public UserDTO Account { get; set; }
+
+        public string AccountBlobbed { get; set; }
     }
 }

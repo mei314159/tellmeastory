@@ -16,6 +16,7 @@ namespace TellMe.Core.Contracts
 
 		void NavigateRequestStory(IView view, RequestStoryEventHandler e);
         void NavigateChooseRecipients(IView view, ContactsSelectedEventHandler e);
-        void NavigateAccountSettings(IStoriesListView view);
+        void NavigateAccountSettings(IView view);
+        void NavigateSetProfilePicture(IView view);
     }
 }

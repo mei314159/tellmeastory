@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SQLite;
+using SQLiteNetExtensions.Extensions;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Local
@@ -28,7 +29,7 @@ namespace TellMe.Core.Types.DataServices.Local
                 }
                 else
                 {
-                    conn.InsertOrReplace(authInfo, typeof(AuthenticationInfoDTO));
+                    conn.InsertOrReplaceWithChildren(authInfo);
                 }
             });
         }
@@ -36,7 +37,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public AuthenticationInfoDTO GetAuthInfo()
         {
             var conn = new SQLiteConnection(this._dbPath);
-            var result = conn.Query<AuthenticationInfoDTO>("SELECT * FROM AuthenticationInfo").FirstOrDefault();
+            var result = conn.GetAllWithChildren<AuthenticationInfoDTO>().FirstOrDefault();
             return result;
         }
     }

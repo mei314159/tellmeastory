@@ -23,6 +23,8 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="FluentValidation" Version="7.1.1" />
-    <PackageReference Include="sqlite-net-pcl" Version="1.4.118" />
+    <PackageReference Include="SQLiteNetExtensionsCore" Version="2.0.0" />
+    <PackageReference Include="sqlite-net-standard" Version="1.5.1" />
+    <PackageReference Include="SQLiteNetExtensionsCore.Async" Version="2.0.0" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using TellMe.DAL.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts.Domain;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TellMe.DAL.Types.Repositories
 {
@@ -47,6 +48,23 @@ namespace TellMe.DAL.Types.Repositories
             if (commit)
             {
                 _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public async Task SaveAsync(TEntity entity, bool commit = false)
+        {
+            if (Equals(entity.Id, default(TKey)))
+            {
+                await Set.AddAsync(entity).ConfigureAwait(false);
+            }
+            else
+            {
+                Set.Attach(entity);
+            }
+
+            if (commit)
+            {
+                await _unitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
             }
         }
 
