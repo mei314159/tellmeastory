@@ -206,10 +206,6 @@
     <Compile Include="Controllers\SendStoryDetailsViewController.designer.cs">
       <DependentUpon>SendStoryDetailsViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\SignUpPhoneController.cs" />
-    <Compile Include="Controllers\SignUpPhoneController.designer.cs">
-      <DependentUpon>SignUpPhoneController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\StoriesListViewController.cs" />
     <Compile Include="Controllers\StoriesListViewController.designer.cs">
       <DependentUpon>StoriesListViewController.cs</DependentUpon>
@@ -222,6 +218,20 @@
     <Compile Include="RequestStoryViewController.designer.cs">
       <DependentUpon>RequestStoryViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="InitialAuthController.cs" />
+    <Compile Include="InitialAuthController.designer.cs">
+      <DependentUpon>InitialAuthController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SignUpController.cs" />
+    <Compile Include="SignUpController.designer.cs">
+      <DependentUpon>SignUpController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SignInController.cs" />
+    <Compile Include="SignInController.designer.cs">
+      <DependentUpon>SignInController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CustomPopUpView.cs" />
+    <Compile Include="Views\Overlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

@@ -57,24 +57,16 @@ namespace TellMe.DAL.Types.Services
             var ids = result
                     .Select(x => x.SenderId)
                     .Union(result.Select(x => x.ReceiverId)).ToArray();
-            var users = _userRepository.GetQueryable().AsNoTracking().Where(x => ids.Contains(x.Id));
-
-            var contacts = _contactRepository
+            var users = await _userRepository
             .GetQueryable()
             .AsNoTracking()
-            .Where(x => x.UserId == currentUserId);
+            .Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, x => x.UserName).ConfigureAwait(false);
 
-            var nm = await (from user in users
-                            join contact in contacts
-                            on user.PhoneNumberDigits
-                            equals contact.PhoneNumberDigits into gj
-                            from x in gj.DefaultIfEmpty()
-                            select new { Name = x != null ? x.Name : user.PhoneNumber, user.Id })
-            .ToDictionaryAsync(x => x.Id, x => x.Name).ConfigureAwait(false);
             foreach (var item in result)
             {
-                item.SenderName = nm[item.SenderId];
-                item.ReceiverName = nm[item.ReceiverId];
+                item.SenderName = users[item.SenderId];
+                item.ReceiverName = users[item.ReceiverId];
             }
 
             return result;
@@ -110,7 +102,7 @@ namespace TellMe.DAL.Types.Services
             .FirstOrDefaultAsync(x => x.Id == requestSenderId)
             .ConfigureAwait(false);
 
-            
+
             await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
 
             return storyDTOs;

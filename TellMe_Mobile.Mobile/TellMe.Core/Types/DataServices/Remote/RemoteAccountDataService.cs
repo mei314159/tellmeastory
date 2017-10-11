@@ -7,12 +7,12 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteAccountDataService : BaseDataService
     {
-        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInPhoneAsync(string phoneNumber, string confirmationCode)
+        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInAsync(string email, string password)
         {
             var data = new Dictionary<string, string>();
-            data.Add("grant_type", "phone_number");
-            data.Add("phone_number", phoneNumber);
-            data.Add("confirmation_code", confirmationCode);
+            data.Add("grant_type", "password");
+            data.Add("username", email);
+            data.Add("password", password);
             data.Add("client_id", "ios_app");
             var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
                                    .ConfigureAwait(false);
@@ -29,9 +29,9 @@ namespace TellMe.Core.Types.DataServices.Remote
             return await PostAsync<object>("Account/ForgotPassword", new { email }, true);
         }
 
-        public async Task<Result> SignUpPhoneAsync(SignUpPhoneDTO dto)
+        public async Task<Result> SignUpAsync(SignUpDTO dto)
         {
-            var result = await this.PostAsync<object>("account/signup-phone", dto, true).ConfigureAwait(false);
+            var result = await this.PostAsync<object>("account/signup", dto, true).ConfigureAwait(false);
             return result;
         }
     }

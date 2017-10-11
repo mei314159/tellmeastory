@@ -26,6 +26,8 @@ using Hangfire;
 using TellMe.DAL.Contracts.PushNotification;
 using TellMe.Web.AutoMapper;
 using TellMe.DAL.Types.AzureBlob;
+using FluentValidation.AspNetCore;
+using System.Reflection;
 
 namespace TellMe.Web
 {
@@ -65,7 +67,6 @@ namespace TellMe.Web
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
@@ -76,7 +77,8 @@ namespace TellMe.Web
             ConfigureJwtAuthService(services);
 
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc();
+            services.AddMvc().AddFluentValidation(
+                fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

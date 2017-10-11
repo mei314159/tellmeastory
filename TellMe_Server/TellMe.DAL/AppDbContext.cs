@@ -15,12 +15,14 @@ namespace TellMe.DAL
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            builder.Entity<Friendship>().HasOne(x => x.User).WithMany(x => x.Friends).HasForeignKey(x => x.UserId);
+            builder.Entity<Friendship>().HasOne(x => x.Friend).WithMany().HasForeignKey(x => x.FriendId);
             builder.Entity<ApplicationUser>().HasMany(x => x.PushNotificationClients).WithOne(x => x.User).HasForeignKey(x => x.UserId);
             builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
             builder.Entity<Story>().HasOne(x => x.Receiver).WithMany(x => x.ReceivedStories).HasForeignKey(x => x.ReceiverId);
-            builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
 
+            // builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
+            // builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
             base.OnModelCreating(builder);
         }
     }

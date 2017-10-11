@@ -38,5 +38,7 @@
 	<string>Tell Me a Story need an access to your camera to record the stories</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Tell Me a Story need an access to your microphone to record the stories</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
 </dict>
 </plist>

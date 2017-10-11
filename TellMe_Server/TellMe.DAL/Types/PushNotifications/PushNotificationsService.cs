@@ -91,26 +91,14 @@ namespace TellMe.DAL.Types.Services
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == requestSenderId)
                         .ConfigureAwait(false);
-                        
-            var receiverContacts = await _contactRepository
-                                    .GetQueryable()
-                                    .AsNoTracking()
-                                    .Where(x =>
-                                    receiverIds.Contains(x.UserId)
-                                    && x.PhoneNumberDigits == user.PhoneNumberDigits)
-                                    .Select(x => new { x.UserId, x.Name })
-                                    .ToListAsync()
-                                    .ConfigureAwait(false);
-                                    
+
             var notifications = storyDTOs.Select(storyDTO =>
             {
-                var contact = receiverContacts.FirstOrDefault(x => x.UserId == requestSenderId);
-                string senderName = contact?.Name ?? user.PhoneNumber;
                 var notification = new IosNotification<StoryDTO>
                 {
                     Data = new IosNotificationAPS
                     {
-                        Message = $"{senderName} requested a story: {storyDTO.Title}"
+                        Message = $"{user.UserName} requested a story: {storyDTO.Title}"
                     },
                     Extra = storyDTO,
                     NotificationType = NotificationTypeEnum.StoryRequest,
@@ -138,26 +126,14 @@ namespace TellMe.DAL.Types.Services
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == senderId)
             .ConfigureAwait(false);
-            var senderContacts = await _contactRepository
-                        .GetQueryable()
-                        .AsNoTracking()
-                        .Where(x =>
-                        receiverIds.Contains(x.UserId)
-                        && x.PhoneNumberDigits == user.PhoneNumberDigits)
-                        .Select(x => new { x.UserId, x.Name })
-                        .ToListAsync()
-                        .ConfigureAwait(false);
 
             var notifications = storyDTOs.Select(storyDTO =>
             {
-                var contact = senderContacts.FirstOrDefault(x => x.UserId == storyDTO.ReceiverId);
-                string senderName = contact?.Name ?? user.PhoneNumber;
-
                 var notification = new IosNotification<StoryDTO>
                 {
                     Data = new IosNotificationAPS
                     {
-                        Message = $"{senderName} sent a story: {storyDTO.Title}"
+                        Message = $"{user.UserName} sent a story: {storyDTO.Title}"
                     },
                     Extra = storyDTO,
                     NotificationType = NotificationTypeEnum.Story,

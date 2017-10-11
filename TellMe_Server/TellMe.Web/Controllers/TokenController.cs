@@ -45,14 +45,15 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            if (parameters.grant_type == "phone_number")
-            {
-                return await DoPhoneNumberAsync(parameters);
-            }
-            // else if (parameters.grant_type == "password")
+            // if (parameters.grant_type == "phone_number")
             // {
-            //     return Json(await DoPasswordAsync(parameters));
+            //     return await DoPhoneNumberAsync(parameters);
             // }
+            // else 
+            if (parameters.grant_type == "password")
+            {
+                return await DoPasswordAsync(parameters);
+            }
             else if (parameters.grant_type == "refresh_token")
             {
                 return DoRefreshToken(parameters);
@@ -68,59 +69,53 @@ namespace TellMe.Web.Controllers
             }
         }
 
-        //scenario 1 get the access-token by username and password  
-        // private async Task<ResponseData> DoPasswordAsync(TokenAuthParams parameters)
-        // {
-        //     //validate the client_id/client_secret/username/password
-        //     var user = await _userManager.FindByEmailAsync(parameters.username);
-        //     //todo validate clientId and client secret
-        //     var isValidated = await _userManager.CheckPasswordAsync(user, parameters.password);
+        private async Task<IActionResult> DoPasswordAsync(TokenAuthParams parameters)
+        {
+            //validate the client_id/client_secret/username/password
+            var user = await _userManager.FindByEmailAsync(parameters.username);
+            //todo validate clientId and client secret
+            var isValidated = await _userManager.CheckPasswordAsync(user, parameters.password);
 
-        //     if (!isValidated)
-        //     {
-        //         return new ResponseData
-        //         {
-        //             Code = "902",
-        //             Message = "invalid user infomation",
-        //             Data = null
-        //         };
-        //     }
+            if (!isValidated)
+            {
+                return BadRequest(new ResponseData
+                {
+                    Code = "902",
+                    Message = "invalid user infomation",
+                    Data = null
+                });
+            }
 
-        //     var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
-        //     var rToken = new RefreshToken
-        //     {
-        //         ClientId = parameters.client_id,
-        //         Token = refresh_token,
-        //         Expired = false,
-        //         UserId = user.Id
-        //     };
+            var rToken = new RefreshToken
+            {
+                ClientId = parameters.client_id,
+                Token = refresh_token,
+                Expired = false,
+                UserId = user.Id
+            };
 
-        //     //store the refresh_token   
-        //     if (_userService.AddToken(rToken))
-        //     {
-        //         return new ResponseData
-        //         {
-        //             Code = "999",
-        //             Message = "OK",
-        //             Data = GetJwt(parameters.client_id, refresh_token, user.Id)
-        //         };
-        //     }
-        //     else
-        //     {
-        //         return new ResponseData
-        //         {
-        //             Code = "909",
-        //             Message = "can not add token to database",
-        //             Data = null
-        //         };
-        //     }
-        // }
+            //store the refresh_token   
+            if (_userService.AddToken(rToken))
+            {
+                return Ok(GetJwt(parameters.client_id, refresh_token, user.Id));
+            }
+            else
+            {
+                return BadRequest(new ResponseData
+                {
+                    Code = "909",
+                    Message = "can not add token to database",
+                    Data = null
+                });
+            }
+        }
 
         private async Task<IActionResult> DoPhoneNumberAsync(TokenAuthParams parameters)
         {
             var formattedPhoneNumber = new Regex(Constants.PhoneNumberCleanupRegex).Replace(parameters.phone_number, string.Empty);
-                
+
             //validate the client_id/client_secret/username/password
             var user = await _userManager.FindByNameAsync(formattedPhoneNumber); //phone number used as username
             //todo validate clientId and client secret
