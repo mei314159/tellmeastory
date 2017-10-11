@@ -113,10 +113,6 @@
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\First.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\First.imageset\vector.pdf" />
-    <ImageAsset Include="Assets.xcassets\Second.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\Second.imageset\vector.pdf" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%402x.png" />
@@ -127,6 +123,9 @@
     <ImageAsset Include="Assets.xcassets\Play.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Play.imageset\play%403x.png" />
     <ImageAsset Include="Assets.xcassets\Play.imageset\play%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\profile%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\profile%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -140,6 +139,7 @@
     <Folder Include="Core\DTO\" />
     <Folder Include="Controllers\" />
     <Folder Include="Assets.xcassets\Play.imageset\" />
+    <Folder Include="Assets.xcassets\Account.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

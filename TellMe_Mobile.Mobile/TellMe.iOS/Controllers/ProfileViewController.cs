@@ -12,6 +12,11 @@ namespace TellMe.iOS
         {
         }
 
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetToolbarHidden(true, true);
+        }
+
         partial void SignOutButton_TouchUpInside(UIButton sender)
         {
             App.Instance.AuthInfo = null;

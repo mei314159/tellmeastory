@@ -106,5 +106,14 @@ namespace TellMe.iOS.Core
 				controller.PresentViewController(targetController, true, null);
 			}
 		}
+
+        public void NavigateAccountSettings(IStoriesListView view)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = UIStoryboard.FromName("Main", null).InstantiateViewController("ProfileViewController");
+                this.Present(targetController, view);
+            });
+        }
     }
 }

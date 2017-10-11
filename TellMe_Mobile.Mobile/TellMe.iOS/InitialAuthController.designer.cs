@@ -14,5 +14,8 @@ namespace TellMe.iOS
     [Register ("InitialAuthController")]
     partial class InitialAuthController
     {
+        void ReleaseDesignerOutlets ()
+        {
+        }
     }
 }

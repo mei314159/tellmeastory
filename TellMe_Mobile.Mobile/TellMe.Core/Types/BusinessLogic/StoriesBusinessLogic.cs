@@ -70,5 +70,10 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             _router.NavigateRequestStory(this._view, (requestedStories) => this.LoadStoriesAsync(true, false));
         }
+
+        public void AccountSettings()
+        {
+            _router.NavigateAccountSettings(_view);
+        }
     }
 }

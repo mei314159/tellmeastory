@@ -33,10 +33,23 @@ namespace TellMe.iOS
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
             this.TableView.DelaysContentTouches = false;
+            this.NavigationController.View.BackgroundColor = UIColor.White;
 
+            this.SetToolbarItems(new[]{
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+                new UIBarButtonItem("Request a Story", UIBarButtonItemStyle.Plain, RequestStoryButtonTouched),
+                new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace),
+                new UIBarButtonItem("Send a Story", UIBarButtonItemStyle.Plain, SendStoryButtonTouched),
+                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
+            }, true);
             Task.Run(() => LoadStories(false, true));
 
             ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetToolbarHidden(false, true);
         }
 
         public void DisplayStories(ICollection<StoryDTO> stories)
@@ -127,14 +140,19 @@ namespace TellMe.iOS
             Task.Run(() => LoadStories(true));
         }
 
-        partial void SendStoryButtonTouched(UIBarButtonItem sender)
+        void SendStoryButtonTouched(object sender, EventArgs e)
         {
             businessLogic.SendStory();
         }
 
-        partial void RequestStoryButtonTouched(UIBarButtonItem sender)
+        void RequestStoryButtonTouched(object sender, EventArgs e)
         {
             businessLogic.RequestStory();
+        }
+
+        partial void AccountSettingsButton_Activated(UIBarButtonItem sender)
+        {
+            businessLogic.AccountSettings();
         }
     }
 }
