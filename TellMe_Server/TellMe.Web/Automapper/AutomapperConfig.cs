@@ -13,7 +13,11 @@ namespace TellMe.Web.AutoMapper
         {
             Mapper.Initialize(cfg =>
             {
-                cfg.CreateMap<Story, StoryDTO>();
+                cfg.CreateMap<Story, StoryDTO>()
+                    .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
+                    .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.Receiver.UserName))
+                    .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl))
+                    .ForMember(x => x.ReceiverPictureUrl, x => x.MapFrom(z => z.Receiver.PictureUrl));
                 cfg.CreateMap<ApplicationUser, UserDTO>();
             });
         }

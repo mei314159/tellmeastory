@@ -75,5 +75,10 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             _router.NavigateAccountSettings(_view);
         }
+
+        public void ShowStorytellers()
+        {
+            _router.NavigateStorytellers(_view);
+        }
     }
 }

@@ -17,5 +17,7 @@ namespace TellMe.DAL.Contracts.DTO
         public string ReceiverId { get; set; }
         public string SenderName { get; set; }
         public string ReceiverName { get; set; }
+        public string SenderPictureUrl { get; set; }
+        public string ReceiverPictureUrl { get; set; }
     }
 }

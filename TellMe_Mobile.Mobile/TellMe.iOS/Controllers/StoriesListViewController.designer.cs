@@ -18,15 +18,41 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIBarButtonItem AccountSettingsButton { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIBarButtonItem Notifications { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIBarButtonItem Storytellers { get; set; }
+
         [Action ("AccountSettingsButton_Activated:")]
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void AccountSettingsButton_Activated (UIKit.UIBarButtonItem sender);
+
+        [Action ("Notifications_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void Notifications_Activated (UIKit.UIBarButtonItem sender);
+
+        [Action ("Storytellers_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void Storytellers_Activated (UIKit.UIBarButtonItem sender);
 
         void ReleaseDesignerOutlets ()
         {
             if (AccountSettingsButton != null) {
                 AccountSettingsButton.Dispose ();
                 AccountSettingsButton = null;
+            }
+
+            if (Notifications != null) {
+                Notifications.Dispose ();
+                Notifications = null;
+            }
+
+            if (Storytellers != null) {
+                Storytellers.Dispose ();
+                Storytellers = null;
             }
         }
     }

@@ -14,13 +14,13 @@ namespace TellMe.Web.Controllers
         private readonly IStorageService _storageService;
         private readonly IStoryService _storyService;
         public StoriesController(
-            IHttpContextAccessor httpContextAccessor, 
+            IHttpContextAccessor httpContextAccessor,
             IUserService userService,
             IStoryService storyService,
             IStorageService storageService) : base(httpContextAccessor, userService)
         {
             _storyService = storyService;
-            _storageService =storageService;
+            _storageService = storageService;
         }
 
         [HttpPost("request")]
@@ -37,13 +37,6 @@ namespace TellMe.Web.Controllers
             var result = await _storyService.SendStoryAsync(this.UserId, dto);
 
             return Ok(result);
-        }
-
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetStoriesAsync(string userId)
-        {
-            var stories = await _storyService.GetAllAsync(this.UserId, userId);
-            return Ok(stories);
         }
 
         [HttpGet("")]

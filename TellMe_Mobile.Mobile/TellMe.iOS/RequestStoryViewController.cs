@@ -32,7 +32,7 @@ namespace TellMe.iOS
 		{
 			recipientsList = new List<ContactDTO>();
 			_businessLogic = new RequestStoryBusinessLogic(this, App.Instance.Router, new RemoteStoriesDataService());
-			this.RecipientsTable.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
+			//this.RecipientsTable.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
 			this.RecipientsTable.RowHeight = 64;
 			this.RecipientsTable.DataSource = this;
 			this.RecipientsTable.TableFooterView = new UIView();
@@ -57,9 +57,10 @@ namespace TellMe.iOS
 
 		public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 		{
-			var cell = tableView.DequeueReusableCell(ContactsListCell.Key, indexPath) as ContactsListCell;
-			cell.Contact = this.recipientsList[indexPath.Row];
-			return cell;
+            return new UITableViewCell();
+			//var cell = tableView.DequeueReusableCell(ContactsListCell.Key, indexPath) as ContactsListCell;
+			//cell.Contact = this.recipientsList[indexPath.Row];
+			//return cell;
 		}
 
 		public void ShowErrorMessage(string title, string message = null)

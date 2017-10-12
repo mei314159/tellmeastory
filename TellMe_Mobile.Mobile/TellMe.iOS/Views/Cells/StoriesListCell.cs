@@ -130,17 +130,21 @@ namespace TellMe.iOS.Views.Cells
             {
                 this.Date.Text = Story.RequestDateUtc?.ToShortDateString();
                 this.Title.Text = $"{story.ReceiverName} requested a story \"{Story.Title}\"";
+                this.ProfilePicture.SetPictureUrl(story.ReceiverPictureUrl);
             }
             else if (story.Status == StoryStatus.Sent)
             {
                 this.Date.Text = Story.CreateDateUtc?.ToShortDateString();
                 this.Title.Text = $"{story.SenderName} sent a story \"{Story.Title}\"";
+                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
             }
             else if (story.Status == StoryStatus.Ignored)
             {
                 this.Date.Text = Story.UpdateDateUtc.ToShortDateString();
                 this.Title.Text = $"{story.SenderName} ignored story request \"{Story.Title}\"";
+                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
             }
+
             Spinner.Hidden = true;
             Preview.Hidden = story.Status != StoryStatus.Sent;
             if (story.Status == StoryStatus.Sent)

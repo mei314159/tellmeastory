@@ -55,7 +55,6 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void GoToImportContacts()
         {
-            this._router.NavigateImportContacts();
         }
 
         public void ContactSelected(ContactDTO dto, object cell)

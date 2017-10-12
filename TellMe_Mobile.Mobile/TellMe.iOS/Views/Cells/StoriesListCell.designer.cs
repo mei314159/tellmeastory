@@ -23,6 +23,10 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Picture ProfilePicture { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
         [Outlet]
@@ -43,6 +47,11 @@ namespace TellMe.iOS.Views.Cells
             if (Preview != null) {
                 Preview.Dispose ();
                 Preview = null;
+            }
+
+            if (ProfilePicture != null) {
+                ProfilePicture.Dispose ();
+                ProfilePicture = null;
             }
 
             if (Spinner != null) {

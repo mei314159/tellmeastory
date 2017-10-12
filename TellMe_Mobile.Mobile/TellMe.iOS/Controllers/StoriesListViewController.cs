@@ -22,7 +22,6 @@ namespace TellMe.iOS
         {
         }
 
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
@@ -153,6 +152,16 @@ namespace TellMe.iOS
         partial void AccountSettingsButton_Activated(UIBarButtonItem sender)
         {
             businessLogic.AccountSettings();
+        }
+
+        partial void Notifications_Activated(UIBarButtonItem sender)
+        {
+            
+        }
+
+        partial void Storytellers_Activated(UIBarButtonItem sender)
+        {
+            businessLogic.ShowStorytellers();
         }
     }
 }

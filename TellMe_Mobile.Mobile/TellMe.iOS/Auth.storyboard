@@ -202,90 +202,6 @@
             <point key="canvasLocation" x="-1237" y="-474"/>
         </scene>
         <!--Import Contacts-->
-        <scene sceneID="19179">
-            <objects>
-                <viewController storyboardIdentifier="ImportContactsController" title="Import Contacts" useStoryboardIdentifierAsRestorationIdentifier="YES" id="19180" customClass="ImportContactsController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="19207"/>
-                        <viewControllerLayoutGuide type="bottom" id="19208"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="19186">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="19184">
-                                <rect key="frame" x="87.5" y="518" width="200" height="44"/>
-                                <color key="backgroundColor" red="0.25490196078431371" green="0.44313725490196076" blue="0.90980392156862744" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="19200"/>
-                                    <constraint firstAttribute="height" constant="44" id="19201"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="19"/>
-                                <state key="normal" title="Provide Access">
-                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                        <real key="value" value="4"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="ProvideAccessButton_TouchUpInside:" destination="19180" eventType="touchUpInside" id="20295"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Provide access to your contacts list to allow us to find your friends who already use Tell Me a Story app" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="23293" translatesAutoresizingMaskIntoConstraints="NO" numberOfLines="0">
-                                <rect key="frame" x="20" y="416" width="335" height="72"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                                <constraints>
-                                    <constraint id="23590" firstItem="23293" firstAttribute="height" constant="72"/>
-                                </constraints>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="23677" translatesAutoresizingMaskIntoConstraints="NO">
-                                <rect key="frame" x="88" y="592" width="200" height="30"/>
-                                <state key="normal" title="Skip">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <constraints>
-                                    <constraint id="23731" firstItem="23677" firstAttribute="height" constant="30"/>
-                                    <constraint id="23783" firstItem="23677" firstAttribute="width" constant="200"/>
-                                </constraints>
-                            </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="25000" translatesAutoresizingMaskIntoConstraints="NO" image="Contacts">
-                                <rect key="frame" x="92" y="72" width="192" height="192"/>
-                                <constraints>
-                                    <constraint id="25052" firstItem="25000" firstAttribute="height" constant="192"/>
-                                    <constraint id="25070" firstAttribute="width" secondItem="25000" secondAttribute="height" multiplier="1:1"/>
-                                </constraints>
-                            </imageView>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="19184" firstAttribute="centerX" secondItem="19186" secondAttribute="centerX" id="19206"/>
-                            <constraint id="22699" firstItem="19186" firstAttribute="bottom" secondItem="19184" secondAttribute="bottom" constant="105"/>
-                            <constraint id="23554" firstItem="19184" firstAttribute="top" secondItem="23293" secondAttribute="bottom" constant="30"/>
-                            <constraint id="23572" firstItem="23293" firstAttribute="centerX" secondItem="19186" secondAttribute="centerX"/>
-                            <constraint id="23695" firstItem="19186" firstAttribute="bottom" secondItem="23677" secondAttribute="bottom" constant="45"/>
-                            <constraint id="23713" firstItem="23677" firstAttribute="centerX" secondItem="19186" secondAttribute="centerX"/>
-                            <constraint id="24504" firstItem="23293" firstAttribute="leading" secondItem="19186" secondAttribute="leadingMargin" constant="4"/>
-                            <constraint id="24522" firstItem="19186" firstAttribute="trailingMargin" secondItem="23293" secondAttribute="trailing" constant="4"/>
-                            <constraint id="25210" firstItem="25000" firstAttribute="centerX" secondItem="19186" secondAttribute="centerX"/>
-                            <constraint id="25228" firstItem="25000" firstAttribute="top" secondItem="19186" secondAttribute="top" constant="72"/>
-                        </constraints>
-                    </view>
-                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
-                    <navigationItem key="navigationItem" title="Sign Up" id="19185"/>
-                    <connections>
-                        <outlet property="ProvideAccessButton" destination="19184" id="name-outlet-19184"/>
-                        <outlet property="SkipButton" destination="23677" id="name-outlet-23677"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="19209" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="839" y="-186"/>
-        </scene>
         <scene sceneID="28288">
             <objects>
                 <viewController id="28289" sceneMemberID="viewController" storyboardIdentifier="InitialAuthController" useStoryboardIdentifierAsRestorationIdentifier="YES" customClass="InitialAuthController">
@@ -564,8 +480,8 @@
     <resources>
         <image name="Contacts" width="192" height="192"/>
         <image name="Play" width="64" height="64"/>
-        <image name="Account" width="25" height="25"/>
         <image name="UserPic" width="36" height="36"/>
+        <image name="Bell" width="64" height="64"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedScreenMetrics key="destination" type="retina47"/>

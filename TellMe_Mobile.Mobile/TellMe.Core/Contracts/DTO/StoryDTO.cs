@@ -5,12 +5,12 @@ namespace TellMe.Core.Contracts.DTO
     [SQLite.Table("Stories")]
     public class StoryDTO
     {
-		[SQLite.PrimaryKey]
-		public int Id { get; set; }
+        [SQLite.PrimaryKey]
+        public int Id { get; set; }
 
-		public string Title { get; set; }
+        public string Title { get; set; }
 
-		public DateTime? RequestDateUtc { get; set; }
+        public DateTime? RequestDateUtc { get; set; }
 
         public DateTime UpdateDateUtc { get; set; }
 
@@ -19,15 +19,19 @@ namespace TellMe.Core.Contracts.DTO
         public StoryStatus Status { get; set; }
 
         public string SenderId { get; set; }
-		
+
         public string ReceiverId { get; set; }
 
-		public string VideoUrl { get; set; }
+        public string VideoUrl { get; set; }
 
         public string PreviewUrl { get; set; }
 
         public string SenderName { get; set; }
 
         public string ReceiverName { get; set; }
+
+        public string SenderPictureUrl { get; set; }
+
+        public string ReceiverPictureUrl { get; set; }
     }
 }

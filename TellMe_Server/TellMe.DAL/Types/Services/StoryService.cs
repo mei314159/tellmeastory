@@ -33,41 +33,18 @@ namespace TellMe.DAL.Types.Services
             _pushNotificationsService = pushNotificationsService;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, string userId = null)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId)
         {
             var stories = _storyRepository
                             .GetQueryable()
-                            .AsNoTracking();
-
-            if (userId != null)
-            {
-                stories = stories
-                .Where(x => (x.SenderId == currentUserId && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == currentUserId));
-            }
-            else
-            {
-                stories = stories.Where(x => x.SenderId == currentUserId || x.ReceiverId == currentUserId);
-            }
-
+                            .AsNoTracking()
+                            .Include(x => x.Sender)
+                            .Include(x => x.Receiver)
+                            .Where(x => x.SenderId == currentUserId || x.ReceiverId == currentUserId);
             var result = await stories
             .ProjectTo<StoryDTO>()
             .ToListAsync()
             .ConfigureAwait(false);
-
-            var ids = result
-                    .Select(x => x.SenderId)
-                    .Union(result.Select(x => x.ReceiverId)).ToArray();
-            var users = await _userRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, x => x.UserName).ConfigureAwait(false);
-
-            foreach (var item in result)
-            {
-                item.SenderName = users[item.SenderId];
-                item.ReceiverName = users[item.ReceiverId];
-            }
 
             return result;
         }

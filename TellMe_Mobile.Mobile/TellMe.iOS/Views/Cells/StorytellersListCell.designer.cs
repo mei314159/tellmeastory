@@ -10,20 +10,24 @@ using System.CodeDom.Compiler;
 
 namespace TellMe.iOS.Views.Cells
 {
-    [Register ("ContactsListCell")]
-    partial class ContactsListCell
+    [Register ("StorytellersListCell")]
+    partial class StorytellersListCell
     {
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel FullName { get; set; }
+
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton InviteButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel Name { get; set; }
+        TellMe.iOS.Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel PhoneNumber { get; set; }
+        UIKit.UILabel Username { get; set; }
 
         [Action ("InviteButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -31,19 +35,24 @@ namespace TellMe.iOS.Views.Cells
 
         void ReleaseDesignerOutlets ()
         {
+            if (FullName != null) {
+                FullName.Dispose ();
+                FullName = null;
+            }
+
             if (InviteButton != null) {
                 InviteButton.Dispose ();
                 InviteButton = null;
             }
 
-            if (Name != null) {
-                Name.Dispose ();
-                Name = null;
+            if (ProfilePicture != null) {
+                ProfilePicture.Dispose ();
+                ProfilePicture = null;
             }
 
-            if (PhoneNumber != null) {
-                PhoneNumber.Dispose ();
-                PhoneNumber = null;
+            if (Username != null) {
+                Username.Dispose ();
+                Username = null;
             }
         }
     }

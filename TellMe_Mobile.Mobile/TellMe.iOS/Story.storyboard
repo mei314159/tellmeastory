@@ -360,7 +360,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="16534" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1500" y="-180"/>
+            <point key="canvasLocation" x="-2367" y="-188"/>
         </scene>
         <scene sceneID="19261">
             <objects>
@@ -375,12 +375,76 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="19265" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2031" y="-167"/>
+            <point key="canvasLocation" x="-2869" y="-191"/>
+        </scene>
+        <scene sceneID="24229">
+            <objects>
+                <viewController id="24230" sceneMemberID="viewController" customClass="StorytellersController" storyboardIdentifier="StorytellersController" useStoryboardIdentifierAsRestorationIdentifier="YES">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="24227"/>
+                        <viewControllerLayoutGuide type="bottom" id="24228"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="24231">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" id="24456" translatesAutoresizingMaskIntoConstraints="NO" placeholder="Search for storytellers" showsCancelButton="YES">
+                                <rect key="frame" x="0.0" y="64" width="375" height="44"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="search"/>
+                                <constraints>
+                                    <constraint id="24459" firstItem="24456" firstAttribute="height" constant="44"/>
+                                </constraints>
+                                <scopeButtonTitles>
+                                    <string>Storytellers</string>
+                                    <string>Tribes</string>
+                                </scopeButtonTitles>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" id="24720" translatesAutoresizingMaskIntoConstraints="NO" showsHorizontalScrollIndicator="NO">
+                                <rect key="frame" x="0.0" y="108" width="375" height="559"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes/>
+                            </tableView>
+                        </subviews>
+                        <constraints>
+                            <constraint id="24458" firstItem="24456" firstAttribute="top" secondItem="24227" secondAttribute="bottom"/>
+                            <constraint id="24546" firstItem="24456" firstAttribute="centerX" secondItem="24231" secondAttribute="centerX"/>
+                            <constraint id="24547" firstItem="24456" firstAttribute="width" secondItem="24231" secondAttribute="width"/>
+                            <constraint id="24724" firstItem="24720" firstAttribute="top" secondItem="24456" secondAttribute="bottom"/>
+                            <constraint id="24725" firstItem="24720" firstAttribute="centerX" secondItem="24231" secondAttribute="centerX"/>
+                            <constraint id="24726" firstItem="24720" firstAttribute="width" secondItem="24231" secondAttribute="width"/>
+                            <constraint id="24727" firstItem="24720" firstAttribute="bottom" secondItem="24228" secondAttribute="top"/>
+                        </constraints>
+                    </view>
+                    <navigationItem title="Storytellers" id="24234" key="navigationItem"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="searchDisplayController" destination="24347" id="24346"/>
+                        <outlet property="TableView" destination="24720" id="name-outlet-24720"/>
+                        <outlet property="SearchBar" destination="24456" id="name-outlet-24456"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="24232" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="24347">
+                    <connections>
+                        <outlet property="delegate" destination="24230" id="24348"/>
+                        <outlet property="searchBar" destination="24344" id="24349"/>
+                        <outlet property="searchContentsController" destination="24230" id="24350"/>
+                        <outlet property="searchResultsDataSource" destination="24230" id="24351"/>
+                        <outlet property="searchResultsDelegate" destination="24230" id="24352"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="-1873" y="55"/>
         </scene>
     </scenes>
     <resources>
         <image name="Contacts" width="192" height="192"/>
         <image name="Play" width="64" height="64"/>
+        <image name="UserPic" width="36" height="36"/>
+        <image name="Bell" width="25" height="25"/>
+        <image name="Storytellers" width="25" height="25"/>
+        <image name="Account" width="25" height="25"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedScreenMetrics key="destination" type="retina47"/>

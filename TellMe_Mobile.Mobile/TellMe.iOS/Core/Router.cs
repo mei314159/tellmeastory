@@ -17,27 +17,10 @@ namespace TellMe.iOS.Core
             this.window = window;
         }
 
-        public void NavigateImportContacts()
-        {
-            this.window.InvokeOnMainThread(() => this.window.SwapController(UIStoryboard.FromName("Auth", null).InstantiateViewController("ImportContactsController")));
-        }
-
         public void NavigateMain()
         {
             this.window.InvokeOnMainThread(() => this.window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController()));
         }
-
-        public void NavigateContactDetails(IView view, ContactDTO dto)
-        {
-            this.window.InvokeOnMainThread(() =>
-            {
-
-                var targetController = (ContactDetailsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactDetailsViewController");
-                targetController.ContactDTO = dto;
-				this.Present(targetController, view);
-            });
-        }
-
 
 		public void NavigateRequestStory(IView view, RequestStoryEventHandler e)
 		{
@@ -86,12 +69,12 @@ namespace TellMe.iOS.Core
 
 		public void NavigateChooseRecipients(IView view, ContactsSelectedEventHandler e)
 		{
-			this.window.InvokeOnMainThread(() =>
-			{
-                var targetController = (ContactsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactsViewController");
-                targetController.ContactsSelected += e;
-				this.Present(targetController, view);
-			});
+			//this.window.InvokeOnMainThread(() =>
+			//{
+   //             var targetController = (ContactsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactsViewController");
+   //             targetController.ContactsSelected += e;
+			//	this.Present(targetController, view);
+			//});
 		}
 
         public void NavigateAccountSettings(IView view)
@@ -112,7 +95,14 @@ namespace TellMe.iOS.Core
             });
         }
 
-
+        public void NavigateStorytellers(IView view)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
+                this.Present(targetController, view);
+            });
+        }
 
         private void Present(UIViewController targetController, IView view)
         {
