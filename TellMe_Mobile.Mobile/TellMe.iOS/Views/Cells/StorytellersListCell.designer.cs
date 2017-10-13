@@ -15,11 +15,11 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel FullName { get; set; }
+        UIKit.UILabel FriendshipStatusLabel { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIButton InviteButton { get; set; }
+        UIKit.UILabel FullName { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -29,20 +29,16 @@ namespace TellMe.iOS.Views.Cells
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UILabel Username { get; set; }
 
-        [Action ("InviteButton_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void InviteButton_TouchUpInside (UIKit.UIButton sender);
-
         void ReleaseDesignerOutlets ()
         {
+            if (FriendshipStatusLabel != null) {
+                FriendshipStatusLabel.Dispose ();
+                FriendshipStatusLabel = null;
+            }
+
             if (FullName != null) {
                 FullName.Dispose ();
                 FullName = null;
-            }
-
-            if (InviteButton != null) {
-                InviteButton.Dispose ();
-                InviteButton = null;
             }
 
             if (ProfilePicture != null) {

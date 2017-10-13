@@ -8,7 +8,6 @@ namespace TellMe.Web.Controllers
     [Route("api/storytellers")]
     public class StorytellerController : AuthorizedController
     {
-        
         public StorytellerController(IHttpContextAccessor httpContextAccessor, IUserService userService) : base(httpContextAccessor, userService)
         {
         }
@@ -32,6 +31,19 @@ namespace TellMe.Web.Controllers
         {
             var friendshipStatus = await UserService.AddToFriendsAsync(this.UserId, userId);
             return Ok(friendshipStatus);
+        }
+
+        [HttpPost("{userId}/reject-friendship")]
+        public async Task<IActionResult> RejectFriendshipRequestAsync(string userId)
+        {
+            var friendshipStatus = await UserService.RejectFriendshipRequestAsync(this.UserId, userId);
+            return Ok(friendshipStatus);
+        }
+
+        [HttpPost("request-to-join")]
+        public async Task<IActionResult> SendRequestToJoinAsync(string email)
+        {
+            return Ok();
         }
     }
 }

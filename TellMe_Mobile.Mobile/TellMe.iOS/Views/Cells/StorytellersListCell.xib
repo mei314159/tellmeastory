@@ -20,25 +20,6 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="239" translatesAutoresizingMaskIntoConstraints="NO" clipsSubviews="YES">
-                        <rect key="frame" x="310" y="17" width="50" height="30"/>
-                        <state key="normal" title="Invite">
-                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="titleColor" colorSpace="calibratedRGB" red="0.058823529411764705" green="0.49803921568627452" blue="0.996078431372549" alpha="1"/>
-                        </state>
-                        <constraints>
-                            <constraint id="243" firstItem="239" firstAttribute="width" constant="50" relation="greaterThanOrEqual"/>
-                            <constraint id="244" firstItem="239" firstAttribute="height" constant="30"/>
-                        </constraints>
-                        <connections>
-                            <action selector="InviteButton_TouchUpInside:" destination="cxk-wN-pdQ" id="271" eventType="touchUpInside"/>
-                        </connections>
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute keyPath="layer.cornerRadius" type="number">
-                                <real key="value" value="4"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                    </button>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="526" translatesAutoresizingMaskIntoConstraints="NO" text="full name">
                         <rect key="frame" x="64" y="34" width="63" height="18"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -60,26 +41,35 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Friendship Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="5358" translatesAutoresizingMaskIntoConstraints="NO" misplaced="YES">
+                        <rect key="frame" x="245" y="22" width="120" height="19"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <constraints>
+                            <constraint id="9943" firstItem="5358" firstAttribute="width" constant="120" relation="lessThanOrEqual"/>
+                        </constraints>
+                    </label>
                 </subviews>
                 <constraints>
-                    <constraint id="240" firstItem="239" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY"/>
-                    <constraint id="242" firstItem="YTl-1W-gDM" firstAttribute="trailing" secondItem="239" secondAttribute="trailing" constant="15"/>
-                    <constraint id="252" firstItem="239" firstAttribute="leading" secondItem="142" secondAttribute="trailing" constant="8" relation="greaterThanOrEqual"/>
                     <constraint id="525" firstItem="142" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="10"/>
                     <constraint id="527" firstItem="526" firstAttribute="leading" secondItem="142" secondAttribute="leading"/>
                     <constraint id="528" firstItem="526" firstAttribute="top" secondItem="142" secondAttribute="bottom"/>
-                    <constraint id="529" firstItem="239" firstAttribute="leading" secondItem="526" secondAttribute="trailing" constant="8" relation="greaterThanOrEqual"/>
                     <constraint id="2787" firstItem="1956" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="10"/>
                     <constraint id="2880" firstItem="1956" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="10"/>
                     <constraint id="2973" firstItem="YTl-1W-gDM" firstAttribute="bottom" secondItem="1956" secondAttribute="bottom" constant="9" relation="greaterThanOrEqual"/>
                     <constraint id="4557" firstItem="142" firstAttribute="leading" secondItem="1956" secondAttribute="trailing" constant="10"/>
+                    <constraint id="5905" firstItem="YTl-1W-gDM" firstAttribute="trailing" secondItem="5358" secondAttribute="trailing" constant="10"/>
+                    <constraint id="7977" firstItem="5358" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY"/>
+                    <constraint id="10179" firstItem="5358" firstAttribute="leading" secondItem="142" secondAttribute="trailing" constant="129" relation="greaterThanOrEqual"/>
+                    <constraint id="10416" firstItem="5358" firstAttribute="leading" secondItem="526" secondAttribute="trailing" constant="10" relation="greaterThanOrEqual"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="Username" destination="142" id="name-outlet-142"/>
-                <outlet property="InviteButton" destination="239" id="name-outlet-239"/>
                 <outlet property="FullName" destination="526" id="name-outlet-526"/>
                 <outlet property="ProfilePicture" destination="1956" id="name-outlet-1956"/>
+                <outlet property="FriendshipStatusLabel" destination="5358" id="name-outlet-5358"/>
             </connections>
             <color key="backgroundColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
         </tableViewCell>

@@ -8,6 +8,7 @@ using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
+using TellMe.Core.DTO;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
@@ -34,7 +35,7 @@ namespace TellMe.iOS
         }
 
         public AccountBusinessLogic AccountBusinessLogic { get; private set; }
-        public QuietContactsSyncBusinessLogic SyncContactsBusinessLogic { get; set; }
+        public NotificationsCenterView NotificationsCenterView;
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -46,10 +47,8 @@ namespace TellMe.iOS
             var accountService = new AccountService();
             var applicationDataStorage = new ApplicationDataStorage();
             var remotePushDataService = new RemotePushDataService();
-            var remoteContactsDataService = new RemoteContactsDataService();
             var contactsProvider = new ContactsProvider();
             this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
-            this.SyncContactsBusinessLogic = new QuietContactsSyncBusinessLogic(contactsProvider, remoteContactsDataService);
             App.Instance.Initialize(accountService, applicationDataStorage, new Router(window));
 
             this.Window = window;
@@ -66,6 +65,8 @@ namespace TellMe.iOS
             }
 
             UNUserNotificationCenter.Current.Delegate = this;
+
+            this.NotificationsCenterView = NotificationsCenterView.Create();
             return true;
         }
 
@@ -93,7 +94,7 @@ namespace TellMe.iOS
         {
             if (this.AccountBusinessLogic.IsAuthenticated)
             {
-                await SyncContactsBusinessLogic.SynchronizeContacts();
+                //await SyncContactsBusinessLogic.SynchronizeContacts();
             }
         }
 
@@ -188,6 +189,15 @@ namespace TellMe.iOS
                     App.Instance.Router.NavigateRecordStory(controller, ((JObject)notification.Extra).ToObject<StoryDTO>());
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.Story)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.FriendshipRequest)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.FriendshipAccepted)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.FriendshipRejected)
                 {
                 }
             }

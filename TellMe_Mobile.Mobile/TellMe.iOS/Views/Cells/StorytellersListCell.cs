@@ -1,5 +1,4 @@
 ﻿using System;
-using Contacts;
 using Foundation;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
@@ -21,8 +20,6 @@ namespace TellMe.iOS.Views.Cells
             // Note: this .ctor should not contain any initialization logic.
         }
 
-        public Action<StorytellerDTO> OnSendFriendshiopRequestButtonTouched;
-
         StorytellerDTO storyteller;
         public StorytellerDTO Storyteller
         {
@@ -37,11 +34,6 @@ namespace TellMe.iOS.Views.Cells
             }
         }
 
-        partial void InviteButton_TouchUpInside(UIButton sender)
-        {
-            OnSendFriendshiopRequestButtonTouched?.Invoke(this.Storyteller);
-        }
-
         private void Initialize()
         {
             this.Username.Text = Storyteller.UserName;
@@ -49,27 +41,23 @@ namespace TellMe.iOS.Views.Cells
             this.ProfilePicture.SetPictureUrl(storyteller.PictureUrl);
 
             if (storyteller.FriendshipStatus == FriendshipStatus.Accepted){
-                this.InviteButton.SetTitle("Friends", UIControlState.Normal);
-                this.InviteButton.SetTitleColor(UIColor.LightGray, UIControlState.Normal);
-                this.InviteButton.Enabled = false;
+                this.FriendshipStatusLabel.Text = "Friends";
+                this.FriendshipStatusLabel.TextColor = UIColor.DarkGray;
             }
             else if (storyteller.FriendshipStatus == FriendshipStatus.Requested)
             {
-                this.InviteButton.SetTitle("Waiting for response", UIControlState.Normal);
-                this.InviteButton.SetTitleColor(UIColor.LightGray, UIControlState.Normal);
-                this.InviteButton.Enabled = false;
+                this.FriendshipStatusLabel.Text = "Waiting for response";
+                this.FriendshipStatusLabel.TextColor = UIColor.LightGray;
             }
             else if (storyteller.FriendshipStatus == FriendshipStatus.WaitingForResponse)
             {
-                this.InviteButton.SetTitle("Accept friendship", UIControlState.Normal);
-                this.InviteButton.SetTitleColor(UIColor.LightGray, UIControlState.Normal);
-                this.InviteButton.Enabled = true;
+                this.FriendshipStatusLabel.Text = "Followed you";
+                this.FriendshipStatusLabel.TextColor = UIColor.Blue;
             }
             else
             {
-                this.InviteButton.SetTitle("Add to friends", UIControlState.Normal);
-                this.InviteButton.SetTitleColor(UIColor.Blue, UIControlState.Normal);
-                this.InviteButton.Enabled = true;
+                this.FriendshipStatusLabel.Text = "Follow";
+                this.FriendshipStatusLabel.TextColor = UIColor.Orange;
             }
 
             //if (Contact.IsAppUser){

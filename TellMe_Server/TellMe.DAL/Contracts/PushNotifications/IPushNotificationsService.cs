@@ -11,5 +11,9 @@ namespace TellMe.DAL.Contracts.PushNotification
         
 		Task SendStoryRequestPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string requestSenderId);
         Task SendStoryPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string senderId);
+        Task SendFriendshipRequestPushNotificationAsync(StorytellerDTO friendshipInitiator, string friendId);
+        Task SendFriendshipAcceptedPushNotificationAsync(StorytellerDTO friendshipAcceptor, string friendId);
+
+        Task SendFriendshipRejectedPushNotificationAsync(StorytellerDTO friendshipRejector, string friendId);
     }
 }

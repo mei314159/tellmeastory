@@ -23,11 +23,6 @@ namespace TellMe.DAL.Types.Services
     {
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
-
-        private readonly IRepository<Contact, int> _contactRepository;
-
-
-
         private readonly PushSettings _pushSettings;
 
         private readonly IHostingEnvironment _environment;
@@ -35,13 +30,11 @@ namespace TellMe.DAL.Types.Services
         public PushNotificationsService(
             IRepository<ApplicationUser, string> UserRepository,
             IRepository<PushNotificationClient, int> pushTokenRepository,
-            IRepository<Contact, int> contactRepository,
             IOptions<PushSettings> pushSettings,
             IHostingEnvironment environment)
         {
             _userRepository = UserRepository;
             _pushTokenRepository = pushTokenRepository;
-            _contactRepository = contactRepository;
             _pushSettings = pushSettings.Value;
             _environment = environment;
         }
@@ -143,6 +136,77 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             Task.Run(() => SendIosPushNotification<StoryDTO>(notifications));
+        }
+
+        public async Task SendFriendshipRequestPushNotificationAsync(StorytellerDTO friendshipInitiator, string friendId)
+        {
+            var pushClients = await _pushTokenRepository
+                                        .GetQueryable()
+                                        .AsNoTracking()
+                                        .Where(a => a.UserId == friendId && a.OsType == OsType.iOS)
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+            var notification = new IosNotification<StorytellerDTO>
+            {
+                Data = new IosNotificationAPS
+                {
+                    Message = $"{friendshipInitiator.UserName} sent you a friendship request"
+                },
+                Extra = friendshipInitiator,
+                NotificationType = NotificationTypeEnum.FriendshipRequest,
+            };
+
+            Task.Run(() => SendIosPushNotification<StorytellerDTO>(notification, pushClients));
+        }
+
+        public async Task SendFriendshipAcceptedPushNotificationAsync(StorytellerDTO friendshipAcceptor, string friendId)
+        {
+            var pushClients = await _pushTokenRepository
+                                        .GetQueryable()
+                                        .AsNoTracking()
+                                        .Where(a => a.UserId == friendId && a.OsType == OsType.iOS)
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+            var notification = new IosNotification<StorytellerDTO>
+            {
+                Data = new IosNotificationAPS
+                {
+                    Message = $"{friendshipAcceptor.UserName} accepted your friendship request"
+                },
+                Extra = friendshipAcceptor,
+                NotificationType = NotificationTypeEnum.FriendshipAccepted,
+            };
+
+            Task.Run(() => SendIosPushNotification<StorytellerDTO>(notification, pushClients));
+        }
+
+        public async Task SendFriendshipRejectedPushNotificationAsync(StorytellerDTO friendshipRejector, string friendId)
+        {
+            var pushClients = await _pushTokenRepository
+                                        .GetQueryable()
+                                        .AsNoTracking()
+                                        .Where(a => a.UserId == friendId && a.OsType == OsType.iOS)
+                                        .ToListAsync()
+                                        .ConfigureAwait(false);
+
+            var notification = new IosNotification<StorytellerDTO>
+            {
+                Data = new IosNotificationAPS
+                {
+                    Message = $"{friendshipRejector.UserName} rejected your friendship request"
+                },
+                Extra = friendshipRejector,
+                NotificationType = NotificationTypeEnum.FriendshipRejected,
+            };
+
+            Task.Run(() => SendIosPushNotification<StorytellerDTO>(notification, pushClients));
+        }
+
+        public void SendIosPushNotification<T>(IosNotification<T> notification, IReadOnlyCollection<PushNotificationClient> pushClients)
+        {
+            SendIosPushNotification<T>(new Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients));
         }
 
         public void SendIosPushNotification<T>(params Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>[] notifications)

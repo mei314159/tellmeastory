@@ -10,13 +10,15 @@ using TellMe.iOS.Views.Cells;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Remote;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
-    public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource
+    public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource, IUITableViewDelegate
     {
         private StorytellersBusinessLogic _businessLogic;
         private List<StorytellerDTO> storytellersList = new List<StorytellerDTO>();
+        private List<StorytellerDTO> tribes = new List<StorytellerDTO>();
 
         public StorytellersController(IntPtr handle) : base(handle)
         {
@@ -33,12 +35,23 @@ namespace TellMe.iOS
             this.TableView.TableFooterView = new UIView();
             this.TableView.DelaysContentTouches = false;
             this.TableView.DataSource = this;
+            this.TableView.Delegate = this;
             this.SearchBar.OnEditingStarted += SearchBar_OnEditingStarted;
             this.SearchBar.OnEditingStopped += SearchBar_OnEditingStopped;
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
             this.SearchBar.SearchButtonClicked += SearchBar_SearchButtonClicked;
-
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(HideSearchCancelButton));
             Task.Run(() => LoadStorytellers(false, true));
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetToolbarHidden(true, true);
+        }
+
+        void HideSearchCancelButton()
+        {
+            SearchBar.EndEditing(true);
         }
 
         private void SearchBar_OnEditingStarted(object sender, EventArgs e)
@@ -52,7 +65,7 @@ namespace TellMe.iOS
             SearchBar.ResignFirstResponder();
         }
 
-        private async void SearchBar_CancelButtonClicked(object sender, EventArgs e)
+        private void SearchBar_CancelButtonClicked(object sender, EventArgs e)
         {
             SearchBar.EndEditing(true);
             Task.Run(() => LoadStorytellers(false));
@@ -106,38 +119,74 @@ namespace TellMe.iOS
             return this.storytellersList.Count;
         }
 
-        //public nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-        //{
-        //    var cell = storytellersList[indexPath.Row];
-        //    if (cell.Status == StoryStatus.Sent)
-        //    {
-        //        return tableView.Frame.Width + 64;
-        //    }
-        //    else
-        //    {
-        //        return 64;
-        //    }
-        //}
+        [Export("tableView:didSelectRowAtIndexPath:")]
+        public void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            tableView.DeselectRow(indexPath, false);
+            if (indexPath.Section == 0)
+            {
+                var dto = this.storytellersList[indexPath.Row];
+                string title = null;
+                string confirmButtonTitle = null;
+                switch (dto.FriendshipStatus)
+                {
+                    case FriendshipStatus.Accepted:
+                    case FriendshipStatus.Rejected:
+                    case FriendshipStatus.Requested:
+                        return;
+                    case FriendshipStatus.WaitingForResponse:
+                        title = "Accept Follow Request?";
+                        confirmButtonTitle = "Accept";
+                        break;
+                    case FriendshipStatus.None:
+                        title = "Send a Follow Request?";
+                        confirmButtonTitle = "Send";
+                        break;
 
-        //public void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        //{
-        //    var dto = this.storytellersList[indexPath.Row];
-        //    if (dto.Status != StoryStatus.Requested || dto.ReceiverId == App.Instance.AuthInfo.UserId)
-        //    {
-        //        tableView.DeselectRow(indexPath, false);
-        //    }
-        //    else
-        //    {
-        //        businessLogic.SendStory(dto);
-        //    }
-        //}
+                }
+
+                UIAlertController alert = UIAlertController
+                    .Create(title, string.Empty, UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create(confirmButtonTitle, UIAlertActionStyle.Default, (x) => SendFriendshipRequest(dto)));
+                this.PresentViewController(alert, true, null);
+            }
+        }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
             cell.Storyteller = this.storytellersList[indexPath.Row];
-            cell.OnSendFriendshiopRequestButtonTouched = SendFriendshipRequest;
             return cell;
+        }
+
+        [Export("tableView:titleForHeaderInSection:")]
+        public string TitleForHeader(UITableView tableView, nint section)
+        {
+            if (section == 0)
+                return "Friends";
+            if (section == 1)
+                return "Tribes";
+
+            return string.Empty;
+        }
+
+        [Export("numberOfSectionsInTableView:")]
+        public nint NumberOfSections(UITableView tableView)
+        {
+            return tribes.Count > 0 ? 2 : 1; //Friends Tribes
+        }
+
+        public void ShowSendRequestPrompt()
+        {
+            InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                        .Create("Storytellers not found","Send a request to join?", UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create("Send", UIAlertActionStyle.Default, (x) => this.ShowSendRequestToJoinPrompt()));
+                this.PresentViewController(alert, true, null);
+            });
         }
 
         private async void SendFriendshipRequest(StorytellerDTO storyteller)
@@ -161,10 +210,18 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
         }
 
-
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
             Task.Run(() => LoadStorytellers(true));
+
+        }
+
+        private void ShowSendRequestToJoinPrompt()
+        {
+            var popup = InputPopupView.Create("Send request to join", "Enter email address");
+            popup.KeyboardType = UIKeyboardType.EmailAddress;
+            popup.PopUp(true);
+            popup.OnSubmit += async (email) => await _businessLogic.SendRequestToJoinPromptAsync(email);
         }
     }
 }

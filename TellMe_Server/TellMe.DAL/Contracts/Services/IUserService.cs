@@ -19,5 +19,6 @@ namespace TellMe.DAL.Contracts.Services
         Task<IReadOnlyCollection<StorytellerDTO>> SearchAsync(string currentUserId, string fragment);
         Task<IReadOnlyCollection<StorytellerDTO>> GetAllFriendsAsync(string currentUserId);
         Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
+        Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);
     }
 }

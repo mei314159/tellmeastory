@@ -14,6 +14,11 @@ namespace TellMe.iOS.Views
 
         public CustomPopUpView(CGSize size, bool showCloseButton = true)
         {
+            Init(size, showCloseButton);
+        }
+
+        protected virtual void Init(CGSize size, bool showCloseButton)
+        {
             nfloat lx = (UIScreen.MainScreen.Bounds.Width - size.Width) / 2;
             nfloat ly = (UIScreen.MainScreen.Bounds.Height - size.Height) / 2;
             this.Frame = new CGRect(new CGPoint(lx, ly), size);
@@ -27,12 +32,13 @@ namespace TellMe.iOS.Views
                 nfloat btnHeight = 40;
                 btnClose.SetTitle("Close", UIControlState.Normal);
                 btnClose.Frame = new CGRect(0, this.Frame.Height - btnHeight, this.Frame.Width, btnHeight);
-                btnClose.TouchUpInside += delegate
-                {
-                    Close();
-                };
+                btnClose.TouchUpInside += (s, e) => Close();
                 this.AddSubview(btnClose);
             }
+        }
+
+        protected CustomPopUpView(IntPtr handle) : base(handle)
+        {
         }
 
         public virtual void PopUp(bool animated = true, Action popAnimationFinish = null)
@@ -46,14 +52,13 @@ namespace TellMe.iOS.Views
             if (animated)
             {
                 Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);
-                UIView.Animate(0.15, delegate
+                Animate(0.15, delegate
                 {
                     Transform = CGAffineTransform.MakeScale(1, 1);
                     effectView.Alpha = 0.8f;
                 }, delegate
                 {
-                    if (null != popAnimationFinish)
-                        popAnimationFinish();
+                    popAnimationFinish?.Invoke();
                 });
             }
             else
@@ -66,7 +71,7 @@ namespace TellMe.iOS.Views
         {
             if (animated)
             {
-                UIView.Animate(0.15, delegate
+                Animate(0.15, delegate
                 {
                     Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);
                     effectView.Alpha = 0;
@@ -74,12 +79,12 @@ namespace TellMe.iOS.Views
                 {
                     this.RemoveFromSuperview();
                     effectView.RemoveFromSuperview();
-                    if (null != PopWillClose) PopWillClose();
+                    PopWillClose?.Invoke();
                 });
             }
             else
             {
-                if (null != PopWillClose) PopWillClose();
+                PopWillClose?.Invoke();
             }
         }
     }

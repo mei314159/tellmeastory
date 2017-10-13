@@ -62,7 +62,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4057" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1053" y="-910"/>
+            <point key="canvasLocation" x="-2318" y="-887"/>
         </scene>
         <!--Send Story Details View Controller-->
         <scene sceneID="8072">
@@ -161,7 +161,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8075" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-607" y="-900"/>
+            <point key="canvasLocation" x="-1872" y="-877"/>
         </scene>
         <scene sceneID="14510">
             <objects>
@@ -176,7 +176,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="14514" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2025" y="-901"/>
+            <point key="canvasLocation" x="-3290" y="-878"/>
         </scene>
         <scene sceneID="14768">
             <objects>
@@ -254,7 +254,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="14771" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1503" y="-913"/>
+            <point key="canvasLocation" x="-2768" y="-890"/>
         </scene>
         <scene sceneID="16497">
             <objects>
@@ -360,7 +360,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="16534" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2367" y="-188"/>
+            <point key="canvasLocation" x="-2756" y="-48"/>
         </scene>
         <scene sceneID="19261">
             <objects>
@@ -375,7 +375,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="19265" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2869" y="-191"/>
+            <point key="canvasLocation" x="-3289" y="-55"/>
         </scene>
         <scene sceneID="24229">
             <objects>
@@ -389,7 +389,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <subviews>
-                            <searchBar contentMode="redraw" id="24456" translatesAutoresizingMaskIntoConstraints="NO" placeholder="Search for storytellers" showsCancelButton="YES">
+                            <searchBar contentMode="redraw" id="24456" translatesAutoresizingMaskIntoConstraints="NO" placeholder="Search for storytellers">
                                 <rect key="frame" x="0.0" y="64" width="375" height="44"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="search"/>
                                 <constraints>
@@ -400,7 +400,7 @@
                                     <string>Tribes</string>
                                 </scopeButtonTitles>
                             </searchBar>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" id="24720" translatesAutoresizingMaskIntoConstraints="NO" showsHorizontalScrollIndicator="NO">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="24720" translatesAutoresizingMaskIntoConstraints="NO" showsHorizontalScrollIndicator="NO">
                                 <rect key="frame" x="0.0" y="108" width="375" height="559"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes/>
@@ -435,7 +435,7 @@
                     </connections>
                 </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="-1873" y="55"/>
+            <point key="canvasLocation" x="-2252" y="-46"/>
         </scene>
     </scenes>
     <resources>

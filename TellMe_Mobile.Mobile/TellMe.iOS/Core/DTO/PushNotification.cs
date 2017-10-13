@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using TellMe.Core.DTO;
 
 namespace TellMe.iOS.Core.DTO
 {

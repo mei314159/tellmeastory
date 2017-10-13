@@ -18,13 +18,5 @@ namespace TellMe.DAL.Types.Domain
         public virtual ICollection<Story> SentStories { get; set; }
 
         public virtual ICollection<Story> ReceivedStories { get; set; }
-        
-        // public virtual ICollection<Contact> Contacts { get; set; }
-        // public long PhoneNumberDigits { get; set; }
-
-        // public int PhoneCountryCode { get; set; }
-
-        // [MaxLength(2)]
-        // public string CountryCode { get; set; }
     }
 }

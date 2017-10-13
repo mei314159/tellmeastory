@@ -17,18 +17,14 @@ namespace TellMe.DAL.Types.Services
     public class StoryService : IStoryService
     {
         private readonly IRepository<Story, int> _storyRepository;
-        private readonly IRepository<Contact, int> _contactRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-
         private readonly IPushNotificationsService _pushNotificationsService;
         public StoryService(
             IRepository<Story, int> storyRepository,
-            IRepository<Contact, int> contactRepository,
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService)
         {
             _storyRepository = storyRepository;
-            _contactRepository = contactRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
         }

@@ -8,6 +8,7 @@ namespace TellMe.Core.Contracts.UI.Views
         void ShowSuccessMessage(string message);
 
         void DisplayStorytellers(ICollection<StorytellerDTO> items);
+        void ShowSendRequestPrompt();
     }
 
 

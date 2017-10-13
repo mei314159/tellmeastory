@@ -167,6 +167,8 @@
     <InterfaceDefinition Include="Views\Cells\StorytellersListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
     <InterfaceDefinition Include="Story.storyboard" />
+    <InterfaceDefinition Include="Views\InputPopupView.xib" />
+    <InterfaceDefinition Include="Views\NotificationsCenterView.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -186,7 +188,6 @@
     </Compile>
     <Compile Include="Core\Router.cs" />
     <Compile Include="Core\DTO\PushNotification.cs" />
-    <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
     <Compile Include="Core\DTO\IosNotificationAPS.cs" />
     <Compile Include="Views\Cells\StoriesListCell.cs" />
     <Compile Include="Views\Cells\StoriesListCell.designer.cs">
@@ -251,6 +252,14 @@
     <Compile Include="StorytellersController.cs" />
     <Compile Include="StorytellersController.designer.cs">
       <DependentUpon>StorytellersController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InputPopupView.cs" />
+    <Compile Include="Views\InputPopupView.designer.cs">
+      <DependentUpon>InputPopupView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NotificationsCenterView.cs" />
+    <Compile Include="Views\NotificationsCenterView.designer.cs">
+      <DependentUpon>NotificationsCenterView.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

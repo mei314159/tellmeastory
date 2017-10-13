@@ -24,5 +24,11 @@ namespace TellMe.Core.Types.DataServices.Remote
             var result = await this.PostAsync<FriendshipStatus>($"storytellers/{id}/add-to-friends", null).ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> SendRequestToJoinAsync(string email)
+        {
+            var result = await this.PostAsync<object>($"storytellers/request-to-join", email).ConfigureAwait(false);
+            return result;
+        }
     }
 }
