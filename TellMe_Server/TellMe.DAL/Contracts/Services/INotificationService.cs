@@ -7,5 +7,6 @@ namespace TellMe.DAL.Contracts.Services
     public interface INotificationService : IService
     {
         Task<IReadOnlyCollection<NotificationDTO>> GetNotificationsAsync(string currentUserId, int skip);
+        Task HandleNotificationAsync(int notificationId);
     }
 }

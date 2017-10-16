@@ -33,5 +33,17 @@ namespace TellMe.DAL.Types.Services
             var result = Mapper.Map<List<NotificationDTO>>(query);
             return result;
         }
+
+        public async Task HandleNotificationAsync(int notificationId)
+        {
+            var notification = await _notificationRepository
+            .GetQueryable()
+            .FirstOrDefaultAsync(x => x.Id == notificationId)
+            .ConfigureAwait(false);
+            notification.Handled = true;
+            await _notificationRepository
+            .SaveAsync(notification, true)
+            .ConfigureAwait(false);
+        }
     }
 }

@@ -17,6 +17,8 @@ namespace TellMe.DAL.Types.Domain
 
         public string Text { get; set; }
 
+        public bool Handled { get; set; }
+
         public NotificationTypeEnum Type { get; set; }
 
         [NotMapped]

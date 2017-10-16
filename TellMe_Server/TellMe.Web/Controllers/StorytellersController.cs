@@ -9,8 +9,13 @@ namespace TellMe.Web.Controllers
     [Route("api/storytellers")]
     public class StorytellersController : AuthorizedController
     {
-        public StorytellersController(IHttpContextAccessor httpContextAccessor, IUserService userService) : base(httpContextAccessor, userService)
+        private INotificationService _notificationService;
+        public StorytellersController(
+            IHttpContextAccessor httpContextAccessor,
+            IUserService userService,
+            INotificationService notificationService) : base(httpContextAccessor, userService)
         {
+            _notificationService = notificationService;
         }
 
         [HttpGet("search/{fragment}")]
@@ -31,6 +36,7 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> AddToFriendsAsync(string userId, [FromBody] int? notificationId)
         {
             var friendshipStatus = await UserService.AddToFriendsAsync(this.UserId, userId);
+            await _notificationService.HandleNotificationAsync(notificationId.Value);
             return Ok(friendshipStatus);
         }
 
@@ -38,6 +44,7 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> RejectFriendshipRequestAsync(string userId, [FromBody] int? notificationId)
         {
             var friendshipStatus = await UserService.RejectFriendshipRequestAsync(this.UserId, userId);
+            await _notificationService.HandleNotificationAsync(notificationId.Value);
             return Ok(friendshipStatus);
         }
 

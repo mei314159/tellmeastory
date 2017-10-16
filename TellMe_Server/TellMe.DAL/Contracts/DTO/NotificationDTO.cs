@@ -13,6 +13,8 @@ namespace TellMe.DAL.Contracts.DTO
 
         public string Text { get; set; }
 
+        public bool Handled { get; set; }
+        
         public NotificationTypeEnum Type { get; set; }
 
         public object Extra { get; set; }

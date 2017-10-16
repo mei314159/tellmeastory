@@ -34,19 +34,15 @@ namespace TellMe.iOS
             this.TableView.Delegate = this;
             this.TableView.RegisterNibForCellReuse(NotificationCenterCell.Nib, NotificationCenterCell.Key);
             this.TableView.RefreshControl = new UIRefreshControl();
-            this.TableView.RefreshControl.ValueChanged += (s, e) => LoadNotificationsAsync(true, true);
+            this.TableView.RefreshControl.ValueChanged += (s, e) => LoadNotificationsAsync(true);
 
-            Task.Run(() => LoadNotificationsAsync(false, true));
+            Task.Run(() => LoadNotificationsAsync(false));
         }
 
-        private async Task LoadNotificationsAsync(bool forceRefresh, bool clearCache, bool showSpinner = true)
+        private async Task LoadNotificationsAsync(bool forceRefresh)
         {
-            if (showSpinner || notificationsList.Count == 0)
-            {
-                InvokeOnMainThread(() => TableView.RefreshControl.BeginRefreshing());
-            }
-
-            await businessLogic.LoadNotificationsAsync(forceRefresh, clearCache);
+            InvokeOnMainThread(() => TableView.RefreshControl.BeginRefreshing());
+            await businessLogic.LoadNotificationsAsync(forceRefresh);
             InvokeOnMainThread(() => TableView.RefreshControl.EndRefreshing());
         }
 
