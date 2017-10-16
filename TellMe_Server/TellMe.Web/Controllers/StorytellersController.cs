@@ -5,10 +5,11 @@ using TellMe.DAL.Contracts.Services;
 
 namespace TellMe.Web.Controllers
 {
+
     [Route("api/storytellers")]
-    public class StorytellerController : AuthorizedController
+    public class StorytellersController : AuthorizedController
     {
-        public StorytellerController(IHttpContextAccessor httpContextAccessor, IUserService userService) : base(httpContextAccessor, userService)
+        public StorytellersController(IHttpContextAccessor httpContextAccessor, IUserService userService) : base(httpContextAccessor, userService)
         {
         }
 
@@ -27,14 +28,14 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPost("{userId}/add-to-friends")]
-        public async Task<IActionResult> AddToFriendsAsync(string userId)
+        public async Task<IActionResult> AddToFriendsAsync(string userId, [FromBody] int? notificationId)
         {
             var friendshipStatus = await UserService.AddToFriendsAsync(this.UserId, userId);
             return Ok(friendshipStatus);
         }
 
         [HttpPost("{userId}/reject-friendship")]
-        public async Task<IActionResult> RejectFriendshipRequestAsync(string userId)
+        public async Task<IActionResult> RejectFriendshipRequestAsync(string userId, [FromBody] int? notificationId)
         {
             var friendshipStatus = await UserService.RejectFriendshipRequestAsync(this.UserId, userId);
             return Ok(friendshipStatus);

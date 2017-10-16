@@ -35,7 +35,6 @@ namespace TellMe.iOS
         }
 
         public AccountBusinessLogic AccountBusinessLogic { get; private set; }
-        public NotificationsCenterView NotificationsCenterView;
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -66,7 +65,6 @@ namespace TellMe.iOS
 
             UNUserNotificationCenter.Current.Delegate = this;
 
-            this.NotificationsCenterView = NotificationsCenterView.Create();
             return true;
         }
 

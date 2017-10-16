@@ -67,7 +67,7 @@ namespace TellMe.iOS.Core
 			});
 		}
 
-		public void NavigateChooseRecipients(IView view, ContactsSelectedEventHandler e)
+		public void NavigateChooseRecipients(IView view, UserSelectedEventHandler e)
 		{
 			//this.window.InvokeOnMainThread(() =>
 			//{
@@ -104,10 +104,10 @@ namespace TellMe.iOS.Core
             });
         }
 
-        private void Present(UIViewController targetController, IView view)
+        private void Present(UIViewController targetController, IView view, bool push = true)
         {
             var controller = (UIViewController)view;
-            if (controller.NavigationController != null)
+            if (controller.NavigationController != null && push)
             {
                 controller.NavigationController.PushViewController(targetController, true);
             }
@@ -115,6 +115,15 @@ namespace TellMe.iOS.Core
             {
                 controller.PresentViewController(targetController, true, null);
             }
+        }
+
+        public void NavigateNotificationsCenter(IView view)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = UIStoryboard.FromName("Main", null).InstantiateViewController("NotificationCenterController");
+                this.Present(targetController, view, false);
+            });
         }
     }
 }

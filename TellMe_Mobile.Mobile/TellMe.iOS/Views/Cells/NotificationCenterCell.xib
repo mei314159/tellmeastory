@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="64" id="cxk-wN-pdQ" customClass="NotificationCenterCell">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="63"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" id="603" translatesAutoresizingMaskIntoConstraints="NO" numberOfLines="0" minimumScaleFactor="0.5" baselineAdjustment="alignBaselines">
+                        <rect key="frame" x="64" y="10" width="301" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <constraints>
+                            <constraint id="1275" firstItem="603" firstAttribute="height" constant="21" relation="greaterThanOrEqual"/>
+                            <constraint id="1296" firstItem="603" firstAttribute="height" constant="44" relation="lessThanOrEqual"/>
+                        </constraints>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="2210" translatesAutoresizingMaskIntoConstraints="NO" image="UserPic" clipsSubviews="YES">
+                        <rect key="frame" x="10" y="10" width="44" height="44"/>
+                        <constraints>
+                            <constraint id="2301" firstItem="2210" firstAttribute="height" constant="44"/>
+                            <constraint id="2312" firstAttribute="width" secondItem="2210" secondAttribute="height" multiplier="1:1"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute keyPath="layer.cornerRadius" type="number">
+                                <real key="value" value="22"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint id="968" firstItem="603" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="10"/>
+                    <constraint id="1327" firstItem="YTl-1W-gDM" firstAttribute="bottom" secondItem="603" secondAttribute="bottom" constant="10" relation="greaterThanOrEqual"/>
+                    <constraint id="1383" firstItem="YTl-1W-gDM" firstAttribute="trailing" secondItem="603" secondAttribute="trailing" constant="10"/>
+                    <constraint id="2323" firstItem="2210" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="10"/>
+                    <constraint id="2334" firstItem="2210" firstAttribute="leading" secondItem="YTl-1W-gDM" secondAttribute="leading" constant="10"/>
+                    <constraint id="2345" firstItem="YTl-1W-gDM" firstAttribute="bottom" secondItem="2210" secondAttribute="bottom" constant="9" relation="greaterThanOrEqual"/>
+                    <constraint id="2448" firstItem="603" firstAttribute="leading" secondItem="2210" secondAttribute="trailing" constant="10"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
+            <connections>
+                <outlet property="Text" destination="603" id="name-outlet-603"/>
+                <outlet property="PictureView" destination="2210" id="name-outlet-2210"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="Contacts" width="192" height="192"/>
+        <image name="Play" width="64" height="64"/>
+        <image name="UserPic" width="36" height="36"/>
+        <image name="Bell" width="25" height="25"/>
+        <image name="Storytellers" width="25" height="25"/>
+        <image name="Account" width="25" height="25"/>
+    </resources>
+</document>

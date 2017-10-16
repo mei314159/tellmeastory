@@ -33,14 +33,15 @@ namespace TellMe.iOS
             this.TableView.RefreshControl = new UIRefreshControl();
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
-            this.TableView.DelaysContentTouches = false;
-            this.TableView.DataSource = this;
             this.TableView.Delegate = this;
+            this.TableView.DataSource = this;
             this.SearchBar.OnEditingStarted += SearchBar_OnEditingStarted;
             this.SearchBar.OnEditingStopped += SearchBar_OnEditingStopped;
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
             this.SearchBar.SearchButtonClicked += SearchBar_SearchButtonClicked;
-            this.View.AddGestureRecognizer(new UITapGestureRecognizer(HideSearchCancelButton));
+            UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton);
+            uITapGestureRecognizer.CancelsTouchesInView = false;
+            this.View.AddGestureRecognizer(uITapGestureRecognizer);
             Task.Run(() => LoadStorytellers(false, true));
         }
 
@@ -182,7 +183,7 @@ namespace TellMe.iOS
             InvokeOnMainThread(() =>
             {
                 UIAlertController alert = UIAlertController
-                        .Create("Storytellers not found","Send a request to join?", UIAlertControllerStyle.Alert);
+                        .Create("Storytellers not found", "Send a request to join?", UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
                 alert.AddAction(UIAlertAction.Create("Send", UIAlertActionStyle.Default, (x) => this.ShowSendRequestToJoinPrompt()));
                 this.PresentViewController(alert, true, null);
@@ -212,7 +213,15 @@ namespace TellMe.iOS
 
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            Task.Run(() => LoadStorytellers(true));
+            if (!string.IsNullOrWhiteSpace(SearchBar.Text))
+            {
+
+                Task.Run(() => SearchStorytellers(SearchBar.Text));
+            }
+            else
+            {
+                Task.Run(() => LoadStorytellers(true));
+            }
 
         }
 

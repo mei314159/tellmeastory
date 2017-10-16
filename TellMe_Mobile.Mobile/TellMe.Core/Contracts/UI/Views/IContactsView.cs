@@ -3,13 +3,13 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
-	public delegate void ContactsSelectedEventHandler(ICollection<ContactDTO> selectedItems);
+    public delegate void UserSelectedEventHandler(ICollection<StorytellerDTO> selectedItems);
 
     public interface IContactsView : IView
     {
-		event ContactsSelectedEventHandler ContactsSelected;
-        void DisplayContacts(ICollection<ContactDTO> contacts);
+		event UserSelectedEventHandler ContactsSelected;
+        void DisplayContacts(ICollection<StorytellerDTO> contacts);
         void SelectCell(object cell, bool selected);
-        void Done(List<ContactDTO> selectedItems);
+        void Done(List<StorytellerDTO> selectedItems);
     }
 }

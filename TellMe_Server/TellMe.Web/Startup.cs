@@ -69,6 +69,7 @@ namespace TellMe.Web
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IStorageService, StorageService>();
+            services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddSingleton<IHostingEnvironment>(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));

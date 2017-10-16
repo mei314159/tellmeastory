@@ -17,7 +17,7 @@ namespace TellMe.iOS
     public partial class SendStoryDetailsViewController : UIViewController, ISendStoryDetailsView, IUITableViewDataSource
     {
         SendStoryDetailsBusinessLogic _businessLogic;
-        private List<ContactDTO> recipientsList;
+        private List<StorytellerDTO> recipientsList;
 
         public SendStoryDetailsViewController(IntPtr handle) : base(handle)
         {
@@ -34,7 +34,7 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            recipientsList = new List<ContactDTO>();
+            recipientsList = new List<StorytellerDTO>();
             _businessLogic = new SendStoryDetailsBusinessLogic(this, App.Instance.Router, new RemoteStoriesDataService());
             //this.RecipientsTable.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
             this.RecipientsTable.RowHeight = 64;
@@ -57,7 +57,7 @@ namespace TellMe.iOS
             });
         }
 
-        public void DisplayRecipients(ICollection<ContactDTO> recipients)
+        public void DisplayRecipients(ICollection<StorytellerDTO> recipients)
         {
             lock (((ICollection)recipientsList).SyncRoot)
             {

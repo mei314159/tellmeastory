@@ -19,6 +19,8 @@ namespace TellMe.Web.AutoMapper
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl))
                     .ForMember(x => x.ReceiverPictureUrl, x => x.MapFrom(z => z.Receiver.PictureUrl));
                 cfg.CreateMap<ApplicationUser, UserDTO>();
+                cfg.CreateMap<Notification, NotificationDTO>()
+                .ForMember(x => x.Extra, x => x.MapFrom(y => y.Extra));
             });
         }
     }

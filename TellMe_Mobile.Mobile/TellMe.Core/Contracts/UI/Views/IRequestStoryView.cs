@@ -12,7 +12,7 @@ namespace TellMe.Core.Contracts.UI.Views
 
         IButton SendButton { get; }
 
-        void DisplayRecipients(ICollection<ContactDTO> selectedItems);
+        void DisplayRecipients(ICollection<StorytellerDTO> selectedItems);
         void ShowSuccessMessage(string message, Action complete);
         void Close(ICollection<StoryDTO> requestedStories);
     }

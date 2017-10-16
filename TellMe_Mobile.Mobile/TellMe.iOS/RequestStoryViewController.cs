@@ -17,7 +17,7 @@ namespace TellMe.iOS
     public partial class RequestStoryViewController : UIViewController, IRequestStoryView, IUITableViewDataSource
 	{
 		private RequestStoryBusinessLogic _businessLogic;
-		private List<ContactDTO> recipientsList;
+        private List<StorytellerDTO> recipientsList;
 
 		ITextInput IRequestStoryView.StoryName => this.StoryName;
 		IButton IRequestStoryView.SendButton => this.SendButton;
@@ -30,7 +30,7 @@ namespace TellMe.iOS
 
 		public override void ViewDidLoad()
 		{
-			recipientsList = new List<ContactDTO>();
+            recipientsList = new List<StorytellerDTO>();
 			_businessLogic = new RequestStoryBusinessLogic(this, App.Instance.Router, new RemoteStoriesDataService());
 			//this.RecipientsTable.RegisterNibForCellReuse(ContactsListCell.Nib, ContactsListCell.Key);
 			this.RecipientsTable.RowHeight = 64;
@@ -39,7 +39,7 @@ namespace TellMe.iOS
 			this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
 		}
 
-		public void DisplayRecipients(ICollection<ContactDTO> recipients)
+        public void DisplayRecipients(ICollection<StorytellerDTO> recipients)
 		{
 			lock (((ICollection)recipientsList).SyncRoot)
 			{

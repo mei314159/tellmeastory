@@ -156,8 +156,7 @@ namespace TellMe.iOS
 
         partial void Notifications_Activated(UIBarButtonItem sender)
         {
-            var notificationCenter = NotificationsCenterView.Create(65);
-            notificationCenter.PopUp(true);
+            businessLogic.NotificationsCenter();
         }
 
         partial void Storytellers_Activated(UIBarButtonItem sender)

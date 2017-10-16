@@ -11,26 +11,35 @@ using UIKit;
 
 namespace TellMe.iOS
 {
-    [Register ("NotificationsCenterView")]
-    partial class NotificationsCenterView
+    [Register ("NotificationCenterController")]
+    partial class NotificationCenterController
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIButton CloseButton { get; set; }
+        UIKit.UIBarButtonItem CloseButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UINavigationBar NavBar { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UITableView TableView { get; set; }
 
-        [Action ("CloseButton_TouchUpInside:")]
+        [Action ("CloseButton_Activated:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void CloseButton_TouchUpInside (UIKit.UIButton sender);
+        partial void CloseButton_Activated (UIKit.UIBarButtonItem sender);
 
         void ReleaseDesignerOutlets ()
         {
             if (CloseButton != null) {
                 CloseButton.Dispose ();
                 CloseButton = null;
+            }
+
+            if (NavBar != null) {
+                NavBar.Dispose ();
+                NavBar = null;
             }
 
             if (TableView != null) {

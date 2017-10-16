@@ -15,7 +15,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private IRequestStoryView _view;
         private IRouter _router;
         private RemoteStoriesDataService _remoteStoriesDataService;
-        private List<ContactDTO> recipientsList;
+        private List<StorytellerDTO> recipientsList;
         private RequestStoryValidator _validator;
         public RequestStoryBusinessLogic(IRequestStoryView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
         {
@@ -23,7 +23,7 @@ namespace TellMe.Core.Types.BusinessLogic
             this._router = _router;
             this._remoteStoriesDataService = remoteStoriesDataService;
             this._validator = new RequestStoryValidator();
-            this.recipientsList = new List<ContactDTO>();
+            this.recipientsList = new List<StorytellerDTO>();
         }
 
         public void ChooseRecipients()
@@ -31,7 +31,7 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateChooseRecipients(_view, RecipientsSelected);
         }
 
-        void RecipientsSelected(ICollection<ContactDTO> selectedItems)
+        void RecipientsSelected(ICollection<StorytellerDTO> selectedItems)
         {
             recipientsList.Clear();
             recipientsList.AddRange(selectedItems);
@@ -47,7 +47,7 @@ namespace TellMe.Core.Types.BusinessLogic
             var dto = new StoryRequestDTO
             {
                 Title = title,
-                ReceiverIds = recipientsList.Select(x => x.UserId).ToArray()
+                ReceiverIds = recipientsList.Select(x => x.Id).ToArray()
             };
 
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);

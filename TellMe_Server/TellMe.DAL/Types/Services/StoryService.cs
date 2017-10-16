@@ -11,22 +11,26 @@ using AutoMapper;
 using TellMe.DAL.Contracts.PushNotification;
 using System;
 using AutoMapper.QueryableExtensions;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Services
 {
     public class StoryService : IStoryService
     {
+        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IRepository<Story, int> _storyRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         public StoryService(
             IRepository<Story, int> storyRepository,
             IRepository<ApplicationUser, string> userRepository,
-            IPushNotificationsService pushNotificationsService)
+            IPushNotificationsService pushNotificationsService,
+            IRepository<Notification, int> notificationRepository)
         {
             _storyRepository = storyRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId)
@@ -75,9 +79,17 @@ namespace TellMe.DAL.Types.Services
             .FirstOrDefaultAsync(x => x.Id == requestSenderId)
             .ConfigureAwait(false);
 
+            var notifications = storyDTOs.Select(x => new Notification
+            {
+                Date = now,
+                Type = NotificationTypeEnum.StoryRequest,
+                RecipientId = x.SenderId,
+                Extra = x,
+                Text = $"{user.UserName} requested a story: {x.Title}"
+            }).ToArray();
 
-            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
-
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
             return storyDTOs;
         }
 
@@ -118,10 +130,25 @@ namespace TellMe.DAL.Types.Services
 
             }
             _storyRepository.PreCommitSave();
+            
+            var user = await _userRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == senderId)
+            .ConfigureAwait(false);
+
             var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
+            var notifications = storyDTOs.Select(x => new Notification
+            {
+                Date = now,
+                Type = NotificationTypeEnum.Story,
+                RecipientId = x.ReceiverId,
+                Extra = x,
+                Text = $"{user.UserName} sent a story: {x.Title}"
+            }).ToArray();
 
-            await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, senderId).ConfigureAwait(false);
-
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
             return storyDTOs;
         }
     }

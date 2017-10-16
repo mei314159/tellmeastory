@@ -9,11 +9,13 @@ using TellMe.DAL.Contracts.DTO;
 using AutoMapper.QueryableExtensions;
 using System;
 using TellMe.DAL.Contracts.PushNotification;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Services
 {
     public class UserService : IUserService
     {
+        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Friendship, int> _friendshipRepository;
@@ -23,12 +25,14 @@ namespace TellMe.DAL.Types.Services
             IRepository<ApplicationUser, string> serviceRepository,
             IRepository<RefreshToken, int> refreshTokenRepository,
             IRepository<Friendship, int> friendshipRepository,
-            IPushNotificationsService pushNotificationsService)
+            IPushNotificationsService pushNotificationsService,
+            IRepository<Notification, int> notificationRepository)
         {
             _userRepository = serviceRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _friendshipRepository = friendshipRepository;
             _pushNotificationsService = pushNotificationsService;
+            _notificationRepository = notificationRepository;
         }
         public async Task<ApplicationUser> GetAsync(string id)
         {
@@ -108,7 +112,7 @@ namespace TellMe.DAL.Types.Services
             .Where(x => (x.UserId == currentUserId && x.FriendId == userId) || (x.UserId == userId && x.FriendId == currentUserId))
             .ToListAsync().ConfigureAwait(false);
 
-            DateTime utcNow = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
             Friendship myFriendship = null;
             if (friendships.Count == 0)
             {
@@ -117,17 +121,16 @@ namespace TellMe.DAL.Types.Services
                     UserId = currentUserId,
                     FriendId = userId,
                     Status = FriendshipStatus.Requested,
-                    UpdateDate = utcNow
+                    UpdateDate = now
                 };
-                friendships.Add(myFriendship);
-                friendships.Add(new Friendship
+                _friendshipRepository.Save(myFriendship);
+                _friendshipRepository.Save(new Friendship
                 {
                     UserId = userId,
                     FriendId = currentUserId,
                     Status = FriendshipStatus.WaitingForResponse,
-                    UpdateDate = utcNow
+                    UpdateDate = now
                 });
-                _friendshipRepository.AddRange(friendships);
             }
             else
             {
@@ -139,7 +142,7 @@ namespace TellMe.DAL.Types.Services
                         if (friendship.Status == FriendshipStatus.WaitingForResponse)
                         {
                             friendship.Status = FriendshipStatus.Accepted;
-                            friendship.UpdateDate = utcNow;
+                            friendship.UpdateDate = now;
                         }
                         myFriendship = friendship;
                     }
@@ -147,32 +150,49 @@ namespace TellMe.DAL.Types.Services
                     if (friendship.UserId == userId && friendship.Status == FriendshipStatus.Requested)
                     {
                         friendship.Status = FriendshipStatus.Accepted;
-                        friendship.UpdateDate = utcNow;
+                        friendship.UpdateDate = now;
                     }
                 }
             }
 
             _friendshipRepository.PreCommitSave();
 
+            var user = await _userRepository.GetQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
             var friend = new StorytellerDTO
             {
                 Id = myFriendship.UserId,
-                UserName = myFriendship.User.UserName,
-                FullName = myFriendship.User.FullName,
-                PictureUrl = myFriendship.User.PictureUrl,
-                FriendshipStatus = myFriendship.Status
+                FriendshipStatus = myFriendship.Status,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                PictureUrl = user.PictureUrl
             };
             if (friendships.Count == 0)
             {
-                await _pushNotificationsService
-                .SendFriendshipRequestPushNotificationAsync(friend, myFriendship.FriendId)
-                .ConfigureAwait(false);
+                var notification = new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.FriendshipRequest,
+                    RecipientId = myFriendship.FriendId,
+                    Extra = friend,
+                    Text = $"{friend.UserName} sent you a friendship request"
+                };
+
+                await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
+                await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
             else
             {
-                await _pushNotificationsService
-                                .SendFriendshipAcceptedPushNotificationAsync(friend, myFriendship.FriendId)
-                                .ConfigureAwait(false);
+                var notification = new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.FriendshipAccepted,
+                    RecipientId = myFriendship.FriendId,
+                    Extra = friend,
+                    Text = $"{friend.UserName} accepted your friendship request"
+                };
+
+                await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
+                await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
 
             return myFriendship.Status;
@@ -184,7 +204,7 @@ namespace TellMe.DAL.Types.Services
             .Where(x => (x.UserId == currentUserId && x.FriendId == userId) || (x.UserId == userId && x.FriendId == currentUserId))
             .ToListAsync().ConfigureAwait(false);
 
-            DateTime utcNow = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
             Friendship myFriendship = null;
             if (friendships.Count > 0)
             {
@@ -204,10 +224,18 @@ namespace TellMe.DAL.Types.Services
                 PictureUrl = myFriendship.User.PictureUrl,
                 FriendshipStatus = myFriendship.Status
             };
-            await _pushNotificationsService
-                            .SendFriendshipRejectedPushNotificationAsync(friend, myFriendship.FriendId)
-                            .ConfigureAwait(false);
 
+            var notification = new Notification
+            {
+                Date = now,
+                Type = NotificationTypeEnum.FriendshipRejected,
+                RecipientId = myFriendship.FriendId,
+                Extra = friend,
+                Text = $"{friend.UserName} rejected your friendship request"
+            };
+
+            await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return FriendshipStatus.Rejected;
         }

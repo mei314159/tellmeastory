@@ -17,7 +17,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private ISendStoryDetailsView _view;
         private IRouter _router;
         private RemoteStoriesDataService _remoteStoriesDataService;
-        private List<ContactDTO> recipientsList;
+        private List<StorytellerDTO> recipientsList;
         private SendStoryValidator _validator;
         public SendStoryDetailsBusinessLogic(ISendStoryDetailsView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
         {
@@ -25,7 +25,7 @@ namespace TellMe.Core.Types.BusinessLogic
             this._router = _router;
             this._remoteStoriesDataService = remoteStoriesDataService;
             this._validator = new SendStoryValidator();
-            this.recipientsList = new List<ContactDTO>();
+            this.recipientsList = new List<StorytellerDTO>();
         }
 
         public void Init()
@@ -37,11 +37,11 @@ namespace TellMe.Core.Types.BusinessLogic
                 this._view.ChooseRecipientsButton.Enabled = false;
                 this._view.SendButton.Enabled = true;
 
-                this.RecipientsSelected(new[]{new ContactDTO
+                this.RecipientsSelected(new[]{new StorytellerDTO
                 {
-                    Name = _view.RequestedStory.ReceiverName,
-                    UserId = _view.RequestedStory.ReceiverId
-                }});
+                        UserName = _view.RequestedStory.ReceiverName,
+                        Id = _view.RequestedStory.ReceiverId
+                    }});
             }
         }
 
@@ -50,7 +50,7 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateChooseRecipients(_view, RecipientsSelected);
         }
 
-        void RecipientsSelected(ICollection<ContactDTO> selectedItems)
+        void RecipientsSelected(ICollection<StorytellerDTO> selectedItems)
         {
             recipientsList.Clear();
             recipientsList.AddRange(selectedItems);
@@ -77,7 +77,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 var dto = new SendStoryDTO();
                 dto.Title = title;
                 dto.Id = _view.RequestedStory?.Id;
-                dto.ReceiverIds = recipientsList.Select(x => x.UserId).ToArray();
+                dto.ReceiverIds = recipientsList.Select(x => x.Id).ToArray();
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
                 dto.PreviewUrl = uploadResult.Data.PreviewImageUrl;
                 var result = await _remoteStoriesDataService.SendStoryAsync(dto).ConfigureAwait(false);

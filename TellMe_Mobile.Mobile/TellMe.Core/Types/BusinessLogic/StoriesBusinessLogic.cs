@@ -15,7 +15,6 @@ namespace TellMe.Core.Types.BusinessLogic
     public class StoriesBusinessLogic
     {
         private RemoteStoriesDataService _remoteStoriesService;
-        private LocalContactsDataService _localContactsService;
         private LocalStoriesDataService _localStoriesService;
         private IStoriesListView _view;
         private IRouter _router;
@@ -24,7 +23,6 @@ namespace TellMe.Core.Types.BusinessLogic
         public StoriesBusinessLogic(RemoteStoriesDataService remoteStoriesService, IStoriesListView view, IRouter router)
         {
             _remoteStoriesService = remoteStoriesService;
-            _localContactsService = new LocalContactsDataService();
             _localStoriesService = new LocalStoriesDataService();
             _view = view;
             _router = router;
@@ -79,6 +77,11 @@ namespace TellMe.Core.Types.BusinessLogic
         public void ShowStorytellers()
         {
             _router.NavigateStorytellers(_view);
+        }
+
+        public void NotificationsCenter()
+        {
+            _router.NavigateNotificationsCenter(_view);
         }
     }
 }

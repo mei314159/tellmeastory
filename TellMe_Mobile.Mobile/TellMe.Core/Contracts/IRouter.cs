@@ -12,9 +12,10 @@ namespace TellMe.Core.Contracts
         void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryDTO requestedStory = null);
 
 		void NavigateRequestStory(IView view, RequestStoryEventHandler e);
-        void NavigateChooseRecipients(IView view, ContactsSelectedEventHandler e);
+        void NavigateChooseRecipients(IView view, UserSelectedEventHandler e);
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);
         void NavigateStorytellers(IView view);
+        void NavigateNotificationsCenter(IView view);
     }
 }
