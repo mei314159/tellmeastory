@@ -16,6 +16,10 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UINavigationItem NavItem { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UISearchBar SearchBar { get; set; }
 
         [Outlet]
@@ -26,8 +30,17 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UITableView TableView { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.NSLayoutConstraint TableViewTop { get; set; }
+
         void ReleaseDesignerOutlets ()
         {
+            if (NavItem != null) {
+                NavItem.Dispose ();
+                NavItem = null;
+            }
+
             if (SearchBar != null) {
                 SearchBar.Dispose ();
                 SearchBar = null;
@@ -41,6 +54,11 @@ namespace TellMe.iOS
             if (TableView != null) {
                 TableView.Dispose ();
                 TableView = null;
+            }
+
+            if (TableViewTop != null) {
+                TableViewTop.Dispose ();
+                TableViewTop = null;
             }
         }
     }

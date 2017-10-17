@@ -12,15 +12,18 @@ namespace TellMe.Web.Controllers
     public class StoriesController : AuthorizedController
     {
         private readonly IStorageService _storageService;
+        private INotificationService _notificationService;
         private readonly IStoryService _storyService;
         public StoriesController(
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,
             IStoryService storyService,
-            IStorageService storageService) : base(httpContextAccessor, userService)
+            IStorageService storageService,
+            INotificationService notificationService) : base(httpContextAccessor, userService)
         {
             _storyService = storyService;
             _storageService = storageService;
+            _notificationService = notificationService;
         }
 
         [HttpPost("request")]
@@ -35,7 +38,8 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> SendStoryAsync([FromBody] SendStoryDTO dto)
         {
             var result = await _storyService.SendStoryAsync(this.UserId, dto);
-
+            if (dto.NotificationId.HasValue)
+                await _notificationService.HandleNotificationAsync(dto.NotificationId.Value);
             return Ok(result);
         }
 
@@ -66,6 +70,14 @@ namespace TellMe.Web.Controllers
             var result = await _storageService.UploadAsync(videoFileStream, videoBlobName, previewImageStream, previewImageBlobName);
 
             return Ok(result);
+        }
+
+        [HttpPost("{storyId}/reject-request")]
+        public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int? notificationId)
+        {
+            var storyStatus = await _storyService.RejectRequestAsync(this.UserId, storyId);
+            await _notificationService.HandleNotificationAsync(notificationId.Value);
+            return Ok(storyStatus);
         }
     }
 }

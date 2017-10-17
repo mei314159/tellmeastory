@@ -6,6 +6,6 @@ namespace TellMe.Core.Contracts.DTO
     {
         public string Title { get; set; }
 
-        public string[] ReceiverIds { get; set; }
+        public string ReceiverId { get; set; }
     }
 }

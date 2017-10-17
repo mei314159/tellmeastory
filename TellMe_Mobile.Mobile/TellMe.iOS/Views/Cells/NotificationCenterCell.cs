@@ -7,10 +7,11 @@ using TellMe.Core.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using SDWebImage;
+using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.iOS.Views.Cells
 {
-    public partial class NotificationCenterCell : UITableViewCell
+    public partial class NotificationCenterCell : UITableViewCell, INotificationCenterCell
     {
         public static readonly NSString Key = new NSString("NotificationCenterCell");
         public static readonly UINib Nib;

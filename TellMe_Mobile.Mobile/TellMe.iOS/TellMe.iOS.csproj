@@ -169,6 +169,7 @@
     <InterfaceDefinition Include="Story.storyboard" />
     <InterfaceDefinition Include="Views\InputPopupView.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -201,10 +202,6 @@
     <Compile Include="Views\CustomPicker\ModalPickerViewController.cs" />
     <Compile Include="Core\UI\Button.cs" />
     <Compile Include="Core\UI\Label.cs" />
-    <Compile Include="Controllers\ContactsViewController.cs" />
-    <Compile Include="Controllers\ContactsViewController.designer.cs">
-      <DependentUpon>ContactsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\OutputDelegate.cs" />
     <Compile Include="Controllers\PreviewVideoController.cs" />
     <Compile Include="Controllers\PreviewVideoController.designer.cs">
@@ -218,41 +215,13 @@
     <Compile Include="Controllers\RecordVideoController.designer.cs">
       <DependentUpon>RecordVideoController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\SendStoryDetailsViewController.cs" />
-    <Compile Include="Controllers\SendStoryDetailsViewController.designer.cs">
-      <DependentUpon>SendStoryDetailsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\StoriesListViewController.cs" />
     <Compile Include="Controllers\StoriesListViewController.designer.cs">
       <DependentUpon>StoriesListViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="RequestStoryViewController.cs" />
-    <Compile Include="RequestStoryViewController.designer.cs">
-      <DependentUpon>RequestStoryViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InitialAuthController.cs" />
-    <Compile Include="InitialAuthController.designer.cs">
-      <DependentUpon>InitialAuthController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SignUpController.cs" />
-    <Compile Include="SignUpController.designer.cs">
-      <DependentUpon>SignUpController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SignInController.cs" />
-    <Compile Include="SignInController.designer.cs">
-      <DependentUpon>SignInController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\CustomPopUpView.cs" />
     <Compile Include="Views\Overlay.cs" />
-    <Compile Include="UploadPictureController.cs" />
-    <Compile Include="UploadPictureController.designer.cs">
-      <DependentUpon>UploadPictureController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\UI\Picture.cs" />
-    <Compile Include="StorytellersController.cs" />
-    <Compile Include="StorytellersController.designer.cs">
-      <DependentUpon>StorytellersController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\InputPopupView.cs" />
     <Compile Include="Views\InputPopupView.designer.cs">
       <DependentUpon>InputPopupView.cs</DependentUpon>
@@ -261,9 +230,39 @@
     <Compile Include="Views\Cells\NotificationCenterCell.designer.cs">
       <DependentUpon>NotificationCenterCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="NotificationCenterController.cs" />
-    <Compile Include="NotificationCenterController.designer.cs">
+    <Compile Include="Views\Cells\NotificationCenterStoryCell.cs" />
+    <Compile Include="Views\Cells\NotificationCenterStoryCell.designer.cs">
+      <DependentUpon>NotificationCenterStoryCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\InitialAuthController.cs" />
+    <Compile Include="Controllers\InitialAuthController.designer.cs">
+      <DependentUpon>InitialAuthController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\NotificationCenterController.cs" />
+    <Compile Include="Controllers\NotificationCenterController.designer.cs">
       <DependentUpon>NotificationCenterController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SignInController.cs" />
+    <Compile Include="Controllers\SignInController.designer.cs">
+      <DependentUpon>SignInController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SignUpController.cs" />
+    <Compile Include="Controllers\SignUpController.designer.cs">
+      <DependentUpon>SignUpController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\StorytellersController.cs" />
+    <Compile Include="Controllers\StorytellersController.designer.cs">
+      <DependentUpon>StorytellersController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\UploadPictureController.cs" />
+    <Compile Include="Controllers\UploadPictureController.designer.cs">
+      <DependentUpon>UploadPictureController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SendStoryViewController.designer.cs" />
+    <Compile Include="Controllers\SendStoryViewController.cs" />
+    <Compile Include="Controllers\RequestStoryController.cs" />
+    <Compile Include="Controllers\RequestStoryController.designer.cs">
+      <DependentUpon>RequestStoryController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

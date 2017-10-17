@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using SQLite;
 using SQLiteNetExtensions.Extensions;
@@ -50,7 +51,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public async Task<DataResult<ICollection<NotificationDTO>>> GetAllAsync()
         {
             var conn = new SQLiteAsyncConnection(this._dbPath);
-            var result = await conn.GetAllWithChildrenAsync<NotificationDTO>().ConfigureAwait(false);
+            var result = (await conn.GetAllWithChildrenAsync<NotificationDTO>().ConfigureAwait(false)).OrderByDescending(x => x.Date).ToArray();
             var updateInfo = await conn.FindAsync<UpdateInfo>("Notifications").ConfigureAwait(false);
             return new DataResult<ICollection<NotificationDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }

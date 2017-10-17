@@ -9,9 +9,9 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteStoriesDataService : BaseDataService
     {
-        public async Task<Result<List<StoryDTO>>> RequestStoryAsync(StoryRequestDTO dto)
+        public async Task<Result<StoryDTO>> RequestStoryAsync(StoryRequestDTO dto)
         {
-            var result = await this.PostAsync<List<StoryDTO>>("stories/request", dto).ConfigureAwait(false);
+            var result = await this.PostAsync<StoryDTO>("stories/request", dto).ConfigureAwait(false);
 
             return result;
         }
@@ -34,10 +34,16 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
-        public async Task<Result<StoryDTO[]>> SendStoryAsync(SendStoryDTO dto)
+        public async Task<Result<StoryDTO>> SendStoryAsync(SendStoryDTO dto)
         {
-            var result = await this.PostAsync<StoryDTO[]>("stories", dto).ConfigureAwait(false);
+            var result = await this.PostAsync<StoryDTO>("stories", dto).ConfigureAwait(false);
 
+            return result;
+        }
+
+        public async Task<Result<StoryStatus>> RejectStoryRequestAsync(int storyId, int notificationid)
+        {
+            var result = await this.PostAsync<StoryStatus>($"stories/{storyId}/reject-request", notificationid).ConfigureAwait(false);
             return result;
         }
     }

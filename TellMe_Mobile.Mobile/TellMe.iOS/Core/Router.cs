@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
@@ -22,60 +23,61 @@ namespace TellMe.iOS.Core
             this.window.InvokeOnMainThread(() => this.window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController()));
         }
 
-		public void NavigateRequestStory(IView view, RequestStoryEventHandler e)
-		{
-			this.window.InvokeOnMainThread(() =>
-			{
-                var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RequestStoryViewController");
-                ((RequestStoryViewController)targetController.ViewControllers.First()).StoryRequested += e;
-				var controller = (UIViewController)view;
-				controller.PresentViewController(targetController, true, null);
-			});
-		}
-
-        public void NavigateRecordStory(IView view, StoryDTO requestedStory = null)
+        public void NavigateRequestStory(IView view, StorytellerDTO recipient)
         {
-			this.window.InvokeOnMainThread(() =>
-			{
-				var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
-                ((RecordVideoController)targetController.ViewControllers.First()).RequestedStory = requestedStory;
-				var controller = (UIViewController)view;
-				controller.PresentViewController(targetController, true, null);
-			});
+            var targetController = (RequestStoryController)UIStoryboard.FromName("Story", null).InstantiateViewController("RequestStoryController");
+            targetController.Recipient = recipient;
+            this.Present(targetController, view, true);
         }
 
-        public void NavigatePreviewStory(IView view, string videoPath, StoryDTO requestedStory = null)
-		{
-			this.window.InvokeOnMainThread(() =>
-			{
-				var targetController = (PreviewVideoController)UIStoryboard.FromName("Story", null).InstantiateViewController("PreviewVideoController");
+        public void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (StorytellersController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
+                targetController.Mode = StorytellersViewMode.ChooseRecipient;
+                targetController.DismissOnFinish = dismissOnFinish;
+                targetController.RecipientsSelected += e;
+                this.Present(targetController, view);
+            });
+        }
+
+        public void NavigateRecordStory(IView view, StoryDTO requestedStory = null, NotificationDTO notification = null)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
+                var recordController = (RecordVideoController)targetController.ViewControllers.First();
+                recordController.RequestedStory = requestedStory;
+                recordController.RequestNotification = notification;
+                this.Present(targetController, view, false);
+            });
+        }
+
+        public void NavigatePreviewStory(IView view, string videoPath, StoryDTO requestedStory = null, NotificationDTO notification = null)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (PreviewVideoController)UIStoryboard.FromName("Story", null).InstantiateViewController("PreviewVideoController");
                 targetController.VideoPath = videoPath;
                 targetController.RequestedStory = requestedStory;
-				this.Present(targetController, view);
-			});
-		}
+                targetController.RequestNotification = notification;
+                this.Present(targetController, view);
+            });
+        }
 
-		public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryDTO requestedStory = null)
-		{
-			this.window.InvokeOnMainThread(() =>
-			{
-				var targetController = (SendStoryDetailsViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("SendStoryDetailsViewController");
-				targetController.VideoPath = videoPath;
+        public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryDTO requestedStory = null, NotificationDTO notification = null)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (SendStoryViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("SendStoryViewController");
+                targetController.VideoPath = videoPath;
                 targetController.PreviewImagePath = previewImagePath;
                 targetController.RequestedStory = requestedStory;
-				this.Present(targetController, view);
-			});
-		}
-
-		public void NavigateChooseRecipients(IView view, UserSelectedEventHandler e)
-		{
-			//this.window.InvokeOnMainThread(() =>
-			//{
-   //             var targetController = (ContactsViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("ContactsViewController");
-   //             targetController.ContactsSelected += e;
-			//	this.Present(targetController, view);
-			//});
-		}
+                targetController.RequestNotification = notification;
+                this.Present(targetController, view);
+            });
+        }
 
         public void NavigateAccountSettings(IView view)
         {

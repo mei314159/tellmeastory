@@ -11,8 +11,8 @@ using UIKit;
 
 namespace TellMe.iOS
 {
-    [Register ("RequestStoryViewController")]
-    partial class RequestStoryViewController
+    [Register ("SendStoryViewController")]
+    partial class SendStoryViewController
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -20,27 +20,19 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem CloseButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITableView RecipientsTable { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Button SendButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.TextInput StoryName { get; set; }
+        UIKit.UILabel StoryLabel { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.TextInput StoryTitle { get; set; }
 
         [Action ("ChooseRecipientsButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void ChooseRecipientsButton_TouchUpInside (TellMe.iOS.Button sender);
-
-        [Action ("CloseButton_Activated:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void CloseButton_Activated (UIKit.UIBarButtonItem sender);
 
         [Action ("SendButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -53,24 +45,19 @@ namespace TellMe.iOS
                 ChooseRecipientsButton = null;
             }
 
-            if (CloseButton != null) {
-                CloseButton.Dispose ();
-                CloseButton = null;
-            }
-
-            if (RecipientsTable != null) {
-                RecipientsTable.Dispose ();
-                RecipientsTable = null;
-            }
-
             if (SendButton != null) {
                 SendButton.Dispose ();
                 SendButton = null;
             }
 
-            if (StoryName != null) {
-                StoryName.Dispose ();
-                StoryName = null;
+            if (StoryLabel != null) {
+                StoryLabel.Dispose ();
+                StoryLabel = null;
+            }
+
+            if (StoryTitle != null) {
+                StoryTitle.Dispose ();
+                StoryTitle = null;
             }
         }
     }

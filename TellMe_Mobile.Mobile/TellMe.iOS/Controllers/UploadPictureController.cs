@@ -7,6 +7,7 @@ using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
@@ -31,18 +32,7 @@ namespace TellMe.iOS
             _businessLogic.Init();
         }
 
-        public void ShowErrorMessage(string title, string message = null)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create(title,
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
         async partial void ContinueButton_TouchUpInside(UIButton sender)
         {

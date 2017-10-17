@@ -59,14 +59,14 @@ namespace TellMe.Core.Types.BusinessLogic
         }
 
 
-        public void SendStory(StoryDTO requestedStory = null)
-		{
-            _router.NavigateRecordStory(this._view, requestedStory);
+        public void SendStory()
+        {
+            _router.NavigateRecordStory(_view);
         }
 
         public void RequestStory()
         {
-            _router.NavigateRequestStory(this._view, (requestedStories) => this.LoadStoriesAsync(true, false));
+            _router.NavigateChooseRecipients(_view, RequestStoryRecipientSelectedEventHandler, false);
         }
 
         public void AccountSettings()
@@ -82,6 +82,11 @@ namespace TellMe.Core.Types.BusinessLogic
         public void NotificationsCenter()
         {
             _router.NavigateNotificationsCenter(_view);
+        }
+
+        void RequestStoryRecipientSelectedEventHandler(StorytellerDTO selectedStoryteller)
+        {
+            _router.NavigateRequestStory(this._view, selectedStoryteller);
         }
     }
 }

@@ -73,18 +73,7 @@ namespace TellMe.iOS
             overlay.Close(true);
         }
 
-        public void ShowErrorMessage(string title, string message = null)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create(title,
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
         private bool TextFieldShouldReturn(UITextField textField)
         {

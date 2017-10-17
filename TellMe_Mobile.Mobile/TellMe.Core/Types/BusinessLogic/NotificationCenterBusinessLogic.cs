@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
@@ -11,17 +12,25 @@ namespace TellMe.Core.Types.BusinessLogic
 {
     public class NotificationCenterBusinessLogic
     {
-        private readonly INotificationsCenterView _view;
-        private readonly RemoteNotificationsDataService _remoteNotificationsDataService;
-        private readonly RemoteStorytellersDataService _remoteStorytellersDataService;
-        private readonly LocalNotificationsDataService _localNotificationsDataService;
-        private readonly List<NotificationDTO> notifications = new List<NotificationDTO>();
+        readonly INotificationsCenterView _view;
+        readonly RemoteNotificationsDataService _remoteNotificationsDataService;
+        readonly RemoteStorytellersDataService _remoteStorytellersDataService;
+        readonly RemoteStoriesDataService _remoteStoriesDataService;
+        readonly LocalNotificationsDataService _localNotificationsDataService;
+        readonly LocalStoriesDataService _localStoriesDataService;
+        readonly LocalStorytellersDataService _localStorytellersDataService;
+        readonly List<NotificationDTO> notifications = new List<NotificationDTO>();
+        readonly IRouter _router;
 
-        public NotificationCenterBusinessLogic(RemoteStorytellersDataService remoteStorytellersDataService, RemoteNotificationsDataService remoteNotificationsDataService, INotificationsCenterView view)
+        public NotificationCenterBusinessLogic(IRouter router, RemoteStoriesDataService remoteStoriesDataService, RemoteStorytellersDataService remoteStorytellersDataService, RemoteNotificationsDataService remoteNotificationsDataService, INotificationsCenterView view)
         {
+            _router = router;
             _remoteStorytellersDataService = remoteStorytellersDataService;
+            _remoteStoriesDataService = remoteStoriesDataService;
             _remoteNotificationsDataService = remoteNotificationsDataService;
             _localNotificationsDataService = new LocalNotificationsDataService();
+            _localStoriesDataService = new LocalStoriesDataService();
+            _localStorytellersDataService = new LocalStorytellersDataService();
             _view = view;
         }
 
@@ -80,6 +89,9 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 notification.Handled = true;
                 await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
+
+                dto.FriendshipStatus = result.Data;
+                await _localStorytellersDataService.SaveAsync(dto).ConfigureAwait(false);
                 this._view.ReloadNotification(notification);
             }
             else
@@ -87,6 +99,31 @@ namespace TellMe.Core.Types.BusinessLogic
                 result.ShowResultError(this._view);
                 return;
             }
+        }
+
+        public async Task RejectStoryRequestRequestAsync(NotificationDTO notification, StoryDTO dto)
+        {
+            var result = await _remoteStoriesDataService.RejectStoryRequestAsync(dto.Id, notification.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                notification.Handled = true;
+                await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
+
+                dto.Status = result.Data;
+                await _localStoriesDataService.SaveAsync(dto).ConfigureAwait(false);
+
+                this._view.ReloadNotification(notification);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
+            }
+        }
+
+        public void AcceptStoryRequestRequest(NotificationDTO notification, StoryDTO dto)
+        {
+            _router.NavigateRecordStory(_view, dto, notification);
         }
     }
 }

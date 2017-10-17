@@ -6,9 +6,9 @@
 
         public string ReceiverId { get; set; }
 
-        public string Title { get; set; }
+        public int? NotificationId { get; set; }
 
-        public string[] ReceiverIds { get; set; }
+        public string Title { get; set; }
 
         public string VideoUrl { get; set; }
 

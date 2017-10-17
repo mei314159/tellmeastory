@@ -55,5 +55,15 @@ namespace TellMe.Core.Types.DataServices.Local
             var updateInfo = await conn.FindAsync<UpdateInfo>("Stories").ConfigureAwait(false);
             return new DataResult<ICollection<StoryDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
+
+        public async Task SaveAsync(StoryDTO story)
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath);
+            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            {
+                c.InsertOrReplace(story, typeof(StoryDTO));
+                c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Stories" });
+            }).ConfigureAwait(false);
+        }
     }
 }

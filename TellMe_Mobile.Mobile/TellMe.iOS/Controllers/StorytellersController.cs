@@ -20,12 +20,23 @@ namespace TellMe.iOS
         private List<StorytellerDTO> storytellersList = new List<StorytellerDTO>();
         private List<StorytellerDTO> tribes = new List<StorytellerDTO>();
 
+        public StorytellersViewMode Mode { get; set; }
+        public event StorytellerSelectedEventHandler RecipientsSelected;
+        public bool DismissOnFinish { get; set; }
+
         public StorytellersController(IntPtr handle) : base(handle)
         {
         }
 
         public override void ViewDidLoad()
         {
+            if (Mode == StorytellersViewMode.ChooseRecipient)
+            {
+                NavItem.Title = "Choose recipient";
+                SearchBar.Hidden = true;
+                TableViewTop.Constant = 0;
+            }
+
             this._businessLogic = new StorytellersBusinessLogic(new RemoteStorytellersDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -89,40 +100,35 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => TableView.ReloadData());
         }
 
-        public void ShowErrorMessage(string title, string message = null)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create(title,
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create("Success",
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
+        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
             return this.storytellersList.Count;
         }
 
+        [Export("tableView:didDeselectRowAtIndexPath:")]
+        public void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+        {
+            NavItem.SetRightBarButtonItem(null, false);
+            var cell = tableView.CellAt(indexPath);
+            cell.Accessory = UITableViewCellAccessory.None;
+            tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
+        }
+
         [Export("tableView:didSelectRowAtIndexPath:")]
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
+            if (Mode == StorytellersViewMode.ChooseRecipient)
+            {
+                NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched), false);
+                var cell = tableView.CellAt(indexPath);
+                cell.Accessory = UITableViewCellAccessory.Checkmark;
+                return;
+            }
+
             tableView.DeselectRow(indexPath, false);
             if (indexPath.Section == 0)
             {
@@ -231,6 +237,18 @@ namespace TellMe.iOS
             popup.KeyboardType = UIKeyboardType.EmailAddress;
             popup.PopUp(true);
             popup.OnSubmit += async (email) => await _businessLogic.SendRequestToJoinPromptAsync(email);
+        }
+
+        void ContinueButtonTouched(object sender, EventArgs e)
+        {
+            RecipientsSelected?.Invoke(storytellersList[TableView.IndexPathForSelectedRow.Row]);
+            if (DismissOnFinish)
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            }
         }
     }
 }

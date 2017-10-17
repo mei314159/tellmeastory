@@ -11,16 +11,12 @@ using UIKit;
 
 namespace TellMe.iOS
 {
-    [Register ("SendStoryDetailsViewController")]
-    partial class SendStoryDetailsViewController
+    [Register ("RequestStoryController")]
+    partial class RequestStoryController
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button ChooseRecipientsButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITableView RecipientsTable { get; set; }
+        UIKit.UILabel RequestTextPreview { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -28,11 +24,7 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.TextInput StoryName { get; set; }
-
-        [Action ("ChooseRecipientsButton_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ChooseRecipientsButton_TouchUpInside (TellMe.iOS.Button sender);
+        TellMe.iOS.TextInput StoryTitle { get; set; }
 
         [Action ("SendButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -40,14 +32,9 @@ namespace TellMe.iOS
 
         void ReleaseDesignerOutlets ()
         {
-            if (ChooseRecipientsButton != null) {
-                ChooseRecipientsButton.Dispose ();
-                ChooseRecipientsButton = null;
-            }
-
-            if (RecipientsTable != null) {
-                RecipientsTable.Dispose ();
-                RecipientsTable = null;
+            if (RequestTextPreview != null) {
+                RequestTextPreview.Dispose ();
+                RequestTextPreview = null;
             }
 
             if (SendButton != null) {
@@ -55,9 +42,9 @@ namespace TellMe.iOS
                 SendButton = null;
             }
 
-            if (StoryName != null) {
-                StoryName.Dispose ();
-                StoryName = null;
+            if (StoryTitle != null) {
+                StoryTitle.Dispose ();
+                StoryTitle = null;
             }
         }
     }

@@ -26,7 +26,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void PreviewStory()
         {
-            _router.NavigatePreviewStory(_view, this.videoPath, _view.RequestedStory);
+            _router.NavigatePreviewStory(_view, this.videoPath, _view.RequestedStory, _view.RequestNotification);
         }
 
         public void ToggleRecording()
@@ -98,14 +98,12 @@ namespace TellMe.Core.Types.BusinessLogic
 			}
 		}
 
-        public void CloseTouched()
+        public void WillClose()
         {
             if (recording)
             {
                 StopRecording(true);
             }
-
-            this._view.Close();
         }
 
         public void SwitchCamera()

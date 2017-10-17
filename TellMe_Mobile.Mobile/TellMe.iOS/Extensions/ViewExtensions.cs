@@ -172,5 +172,31 @@ namespace TellMe.iOS.Extensions
             UIGraphics.EndImageContext();
             return modifiedImage;
         }
+
+        public static void ShowSuccessMessage(this UIViewController controller, string message, Action complete = null)
+        {
+            controller.InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create("Success",
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, (obj) => complete?.Invoke()));
+                controller.PresentViewController(alert, true, null);
+            });
+        }
+
+        public static void ShowErrorMessage(this UIViewController controller, string title, string message = null)
+        {
+            controller.InvokeOnMainThread(() =>
+            {
+                UIAlertController alert = UIAlertController
+                    .Create(title,
+                            message ?? string.Empty,
+                            UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
+                controller.PresentViewController(alert, true, null);
+            });
+        }
     }
 }

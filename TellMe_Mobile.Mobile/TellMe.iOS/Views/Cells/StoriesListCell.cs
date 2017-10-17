@@ -7,7 +7,7 @@ using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
-
+using TellMe.Core.Types.Extensions;
 namespace TellMe.iOS.Views.Cells
 {
     public partial class StoriesListCell : UITableViewCell
@@ -128,19 +128,19 @@ namespace TellMe.iOS.Views.Cells
         {
             if (story.Status == StoryStatus.Requested)
             {
-                this.Date.Text = Story.RequestDateUtc?.ToShortDateString();
+                this.Date.Text = Story.RequestDateUtc?.GetDateString();
                 this.Title.Text = $"{story.ReceiverName} requested a story \"{Story.Title}\"";
                 this.ProfilePicture.SetPictureUrl(story.ReceiverPictureUrl);
             }
             else if (story.Status == StoryStatus.Sent)
             {
-                this.Date.Text = Story.CreateDateUtc?.ToShortDateString();
+                this.Date.Text = Story.CreateDateUtc?.GetDateString();
                 this.Title.Text = $"{story.SenderName} sent a story \"{Story.Title}\"";
                 this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
             }
             else if (story.Status == StoryStatus.Ignored)
             {
-                this.Date.Text = Story.UpdateDateUtc.ToShortDateString();
+                this.Date.Text = Story.UpdateDateUtc.GetDateString();
                 this.Title.Text = $"{story.SenderName} ignored story request \"{Story.Title}\"";
                 this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
             }

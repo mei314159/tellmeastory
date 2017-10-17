@@ -1,4 +1,4 @@
-using Foundation;
+﻿using Foundation;
 using System;
 using UIKit;
 using TellMe.Core.Contracts.UI.Views;
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Views.Cells;
 using TellMe.Core;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
@@ -51,6 +52,12 @@ namespace TellMe.iOS
             this.NavigationController.SetToolbarHidden(false, true);
         }
 
+        [Action("UnwindToStoriesViewController:")]
+        public void UnwindToStoriesViewController(UIStoryboardSegue segue)
+        {
+            Console.WriteLine("We've unwinded to Yellow!");
+        }
+
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
             lock (((ICollection)storiesList).SyncRoot)
@@ -62,31 +69,8 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => TableView.ReloadData());
         }
 
-        public void ShowErrorMessage(string title, string message = null)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create(title,
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
-
-        public void ShowSuccessMessage(string message)
-        {
-            InvokeOnMainThread(() =>
-            {
-                UIAlertController alert = UIAlertController
-                    .Create("Success",
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
-                this.PresentViewController(alert, true, null);
-            });
-        }
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
@@ -108,15 +92,11 @@ namespace TellMe.iOS
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            var dto = this.storiesList[indexPath.Row];
-            if (dto.Status != StoryStatus.Requested || dto.ReceiverId == App.Instance.AuthInfo.UserId)
-            {
-                tableView.DeselectRow(indexPath, false);
-            }
-            else
-            {
-                businessLogic.SendStory(dto);
-            }
+            //var dto = this.storiesList[indexPath.Row];
+            //if (dto.Status != StoryStatus.Requested || dto.ReceiverId == App.Instance.AuthInfo.UserId)
+            //{
+            //    tableView.DeselectRow(indexPath, false);
+            //}
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

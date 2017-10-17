@@ -1,67 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
+using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class SendStoryDetailsBusinessLogic
+    public class SendStoryBusinessLogic
     {
-        private ISendStoryDetailsView _view;
+        private ISendStoryView _view;
         private IRouter _router;
         private RemoteStoriesDataService _remoteStoriesDataService;
-        private List<StorytellerDTO> recipientsList;
+        private LocalNotificationsDataService _localNotificationsDataService;
         private SendStoryValidator _validator;
-        public SendStoryDetailsBusinessLogic(ISendStoryDetailsView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
+
+        private StorytellerDTO _recipient;
+        public SendStoryBusinessLogic(ISendStoryView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
         {
             this._view = _view;
             this._router = _router;
             this._remoteStoriesDataService = remoteStoriesDataService;
+            _localNotificationsDataService = new LocalNotificationsDataService();
             this._validator = new SendStoryValidator();
-            this.recipientsList = new List<StorytellerDTO>();
         }
 
         public void Init()
         {
             if (_view.RequestedStory != null)
             {
-                this._view.StoryName.Text = _view.RequestedStory.Title;
-                this._view.StoryName.Enabled = false;
-                this._view.ChooseRecipientsButton.Enabled = false;
-                this._view.SendButton.Enabled = true;
-
-                this.RecipientsSelected(new[]{new StorytellerDTO
-                {
-                        UserName = _view.RequestedStory.ReceiverName,
-                        Id = _view.RequestedStory.ReceiverId
-                    }});
+                this._view.StoryTitle.Text = _view.RequestedStory.Title;
+                this._view.StoryTitle.Enabled = false;
+                InitButtons();
             }
         }
 
-        public void ChooseRecipients()
+        public void InitButtons()
         {
-            _router.NavigateChooseRecipients(_view, RecipientsSelected);
-        }
-
-        void RecipientsSelected(ICollection<StorytellerDTO> selectedItems)
-        {
-            recipientsList.Clear();
-            recipientsList.AddRange(selectedItems);
-            this._view.SendButton.Enabled = selectedItems.Count > 0;
-            this._view.DisplayRecipients(selectedItems);
+            this._view.SendButton.Enabled = (_view.RequestedStory != null || _recipient != null) && !string.IsNullOrWhiteSpace(_view.StoryTitle.Text);
+            this._view.ChooseRecipientsButton.Enabled = _view.RequestedStory == null;
         }
 
         public async Task SendAsync()
         {
             this._view.SendButton.Enabled = false;
-            var title = this._view.StoryName.Text;
+            var title = this._view.StoryTitle.Text;
+            var recipientId = _recipient?.Id ?? _view.RequestedStory.ReceiverId;
+
             var videoStream = File.OpenRead(this._view.VideoPath);
             var previewImageStream = File.OpenRead(this._view.PreviewImagePath);
             var uploadResult = await _remoteStoriesDataService
@@ -73,16 +63,23 @@ namespace TellMe.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (uploadResult.IsSuccess)
             {
-
                 var dto = new SendStoryDTO();
                 dto.Title = title;
                 dto.Id = _view.RequestedStory?.Id;
-                dto.ReceiverIds = recipientsList.Select(x => x.Id).ToArray();
+                dto.ReceiverId = recipientId;
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
                 dto.PreviewUrl = uploadResult.Data.PreviewImageUrl;
+                dto.NotificationId = _view.RequestNotification?.Id;
+
                 var result = await _remoteStoriesDataService.SendStoryAsync(dto).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
+                    if (_view.RequestNotification != null)
+                    {
+                        _view.RequestNotification.Handled = true;
+                        await _localNotificationsDataService.SaveAsync(_view.RequestNotification).ConfigureAwait(false);
+                    }
+
                     this._view.ShowSuccessMessage("Story successfully sent", _view.Close);
                 }
                 else
@@ -96,6 +93,17 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             _view.InvokeOnMainThread(() => this._view.SendButton.Enabled = true);
+        }
+
+        public void ChooseRecipients()
+        {
+            _router.NavigateChooseRecipients(_view, HandleStorytellerSelectedEventHandler, true);
+        }
+
+        void HandleStorytellerSelectedEventHandler(StorytellerDTO recipient)
+        {
+            _recipient = recipient;
+            InitButtons();
         }
     }
 }

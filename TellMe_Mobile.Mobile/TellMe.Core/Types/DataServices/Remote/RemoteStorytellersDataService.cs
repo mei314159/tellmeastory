@@ -25,13 +25,13 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
-        public async Task<Result> RejectFriendshipRequestAsync(string id, int notificationId)
+        public async Task<Result<FriendshipStatus>> RejectFriendshipRequestAsync(string id, int notificationId)
         {
             var result = await this.PostAsync<FriendshipStatus>($"storytellers/{id}/reject-friendship", notificationId).ConfigureAwait(false);
             return result;
         }
 
-        public async Task<Result> AcceptFriendshipRequestAsync(string id, int notificationId)
+        public async Task<Result<FriendshipStatus>> AcceptFriendshipRequestAsync(string id, int notificationId)
         {
             var result = await this.PostAsync<FriendshipStatus>($"storytellers/{id}/add-to-friends", notificationId).ConfigureAwait(false);
             return result;

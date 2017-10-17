@@ -31,9 +31,6 @@ namespace TellMe.iOS
             App.Instance.Router.NavigateSetProfilePicture(this);
         }
 
-        public void ShowErrorMessage(string title, string message = null)
-        {
-            
-        }
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
     }
 }

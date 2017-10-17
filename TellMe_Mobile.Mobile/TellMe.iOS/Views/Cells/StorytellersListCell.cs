@@ -41,7 +41,7 @@ namespace TellMe.iOS.Views.Cells
             this.ProfilePicture.SetPictureUrl(storyteller.PictureUrl);
 
             if (storyteller.FriendshipStatus == FriendshipStatus.Accepted){
-                this.FriendshipStatusLabel.Text = "Friends";
+                this.FriendshipStatusLabel.Text = "Friend";
                 this.FriendshipStatusLabel.TextColor = UIColor.DarkGray;
             }
             else if (storyteller.FriendshipStatus == FriendshipStatus.Requested)
@@ -59,7 +59,7 @@ namespace TellMe.iOS.Views.Cells
                 this.FriendshipStatusLabel.Text = "Follow";
                 this.FriendshipStatusLabel.TextColor = UIColor.Orange;
             }
-
+            //this.AccessoryView = 
             //if (Contact.IsAppUser){
             //    this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
             //}

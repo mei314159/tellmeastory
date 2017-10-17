@@ -8,6 +8,7 @@ using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.Core.Contracts.DTO;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
@@ -40,6 +41,7 @@ namespace TellMe.iOS
         IButton IRecordVideoView.RecordButton => this.RecordButton;
 
         public StoryDTO RequestedStory { get; set; }
+        public NotificationDTO RequestNotification { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -101,22 +103,12 @@ namespace TellMe.iOS
 
         public override void ViewWillDisappear(bool animated)
         {
+            businessLogic.WillClose();
             session.StopRunning();
             base.ViewWillDisappear(animated);
         }
 
-		public void ShowErrorMessage(string title, string message = null)
-		{
-			InvokeOnMainThread(() =>
-			{
-				UIAlertController alert = UIAlertController
-					.Create(title,
-							message ?? string.Empty,
-							UIAlertControllerStyle.Alert);
-				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-				this.PresentViewController(alert, true, null);
-			});
-		}
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
         public void StartCapture(string videoPath)
         {
@@ -144,20 +136,9 @@ namespace TellMe.iOS
             session.StartRunning();
         }
 
-        public void Close()
-        {
-            session.StopRunning();
-            this.DismissViewController(true, null);
-        }
-
         partial void RecordButtonTouched(Button sender)
         {
             businessLogic.ToggleRecording();
-        }
-
-        partial void CloseButtonTouched(UIBarButtonItem sender)
-        {
-            businessLogic.CloseTouched();
         }
 
         protected override void Dispose(bool disposing)
@@ -178,6 +159,11 @@ namespace TellMe.iOS
         partial void SwitchCameraButtonTouched(UIBarButtonItem sender)
         {
             businessLogic.SwitchCamera();
+        }
+
+        partial void CloseButtonTouched(UIBarButtonItem sender)
+        {
+            this.DismissViewController(true, null);
         }
     }
 }
