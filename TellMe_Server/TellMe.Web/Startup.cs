@@ -28,6 +28,7 @@ using TellMe.Web.AutoMapper;
 using TellMe.DAL.Types.AzureBlob;
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace TellMe.Web
 {
@@ -77,6 +78,10 @@ namespace TellMe.Web
             services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
             ConfigureJwtAuthService(services);
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 1048576 * 500; //500 Megabytes
+            });
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().AddFluentValidation(
                 fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));

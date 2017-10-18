@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using HockeyApp.iOS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SDWebImage;
@@ -38,6 +39,7 @@ namespace TellMe.iOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            InitializeHockeyApp();
             SDWebImageManager.SharedManager.ImageDownloader.MaxConcurrentDownloads = 3;
             SDWebImageManager.SharedManager.ImageCache.ShouldCacheImagesInMemory = false;
             SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
@@ -66,6 +68,16 @@ namespace TellMe.iOS
             UNUserNotificationCenter.Current.Delegate = this;
 
             return true;
+        }
+
+        private void InitializeHockeyApp()
+        {
+            var manager = BITHockeyManager.SharedHockeyManager;
+            manager.Configure("1b07145a8d984619a8d66c8d4747a60f");
+            manager.CrashManager.EnableAppNotTerminatingCleanlyDetection = true;
+            manager.DebugLogEnabled = true;
+            manager.StartManager();
+            manager.Authenticator.AuthenticateInstallation();
         }
 
         public override void OnResignActivation(UIApplication application)

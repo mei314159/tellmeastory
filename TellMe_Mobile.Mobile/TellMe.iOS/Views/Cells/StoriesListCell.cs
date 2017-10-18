@@ -14,7 +14,7 @@ namespace TellMe.iOS.Views.Cells
     {
         AVUrlAsset _playerAsset;
         AVPlayerItem _playerItem;
-		AVPlayer _player;
+        AVPlayer _player;
         AVPlayerLayer _playerLayer;
         public static NSString AVCustomEditPlayerViewControllerStatusObservationContext = new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
         public static readonly NSString Key = new NSString("StoriesListCell");
@@ -34,6 +34,7 @@ namespace TellMe.iOS.Views.Cells
         {
             this.Preview.AddGestureRecognizer(new UITapGestureRecognizer(PreviewTouched));
             this.Video.AddGestureRecognizer(new UITapGestureRecognizer(VideoTouched));
+            this.defaultPicture = UIImage.FromBundle("UserPic");
         }
 
         StoryDTO story;
@@ -52,6 +53,8 @@ namespace TellMe.iOS.Views.Cells
                 this.Initialize();
             }
         }
+
+        private UIImage defaultPicture;
 
         private void PreviewTouched()
         {
@@ -130,19 +133,23 @@ namespace TellMe.iOS.Views.Cells
             {
                 this.Date.Text = Story.RequestDateUtc?.GetDateString();
                 this.Title.Text = $"{story.ReceiverName} requested a story \"{Story.Title}\"";
-                this.ProfilePicture.SetPictureUrl(story.ReceiverPictureUrl);
+                this.ProfilePicture.SetPictureUrl(story.ReceiverPictureUrl, defaultPicture);
             }
             else if (story.Status == StoryStatus.Sent)
             {
                 this.Date.Text = Story.CreateDateUtc?.GetDateString();
                 this.Title.Text = $"{story.SenderName} sent a story \"{Story.Title}\"";
-                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
+                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl, defaultPicture);
             }
             else if (story.Status == StoryStatus.Ignored)
             {
                 this.Date.Text = Story.UpdateDateUtc.GetDateString();
                 this.Title.Text = $"{story.SenderName} ignored story request \"{Story.Title}\"";
-                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl);
+                this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl, defaultPicture);
+            }
+            else
+            {
+                this.ProfilePicture.SetPictureUrl(null, defaultPicture);
             }
 
             Spinner.Hidden = true;
@@ -166,14 +173,14 @@ namespace TellMe.iOS.Views.Cells
                 if (playerItem.Status == AVPlayerItemStatus.ReadyToPlay)
                 {
                     Video.Hidden = false;
-					Spinner.StopAnimating();
-					Spinner.Hidden = true;
+                    Spinner.StopAnimating();
+                    Spinner.Hidden = true;
                     _player.Play();
                 }
                 else if (playerItem.Status == AVPlayerItemStatus.Failed)
                 {
-					Spinner.StopAnimating();
-					Spinner.Hidden = true;
+                    Spinner.StopAnimating();
+                    Spinner.Hidden = true;
                     Console.WriteLine(playerItem.Error.LocalizedDescription);
                     StopPlaying();
                 }
@@ -202,9 +209,9 @@ namespace TellMe.iOS.Views.Cells
             {
                 _player.Pause();
                 _player.Dispose();
-				_playerItem?.Dispose();
-				_playerLayer?.Dispose();
-				_player = null;
+                _playerItem?.Dispose();
+                _playerLayer?.Dispose();
+                _player = null;
                 _playerItem = null;
                 _playerLayer = null;
             }

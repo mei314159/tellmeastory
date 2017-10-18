@@ -18,5 +18,6 @@ namespace TellMe.Core.Contracts
         void NavigateSetProfilePicture(IView view);
         void NavigateStorytellers(IView view);
         void NavigateNotificationsCenter(IView view);
+        void SwapToAuth();
     }
 }

@@ -43,16 +43,21 @@ namespace TellMe.iOS
         {
             if (this.Image == null)
                 return null;
-            
+
             var stream = this.Image.MaxResizeImage(320, 320).AsJPEG().AsStream();
             stream.Position = 0;
             return stream;
         }
 
-        public void SetPictureUrl(string pictureUrl)
+        public void SetPictureUrl(string pictureUrl, object defaultPicture)
         {
             if (pictureUrl != null)
                 this.SetImage(new NSUrl(pictureUrl));
+            else if (defaultPicture != null && defaultPicture is UIImage)
+            {
+                var defPic = (UIImage)defaultPicture;
+                this.Image = defPic;
+            }
         }
     }
 }

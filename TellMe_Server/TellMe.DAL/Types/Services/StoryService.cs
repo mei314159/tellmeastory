@@ -40,7 +40,9 @@ namespace TellMe.DAL.Types.Services
                             .AsNoTracking()
                             .Include(x => x.Sender)
                             .Include(x => x.Receiver)
-                            .Where(x => x.SenderId == currentUserId || (x.ReceiverId == currentUserId && x.Status == StoryStatus.Sent));
+                            .Where(x => 
+                            (x.SenderId == currentUserId && x.Status == StoryStatus.Sent) 
+                            || (x.ReceiverId == currentUserId && x.Status == StoryStatus.Sent));
             var result = await stories
             .ProjectTo<StoryDTO>()
             .ToListAsync()

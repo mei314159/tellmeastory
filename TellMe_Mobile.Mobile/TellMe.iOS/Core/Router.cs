@@ -127,5 +127,14 @@ namespace TellMe.iOS.Core
                 this.Present(targetController, view, false);
             });
         }
+
+        public void SwapToAuth()
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var initialController = UIStoryboard.FromName("Auth", null).InstantiateInitialViewController();
+                this.window.SwapController(initialController);
+            });
+        }
     }
 }

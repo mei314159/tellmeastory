@@ -17,7 +17,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public LocalNotificationsDataService()
         {
             this._dbPath = Constants.LocalDbPath;
-            using (var conn = new SQLiteConnection(_dbPath))
+            using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
                 conn.CreateTable<NotificationDTO>();
                 conn.CreateTable<UpdateInfo>();
@@ -26,7 +26,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task DeleteAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.DeleteAll<NotificationDTO>();
@@ -39,7 +39,7 @@ namespace TellMe.Core.Types.DataServices.Local
             if (entities == null)
                 return;
 
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.Trace = true;
@@ -50,7 +50,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task<DataResult<ICollection<NotificationDTO>>> GetAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             var result = (await conn.GetAllWithChildrenAsync<NotificationDTO>().ConfigureAwait(false)).OrderByDescending(x => x.Date).ToArray();
             var updateInfo = await conn.FindAsync<UpdateInfo>("Notifications").ConfigureAwait(false);
             return new DataResult<ICollection<NotificationDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
@@ -58,7 +58,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task SaveAsync(NotificationDTO notification)
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.InsertOrReplace(notification, typeof(NotificationDTO));

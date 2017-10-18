@@ -26,7 +26,7 @@ namespace TellMe.Core.Types.BusinessLogic
         public void Init()
         {
             var account = _accountService.GetAuthInfo().Account;
-            this._view.ProfilePicture.SetPictureUrl(account.PictureUrl);
+            this._view.ProfilePicture.SetPictureUrl(account.PictureUrl, null);
         }
 
         public void SkipButtonTouched()

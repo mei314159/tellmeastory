@@ -20,10 +20,7 @@ namespace TellMe.iOS
 
         partial void SignOutButton_TouchUpInside(UIButton sender)
         {
-            App.Instance.AuthInfo = null;
-            var initialController = UIStoryboard
-                .FromName("Auth", null).InstantiateInitialViewController();
-            View.Window.SwapController(initialController);
+            App.Instance.Authenticate();
         }
 
         partial void ChangePictureButton_TouchUpInside(UIButton sender)

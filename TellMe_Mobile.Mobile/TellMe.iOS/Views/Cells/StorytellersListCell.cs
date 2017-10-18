@@ -7,6 +7,7 @@ namespace TellMe.iOS.Views.Cells
 {
     public partial class StorytellersListCell : UITableViewCell
     {
+        private UIImage defaultPicture;
         public static readonly NSString Key = new NSString("StorytellersListCell");
         public static readonly UINib Nib;
 
@@ -18,6 +19,11 @@ namespace TellMe.iOS.Views.Cells
         protected StorytellersListCell(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
+        }
+
+        public override void AwakeFromNib()
+        {
+            this.defaultPicture = UIImage.FromBundle("UserPic");
         }
 
         StorytellerDTO storyteller;
@@ -38,9 +44,10 @@ namespace TellMe.iOS.Views.Cells
         {
             this.Username.Text = Storyteller.UserName;
             this.FullName.Text = Storyteller.FullName;
-            this.ProfilePicture.SetPictureUrl(storyteller.PictureUrl);
+            this.ProfilePicture.SetPictureUrl(storyteller.PictureUrl, defaultPicture);
 
-            if (storyteller.FriendshipStatus == FriendshipStatus.Accepted){
+            if (storyteller.FriendshipStatus == FriendshipStatus.Accepted)
+            {
                 this.FriendshipStatusLabel.Text = "Friend";
                 this.FriendshipStatusLabel.TextColor = UIColor.DarkGray;
             }

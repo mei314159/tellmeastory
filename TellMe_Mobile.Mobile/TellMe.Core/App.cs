@@ -55,5 +55,11 @@ namespace TellMe.Core
         {
             OnNetworkException?.Invoke(ex);
         }
+
+        public void Authenticate()
+        {
+            AuthInfo = null;
+            Router.SwapToAuth();
+        }
     }
 }

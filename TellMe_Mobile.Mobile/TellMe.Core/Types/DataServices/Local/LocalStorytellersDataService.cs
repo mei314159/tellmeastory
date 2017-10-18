@@ -16,7 +16,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public LocalStorytellersDataService()
         {
             this._dbPath = Constants.LocalDbPath;
-            using (var conn = new SQLiteConnection(_dbPath))
+            using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
                 conn.CreateTable<StorytellerDTO>();
                 conn.CreateTable<UpdateInfo>();
@@ -25,7 +25,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task DeleteAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.DeleteAll<StorytellerDTO>();
@@ -38,7 +38,7 @@ namespace TellMe.Core.Types.DataServices.Local
             if (storytellers == null)
                 return;
             
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.Trace = true;
@@ -49,7 +49,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task<DataResult<ICollection<StorytellerDTO>>> GetAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             var result = await conn.GetAllWithChildrenAsync<StorytellerDTO>().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Storytellers").ConfigureAwait(false);
             return new DataResult<ICollection<StorytellerDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
@@ -57,7 +57,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task SaveAsync(StorytellerDTO storyteller)
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.InsertOrReplace(storyteller, typeof(StorytellerDTO));
