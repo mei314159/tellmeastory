@@ -97,6 +97,7 @@ namespace TellMe.iOS
 
         private void Collapse()
         {
+            StopPlaying();
             Animate(0.15, () =>
             {
                 View.Frame = initialFrame;
@@ -105,7 +106,6 @@ namespace TellMe.iOS
                 effectView.Alpha = 0;
             }, () =>
             {
-                StopPlaying();
                 View.RemoveFromSuperview();
                 View.Frame = new CGRect(CGPoint.Empty, initialSize);
                 this.AddSubview(View);

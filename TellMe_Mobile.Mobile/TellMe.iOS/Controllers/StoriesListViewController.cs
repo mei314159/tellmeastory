@@ -55,7 +55,7 @@ namespace TellMe.iOS
         [Action("UnwindToStoriesViewController:")]
         public void UnwindToStoriesViewController(UIStoryboardSegue segue)
         {
-            Console.WriteLine("We've unwinded to Yellow!");
+            Task.Run(() => LoadStories(true, false));
         }
 
         public void DisplayStories(ICollection<StoryDTO> stories)
