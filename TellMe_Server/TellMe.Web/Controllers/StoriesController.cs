@@ -5,6 +5,7 @@ using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.Web.DTO;
 using TellMe.Web.Extensions;
+using System;
 
 namespace TellMe.Web.Controllers
 {
@@ -43,11 +44,20 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
+        [Obsolete("Use: skip/{skip}")]
         [HttpGet("")]
         public async Task<IActionResult> GetStoriesAsync()
         {
-            var stories = await _storyService.GetAllAsync(this.UserId);
-            return Ok(stories);
+            var result = await _storyService.GetAllAsync(this.UserId);
+            return Ok(result);
+        }
+
+        [HttpGet("skip/{skip}")]
+        public async Task<IActionResult> GetStoriesAsync(int skip)
+        {
+            var result = await _storyService.GetAllAsync(this.UserId, skip < 0 ? 0 : skip);
+
+            return Ok(result);
         }
 
         [HttpPost("upload-media")]

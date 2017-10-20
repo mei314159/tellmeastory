@@ -19,6 +19,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private IStoriesListView _view;
         private IRouter _router;
         private RequestStoryValidator _validator;
+        readonly List<StoryDTO> stories = new List<StoryDTO>();
 
         public StoriesBusinessLogic(RemoteStoriesDataService remoteStoriesService, IStoriesListView view, IRouter router)
         {
@@ -31,18 +32,22 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
-            ICollection<StoryDTO> stories;
             var localContacts = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
             if (localContacts.Expired || forceRefresh || clearCache)
             {
+                if (forceRefresh)
+                {
+                    stories.Clear();
+                }
+
                 if (clearCache){
                     await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
                 }
-                var result = await _remoteStoriesService.GetStoriesAsync().ConfigureAwait(false);
+                var result = await _remoteStoriesService.GetStoriesAsync(stories.Count).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                    stories = result.Data;
+                    stories.AddRange(result.Data);
                 }
                 else
                 {
@@ -52,7 +57,8 @@ namespace TellMe.Core.Types.BusinessLogic
             }
             else
             {
-                stories = localContacts.Data;
+                stories.Clear();
+                stories.AddRange(localContacts.Data);
             }
 
             this._view.DisplayStories(stories.OrderByDescending(x => x.UpdateDateUtc).ToList());

@@ -106,6 +106,11 @@ namespace TellMe.iOS
             return cell;
         }
 
+        public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+        {
+            (cell as StoriesListCell)?.EndDisplaying();
+        }
+
         private async Task LoadStories(bool forceRefresh, bool clearCache = false)
         {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());

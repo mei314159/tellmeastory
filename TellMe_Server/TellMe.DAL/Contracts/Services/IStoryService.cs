@@ -9,7 +9,7 @@ namespace TellMe.DAL.Contracts.Services
     {
         Task<StoryDTO> RequestStoryAsync(string requestSenderId, StoryRequestDTO dto);
         Task<StoryDTO> SendStoryAsync(string senderId, SendStoryDTO dto);
-        Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId);
+        Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int? skip = null);
         Task<StoryStatus> RejectRequestAsync(string currentUserId, int storyId);
     }
 }

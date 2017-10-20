@@ -16,9 +16,9 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
-        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId = null)
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int skip)
 		{
-            var result = await this.GetAsync<List<StoryDTO>>($"stories/{userId}").ConfigureAwait(false);
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/skip/{skip}").ConfigureAwait(false);
 			return result;
 		}
 

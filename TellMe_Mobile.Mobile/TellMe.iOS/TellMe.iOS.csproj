@@ -176,6 +176,7 @@
     <InterfaceDefinition Include="Views\InputPopupView.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterCell.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
+    <InterfaceDefinition Include="Views\StoryView.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -269,6 +270,10 @@
     <Compile Include="Controllers\RequestStoryController.cs" />
     <Compile Include="Controllers\RequestStoryController.designer.cs">
       <DependentUpon>RequestStoryController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StoryView.cs" />
+    <Compile Include="Views\StoryView.designer.cs">
+      <DependentUpon>StoryView.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

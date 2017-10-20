@@ -30,7 +30,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task LoadStorytellersAsync(bool forceRefresh = false, bool clearCache = false)
         {
-            ICollection<StorytellerDTO> entities;
+            IEnumerable<StorytellerDTO> entities;
             var localEntities = await _localStorytellersService.GetAllAsync().ConfigureAwait(false);
             if (localEntities.Expired || forceRefresh || clearCache)
             {
@@ -53,6 +53,12 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 entities = localEntities.Data;
+            }
+
+
+            if (_view.Mode == StorytellersViewMode.ChooseRecipient)
+            {
+                entities = entities.Where(x => x.FriendshipStatus == FriendshipStatus.Accepted);
             }
 
             this._view.DisplayStorytellers(entities.OrderBy(x => x.UserName).ToList());

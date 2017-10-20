@@ -33,16 +33,22 @@ namespace TellMe.DAL.Types.Services
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int? skip = null)
         {
-            var stories = _storyRepository
+            IQueryable<Story> stories = _storyRepository
                             .GetQueryable()
                             .AsNoTracking()
                             .Include(x => x.Sender)
                             .Include(x => x.Receiver)
-                            .Where(x => 
-                            (x.SenderId == currentUserId && x.Status == StoryStatus.Sent) 
-                            || (x.ReceiverId == currentUserId && x.Status == StoryStatus.Sent));
+                            .Where(x =>
+                            (x.SenderId == currentUserId && x.Status == StoryStatus.Sent)
+                            || (x.ReceiverId == currentUserId && x.Status == StoryStatus.Sent))
+                            .OrderByDescending(x => x.CreateDateUtc);
+            if (skip.HasValue)
+            {
+                stories = stories.Skip(skip.Value).Take(20);
+            }
+
             var result = await stories
             .ProjectTo<StoryDTO>()
             .ToListAsync()
