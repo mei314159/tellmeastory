@@ -4,6 +4,6 @@ namespace TellMe.DAL.Types.Domain
 {
     public abstract class EntityBase<T> : IEntityBase<T>
     {
-        public T Id { get; set; }
+        public virtual T Id { get; set; }
     }
 }
