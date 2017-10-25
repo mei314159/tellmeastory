@@ -16,8 +16,10 @@ namespace TellMe.iOS
 {
     public partial class StoriesListViewController : UITableViewController, IStoriesListView //, IUITableViewDataSourcePrefetching
     {
-        private StoriesBusinessLogic businessLogic;
+        private StoriesBusinessLogic _businessLogic;
         private List<StoryDTO> storiesList = new List<StoryDTO>();
+        private volatile bool loadingMore;
+        private volatile bool canLoadMore;
 
         public StoriesListViewController(IntPtr handle) : base(handle)
         {
@@ -26,15 +28,23 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this.businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
+            this._businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
             this.TableView.DelaysContentTouches = false;
+            this.TableView.TableFooterView.Hidden = true;
             this.NavigationController.View.BackgroundColor = UIColor.White;
 
+            Task.Run(() => LoadStoriesAsync(false, true));
+
+            ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
             this.SetToolbarItems(new[]{
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 new UIBarButtonItem("Request a Story", UIBarButtonItemStyle.Plain, RequestStoryButtonTouched),
@@ -42,28 +52,24 @@ namespace TellMe.iOS
                 new UIBarButtonItem("Send a Story", UIBarButtonItemStyle.Plain, SendStoryButtonTouched),
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
             }, true);
-            Task.Run(() => LoadStories(false, true));
-
-            ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
             this.NavigationController.SetToolbarHidden(false, true);
         }
 
         [Action("UnwindToStoriesViewController:")]
         public void UnwindToStoriesViewController(UIStoryboardSegue segue)
         {
-            Task.Run(() => LoadStories(true, false));
+            Task.Run(() => LoadStoriesAsync(true, false));
         }
 
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
             lock (((ICollection)storiesList).SyncRoot)
             {
+                var initialCount = storiesList.Count;
                 storiesList.Clear();
                 storiesList.AddRange(stories);
+
+                this.canLoadMore = stories.Count > initialCount;
             }
 
             InvokeOnMainThread(() => TableView.ReloadData());
@@ -79,15 +85,10 @@ namespace TellMe.iOS
 
         public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = storiesList[indexPath.Row];
-            if (cell.Status == StoryStatus.Sent)
-            {
-                return tableView.Frame.Width + 64;
-            }
-            else
-            {
+            if (storiesList.Count == 0 || indexPath.Row >= storiesList.Count)
                 return 64;
-            }
+
+            return tableView.Frame.Width + 64;
         }
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
@@ -111,42 +112,70 @@ namespace TellMe.iOS
             (cell as StoriesListCell)?.EndDisplaying();
         }
 
-        private async Task LoadStories(bool forceRefresh, bool clearCache = false)
+        public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+        {
+            if (storiesList.Count - indexPath.Row == 5 && canLoadMore)
+            {
+                LoadMoreAsync();
+            }
+        }
+
+        private async Task LoadMoreAsync()
+        {
+            if (this.loadingMore)
+                return;
+
+            this.loadingMore = true;
+            InvokeOnMainThread(() =>
+            {
+                this.ActivityIndicator.StartAnimating();
+                this.TableView.TableFooterView.Hidden = false;
+            });
+            await _businessLogic.LoadStoriesAsync(false, false);
+            InvokeOnMainThread(() =>
+            {
+                this.ActivityIndicator.StopAnimating();
+                this.TableView.TableFooterView.Hidden = true;
+            });
+
+            this.loadingMore = false;
+        }
+
+        private async Task LoadStoriesAsync(bool forceRefresh, bool clearCache = false)
         {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
-            await businessLogic.LoadStoriesAsync(forceRefresh, clearCache);
+            await _businessLogic.LoadStoriesAsync(forceRefresh, clearCache);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
-
         }
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            Task.Run(() => LoadStories(true));
+            Task.Run(() => LoadStoriesAsync(true));
         }
 
         void SendStoryButtonTouched(object sender, EventArgs e)
         {
-            businessLogic.SendStory();
+            _businessLogic.SendStory();
         }
 
         void RequestStoryButtonTouched(object sender, EventArgs e)
         {
-            businessLogic.RequestStory();
+            _businessLogic.RequestStory();
         }
 
         partial void AccountSettingsButton_Activated(UIBarButtonItem sender)
         {
-            businessLogic.AccountSettings();
+            _businessLogic.AccountSettings();
         }
 
         partial void Notifications_Activated(UIBarButtonItem sender)
         {
-            businessLogic.NotificationsCenter();
+            _businessLogic.NotificationsCenter();
         }
 
         partial void Storytellers_Activated(UIBarButtonItem sender)
         {
-            businessLogic.ShowStorytellers();
+            _businessLogic.ShowStorytellers();
         }
     }
 }

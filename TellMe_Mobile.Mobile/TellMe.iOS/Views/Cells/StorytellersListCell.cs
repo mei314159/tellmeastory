@@ -23,6 +23,7 @@ namespace TellMe.iOS.Views.Cells
 
         public override void AwakeFromNib()
         {
+            base.AwakeFromNib();
             this.defaultPicture = UIImage.FromBundle("UserPic");
         }
 

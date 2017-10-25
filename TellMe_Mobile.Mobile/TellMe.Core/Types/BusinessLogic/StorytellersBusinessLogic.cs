@@ -16,33 +16,75 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private RemoteStorytellersDataService _remoteStorytellersService;
         private LocalStorytellersDataService _localStorytellersService;
+        private RemoteTribesDataService _remoteTribesService;
+        private LocalTribesDataService _localTribesService;
         private IStorytellersView _view;
         private IRouter _router;
         private EmailValidator _emailValidator;
-        public StorytellersBusinessLogic(RemoteStorytellersDataService remoteStorytellersService, IStorytellersView view, IRouter router)
+        private readonly List<ContactDTO> contacts = new List<ContactDTO>();
+
+        public StorytellersBusinessLogic(RemoteStorytellersDataService remoteStorytellersService, RemoteTribesDataService remoteTribesService, IStorytellersView view, IRouter router)
         {
             _remoteStorytellersService = remoteStorytellersService;
+            _remoteTribesService = remoteTribesService;
             _localStorytellersService = new LocalStorytellersDataService();
+            _localTribesService = new LocalTribesDataService();
             _view = view;
             _router = router;
             _emailValidator = new EmailValidator();
         }
 
-        public async Task LoadStorytellersAsync(bool forceRefresh = false, bool clearCache = false)
+        public async Task LoadAsync(bool forceRefresh, string searchText)
         {
-            IEnumerable<StorytellerDTO> entities;
-            var localEntities = await _localStorytellersService.GetAllAsync().ConfigureAwait(false);
-            if (localEntities.Expired || forceRefresh || clearCache)
+            bool useLocal = !string.IsNullOrWhiteSpace(searchText) && !forceRefresh;
+            if (useLocal)
             {
-                if (clearCache)
+                var storytellers = await _localStorytellersService.GetAllAsync().ConfigureAwait(false);
+                useLocal = !storytellers.Expired;
+                var tribes = await _localTribesService.GetAllAsync().ConfigureAwait(false);
+                useLocal = !tribes.Expired;
+
+                if (useLocal)
                 {
-                    await _localStorytellersService.DeleteAllAsync().ConfigureAwait(false);
+                    contacts.Clear();
+                    contacts.AddRange(storytellers.Data
+                                      .Where(x =>
+                                             (_view.Mode == ContactsMode.FriendsOnly && x.FriendshipStatus == FriendshipStatus.Accepted) ||
+                                             x.FriendshipStatus != FriendshipStatus.None
+                     ).Select(x => new ContactDTO
+                     {
+                         Type = ContactType.User,
+                         UserId = x.Id,
+                         User = x
+                     }).Union(tribes.Data.Select(x => new ContactDTO
+                     {
+                         Type = ContactType.Tribe,
+                         TribeId = x.Id,
+                         Tribe = x
+                     })));
                 }
-                var result = await _remoteStorytellersService.GetAllAsync().ConfigureAwait(false);
+            }
+
+            if (!useLocal)
+            {
+                if (forceRefresh)
+                {
+                    contacts.Clear();
+                    await ClearLocalDB().ConfigureAwait(false);
+                }
+
+                var result = await _remoteStorytellersService.SearchAsync(searchText, contacts.Count, _view.Mode).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    await _localStorytellersService.SaveAllAsync(result.Data).ConfigureAwait(false);
-                    entities = result.Data;
+                    if (result.Data.Count > 0)
+                    {
+                        contacts.AddRange(result.Data);
+                        await SaveContactsToLocalDB(result).ConfigureAwait(false);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(searchText) && contacts.Count == 0)
+                    {
+                        this._view.ShowSendRequestPrompt();
+                    }
                 }
                 else
                 {
@@ -50,38 +92,29 @@ namespace TellMe.Core.Types.BusinessLogic
                     return;
                 }
             }
-            else
-            {
-                entities = localEntities.Data;
-            }
 
-
-            if (_view.Mode == StorytellersViewMode.ChooseRecipient)
-            {
-                entities = entities.Where(x => x.FriendshipStatus == FriendshipStatus.Accepted);
-            }
-
-            this._view.DisplayStorytellers(entities.OrderBy(x => x.UserName).ToList());
+            this._view.DisplayContacts(contacts);
         }
 
-        public async Task SearchStorytellersAsync(string fragment)
+        private async Task ClearLocalDB()
         {
-            var result = await _remoteStorytellersService.SearchAsync(fragment).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                if (result.Data.Count > 0)
-                {
-                    this._view.DisplayStorytellers(result.Data.OrderBy(x => x.UserName).ToList());
-                }
-                else
-                {
-                    this._view.ShowSendRequestPrompt();
-                }
-            }
-            else
-            {
-                result.ShowResultError(this._view);
-            }
+            await _localStorytellersService.DeleteAllAsync().ConfigureAwait(false);
+            await _localTribesService.DeleteAllAsync().ConfigureAwait(false);
+        }
+
+        private async Task SaveContactsToLocalDB(Result<List<ContactDTO>> result)
+        {
+            await _localStorytellersService
+                    .SaveAllAsync(result.Data
+                                  .Where(x =>
+                                         x.Type == ContactType.User &&
+                                         x.User.FriendshipStatus != FriendshipStatus.None)
+                    .Select(x => x.User))
+                    .ConfigureAwait(false);
+            await _localTribesService
+                .SaveAllAsync(result.Data.Where(x => x.Type == ContactType.Tribe)
+                .Select(x => x.Tribe))
+                .ConfigureAwait(false);
         }
 
         public async Task SendFriendshipRequestAsync(StorytellerDTO storyteller)
@@ -116,6 +149,62 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 result.ShowResultError(this._view);
+            }
+        }
+
+        public void AddTribe()
+        {
+            _router.NavigateChooseTribeMembers(_view, HandleStorytellerSelectedEventHandler, false);
+        }
+
+        void HandleStorytellerSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
+        {
+            var tribeMembers = selectedContacts.Select(x => x.User).ToList();
+            _router.NavigateCreateTribe(this._view, tribeMembers, TribeCreated);
+        }
+
+        void TribeCreated(TribeDTO tribe)
+        {
+            contacts.Add(new ContactDTO
+            {
+                Tribe = tribe,
+                TribeId = tribe.Id,
+                Name = tribe.Name,
+                Type = ContactType.Tribe
+            });
+
+            this._view.DisplayContacts(contacts);
+        }
+
+        public async Task AcceptTribeInvitationAsync(TribeDTO dto)
+        {
+            var result = await _remoteTribesService.AcceptTribeInvitationAsync(dto.Id, null).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                dto.MembershipStatus = result.Data;
+                await _localTribesService.SaveAsync(dto).ConfigureAwait(false);
+                this._view.DisplayContacts(contacts);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
+            }
+        }
+
+        public async Task RejectTribeInvitationAsync(TribeDTO dto)
+        {
+            var result = await _remoteTribesService.RejectTribeInvitationAsync(dto.Id, null).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                dto.MembershipStatus = result.Data;
+                await _localTribesService.SaveAsync(dto).ConfigureAwait(false);
+                this._view.DisplayContacts(contacts);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
             }
         }
     }

@@ -80,7 +80,7 @@
         <scene sceneID="3076">
             <objects>
                 <tableViewController id="3077" sceneMemberID="viewController" customClass="StoriesListViewController" storyboardIdentifier="StoriesListViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" hasRefreshControl="1">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="3078">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="-1" sectionFooterHeight="44" id="3078">
                         <rect key="frame" x="0.0" y="64" width="375" height="559"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -98,6 +98,20 @@
                             <outlet property="dataSource" destination="3077" id="3079"/>
                             <outlet property="delegate" destination="3077" id="3080"/>
                         </connections>
+                        <view contentMode="scaleToFill" id="31708" key="tableFooterView">
+                            <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <subviews>
+                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="32071">
+                                    <rect key="frame" x="178" y="12" width="20" height="20"/>
+                                </activityIndicatorView>
+                            </subviews>
+                            <constraints>
+                                <constraint id="32072" firstItem="32071" firstAttribute="centerX" secondItem="31708" secondAttribute="centerX"/>
+                                <constraint id="32073" firstItem="32071" firstAttribute="centerY" secondItem="31708" secondAttribute="centerY"/>
+                            </constraints>
+                        </view>
                     </tableView>
                     <navigationItem title="Stories" id="3128" key="navigationItem">
                         <rightBarButtonItems>
@@ -134,6 +148,7 @@
                         <outlet property="AccountSettingsButton" destination="19949" id="name-outlet-19949"/>
                         <outlet property="Notifications" destination="22104" id="name-outlet-22104"/>
                         <outlet property="Storytellers" destination="24667" id="name-outlet-24667"/>
+                        <outlet property="ActivityIndicator" destination="32071" id="name-outlet-32071"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3083" userLabel="First Responder" sceneMemberID="firstResponder"/>

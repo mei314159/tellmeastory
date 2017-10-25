@@ -61,7 +61,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 stories.AddRange(localContacts.Data);
             }
 
-            this._view.DisplayStories(stories.OrderByDescending(x => x.UpdateDateUtc).ToList());
+            this._view.DisplayStories(stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
 
 
@@ -90,9 +90,9 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateNotificationsCenter(_view);
         }
 
-        void RequestStoryRecipientSelectedEventHandler(StorytellerDTO selectedStoryteller)
+        void RequestStoryRecipientSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
         {
-            _router.NavigateRequestStory(this._view, selectedStoryteller);
+            _router.NavigateRequestStory(this._view, selectedContacts);
         }
     }
 }

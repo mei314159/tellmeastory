@@ -30,6 +30,10 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton OkButton { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel Title { get; set; }
+
         [Action ("CancelButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void CancelButton_TouchUpInside (UIKit.UIButton sender);
@@ -58,6 +62,11 @@ namespace TellMe.iOS
             if (OkButton != null) {
                 OkButton.Dispose ();
                 OkButton = null;
+            }
+
+            if (Title != null) {
+                Title.Dispose ();
+                Title = null;
             }
         }
     }

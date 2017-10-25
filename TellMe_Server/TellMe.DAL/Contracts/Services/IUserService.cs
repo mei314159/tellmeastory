@@ -15,9 +15,9 @@ namespace TellMe.DAL.Contracts.Services
         Task<bool> ExpireTokenAsync(RefreshToken token);
 
         Task<RefreshToken> GetTokenAsync(string token, string clientId);
-        
-        Task<IReadOnlyCollection<StorytellerDTO>> SearchAsync(string currentUserId, string fragment);
-        Task<IReadOnlyCollection<StorytellerDTO>> GetAllFriendsAsync(string currentUserId);
+
+        Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int? skip = null);
+
         Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
         Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);
     }

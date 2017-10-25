@@ -19,20 +19,23 @@ namespace TellMe.DAL.Types.Services
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Friendship, int> _friendshipRepository;
+        private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<RefreshToken, int> _refreshTokenRepository;
 
         public UserService(
-            IRepository<ApplicationUser, string> serviceRepository,
+            IRepository<ApplicationUser, string> userRepository,
             IRepository<RefreshToken, int> refreshTokenRepository,
             IRepository<Friendship, int> friendshipRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository)
+            IRepository<Notification, int> notificationRepository,
+            IRepository<TribeMember, int> tribeMemberRepository)
         {
-            _userRepository = serviceRepository;
+            _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _friendshipRepository = friendshipRepository;
             _pushNotificationsService = pushNotificationsService;
             _notificationRepository = notificationRepository;
+            _tribeMemberRepository = tribeMemberRepository;
         }
         public async Task<ApplicationUser> GetAsync(string id)
         {
@@ -40,52 +43,90 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task<IReadOnlyCollection<StorytellerDTO>> SearchAsync(string currentUserId, string fragment)
+        public async Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int? skip = null)
         {
-            var uppercaseFragment = fragment.ToUpper();
-            var words = uppercaseFragment.Split(' ');
-            var users = _userRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .Where(x => x.Id != currentUserId &&
-            (x.NormalizedUserName.StartsWith(uppercaseFragment)
-            || x.NormalizedEmail == uppercaseFragment
-            || words.All(y => x.FullName.ToUpper().Contains(y))));
+            string uppercaseFragment = null;
+            var userQuery = _userRepository
+                .GetQueryable(true)
+                .Where(x => x.Id != currentUserId);
+
+            if (!string.IsNullOrWhiteSpace(fragment))
+            {
+                uppercaseFragment = fragment.ToUpper();
+                var words = uppercaseFragment.Split(' ');
+
+                userQuery = userQuery
+                .Where(x => x.NormalizedUserName.StartsWith(uppercaseFragment)
+                         || x.NormalizedEmail == uppercaseFragment
+                         || words.All(y => x.FullName.ToUpper().Contains(y)));
+            }
 
             var friends = _friendshipRepository
-            .GetQueryable()
-            .AsNoTracking()
+            .GetQueryable(true)
             .Where(x => x.UserId == currentUserId);
 
-            var result = await (from user in users
-                                join friend in friends on user.Id equals friend.FriendId into gj
-                                from x in gj.DefaultIfEmpty()
-                                select new StorytellerDTO
-                                {
-                                    Id = user.Id,
-                                    UserName = user.UserName,
-                                    FullName = user.FullName,
-                                    PictureUrl = user.PictureUrl,
-                                    FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
-                                }).ToListAsync().ConfigureAwait(false);
+            var users =
+            (from user in userQuery
+             join friend in friends on user.Id equals friend.FriendId into gj
+             from x in gj.DefaultIfEmpty()
+             select new ContactDTO
+             {
+                 Type = ContactType.User,
+                 Name = user.UserName,
+                 UserId = user.Id,
+                 User = new StorytellerDTO
+                 {
+                     Id = user.Id,
+                     UserName = user.UserName,
+                     FullName = user.FullName,
+                     PictureUrl = user.PictureUrl,
+                     FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
+                 }
+             });
 
-            return result;
-        }
-
-        public async Task<IReadOnlyCollection<StorytellerDTO>> GetAllFriendsAsync(string currentUserId)
-        {
-            var result = await _friendshipRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .Where(x => x.UserId == currentUserId)
-            .Select(x => new StorytellerDTO
+            if (mode == ContactsMode.FriendsAndTribes || mode == ContactsMode.FriendsOnly)
             {
-                Id = x.FriendId,
-                UserName = x.Friend.UserName,
-                FullName = x.Friend.FullName,
-                PictureUrl = x.Friend.PictureUrl,
-                FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
-            }).ToListAsync().ConfigureAwait(false);
+                users = users.Where(x => x.User.FriendshipStatus == FriendshipStatus.Accepted);
+            }
+
+
+
+            IQueryable<ContactDTO> contacts;
+            if (mode == ContactsMode.FriendsOnly)
+            {
+                contacts = users;
+            }
+            else
+            {
+                var tribeQuery = _tribeMemberRepository
+                    .GetQueryable(true)
+                    .Include(x => x.Tribe)
+                    .Where(x => x.UserId == currentUserId && x.Status != TribeMemberStatus.Rejected);
+                if (!string.IsNullOrWhiteSpace(fragment))
+                {
+                    tribeQuery = tribeQuery.Where(x => x.Tribe.Name.ToUpper().StartsWith(uppercaseFragment));
+                }
+                var tribes = tribeQuery.Select(x => new ContactDTO
+                {
+                    Type = ContactType.Tribe,
+                    Name = x.Tribe.Name,
+                    TribeId = x.TribeId,
+                    Tribe = new TribeDTO
+                    {
+                        Id = x.TribeId,
+                        Name = x.Tribe.Name,
+                        CreateDateUtc = x.Tribe.CreateDateUtc,
+                        MembershipStatus = x.Status,
+                        CreatorId = x.Tribe.CreatorId,
+                        CreatorName = x.Tribe.Creator.UserName,
+                        CreatorPictureUrl = x.Tribe.Creator.PictureUrl
+                    }
+                });
+
+                contacts = users.Concat(tribes);
+            }
+
+            var result = await contacts.OrderBy(x => x.Type).ThenBy(x => x.Name).Skip(skip.Value).ToListAsync().ConfigureAwait(false);
             return result;
         }
 
@@ -100,7 +141,6 @@ namespace TellMe.DAL.Types.Services
             await _refreshTokenRepository.SaveAsync(token).ConfigureAwait(false);
             return true;
         }
-
         public Task<RefreshToken> GetTokenAsync(string token, string clientId)
         {
             return _refreshTokenRepository.GetQueryable().FirstOrDefaultAsync(x => x.ClientId == clientId && x.Token == token);

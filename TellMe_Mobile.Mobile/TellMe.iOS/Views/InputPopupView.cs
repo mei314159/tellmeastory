@@ -34,11 +34,12 @@ namespace TellMe.iOS
             set => this.Input.KeyboardType = value;
         }
 
-        public static InputPopupView Create(string label, string placeholder)
+        public static InputPopupView Create(string title, string label, string placeholder)
         {
             var view = (InputPopupView)Nib.Instantiate(null, null)[0];
             view.Init(view.Frame.Size, false);
             view.Label.Text = label;
+            view.Title.Text = title;
             view.Input.Placeholder = placeholder;
             return view;
         }

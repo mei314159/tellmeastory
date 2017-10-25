@@ -16,6 +16,14 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIActivityIndicatorView ActivityIndicator { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIBarButtonItem AddTribeButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UINavigationItem NavItem { get; set; }
 
         [Outlet]
@@ -34,8 +42,22 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.NSLayoutConstraint TableViewTop { get; set; }
 
+        [Action ("AddTribeButton_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void AddTribeButton_Activated (UIKit.UIBarButtonItem sender);
+
         void ReleaseDesignerOutlets ()
         {
+            if (ActivityIndicator != null) {
+                ActivityIndicator.Dispose ();
+                ActivityIndicator = null;
+            }
+
+            if (AddTribeButton != null) {
+                AddTribeButton.Dispose ();
+                AddTribeButton = null;
+            }
+
             if (NavItem != null) {
                 NavItem.Dispose ();
                 NavItem = null;

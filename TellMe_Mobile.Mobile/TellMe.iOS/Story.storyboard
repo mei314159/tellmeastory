@@ -167,10 +167,24 @@
                                     <string>Tribes</string>
                                 </scopeButtonTitles>
                             </searchBar>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" id="24720" translatesAutoresizingMaskIntoConstraints="NO" showsHorizontalScrollIndicator="NO">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="44" id="24720" translatesAutoresizingMaskIntoConstraints="NO" showsHorizontalScrollIndicator="NO">
                                 <rect key="frame" x="0.0" y="108" width="375" height="559"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes/>
+                                <view contentMode="scaleToFill" id="53862" key="tableFooterView">
+                                    <rect key="frame" x="0.0" y="134.5" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="54194">
+                                            <rect key="frame" x="178" y="12" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint id="54195" firstItem="54194" firstAttribute="centerY" secondItem="53862" secondAttribute="centerY"/>
+                                        <constraint id="54196" firstItem="54194" firstAttribute="centerX" secondItem="53862" secondAttribute="centerX"/>
+                                    </constraints>
+                                </view>
                             </tableView>
                         </subviews>
                         <constraints>
@@ -183,7 +197,13 @@
                             <constraint id="31135" firstItem="24720" firstAttribute="top" secondItem="24227" secondAttribute="bottom" constant="44"/>
                         </constraints>
                     </view>
-                    <navigationItem title="Storytellers" id="24234" key="navigationItem"/>
+                    <navigationItem title="Storytellers" id="24234" key="navigationItem">
+                        <barButtonItem key="rightBarButtonItem" id="55558" image="AddGroup">
+                            <connections>
+                                <action selector="AddTribeButton_Activated:" destination="24230" id="57967"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="searchDisplayController" destination="24347" id="24346"/>
@@ -191,6 +211,8 @@
                         <outlet property="SearchBar" destination="24456" id="name-outlet-24456"/>
                         <outlet property="NavItem" destination="24234" id="name-outlet-24234"/>
                         <outlet property="TableViewTop" destination="31135" id="name-outlet-31135"/>
+                        <outlet property="ActivityIndicator" destination="54194" id="name-outlet-54194"/>
+                        <outlet property="AddTribeButton" destination="55558" id="name-outlet-55558"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="24232" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -424,6 +446,7 @@
         <image name="Bell" width="25" height="25"/>
         <image name="Storytellers" width="25" height="25"/>
         <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedScreenMetrics key="destination" type="retina47"/>

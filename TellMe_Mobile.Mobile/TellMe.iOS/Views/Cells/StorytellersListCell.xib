@@ -61,7 +61,7 @@
                     <constraint id="4557" firstItem="142" firstAttribute="leading" secondItem="1956" secondAttribute="trailing" constant="10"/>
                     <constraint id="5905" firstItem="YTl-1W-gDM" firstAttribute="trailing" secondItem="5358" secondAttribute="trailing" constant="10"/>
                     <constraint id="7977" firstItem="5358" firstAttribute="centerY" secondItem="YTl-1W-gDM" secondAttribute="centerY"/>
-                    <constraint id="10179" firstItem="5358" firstAttribute="leading" secondItem="142" secondAttribute="trailing" constant="129" relation="greaterThanOrEqual"/>
+                    <constraint id="10179" firstItem="5358" firstAttribute="leading" secondItem="142" secondAttribute="trailing" constant="10" relation="greaterThanOrEqual"/>
                     <constraint id="10416" firstItem="5358" firstAttribute="leading" secondItem="526" secondAttribute="trailing" constant="10" relation="greaterThanOrEqual"/>
                 </constraints>
             </tableViewCellContentView>

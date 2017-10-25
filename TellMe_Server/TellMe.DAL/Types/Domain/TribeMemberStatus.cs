@@ -4,6 +4,7 @@ namespace TellMe.DAL.Types.Domain
     {
         Invited = 1,
         Joined = 2,
-        Rejected = 3
+        Rejected = 3,
+        Creator = 4
     }
 }

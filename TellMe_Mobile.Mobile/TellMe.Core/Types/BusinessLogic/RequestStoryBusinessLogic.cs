@@ -30,10 +30,14 @@ namespace TellMe.Core.Types.BusinessLogic
             this._view.SendButton.Enabled = false;
             var title = this._view.StoryTitle.Text;
 
-            var dto = new StoryRequestDTO
+            var dto = new RequestStoryDTO
             {
-                Title = title,
-                ReceiverId = _view.Recipient.Id
+                Requests = _view.Recipients.Select(x => new StoryRequestDTO
+                {
+                    Title = title,
+                    UserId = x.Type == ContactType.User ? x.User.Id : null,
+                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?)null
+                }).ToList()
             };
 
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);

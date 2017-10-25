@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq.Expressions;
 
 namespace TellMe.DAL.Types.Repositories
 {
@@ -32,6 +34,11 @@ namespace TellMe.DAL.Types.Repositories
         public IQueryable<TEntity> GetQueryable(bool asNoTracking = false)
         {
             return asNoTracking ? Set.AsNoTracking() : Set;
+        }
+
+        public void Detach(TEntity entity)
+        {
+            _unitOfWork.Context.Entry(entity).State = EntityState.Detached;
         }
 
         public void Save(TEntity entity, bool commit = false)
@@ -83,6 +90,36 @@ namespace TellMe.DAL.Types.Repositories
             if (commit)
             {
                 _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
+        where TProperty : class
+        {
+            _unitOfWork.Context.Entry(entity).Reference(property);
+        }
+
+        public void LoadProperty<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, TProperty>> property)
+        where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadProperty(entity, property);
+            }
+        }
+
+        public void LoadCollection<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+        where TProperty : class
+        {
+            _unitOfWork.Context.Entry(entity).Collection(propertyExpression);
+        }
+
+        public void LoadCollection<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+        where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadCollection(entity, propertyExpression);
             }
         }
     }

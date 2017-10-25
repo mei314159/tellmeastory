@@ -11,18 +11,24 @@ using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Extensions;
+using System.Linq;
+using TellMe.iOS.Views;
 
 namespace TellMe.iOS
 {
     public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource, IUITableViewDelegate
     {
         private StorytellersBusinessLogic _businessLogic;
-        private List<StorytellerDTO> storytellersList = new List<StorytellerDTO>();
-        private List<StorytellerDTO> tribes = new List<StorytellerDTO>();
+        private List<ContactDTO> storytellersList = new List<ContactDTO>();
+        private List<ContactDTO> tribesList = new List<ContactDTO>();
+        private volatile bool loadingMore;
+        private volatile bool canLoadMore;
 
-        public StorytellersViewMode Mode { get; set; }
+        public ContactsMode Mode { get; set; }
         public event StorytellerSelectedEventHandler RecipientsSelected;
         public bool DismissOnFinish { get; set; }
+
+        public string SearchText => SearchBar.Text;
 
         public StorytellersController(IntPtr handle) : base(handle)
         {
@@ -30,15 +36,11 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            if (Mode == StorytellersViewMode.ChooseRecipient)
-            {
-                NavItem.Title = "Choose recipient";
-                SearchBar.Hidden = true;
-                TableViewTop.Constant = 0;
-            }
+            this.SetMode(Mode);
 
-            this._businessLogic = new StorytellersBusinessLogic(new RemoteStorytellersDataService(), this, App.Instance.Router);
+            this._businessLogic = new StorytellersBusinessLogic(new RemoteStorytellersDataService(), new RemoteTribesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
+            this.TableView.RegisterNibForCellReuse(TribesListCell.Nib, TribesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
             this.TableView.RefreshControl = new UIRefreshControl();
@@ -50,15 +52,21 @@ namespace TellMe.iOS
             this.SearchBar.OnEditingStopped += SearchBar_OnEditingStopped;
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
             this.SearchBar.SearchButtonClicked += SearchBar_SearchButtonClicked;
+            this.TableView.TableFooterView.Hidden = true;
             UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton);
             uITapGestureRecognizer.CancelsTouchesInView = false;
             this.View.AddGestureRecognizer(uITapGestureRecognizer);
-            Task.Run(() => LoadStorytellers(false, true));
+            Load(false);
         }
 
         public override void ViewWillAppear(bool animated)
         {
             this.NavigationController.SetToolbarHidden(true, true);
+        }
+
+        [Action("UnwindToStorytellers:")]
+        public void UnwindToStorytellers(UIStoryboardSegue segue)
+        {
         }
 
         void HideSearchCancelButton()
@@ -79,26 +87,37 @@ namespace TellMe.iOS
 
         private void SearchBar_CancelButtonClicked(object sender, EventArgs e)
         {
+            SearchBar.Text = null;
             SearchBar.EndEditing(true);
-            Task.Run(() => LoadStorytellers(false));
+            Load(true);
         }
 
         private async void SearchBar_SearchButtonClicked(object sender, EventArgs e)
         {
             SearchBar.EndEditing(true);
-            await SearchStorytellers(SearchBar.Text);
+            await Load(true);
         }
 
-        public void DisplayStorytellers(ICollection<StorytellerDTO> items)
+        public void DisplayContacts(ICollection<ContactDTO> contacts)
         {
+            var initialCount = tribesList.Count + storytellersList.Count;
             lock (((ICollection)storytellersList).SyncRoot)
             {
                 storytellersList.Clear();
-                storytellersList.AddRange(items);
+                storytellersList.AddRange(contacts.Where(x => x.Type == ContactType.User).OrderBy(x => x.Name));
             }
+
+            lock (((ICollection)tribesList).SyncRoot)
+            {
+                tribesList.Clear();
+                tribesList.AddRange(contacts.Where(x => x.Type == ContactType.Tribe).OrderBy(x => x.Name));
+            }
+
+            this.canLoadMore = contacts.Count > initialCount;
 
             InvokeOnMainThread(() => TableView.ReloadData());
         }
+
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
@@ -106,26 +125,27 @@ namespace TellMe.iOS
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
-            return this.storytellersList.Count;
+            return section == 0 ? this.storytellersList.Count : this.tribesList.Count;
         }
 
         [Export("tableView:didDeselectRowAtIndexPath:")]
         public void RowDeselected(UITableView tableView, NSIndexPath indexPath)
         {
-            NavItem.SetRightBarButtonItem(null, false);
+            if (tableView.IndexPathsForSelectedRows == null)
+            {
+                NavItem.RightBarButtonItem.Enabled = false;
+            }
+
             var cell = tableView.CellAt(indexPath);
-            cell.Accessory = UITableViewCellAccessory.None;
             tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
         }
 
         [Export("tableView:didSelectRowAtIndexPath:")]
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            if (Mode == StorytellersViewMode.ChooseRecipient)
+            if (Mode == ContactsMode.FriendsAndTribes || Mode == ContactsMode.FriendsOnly)
             {
-                NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched), false);
-                var cell = tableView.CellAt(indexPath);
-                cell.Accessory = UITableViewCellAccessory.Checkmark;
+                NavItem.RightBarButtonItem.Enabled = tableView.IndexPathsForSelectedRows?.Length > 0;
                 return;
             }
 
@@ -135,7 +155,7 @@ namespace TellMe.iOS
                 var dto = this.storytellersList[indexPath.Row];
                 string title = null;
                 string confirmButtonTitle = null;
-                switch (dto.FriendshipStatus)
+                switch (dto.User.FriendshipStatus)
                 {
                     case FriendshipStatus.Accepted:
                     case FriendshipStatus.Rejected:
@@ -158,13 +178,46 @@ namespace TellMe.iOS
                 alert.AddAction(UIAlertAction.Create(confirmButtonTitle, UIAlertActionStyle.Default, (x) => SendFriendshipRequest(dto)));
                 this.PresentViewController(alert, true, null);
             }
+            else if (indexPath.Section == 1)
+            {
+                var dto = this.tribesList[indexPath.Row];
+                if (dto.Tribe.MembershipStatus != TribeMemberStatus.Invited)
+                    return;
+                
+                var alert = UIAlertController
+                    .Create("Accept invitation to tribe?", string.Empty, UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, (x) => RejectTribeInvitationTouched(dto)));
+                alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, (x) => AcceptTribeInvitationTouched(dto)));
+                this.PresentViewController(alert, true, null);
+            }
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
-            cell.Storyteller = this.storytellersList[indexPath.Row];
-            return cell;
+            if (indexPath.Section == 0)
+            {
+                var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
+                cell.Storyteller = this.storytellersList[indexPath.Row].User;
+                cell.TintColor = UIColor.Blue;
+                return cell;
+            }
+
+            if (indexPath.Section == 1)
+            {
+                var cell = tableView.DequeueReusableCell(TribesListCell.Key, indexPath) as TribesListCell;
+                cell.Tribe = this.tribesList[indexPath.Row].Tribe;
+                cell.TintColor = UIColor.Blue;
+                return cell;
+            }
+
+            return null;
+        }
+
+        [Export("tableView:editingStyleForRowAtIndexPath:")]
+        public UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
+        {
+            return (UITableViewCellEditingStyle)3;
         }
 
         [Export("tableView:titleForHeaderInSection:")]
@@ -181,7 +234,45 @@ namespace TellMe.iOS
         [Export("numberOfSectionsInTableView:")]
         public nint NumberOfSections(UITableView tableView)
         {
-            return tribes.Count > 0 ? 2 : 1; //Friends Tribes
+            return Mode == ContactsMode.FriendsOnly ? 1 : 2;
+        }
+
+        partial void AddTribeButton_Activated(UIBarButtonItem sender)
+        {
+            _businessLogic.AddTribe();
+        }
+
+        private void SetMode(ContactsMode mode)
+        {
+            this.Mode = mode;
+            switch (this.Mode)
+            {
+                case ContactsMode.Normal:
+                    TableView.SetEditing(false, true);
+                    NavItem.Title = "Storytellers";
+                    TableViewTop.Constant = 44;
+                    break;
+                case ContactsMode.FriendsAndTribes:
+                    NavItem.Title = "Choose recipient";
+                    TableView.SetEditing(true, true);
+                    SearchBar.Hidden = true;
+                    TableViewTop.Constant = 0;
+                    NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                    {
+                        Enabled = false
+                    }, false);
+                    break;
+                case ContactsMode.FriendsOnly:
+                    NavItem.Title = "Choose Tribe Membes";
+                    TableView.SetEditing(true, true);
+                    SearchBar.Hidden = true;
+                    TableViewTop.Constant = 0;
+                    NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                    {
+                        Enabled = false
+                    }, false);
+                    break;
+            }
         }
 
         public void ShowSendRequestPrompt()
@@ -196,52 +287,89 @@ namespace TellMe.iOS
             });
         }
 
-        private async void SendFriendshipRequest(StorytellerDTO storyteller)
+        private async void SendFriendshipRequest(ContactDTO contact)
         {
-            await _businessLogic.SendFriendshipRequestAsync(storyteller);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(storyteller), 0) }, UITableViewRowAnimation.None);
+            var overlay = new Overlay("Wait");
+            overlay.PopUp(true);
+            await _businessLogic.SendFriendshipRequestAsync(contact.User);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+			overlay.Close(true);
         }
 
-        private async Task LoadStorytellers(bool forceRefresh, bool clearCache = false)
+        async void AcceptTribeInvitationTouched(ContactDTO contact)
         {
+            var overlay = new Overlay("Wait");
+            overlay.PopUp(true);
+            await _businessLogic.AcceptTribeInvitationAsync(contact.Tribe);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            overlay.Close(true);
+        }
+
+        async void RejectTribeInvitationTouched(ContactDTO contact)
+        {
+            var overlay = new Overlay("Wait");
+            overlay.PopUp(true);
+            await _businessLogic.RejectTribeInvitationAsync(contact.Tribe);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            overlay.Close(true);
+        }
+
+        private async Task Load(bool forceRefresh)
+        {
+            var searchText = this.SearchBar.Text;
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
-            await _businessLogic.LoadStorytellersAsync(forceRefresh, clearCache);
+            await _businessLogic.LoadAsync(forceRefresh, searchText);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
 
         }
 
-        private async Task SearchStorytellers(string fragment)
+        [Export("tableView:willDisplayCell:forRowAtIndexPath:")]
+        public void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
-            await _businessLogic.SearchStorytellersAsync(fragment);
-            InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
+            if (canLoadMore && (tribesList.Count + storytellersList.Count - indexPath.Row == 5))
+            {
+                LoadMoreAsync();
+            }
+        }
+
+        private async Task LoadMoreAsync()
+        {
+            if (this.loadingMore)
+                return;
+
+            this.loadingMore = true;
+            var searchText = this.SearchBar.Text;
+            InvokeOnMainThread(() =>
+            {
+                this.ActivityIndicator.StartAnimating();
+                this.TableView.TableFooterView.Hidden = false;
+            });
+            await _businessLogic.LoadAsync(false, searchText);
+            InvokeOnMainThread(() =>
+            {
+                this.ActivityIndicator.StopAnimating();
+                this.TableView.TableFooterView.Hidden = true;
+            });
+            this.loadingMore = false;
         }
 
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(SearchBar.Text))
-            {
-
-                Task.Run(() => SearchStorytellers(SearchBar.Text));
-            }
-            else
-            {
-                Task.Run(() => LoadStorytellers(true));
-            }
-
+            Load(true);
         }
 
         private void ShowSendRequestToJoinPrompt()
         {
-            var popup = InputPopupView.Create("Send request to join", "Enter email address");
+            var popup = InputPopupView.Create("Send request to join", "Please enter an email address to send the invitation", "Email address");
             popup.KeyboardType = UIKeyboardType.EmailAddress;
-            popup.PopUp(true);
             popup.OnSubmit += async (email) => await _businessLogic.SendRequestToJoinPromptAsync(email);
+            popup.PopUp(true);
         }
 
         void ContinueButtonTouched(object sender, EventArgs e)
         {
-            RecipientsSelected?.Invoke(storytellersList[TableView.IndexPathForSelectedRow.Row]);
+            var selectedContacts = TableView.IndexPathsForSelectedRows.Select(x => x.Section == 0 ? storytellersList[x.Row] : tribesList[x.Row]).ToList();
+            RecipientsSelected?.Invoke(selectedContacts);
             if (DismissOnFinish)
             {
                 if (NavigationController != null)

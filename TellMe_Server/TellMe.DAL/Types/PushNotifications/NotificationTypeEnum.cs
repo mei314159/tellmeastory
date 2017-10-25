@@ -6,6 +6,9 @@ namespace TellMe.DAL.Types.PushNotifications
         Story = 2,
         FriendshipRequest = 3,
         FriendshipAccepted = 4,
-        FriendshipRejected = 5
+        FriendshipRejected = 5,
+        TribeInvite = 6,
+        TribeAcceptInvite = 7,
+        TribeRejectInvite = 8
     }
 }

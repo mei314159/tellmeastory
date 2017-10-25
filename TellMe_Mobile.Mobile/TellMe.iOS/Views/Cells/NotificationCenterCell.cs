@@ -50,10 +50,10 @@ namespace TellMe.iOS.Views.Cells
             switch (Notification.Type)
             {
                 case NotificationTypeEnum.StoryRequest:
-                    var storyDTO = ((JObject)notification.Extra).ToObject<StoryDTO>();
-                    index = Notification.Text.IndexOf(storyDTO.ReceiverName, StringComparison.Ordinal);
-                    length = storyDTO.ReceiverName.Length;
-                    PictureView.SetImage(new NSUrl(storyDTO.ReceiverPictureUrl));
+                    var storyRequestDTO = ((JObject)notification.Extra).ToObject<StoryRequestDTO>();
+                    index = Notification.Text.IndexOf(storyRequestDTO.ReceiverName, StringComparison.Ordinal);
+                    length = storyRequestDTO.ReceiverName.Length;
+                    PictureView.SetImage(new NSUrl(storyRequestDTO.SenderPictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipRequest:
                     var dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
@@ -77,6 +77,29 @@ namespace TellMe.iOS.Views.Cells
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
                     PictureView.SetImage(new NSUrl(dto.PictureUrl));
+                    break;
+                case NotificationTypeEnum.TribeInvite:
+                    var tribeDto = ((JObject)notification.Extra).ToObject<TribeDTO>();
+                    index = Notification.Text.IndexOf(tribeDto.CreatorName, StringComparison.Ordinal);
+                    length = tribeDto.CreatorName.Length;
+                    if (!Notification.Handled)
+                    {
+                        this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+                    }
+
+                    PictureView.SetImage(new NSUrl(tribeDto.CreatorPictureUrl));
+                    break;
+                case NotificationTypeEnum.TribeAcceptInvite:
+                    var tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
+                    index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
+                    length = tribeMemberDto.UserName.Length;
+                    PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
+                    break;
+                case NotificationTypeEnum.TribeRejectInvite:
+                    tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
+                    index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
+                    length = tribeMemberDto.UserName.Length;
+                    PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
                     break;
                 default:
                     this.Text.AttributedText = text;

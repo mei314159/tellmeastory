@@ -4,6 +4,7 @@ namespace TellMe.DAL.Contracts.DTO
 {
     public class StoryReceiverDTO
     {
+        public int Id { get; set; }
         public string UserId { get; set; }
         public int? TribeId { get; set; }
 

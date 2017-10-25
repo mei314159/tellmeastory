@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Contracts.Services;
 
 namespace TellMe.Web.Controllers
@@ -18,18 +19,18 @@ namespace TellMe.Web.Controllers
             _notificationService = notificationService;
         }
 
-        [HttpGet("search/{fragment}")]
-        public async Task<IActionResult> SearchAsync(string fragment)
+        [HttpGet("search/{mode}/skip/{skip}/{fragment}")]
+        public async Task<IActionResult> SearchContactsAsync(string fragment, ContactsMode mode, int skip)
         {
-            var users = await UserService.SearchAsync(this.UserId, fragment);
+            var users = await UserService.SearchContactsAsync(this.UserId, fragment, mode, skip > 0 ? skip : 0);
             return Ok(users);
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetAllAsync()
+        [HttpGet("search/{mode}/skip/{skip}")]
+        public async Task<IActionResult> SearchContactsAsync(ContactsMode mode, int skip)
         {
-            var users = await UserService.GetAllFriendsAsync(this.UserId);
-            return Ok(users);
+            var result = await SearchContactsAsync(null, mode, skip);
+            return result;
         }
 
         [HttpPost("{userId}/add-to-friends")]
@@ -51,7 +52,7 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPost("request-to-join")]
-        public async Task<IActionResult> SendRequestToJoinAsync(string email)
+        public IActionResult SendRequestToJoinAsync(string email)
         {
             return Ok();
         }

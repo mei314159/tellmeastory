@@ -4,10 +4,7 @@ using UIKit;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core;
 using TellMe.Core.Contracts.UI.Views;
-using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
-using System.Collections;
-using TellMe.iOS.Views.Cells;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Extensions;
@@ -29,9 +26,11 @@ namespace TellMe.iOS
         IButton ISendStoryView.SendButton => this.SendButton;
         IButton ISendStoryView.ChooseRecipientsButton => this.ChooseRecipientsButton;
 
+		public StoryRequestDTO StoryRequest { get; set; }
         public string PreviewImagePath { get; set; }
-        public StoryDTO RequestedStory { get; set; }
+
         public NotificationDTO RequestNotification { get; set; }
+
 
         public override void ViewDidLoad()
         {

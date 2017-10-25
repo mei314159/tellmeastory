@@ -40,7 +40,7 @@ namespace TellMe.iOS
 
         IButton IRecordVideoView.RecordButton => this.RecordButton;
 
-        public StoryDTO RequestedStory { get; set; }
+        public StoryRequestDTO StoryRequest { get; set; }
         public NotificationDTO RequestNotification { get; set; }
 
         public override void ViewDidLoad()

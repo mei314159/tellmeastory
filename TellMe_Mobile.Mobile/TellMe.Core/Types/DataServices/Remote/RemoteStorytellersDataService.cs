@@ -7,15 +7,12 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteStorytellersDataService : BaseDataService
     {
-        public async Task<Result<List<StorytellerDTO>>> SearchAsync(string fragment)
+        public async Task<Result<List<ContactDTO>>> SearchAsync(string fragment, int skip, ContactsMode mode)
         {
-            var result = await this.GetAsync<List<StorytellerDTO>>($"storytellers/search/{fragment}").ConfigureAwait(false);
-            return result;
-        }
-
-        public async Task<Result<List<StorytellerDTO>>> GetAllAsync()
-        {
-            var result = await this.GetAsync<List<StorytellerDTO>>($"storytellers").ConfigureAwait(false);
+            var url = string.IsNullOrWhiteSpace(fragment) 
+                            ? $"storytellers/search/{mode}/skip/{skip}" 
+                            : $"storytellers/search/{mode}/skip/{skip}/{fragment}";
+            var result = await this.GetAsync<List<ContactDTO>>(url).ConfigureAwait(false);
             return result;
         }
 

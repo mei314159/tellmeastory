@@ -375,9 +375,13 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<DateTime>("CreateDateUtc");
 
+                    b.Property<string>("CreatorId");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Tribe");
                 });
@@ -528,6 +532,13 @@ namespace TellMe.DAL.Migrations
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Tribe", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
                 });
 
             modelBuilder.Entity("TellMe.DAL.Types.Domain.TribeMember", b =>

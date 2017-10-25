@@ -56,9 +56,9 @@ namespace TellMe.iOS.Views.Cells
             nint length = default(nint);
 
             var storyDTO = ((JObject)notification.Extra).ToObject<StoryDTO>();
-            index = Notification.Text.IndexOf(storyDTO.ReceiverName, StringComparison.Ordinal);
-            length = storyDTO.ReceiverName.Length;
-            PictureView.SetImage(new NSUrl(storyDTO.ReceiverPictureUrl));
+            index = Notification.Text.IndexOf(storyDTO.SenderName, StringComparison.Ordinal);
+            length = storyDTO.SenderName.Length;
+            PictureView.SetImage(new NSUrl(storyDTO.SenderPictureUrl));
             StoryPreview.SetImage(new NSUrl(storyDTO.PreviewUrl));
             if (index >= 0)
             {

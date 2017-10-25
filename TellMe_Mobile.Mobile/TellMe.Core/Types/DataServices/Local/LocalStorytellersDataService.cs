@@ -33,26 +33,26 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
-        public async Task SaveAllAsync(ICollection<StorytellerDTO> storytellers)
+        public async Task SaveAllAsync(IEnumerable<StorytellerDTO> items)
         {
-            if (storytellers == null)
+            if (items == null)
                 return;
             
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.Trace = true;
-                c.InsertOrReplaceAllWithChildren(storytellers);
+                c.InsertOrReplaceAllWithChildren(items);
                 c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Storytellers" });
             }).ConfigureAwait(false);
         }
 
-        public async Task<DataResult<ICollection<StorytellerDTO>>> GetAllAsync()
+        public async Task<DataResult<StorytellerDTO>> GetAllAsync()
         {
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             var result = await conn.GetAllWithChildrenAsync<StorytellerDTO>().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Storytellers").ConfigureAwait(false);
-            return new DataResult<ICollection<StorytellerDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
+            return new DataResult<StorytellerDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
 
         public async Task SaveAsync(StorytellerDTO storyteller)

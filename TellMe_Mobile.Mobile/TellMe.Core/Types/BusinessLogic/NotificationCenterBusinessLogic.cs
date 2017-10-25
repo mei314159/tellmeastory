@@ -16,26 +16,32 @@ namespace TellMe.Core.Types.BusinessLogic
         readonly RemoteNotificationsDataService _remoteNotificationsDataService;
         readonly RemoteStorytellersDataService _remoteStorytellersDataService;
         readonly RemoteStoriesDataService _remoteStoriesDataService;
+        readonly RemoteTribesDataService _remoteTribesDataService;
         readonly LocalNotificationsDataService _localNotificationsDataService;
-        readonly LocalStoriesDataService _localStoriesDataService;
         readonly LocalStorytellersDataService _localStorytellersDataService;
         readonly List<NotificationDTO> notifications = new List<NotificationDTO>();
         readonly IRouter _router;
 
-        public NotificationCenterBusinessLogic(IRouter router, RemoteStoriesDataService remoteStoriesDataService, RemoteStorytellersDataService remoteStorytellersDataService, RemoteNotificationsDataService remoteNotificationsDataService, INotificationsCenterView view)
+        public NotificationCenterBusinessLogic(IRouter router, 
+                                               RemoteStoriesDataService remoteStoriesDataService, 
+                                               RemoteStorytellersDataService remoteStorytellersDataService, 
+                                               RemoteNotificationsDataService remoteNotificationsDataService,
+                                               RemoteTribesDataService remoteTribesDataService,
+                                               INotificationsCenterView view)
         {
             _router = router;
             _remoteStorytellersDataService = remoteStorytellersDataService;
             _remoteStoriesDataService = remoteStoriesDataService;
             _remoteNotificationsDataService = remoteNotificationsDataService;
+            _remoteTribesDataService = remoteTribesDataService;
             _localNotificationsDataService = new LocalNotificationsDataService();
-            _localStoriesDataService = new LocalStoriesDataService();
             _localStorytellersDataService = new LocalStorytellersDataService();
             _view = view;
         }
 
         public async Task LoadNotificationsAsync(bool forceRefresh = false)
         {
+            //await _localNotificationsDataService.DeleteAllAsync();
             var localEntities = await _localNotificationsDataService.GetAllAsync().ConfigureAwait(false);
             if (localEntities.Expired || forceRefresh)
             {
@@ -101,17 +107,13 @@ namespace TellMe.Core.Types.BusinessLogic
             }
         }
 
-        public async Task RejectStoryRequestRequestAsync(NotificationDTO notification, StoryDTO dto)
+        public async Task RejectTribeInvitationAsync(NotificationDTO notification, TribeDTO dto)
         {
-            var result = await _remoteStoriesDataService.RejectStoryRequestAsync(dto.Id, notification.Id).ConfigureAwait(false);
+            var result = await _remoteTribesDataService.RejectTribeInvitationAsync(dto.Id, notification.Id).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 notification.Handled = true;
                 await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
-
-                dto.Status = result.Data;
-                await _localStoriesDataService.SaveAsync(dto).ConfigureAwait(false);
-
                 this._view.ReloadNotification(notification);
             }
             else
@@ -121,7 +123,39 @@ namespace TellMe.Core.Types.BusinessLogic
             }
         }
 
-        public void AcceptStoryRequestRequest(NotificationDTO notification, StoryDTO dto)
+        public async Task AcceptTribeInvitationAsync(NotificationDTO notification, TribeDTO dto)
+        {
+            var result = await _remoteTribesDataService.AcceptTribeInvitationAsync(dto.Id, notification.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                notification.Handled = true;
+                await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
+                this._view.ReloadNotification(notification);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
+            }
+        }
+
+        public async Task RejectStoryRequestRequestAsync(NotificationDTO notification, StoryRequestDTO dto)
+        {
+            var result = await _remoteStoriesDataService.RejectStoryRequestAsync(dto.Id, notification.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                notification.Handled = true;
+                await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
+                this._view.ReloadNotification(notification);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
+            }
+        }
+
+        public void AcceptStoryRequestRequest(NotificationDTO notification, StoryRequestDTO dto)
         {
             _router.NavigateRecordStory(_view, dto, notification);
         }

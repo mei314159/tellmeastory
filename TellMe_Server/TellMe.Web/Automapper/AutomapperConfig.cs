@@ -36,6 +36,22 @@ namespace TellMe.Web.AutoMapper
                     .ForMember(x => x.ReceiverPictureUrl, x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
                     .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
 
+                cfg.CreateMap<Tribe, TribeDTO>()
+                    .ForMember(x => x.Members, x => x.Ignore());
+
+                cfg.CreateMap<TribeMember, TribeMemberDTO>()
+                  .ForMember(x => x.UserName, x => x.MapFrom(y => y.User.UserName))
+                  .ForMember(x => x.UserPictureUrl, x => x.MapFrom(y => y.User.PictureUrl));
+                cfg.CreateMap<ApplicationUser, TribeDTO>()
+                        .ForMember(x => x.CreatorName, x => x.MapFrom(y => y.UserName))
+                        .ForMember(x => x.CreatorPictureUrl, x => x.MapFrom(y => y.PictureUrl))
+                        .ForMember(x => x.CreatorId, x => x.MapFrom(y => y.Id))
+                        .ForAllOtherMembers(x => x.Ignore());
+
+
+                // cfg.CreateMap<TribeDTO, Tribe>()
+                //     .ForMember(x => x.Members, x => x.MapFrom(y => y.Members.Select(m => new TribeMember { UserId = m.Id }).ToList()));
+
                 cfg.CreateMap<ApplicationUser, UserDTO>();
                 cfg.CreateMap<Notification, NotificationDTO>()
                 .ForMember(x => x.Extra, x => x.MapFrom(y => y.Extra));

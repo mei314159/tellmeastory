@@ -1,6 +1,6 @@
 namespace TellMe.DAL.Types.Domain
 {
-    public enum ReceiverType
+    public enum ContactType
     {
         User = 1,
         Tribe = 2

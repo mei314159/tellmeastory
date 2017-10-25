@@ -213,27 +213,17 @@ namespace TellMe.iOS
 
         private void Initialize()
         {
-            if (story.Status != StoryStatus.Sent)
-                return;
-
             this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl, defaultPicture);
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{story.SenderName} sent a story \""));
 
             text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, story.SenderName.Length));
             text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
-            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc?.GetDateString(), foregroundColor: UIColor.LightGray));
+            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             Spinner.Hidden = true;
-            Preview.Hidden = story.Status != StoryStatus.Sent;
-            if (story.Status == StoryStatus.Sent)
-            {
-                this.Preview.SetImage(new NSUrl(story.PreviewUrl));
-            }
-            else
-            {
-                this.Preview.Image = null;
-            }
+            Preview.Hidden = false;
+            this.Preview.SetImage(new NSUrl(story.PreviewUrl));
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)

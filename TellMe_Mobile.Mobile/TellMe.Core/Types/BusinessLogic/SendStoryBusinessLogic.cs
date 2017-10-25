@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private LocalNotificationsDataService _localNotificationsDataService;
         private SendStoryValidator _validator;
 
-        private StorytellerDTO _recipient;
+        private ICollection<ContactDTO> _recipients;
         public SendStoryBusinessLogic(ISendStoryView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
         {
             this._view = _view;
@@ -32,9 +33,9 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void Init()
         {
-            if (_view.RequestedStory != null)
+            if (_view.StoryRequest != null)
             {
-                this._view.StoryTitle.Text = _view.RequestedStory.Title;
+                this._view.StoryTitle.Text = _view.StoryRequest.Title;
                 this._view.StoryTitle.Enabled = false;
                 InitButtons();
             }
@@ -42,15 +43,14 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void InitButtons()
         {
-            this._view.SendButton.Enabled = (_view.RequestedStory != null || _recipient != null) && !string.IsNullOrWhiteSpace(_view.StoryTitle.Text);
-            this._view.ChooseRecipientsButton.Enabled = _view.RequestedStory == null;
+            this._view.SendButton.Enabled = (_view.StoryRequest != null || _recipients != null) && !string.IsNullOrWhiteSpace(_view.StoryTitle.Text);
+            this._view.ChooseRecipientsButton.Enabled = _view.StoryRequest == null;
         }
 
         public async Task SendAsync()
         {
             this._view.SendButton.Enabled = false;
             var title = this._view.StoryTitle.Text;
-            var recipientId = _recipient?.Id ?? _view.RequestedStory.ReceiverId;
 
             var videoStream = File.OpenRead(this._view.VideoPath);
             var previewImageStream = File.OpenRead(this._view.PreviewImagePath);
@@ -65,8 +65,15 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 var dto = new SendStoryDTO();
                 dto.Title = title;
-                dto.Id = _view.RequestedStory?.Id;
-                dto.ReceiverId = recipientId;
+                dto.RequestId = _view.StoryRequest?.Id;
+                if (dto.RequestId == null)
+                {
+                    dto.Receivers = _recipients.Select(x => new StoryReceiverDTO
+                    {
+                        UserId = x.Type == ContactType.User ? x.User.Id : null,
+                        TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?)null
+                    }).ToList();
+                }
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
                 dto.PreviewUrl = uploadResult.Data.PreviewImageUrl;
                 dto.NotificationId = _view.RequestNotification?.Id;
@@ -97,12 +104,12 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ChooseRecipients()
         {
-            _router.NavigateChooseRecipients(_view, HandleStorytellerSelectedEventHandler, true);
+            _router.NavigateChooseRecipients(_view, HandleStorytellersSelectedEventHandler, true);
         }
 
-        void HandleStorytellerSelectedEventHandler(StorytellerDTO recipient)
+        void HandleStorytellersSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
         {
-            _recipient = recipient;
+            _recipients = selectedContacts;
             InitButtons();
         }
     }

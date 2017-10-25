@@ -1,14 +1,16 @@
-﻿namespace TellMe.Core.Contracts.DTO
+﻿using System.Collections.Generic;
+
+namespace TellMe.Core.Contracts.DTO
 {
     public class SendStoryDTO
     {
-        public int? Id { get; set; }
+        public string Title { get; set; }
 
-        public string ReceiverId { get; set; }
+        public int? RequestId { get; set; }
+
+        public List<StoryReceiverDTO> Receivers { get; set; }
 
         public int? NotificationId { get; set; }
-
-        public string Title { get; set; }
 
         public string VideoUrl { get; set; }
 

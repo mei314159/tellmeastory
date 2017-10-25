@@ -196,7 +196,7 @@ namespace TellMe.iOS
                 if (notification.NotificationType == NotificationTypeEnum.StoryRequest)
                 {
                     var controller = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
-                    App.Instance.Router.NavigateRecordStory(controller, requestedStory: ((JObject)notification.Extra).ToObject<StoryDTO>());
+                    App.Instance.Router.NavigateRecordStory(controller, ((JObject)notification.Extra).ToObject<StoryRequestDTO>());
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.Story)
                 {
@@ -208,6 +208,15 @@ namespace TellMe.iOS
                 {
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.FriendshipRejected)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.TribeInvite)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.TribeAcceptInvite)
+                {
+                }
+                else if (notification.NotificationType == NotificationTypeEnum.TribeRejectInvite)
                 {
                 }
             }

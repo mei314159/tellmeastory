@@ -6,7 +6,7 @@ namespace TellMe.Core.Contracts.UI.Views
 {
     public interface ISendStoryView : IView
     {
-        StoryDTO RequestedStory { get; }
+        StoryRequestDTO StoryRequest { get; }
         NotificationDTO RequestNotification { get; }
 
         string VideoPath { get; }

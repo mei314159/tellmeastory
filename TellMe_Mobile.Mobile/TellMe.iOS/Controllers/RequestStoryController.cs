@@ -20,7 +20,7 @@ namespace TellMe.iOS
         {
         }
 
-        public StorytellerDTO Recipient { get; set; }
+        public ICollection<ContactDTO> Recipients { get; set; }
 
         ITextInput IRequestStoryView.StoryTitle => this.StoryTitle;
 
@@ -54,7 +54,7 @@ namespace TellMe.iOS
         private void UpdatePreview()
         {
             var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString(Recipient.UserName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), foregroundColor: UIColor.Blue));
+            text.Append(new NSAttributedString("{Handle}", UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), foregroundColor: UIColor.Blue));
             text.Append(new NSAttributedString(","));
             text.Append(new NSAttributedString(App.Instance.AuthInfo.Account.UserName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             text.Append(new NSAttributedString($" would like you to tell a story about: "));
@@ -62,7 +62,7 @@ namespace TellMe.iOS
             RequestTextPreview.AttributedText = text;
         }
 
-        public void Close(StoryDTO requestedStory)
+        public void Close(ICollection<StoryRequestDTO> requestedStory)
         {
             PerformSegue("UnwindToStories", this);
         }

@@ -26,7 +26,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void PreviewStory()
         {
-            _router.NavigatePreviewStory(_view, this.videoPath, _view.RequestedStory, _view.RequestNotification);
+            _router.NavigatePreviewStory(_view, this.videoPath, _view.StoryRequest, _view.RequestNotification);
         }
 
         public void ToggleRecording()
@@ -40,7 +40,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         private void DeleteFile(string filePath)
         {
-            if (!string.IsNullOrWhiteSpace(videoPath) && File.Exists(filePath))
+            if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
             {
                 Console.WriteLine("Deleting File");
                 File.Delete(filePath);

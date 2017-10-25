@@ -54,6 +54,15 @@
                         <constraint id="6367" firstItem="5601" firstAttribute="height" constant="40"/>
                     </constraints>
                 </stackView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" id="8826" translatesAutoresizingMaskIntoConstraints="NO" minimumScaleFactor="0.7">
+                    <rect key="frame" x="20" y="8" width="260" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17" weight="semibold"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                    <constraints>
+                        <constraint id="9231" firstItem="8826" firstAttribute="height" constant="21"/>
+                    </constraints>
+                </label>
             </subviews>
             <constraints>
                 <constraint id="1845" firstItem="605" firstAttribute="centerX" secondItem="1" secondAttribute="centerX"/>
@@ -61,17 +70,21 @@
                 <constraint id="2175" firstItem="605" firstAttribute="width" secondItem="1" secondAttribute="width" constant="-40"/>
                 <constraint id="3049" firstItem="2721" firstAttribute="width" secondItem="605" secondAttribute="width"/>
                 <constraint id="3159" firstItem="2721" firstAttribute="centerX" secondItem="1" secondAttribute="centerX"/>
-                <constraint id="3269" firstItem="2721" firstAttribute="top" secondItem="1" secondAttribute="top" constant="20" relation="greaterThanOrEqual"/>
                 <constraint id="3379" firstItem="605" firstAttribute="top" secondItem="2721" secondAttribute="bottom" constant="8"/>
                 <constraint id="6147" firstItem="5601" firstAttribute="bottom" secondItem="1" secondAttribute="bottom"/>
                 <constraint id="6257" firstItem="5601" firstAttribute="width" secondItem="1" secondAttribute="width"/>
                 <constraint id="6477" firstItem="5601" firstAttribute="centerX" secondItem="1" secondAttribute="centerX"/>
+                <constraint id="9149" firstItem="8826" firstAttribute="top" secondItem="1" secondAttribute="top" constant="8"/>
+                <constraint id="9150" firstItem="8826" firstAttribute="centerX" secondItem="1" secondAttribute="centerX"/>
+                <constraint id="9151" firstItem="8826" firstAttribute="width" secondItem="605" secondAttribute="width"/>
+                <constraint id="9233" firstItem="2721" firstAttribute="top" secondItem="8826" secondAttribute="bottom" constant="4" relation="greaterThanOrEqual"/>
             </constraints>
             <connections>
                 <outlet property="Input" destination="605" id="name-outlet-605"/>
                 <outlet property="Label" destination="2721" id="name-outlet-2721"/>
                 <outlet property="CancelButton" destination="6601" id="name-outlet-6601"/>
                 <outlet property="OkButton" destination="6711" id="name-outlet-6711"/>
+                <outlet property="Title" destination="8826" id="name-outlet-8826"/>
             </connections>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute keyPath="layer.cornerRadius" type="number">
@@ -87,5 +100,6 @@
         <image name="Bell" width="25" height="25"/>
         <image name="Storytellers" width="25" height="25"/>
         <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
     </resources>
 </document>

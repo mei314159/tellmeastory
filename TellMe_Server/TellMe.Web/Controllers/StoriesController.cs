@@ -44,14 +44,6 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
-        [Obsolete("Use: skip/{skip}")]
-        [HttpGet("")]
-        public async Task<IActionResult> GetStoriesAsync()
-        {
-            var result = await _storyService.GetAllAsync(this.UserId);
-            return Ok(result);
-        }
-
         [HttpGet("skip/{skip}")]
         public async Task<IActionResult> GetStoriesAsync(int skip)
         {

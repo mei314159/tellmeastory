@@ -17,58 +17,67 @@ namespace TellMe.DAL.Types.Services
 {
     public class StoryService : IStoryService
     {
-        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IRepository<Story, int> _storyRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
+        private readonly IRepository<Notification, int> _notificationRepository;
 
         private readonly IRepository<StoryRequestStatus, int> _storyRequestStatusRepository;
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
-
         private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         public StoryService(
             IRepository<Story, int> storyRepository,
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository)
+            IRepository<Notification, int> notificationRepository,
+            IRepository<StoryRequestStatus, int> storyRequestStatusRepository,
+            IRepository<StoryRequest, int> storyRequestRepository,
+            IRepository<StoryReceiver, int> storyReceiverRepository,
+            IRepository<TribeMember, int> tribeMemberRepository)
         {
             _storyRepository = storyRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
             _notificationRepository = notificationRepository;
+            _storyRequestStatusRepository = storyRequestStatusRepository;
+            _storyRequestRepository = storyRequestRepository;
+            _storyReceiverRepository = storyReceiverRepository;
+            _tribeMemberRepository = tribeMemberRepository;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int? skip = null)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int skip)
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
             var receivers = _storyReceiverRepository.GetQueryable(true);
-            IQueryable<Story> stories = _storyRepository.GetQueryable(true).Include(x => x.Sender);
-            var receivedStoryIds = from receiver in receivers
-                                   join tribeMember in tribeMembers
-                                   on receiver.Id equals tribeMember.TribeId into gj
-                                   from tb in gj.DefaultIfEmpty()
-                                   where
-                                       receiver.UserId == currentUserId || (tb != null && tb.Status == TribeMemberStatus.Joined)
-                                   select
-                                     receiver.StoryId;
+            
+            receivers = from receiver in receivers
+                        join tribeMember in tribeMembers
+                        on receiver.TribeId equals tribeMember.TribeId into gj
+                        from tb in gj.DefaultIfEmpty()
+                        where
+                            receiver.UserId == currentUserId || (tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
+                        select
+                          receiver;
+            
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
+            stories = (from story in stories
+                       join receiver in receivers
+                       on story.Id equals receiver.StoryId into gj
+                       from st in gj.DefaultIfEmpty()
+                       where story.SenderId == currentUserId || st != null
+                       orderby story.CreateDateUtc
+                       select story)
+                       .Skip(skip)
+                       .Take(20);
 
-            stories = from story in stories
-                      join receivedStoryId in receivedStoryIds
-                      on story.Id equals receivedStoryId into gj
-                      from st in gj.DefaultIfEmpty()
-                      where story.SenderId == currentUserId || st != 0
-                      orderby story.CreateDateUtc
-                      select story;
-            if (skip.HasValue)
-            {
-                stories = stories.Skip(skip.Value).Take(20);
-            }
 
-            var result = await stories
-            .ProjectTo<StoryDTO>()
-            .ToListAsync()
-            .ConfigureAwait(false);
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryDTO>>(list);
 
             return result;
         }
@@ -82,6 +91,7 @@ namespace TellMe.DAL.Types.Services
         public async Task<ICollection<StoryRequestDTO>> RequestStoryAsync(string requestSenderId, IEnumerable<StoryRequestDTO> requests)
         {
             var entities = Mapper.Map<List<StoryRequest>>(requests);
+            entities.ForEach(x => x.SenderId = requestSenderId);
             _storyRequestRepository.AddRange(entities, true);
 
             var tribeIds = requests.Select(x => x.TribeId).Where(x => x != null).ToList();
@@ -95,7 +105,16 @@ namespace TellMe.DAL.Types.Services
 
             var now = DateTime.UtcNow;
 
-            var requestDTOs = Mapper.Map<List<StoryRequestDTO>>(entities);
+            var entityIds = entities.Select(x => x.Id).ToArray();
+            var requestDTOs = await _storyRequestRepository
+            .GetQueryable(true)
+            .Include(x => x.Sender)
+            .Include(x => x.Receiver)
+            .Where(x => entityIds.Contains(x.Id))
+            .ProjectTo<StoryRequestDTO>()
+            .ToListAsync()
+            .ConfigureAwait(false);
+
             var notifications = requestDTOs.SelectMany(requestDTO =>
             {
                 if (requestDTO.TribeId == null)
@@ -135,7 +154,8 @@ namespace TellMe.DAL.Types.Services
                 Title = dto.Title,
                 SenderId = senderId,
                 VideoUrl = dto.VideoUrl,
-                PreviewUrl = dto.PreviewUrl
+                PreviewUrl = dto.PreviewUrl,
+                RequestId = dto.RequestId
             };
 
             StoryRequest request;
@@ -144,7 +164,7 @@ namespace TellMe.DAL.Types.Services
                 request = await _storyRequestRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == dto.RequestId).ConfigureAwait(false);
                 entity.Receivers = new[] { new StoryReceiver
                 {
-                    UserId = request.TribeId == null ? request.UserId : null,
+                    UserId = request.TribeId == null ? request.SenderId : null,
                     TribeId = request.TribeId
                 }};
             }

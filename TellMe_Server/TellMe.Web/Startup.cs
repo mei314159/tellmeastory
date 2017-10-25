@@ -71,6 +71,7 @@ namespace TellMe.Web
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<ITribeService, TribeService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddSingleton<IHostingEnvironment>(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));
@@ -91,7 +92,7 @@ namespace TellMe.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //loggerFactory.AddDebug();
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();

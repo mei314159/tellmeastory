@@ -20,6 +20,10 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIActivityIndicatorView ActivityIndicator { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIBarButtonItem Notifications { get; set; }
 
         [Outlet]
@@ -43,6 +47,11 @@ namespace TellMe.iOS
             if (AccountSettingsButton != null) {
                 AccountSettingsButton.Dispose ();
                 AccountSettingsButton = null;
+            }
+
+            if (ActivityIndicator != null) {
+                ActivityIndicator.Dispose ();
+                ActivityIndicator = null;
             }
 
             if (Notifications != null) {

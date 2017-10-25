@@ -147,6 +147,9 @@
     <ImageAsset Include="Assets.xcassets\Account.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Account.imageset\profile%403x.png" />
     <ImageAsset Include="Assets.xcassets\Account.imageset\profile%402x.png" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%402x.png" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -165,6 +168,7 @@
     <Folder Include="Assets.xcassets\Bell.imageset\" />
     <Folder Include="Assets.xcassets\Storytellers.imageset\" />
     <Folder Include="Assets.xcassets\Account.imageset\" />
+    <Folder Include="Assets.xcassets\AddGroup.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -177,6 +181,7 @@
     <InterfaceDefinition Include="Views\Cells\NotificationCenterCell.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
     <InterfaceDefinition Include="Views\StoryView.xib" />
+    <InterfaceDefinition Include="Views\Cells\TribesListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -275,6 +280,11 @@
     <Compile Include="Views\StoryView.designer.cs">
       <DependentUpon>StoryView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\Cells\TribesListCell.cs" />
+    <Compile Include="Views\Cells\TribesListCell.designer.cs">
+      <DependentUpon>TribesListCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\CreateTribeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

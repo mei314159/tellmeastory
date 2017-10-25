@@ -48,12 +48,12 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
-        public async Task<DataResult<ICollection<StoryDTO>>> GetAllAsync()
+        public async Task<DataResult<StoryDTO>> GetAllAsync()
         {
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             var result = await conn.Table<StoryDTO>().ToListAsync().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Stories").ConfigureAwait(false);
-            return new DataResult<ICollection<StoryDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
+            return new DataResult<StoryDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
 
         public async Task SaveAsync(StoryDTO story)
