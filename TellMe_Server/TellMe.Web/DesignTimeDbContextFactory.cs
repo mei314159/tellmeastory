@@ -11,6 +11,7 @@ namespace TellMe.Web
         public AppDbContext CreateDbContext(string[] args)
         {
             var env = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            //var env = "Production";
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile($"appsettings.{env}.json")

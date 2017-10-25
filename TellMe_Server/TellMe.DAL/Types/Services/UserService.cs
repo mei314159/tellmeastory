@@ -84,12 +84,10 @@ namespace TellMe.DAL.Types.Services
                  }
              });
 
-            if (mode == ContactsMode.FriendsAndTribes || mode == ContactsMode.FriendsOnly)
+            if (string.IsNullOrWhiteSpace(fragment) || mode != ContactsMode.Normal)
             {
                 users = users.Where(x => x.User.FriendshipStatus == FriendshipStatus.Accepted);
             }
-
-
 
             IQueryable<ContactDTO> contacts;
             if (mode == ContactsMode.FriendsOnly)
