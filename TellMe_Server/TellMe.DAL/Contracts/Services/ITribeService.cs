@@ -12,7 +12,9 @@ namespace TellMe.DAL.Contracts.Services
         Task<TribeMemberStatus> RejectTribeInvitationAsync(string currentUserId, int tribeId);
 
         Task<TribeMemberStatus> AcceptTribeInvitationAsync(string currentUserId, int tribeId);
-        
+
+        Task LeaveTribeAsync(string currentUserId, int tribeId);
+
         Task<TribeDTO> GetAsync(string userId, int tribeId);
         Task<bool> IsTribeCreatorAsync(string userId, int tribeId);
     }

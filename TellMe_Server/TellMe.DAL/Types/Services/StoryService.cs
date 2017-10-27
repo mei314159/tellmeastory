@@ -50,7 +50,7 @@ namespace TellMe.DAL.Types.Services
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
             var receivers = _storyReceiverRepository.GetQueryable(true);
-            
+
             receivers = from receiver in receivers
                         join tribeMember in tribeMembers
                         on receiver.TribeId equals tribeMember.TribeId into gj
@@ -59,7 +59,7 @@ namespace TellMe.DAL.Types.Services
                             receiver.UserId == currentUserId || (tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
                         select
                           receiver;
-            
+
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
@@ -129,7 +129,7 @@ namespace TellMe.DAL.Types.Services
                     }};
                 }
 
-                return tribeMembers.Where(x => x.TribeId == requestDTO.TribeId).Select(x => new Notification
+                return tribeMembers.Where(x => x.TribeId == requestDTO.TribeId && x.UserId != requestSenderId).Select(x => new Notification
                 {
                     Date = now,
                     Type = NotificationTypeEnum.StoryRequest,

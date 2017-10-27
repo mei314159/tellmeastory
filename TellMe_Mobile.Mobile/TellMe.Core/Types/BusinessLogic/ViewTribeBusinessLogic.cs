@@ -58,7 +58,7 @@ namespace TellMe.Core.Types.BusinessLogic
         public void ChooseMembers()
         {
             var selectedItems = new HashSet<string>(_view.Tribe.Members.Select(x => x.UserId));
-            _router.NavigateChooseTribeMembers(_view, HandleStorytellerSelectedEventHandler, false, selectedItems);
+            _router.NavigateChooseTribeMembers(_view, HandleStorytellerSelectedEventHandler, true, selectedItems);
         }
 
         void HandleStorytellerSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
@@ -72,9 +72,11 @@ namespace TellMe.Core.Types.BusinessLogic
                     UserPictureUrl = contact.User.PictureUrl,
                     FullName = contact.User.FullName,
                     TribeId = _view.Tribe.Id,
-                    TribeName = _view.Tribe.Name
+                    TribeName = _view.Tribe.Name,
+                    Status = TribeMemberStatus.Invited
                 });
             }
+            _view.DisplayMembers();
         }
 
         public async Task SaveAsync()
@@ -105,6 +107,23 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 validationResult.ShowValidationResult(this._view);
+            }
+        }
+
+        public async Task LeaveTribeAsync()
+        {
+            var result = await _remoteTribeDataService
+                    .LeaveAsync(_view.Tribe.Id)
+                    .ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                _view.Tribe.Members.RemoveAll(x => x.UserId == App.Instance.AuthInfo.UserId);
+                await _localTribeDataService.DeleteAsync(_view.Tribe).ConfigureAwait(false);
+                this._view.ShowSuccessMessage("You've left this tribe", () => _view.Close(_view.Tribe));
+            }
+            else
+            {
+                result.ShowResultError(this._view);
             }
         }
     }

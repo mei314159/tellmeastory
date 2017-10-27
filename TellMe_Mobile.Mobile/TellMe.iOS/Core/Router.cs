@@ -7,6 +7,7 @@ using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 using UIKit;
+using TellMe.Core.Contracts.UI;
 
 namespace TellMe.iOS.Core
 {
@@ -139,11 +140,12 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewTribe(IView view, TribeDTO tribe)
+        public void NavigateViewTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
         {
             this.window.InvokeOnMainThread(() =>
             {
                 var targetController = new ViewTribeController(tribe);
+                targetController.TribeLeft += e;
                 this.Present(targetController, view, true);
             });
         }

@@ -17,7 +17,7 @@ namespace TellMe.Web.AutoMapper
                 cfg.CreateMap<StoryRequestDTO, StoryRequest>()
                     .ForMember(x => x.UserId, x =>
                     {
-                        x.Condition(y => y.TribeId == null);
+                        x.PreCondition(y => y.TribeId == null);
                         x.MapFrom(z => z.UserId);
                     })
                     .ForMember(x => x.TribeId, x => x.MapFrom(z => z.TribeId))
@@ -39,19 +39,24 @@ namespace TellMe.Web.AutoMapper
                 cfg.CreateMap<Tribe, TribeDTO>()
                     .ForMember(x => x.CreatorName, x =>
                     {
-                        x.Condition(y => y.Creator != null);
+                        x.PreCondition(y => y.Creator != null);
                         x.MapFrom(y => y.Creator.UserName);
                     })
                     .ForMember(x => x.CreatorPictureUrl, x =>
                     {
-                        x.Condition(y => y.Creator != null);
+                        x.PreCondition(y => y.Creator != null);
                         x.MapFrom(y => y.Creator.PictureUrl);
                     })
-                    .ForMember(x => x.Members, x => x.Condition((a, b, c, d, e) => e.Items.ContainsKey("Members")))
+                    .ForMember(x => x.Members, x => x.PreCondition((e) => e.Items.ContainsKey("Members")))
                     .ForMember(x => x.MembershipStatus, x =>
                     {
-                        x.Condition((a, b, c, d, e) => a.Members != null && e.Items.ContainsKey("UserId"));
-                        x.ResolveUsing((y, a, b, c) => y.Members.First(m => m.UserId == (string)c.Items["UserId"]).Status);
+                        x.PreCondition((e) => e.Items.ContainsKey("UserId"));
+                        x.Condition((e) => e.Members != null);
+                        x.ResolveUsing((y, a, b, c) =>
+                        {
+                            var result = y.Members.First(m => m.UserId == (string)c.Items["UserId"]).Status;
+                            return result;
+                        });
                     });
 
                 cfg.CreateMap<TribeMember, TribeMemberDTO>()

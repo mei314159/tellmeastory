@@ -210,7 +210,14 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ViewTribe(TribeDTO tribe)
         {
-            _router.NavigateViewTribe(_view, tribe);
+            _router.NavigateViewTribe(_view, tribe, HandleTribeLeftHandler);
+        }
+
+        void HandleTribeLeftHandler(TribeDTO tribe)
+        {
+            var contact = contacts.FirstOrDefault(x => x.TribeId == tribe.Id);
+            contacts.Remove(contact);
+            _view.DeleteRow(contact);
         }
     }
 }

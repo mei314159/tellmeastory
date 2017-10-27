@@ -33,6 +33,16 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
+        public async Task DeleteAsync(TribeDTO dto)
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            {
+                c.Delete(dto);
+                c.Table<UpdateInfo>().Delete(x => x.TableName == "Tribes");
+            }).ConfigureAwait(false);
+        }
+
         public async Task SaveAllAsync(IEnumerable<TribeDTO> items)
         {
             if (items == null)

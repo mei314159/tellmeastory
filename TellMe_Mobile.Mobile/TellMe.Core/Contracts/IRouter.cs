@@ -19,7 +19,7 @@ namespace TellMe.Core.Contracts
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
 
         void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, HashSet<string> disabledUserIds = null);
-        void NavigateViewTribe(IView view, TribeDTO tribe);
+        void NavigateViewTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
 
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);

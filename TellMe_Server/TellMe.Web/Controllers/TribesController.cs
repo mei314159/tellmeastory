@@ -57,6 +57,16 @@ namespace TellMe.Web.Controllers
             return Ok(status);
         }
 
+        [HttpPost("{tribeId}/leave")]
+        public async Task<IActionResult> LeaveTribeAsync(int tribeId)
+        {
+            var isTribeCreator = await _tribeService.IsTribeCreatorAsync(this.UserId, tribeId);
+            if (isTribeCreator)
+                return BadRequest("Tribe creator  can't leave a tribe");
+            await _tribeService.LeaveTribeAsync(this.UserId, tribeId);
+            return Ok();
+        }
+
         [HttpPost("{tribeId}/reject")]
         public async Task<IActionResult> RejectTribeInvitationAsync(int tribeId, [FromBody] int? notificationId)
         {

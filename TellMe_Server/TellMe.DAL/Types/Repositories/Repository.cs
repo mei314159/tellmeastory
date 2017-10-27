@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq.Expressions;
+using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Types.Repositories
 {
@@ -87,6 +88,15 @@ namespace TellMe.DAL.Types.Repositories
         public void Remove(TEntity entity, bool commit = false)
         {
             Set.Remove(entity);
+            if (commit)
+            {
+                _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public void RemoveAll(List<TEntity> deletedMembers, bool commit)
+        {
+            Set.RemoveRange(deletedMembers);
             if (commit)
             {
                 _unitOfWork.PreCommitSave();

@@ -9,6 +9,8 @@
         FriendshipRejected = 5,
         TribeInvite = 6,
         TribeAcceptInvite = 7,
-        TribeRejectInvite = 8
+        TribeRejectInvite = 8,
+        DeleteFromTribe = 9,
+        LeftTribe = 10
     }
 }

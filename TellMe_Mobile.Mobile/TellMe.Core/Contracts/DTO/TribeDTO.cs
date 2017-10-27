@@ -24,7 +24,7 @@ namespace TellMe.Core.Contracts.DTO
 
 
         [SQLiteNetExtensions.Attributes.TextBlob("MembersBlobbed")]
-        public virtual ICollection<TribeMemberDTO> Members { get; set; }
+        public virtual List<TribeMemberDTO> Members { get; set; }
 
 
         public string StatusBlobbed { get; set; }

@@ -53,7 +53,8 @@ namespace TellMe.iOS.Views.Cells
                     var storyRequestDTO = ((JObject)notification.Extra).ToObject<StoryRequestDTO>();
                     index = Notification.Text.IndexOf(storyRequestDTO.ReceiverName, StringComparison.Ordinal);
                     length = storyRequestDTO.ReceiverName.Length;
-                    PictureView.SetImage(new NSUrl(storyRequestDTO.SenderPictureUrl));
+                    if (!string.IsNullOrWhiteSpace(storyRequestDTO.SenderPictureUrl))
+                        PictureView.SetImage(new NSUrl(storyRequestDTO.SenderPictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipRequest:
                     var dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
@@ -64,19 +65,22 @@ namespace TellMe.iOS.Views.Cells
                         this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
                     }
 
-                    PictureView.SetImage(new NSUrl(dto.PictureUrl));
+                    if (!string.IsNullOrWhiteSpace(dto.PictureUrl))
+                        PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipAccepted:
                     dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
-                    PictureView.SetImage(new NSUrl(dto.PictureUrl));
+                    if (!string.IsNullOrWhiteSpace(dto.PictureUrl))
+                        PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipRejected:
                     dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
-                    PictureView.SetImage(new NSUrl(dto.PictureUrl));
+                    if (!string.IsNullOrWhiteSpace(dto.PictureUrl))
+                        PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.TribeInvite:
                     var tribeDto = ((JObject)notification.Extra).ToObject<TribeDTO>();
@@ -86,20 +90,22 @@ namespace TellMe.iOS.Views.Cells
                     {
                         this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
                     }
-
-                    PictureView.SetImage(new NSUrl(tribeDto.CreatorPictureUrl));
+                    if (!string.IsNullOrWhiteSpace(tribeDto.CreatorPictureUrl))
+                        PictureView.SetImage(new NSUrl(tribeDto.CreatorPictureUrl));
                     break;
                 case NotificationTypeEnum.TribeAcceptInvite:
                     var tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
                     index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
                     length = tribeMemberDto.UserName.Length;
-                    PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
+                    if (!string.IsNullOrWhiteSpace(tribeMemberDto.UserPictureUrl))
+                        PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
                     break;
                 case NotificationTypeEnum.TribeRejectInvite:
                     tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
                     index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
                     length = tribeMemberDto.UserName.Length;
-                    PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
+                    if (!string.IsNullOrWhiteSpace(tribeMemberDto.UserPictureUrl))
+                        PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
                     break;
                 default:
                     this.Text.AttributedText = text;

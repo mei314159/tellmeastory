@@ -199,6 +199,18 @@ namespace TellMe.iOS
             }
         }
 
+        [Export("tableView:canEditRowAtIndexPath:")]
+        public bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
+        {
+            if (indexPath.Section == 0)
+            {
+                var dto = storytellersList[indexPath.Row];
+                return DisabledUserIds?.Contains(dto.UserId) != true;
+            }
+
+            return true;
+        }
+
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             if (indexPath.Section == 0)
@@ -206,17 +218,6 @@ namespace TellMe.iOS
                 var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
                 cell.Storyteller = this.storytellersList[indexPath.Row].User;
                 cell.TintColor = UIColor.Blue;
-
-                if (DisabledUserIds?.Contains(cell.Storyteller.Id) == true)
-                {
-                    cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-                    cell.UserInteractionEnabled = false;
-                }
-                else
-                {
-                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
-                    cell.UserInteractionEnabled = true;
-                }
 
                 return cell;
             }
@@ -402,6 +403,23 @@ namespace TellMe.iOS
                 else
                     this.DismissViewController(true, null);
             }
+        }
+
+        public void DeleteRow(ContactDTO contact)
+        {
+            int section, index;
+            if (contact.Type == ContactType.Tribe)
+            {
+                section = 1;
+                index = tribesList.IndexOf(contact);
+            }
+            else
+            {
+                section = 0;
+                index = storytellersList.IndexOf(contact);
+            }
+
+            TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index, section) }, UITableViewRowAnimation.Automatic);
         }
     }
 }

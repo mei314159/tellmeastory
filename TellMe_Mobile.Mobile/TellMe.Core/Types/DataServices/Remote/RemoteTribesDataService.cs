@@ -36,5 +36,11 @@ namespace TellMe.Core.Types.DataServices.Remote
             var result = await this.PutAsync<TribeDTO>("tribes", dto).ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> LeaveAsync(int tribeId)
+        {
+            var result = await this.PostAsync<TribeDTO>($"tribes/{tribeId}/leave", null).ConfigureAwait(false);
+            return result;
+        }
     }
 }

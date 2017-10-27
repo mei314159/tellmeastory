@@ -63,9 +63,39 @@ namespace TellMe.DAL.Types.Services
             };
             Mapper.Map<Tribe, TribeDTO>(entity, result);
             Mapper.Map<ApplicationUser, TribeDTO>(creator, result);
-            await InviteMembersToTribeAsync(entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
+            await NotifyMembersAboutInvitationToTribeAsync(entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
             result.Members = Mapper.Map<List<TribeMemberDTO>>(entity.Members);
             return result;
+        }
+
+        public async Task LeaveTribeAsync(string currentUserId, int tribeId)
+        {
+            var tribe = await _tribeRepository
+            .GetQueryable()
+            .Include(x => x.Members)
+            .ThenInclude(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == tribeId)
+            .ConfigureAwait(false);
+
+            var tribeMember = tribe.Members.FirstOrDefault(x => x.UserId == currentUserId);
+            _tribeMemberRepository.Remove(tribeMember, true);
+            tribe.Members.Remove(tribeMember);
+
+            var tribeMemberDTO = Mapper.Map<TribeMemberDTO>(tribeMember);
+            var notifications = tribe.Members
+            .Where(x => x.UserId != currentUserId && x.Status == TribeMemberStatus.Joined || x.Status == TribeMemberStatus.Creator)
+            .ToList()
+            .Select(x => new Notification
+            {
+                Date = DateTime.UtcNow,
+                Type = NotificationTypeEnum.TribeRejectInvite,
+                RecipientId = x.UserId,
+                Extra = tribeMemberDTO,
+                Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} has left the tribe"
+            }).ToArray();
+
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
         }
 
         public async Task<TribeMemberStatus> RejectTribeInvitationAsync(string currentUserId, int tribeId)
@@ -169,8 +199,16 @@ namespace TellMe.DAL.Types.Services
                 }).ToList();
             newMembers.ForEach(tribe.Members.Add);
 
+            var deletedMembers = tribe.Members
+                .Where(member => !dto.Members.Any(x => x.UserId == member.UserId)).ToList();
+            deletedMembers.ForEach(x => tribe.Members.Remove(x));
+
+            _tribeRepository.Save(tribe);
+            _tribeMemberRepository.RemoveAll(deletedMembers, true);
+
             var result = Mapper.Map<TribeDTO>(tribe, x => x.Items["UserId"] = currentUserId);
-            await InviteMembersToTribeAsync(newMembers, result).ConfigureAwait(false);
+            await NotifyMembersAboutInvitationToTribeAsync(newMembers, result).ConfigureAwait(false);
+            await NotifyMemberDeletedFromTribeAsync(deletedMembers, result);
             result.Members = Mapper.Map<List<TribeMemberDTO>>(tribe.Members);
             return result;
         }
@@ -184,7 +222,7 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        private async Task InviteMembersToTribeAsync(IEnumerable<TribeMember> members, TribeDTO result)
+        private async Task NotifyMembersAboutInvitationToTribeAsync(IEnumerable<TribeMember> members, TribeDTO result)
         {
             var now = DateTime.UtcNow;
             var notifications = members.Select(x => new Notification
@@ -194,6 +232,23 @@ namespace TellMe.DAL.Types.Services
                 RecipientId = x.UserId,
                 Extra = result,
                 Text = $"{result.CreatorName} invited you to join a tribe \"{result.Name}\""
+            }).ToArray();
+
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+        }
+
+        private async Task NotifyMemberDeletedFromTribeAsync(IEnumerable<TribeMember> members, TribeDTO result)
+        {
+            var extra = new object();
+            var now = DateTime.UtcNow;
+            var notifications = members.Select(x => new Notification
+            {
+                Date = now,
+                Type = NotificationTypeEnum.DeleteFromTribe,
+                RecipientId = x.UserId,
+                Extra = extra,
+                Text = $"You were deleted from a tribe \"{result.Name}\""
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
