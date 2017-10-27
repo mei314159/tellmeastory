@@ -24,7 +24,7 @@
                             <constraint id="1296" firstItem="603" firstAttribute="height" constant="44" relation="lessThanOrEqual"/>
                         </constraints>
                     </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="2210" translatesAutoresizingMaskIntoConstraints="NO" image="UserPic" clipsSubviews="YES">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="2210" translatesAutoresizingMaskIntoConstraints="NO" image="UserPic" clipsSubviews="YES">
                         <rect key="frame" x="10" y="10" width="44" height="44"/>
                         <constraints>
                             <constraint id="2301" firstItem="2210" firstAttribute="height" constant="44"/>
@@ -61,5 +61,6 @@
         <image name="Bell" width="25" height="25"/>
         <image name="Storytellers" width="25" height="25"/>
         <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
     </resources>
 </document>

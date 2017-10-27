@@ -30,9 +30,9 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             businessLogic = new NotificationCenterBusinessLogic(
-                App.Instance.Router, 
-                new RemoteStoriesDataService(), 
-                new RemoteStorytellersDataService(), 
+                App.Instance.Router,
+                new RemoteStoriesDataService(),
+                new RemoteStorytellersDataService(),
                 new RemoteNotificationsDataService(),
                 new RemoteTribesDataService(),
                 this);
@@ -119,6 +119,8 @@ namespace TellMe.iOS
 
             else if (dto.Type == NotificationTypeEnum.Story)
             {
+                //var extra = ((JObject)dto.Extra).ToObject<StoryDTO>();
+                //var storyView = StoryView.Create(extra);
                 //TODO Show story
             }
             else if (!dto.Handled && dto.Type == NotificationTypeEnum.TribeInvite)

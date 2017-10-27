@@ -12,7 +12,7 @@ using TellMe.iOS.Views;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 
-namespace mehspot.iOS
+namespace TellMe.iOS.Controllers
 {
     public class CreateTribeController : DialogViewController, ICreateTribeView
     {
@@ -40,7 +40,6 @@ namespace mehspot.iOS
                     tribeNameElement
                 },
                 new Section ("Members") {
-
                 }
             };
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using mehspot.iOS;
+using TellMe.iOS.Controllers;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
@@ -43,12 +43,13 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish)
+        public void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, HashSet<string> disabledUserIds = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
                 var targetController = (StorytellersController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.FriendsOnly;
+                targetController.DisabledUserIds = disabledUserIds;
                 targetController.DismissOnFinish = dismissOnFinish;
                 targetController.RecipientsSelected += e;
                 this.Present(targetController, view);
@@ -134,6 +135,15 @@ namespace TellMe.iOS.Core
             {
                 var targetController = new CreateTribeController(tribeMembers);
                 targetController.TribeCreated += complete;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateViewTribe(IView view, TribeDTO tribe)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = new ViewTribeController(tribe);
                 this.Present(targetController, view, true);
             });
         }

@@ -20,6 +20,6 @@ namespace TellMe.DAL.Contracts.DTO
         
         public TribeMemberStatus MembershipStatus { get; set; }
 
-        public List<StorytellerDTO> Members { get; set; }
+        public List<TribeMemberDTO> Members { get; set; }
     }
 }

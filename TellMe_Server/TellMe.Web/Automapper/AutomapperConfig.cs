@@ -37,10 +37,26 @@ namespace TellMe.Web.AutoMapper
                     .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
 
                 cfg.CreateMap<Tribe, TribeDTO>()
-                    .ForMember(x => x.Members, x => x.Ignore());
+                    .ForMember(x => x.CreatorName, x =>
+                    {
+                        x.Condition(y => y.Creator != null);
+                        x.MapFrom(y => y.Creator.UserName);
+                    })
+                    .ForMember(x => x.CreatorPictureUrl, x =>
+                    {
+                        x.Condition(y => y.Creator != null);
+                        x.MapFrom(y => y.Creator.PictureUrl);
+                    })
+                    .ForMember(x => x.Members, x => x.Condition((a, b, c, d, e) => e.Items.ContainsKey("Members")))
+                    .ForMember(x => x.MembershipStatus, x =>
+                    {
+                        x.Condition((a, b, c, d, e) => a.Members != null && e.Items.ContainsKey("UserId"));
+                        x.ResolveUsing((y, a, b, c) => y.Members.First(m => m.UserId == (string)c.Items["UserId"]).Status);
+                    });
 
                 cfg.CreateMap<TribeMember, TribeMemberDTO>()
                   .ForMember(x => x.UserName, x => x.MapFrom(y => y.User.UserName))
+                  .ForMember(x => x.FullName, x => x.MapFrom(y => y.User.FullName))
                   .ForMember(x => x.UserPictureUrl, x => x.MapFrom(y => y.User.PictureUrl));
                 cfg.CreateMap<ApplicationUser, TribeDTO>()
                         .ForMember(x => x.CreatorName, x => x.MapFrom(y => y.UserName))

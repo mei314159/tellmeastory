@@ -182,6 +182,7 @@
     <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
     <InterfaceDefinition Include="Views\StoryView.xib" />
     <InterfaceDefinition Include="Views\Cells\TribesListCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\TribeMembersListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -285,6 +286,12 @@
       <DependentUpon>TribesListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Controllers\CreateTribeController.cs" />
+    <Compile Include="Controllers\ViewTribeController.cs" />
+    <Compile Include="Views\Cells\TribeMembersListCell.cs" />
+    <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
+      <DependentUpon>TribeMembersListCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\EditTribeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

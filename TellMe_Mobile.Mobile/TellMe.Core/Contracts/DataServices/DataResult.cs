@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TellMe.Core.Contracts.DataServices
@@ -23,18 +24,18 @@ namespace TellMe.Core.Contracts.DataServices
 
     public class DataResult<T> : DataResult
     {
-        public DataResult(DateTime updateDateUtc, ICollection<T> data) : base(updateDateUtc)
+        public DataResult(DateTime updateDateUtc, T data) : base(updateDateUtc)
         {
             Data = data;
         }
 
-        public ICollection<T> Data { get; set; }
+        public T Data { get; set; }
 
         public override bool Expired
         {
             get
             {
-                return base.Expired || Data.Count == 0;
+                return base.Expired || (Data as ICollection)?.Count == 0;
             }
         }
     }

@@ -207,5 +207,10 @@ namespace TellMe.Core.Types.BusinessLogic
                 return;
             }
         }
+
+        public void ViewTribe(TribeDTO tribe)
+        {
+            _router.NavigateViewTribe(_view, tribe);
+        }
     }
 }

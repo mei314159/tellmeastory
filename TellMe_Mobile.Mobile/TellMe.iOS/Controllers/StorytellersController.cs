@@ -30,6 +30,8 @@ namespace TellMe.iOS
 
         public string SearchText => SearchBar.Text;
 
+        public HashSet<string> DisabledUserIds { get; set; }
+
         public StorytellersController(IntPtr handle) : base(handle)
         {
         }
@@ -56,7 +58,7 @@ namespace TellMe.iOS
             UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton);
             uITapGestureRecognizer.CancelsTouchesInView = false;
             this.View.AddGestureRecognizer(uITapGestureRecognizer);
-            Load(false);
+            LoadAsync(false);
         }
 
         public override void ViewWillAppear(bool animated)
@@ -89,13 +91,13 @@ namespace TellMe.iOS
         {
             SearchBar.Text = null;
             SearchBar.EndEditing(true);
-            Load(true);
+            LoadAsync(true);
         }
 
         private async void SearchBar_SearchButtonClicked(object sender, EventArgs e)
         {
             SearchBar.EndEditing(true);
-            await Load(true);
+            await LoadAsync(true);
         }
 
         public void DisplayContacts(ICollection<ContactDTO> contacts)
@@ -181,15 +183,19 @@ namespace TellMe.iOS
             else if (indexPath.Section == 1)
             {
                 var dto = this.tribesList[indexPath.Row];
-                if (dto.Tribe.MembershipStatus != TribeMemberStatus.Invited)
-                    return;
-                
-                var alert = UIAlertController
-                    .Create("Accept invitation to tribe?", string.Empty, UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, (x) => RejectTribeInvitationTouched(dto)));
-                alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, (x) => AcceptTribeInvitationTouched(dto)));
-                this.PresentViewController(alert, true, null);
+                if (dto.Tribe.MembershipStatus == TribeMemberStatus.Joined || dto.Tribe.MembershipStatus == TribeMemberStatus.Creator)
+                {
+                    _businessLogic.ViewTribe(dto.Tribe);
+                }
+                else if (dto.Tribe.MembershipStatus == TribeMemberStatus.Invited)
+                {
+                    var alert = UIAlertController
+                        .Create("Accept invitation to tribe?", string.Empty, UIAlertControllerStyle.Alert);
+                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, (x) => RejectTribeInvitationTouched(dto)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, (x) => AcceptTribeInvitationTouched(dto)));
+                    this.PresentViewController(alert, true, null);
+                }
             }
         }
 
@@ -200,6 +206,18 @@ namespace TellMe.iOS
                 var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
                 cell.Storyteller = this.storytellersList[indexPath.Row].User;
                 cell.TintColor = UIColor.Blue;
+
+                if (DisabledUserIds?.Contains(cell.Storyteller.Id) == true)
+                {
+                    cell.SelectionStyle = UITableViewCellSelectionStyle.None;
+                    cell.UserInteractionEnabled = false;
+                }
+                else
+                {
+                    cell.SelectionStyle = UITableViewCellSelectionStyle.Default;
+                    cell.UserInteractionEnabled = true;
+                }
+
                 return cell;
             }
 
@@ -217,6 +235,13 @@ namespace TellMe.iOS
         [Export("tableView:editingStyleForRowAtIndexPath:")]
         public UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
         {
+            if (indexPath.Section == 0)
+            {
+                var dto = storytellersList[indexPath.Row];
+                if (DisabledUserIds?.Contains(dto.UserId) == true)
+                    return UITableViewCellEditingStyle.None;
+            }
+
             return (UITableViewCellEditingStyle)3;
         }
 
@@ -293,7 +318,7 @@ namespace TellMe.iOS
             overlay.PopUp(true);
             await _businessLogic.SendFriendshipRequestAsync(contact.User);
             TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
-			overlay.Close(true);
+            overlay.Close(true);
         }
 
         async void AcceptTribeInvitationTouched(ContactDTO contact)
@@ -314,7 +339,7 @@ namespace TellMe.iOS
             overlay.Close(true);
         }
 
-        private async Task Load(bool forceRefresh)
+        private async Task LoadAsync(bool forceRefresh)
         {
             var searchText = this.SearchBar.Text;
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
@@ -355,7 +380,7 @@ namespace TellMe.iOS
 
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
-            Load(true);
+            LoadAsync(true);
         }
 
         private void ShowSendRequestToJoinPrompt()

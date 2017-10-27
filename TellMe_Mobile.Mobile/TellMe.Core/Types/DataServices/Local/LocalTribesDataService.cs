@@ -47,12 +47,20 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
-        public async Task<DataResult<TribeDTO>> GetAllAsync()
+        public async Task<DataResult<TribeDTO>> GetAsync(int tribeId)
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            var result = await conn.GetWithChildrenAsync<TribeDTO>(tribeId).ConfigureAwait(false);
+            var updateInfo = await conn.FindAsync<UpdateInfo>("Tribes").ConfigureAwait(false);
+            return new DataResult<TribeDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
+        }
+
+        public async Task<DataResult<ICollection<TribeDTO>>> GetAllAsync()
         {
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             var result = await conn.GetAllWithChildrenAsync<TribeDTO>().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Tribes").ConfigureAwait(false);
-            return new DataResult<TribeDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
+            return new DataResult<ICollection<TribeDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
 
         public async Task SaveAsync(TribeDTO item)
@@ -60,7 +68,7 @@ namespace TellMe.Core.Types.DataServices.Local
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
-                c.InsertOrReplace(item, typeof(TribeDTO));
+                c.InsertOrReplaceWithChildren(item);
                 c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Tribes" });
             }).ConfigureAwait(false);
         }

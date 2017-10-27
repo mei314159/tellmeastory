@@ -21,11 +21,30 @@ namespace TellMe.Web.Controllers
             _notificationService = notificationService;
         }
 
+        [HttpGet("{tribeId}")]
+        public async Task<IActionResult> GetAsync(int tribeId)
+        {
+            var result = await _tribeService.GetAsync(this.UserId, tribeId);
+
+            return Ok(result);
+        }
+
         [HttpPost("")]
         public async Task<IActionResult> CreateAsync([FromBody] TribeDTO dto)
         {
             var result = await _tribeService.CreateAsync(this.UserId, dto);
 
+            return Ok(result);
+        }
+
+        [HttpPut("")]
+        public async Task<IActionResult> UpdateAsync([FromBody] TribeDTO dto)
+        {
+            var isTribeCreator = await _tribeService.IsTribeCreatorAsync(this.UserId, dto.Id);
+            if (!isTribeCreator)
+                return BadRequest("You don't have permissions to update this tribe");
+
+            var result = await _tribeService.UpdateAsync(this.UserId, dto);
             return Ok(result);
         }
 

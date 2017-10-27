@@ -22,9 +22,12 @@ namespace TellMe.Core.Contracts.DTO
         [SQLiteNetExtensions.Attributes.TextBlob("StatusBlobbed")]
         public TribeMemberStatus MembershipStatus { get; set; }
 
-        public virtual ICollection<StorytellerDTO> Members { get; set; }
+
+        [SQLiteNetExtensions.Attributes.TextBlob("MembersBlobbed")]
+        public virtual ICollection<TribeMemberDTO> Members { get; set; }
 
 
         public string StatusBlobbed { get; set; }
+        public string MembersBlobbed { get; set; }
     }
 }

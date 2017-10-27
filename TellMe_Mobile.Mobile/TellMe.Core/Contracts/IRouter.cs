@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.BusinessLogic;
 
@@ -16,7 +17,9 @@ namespace TellMe.Core.Contracts
 
         void NavigateRequestStory(IView view, ICollection<ContactDTO> recipients);
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
-        void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
+
+        void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, HashSet<string> disabledUserIds = null);
+        void NavigateViewTribe(IView view, TribeDTO tribe);
 
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);

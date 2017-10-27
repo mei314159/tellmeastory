@@ -114,7 +114,7 @@ namespace TellMe.iOS
             });
         }
 
-        private void Expand()
+        public void Expand()
         {
             var window = Window;
             this.initialSize = View.Frame.Size;
@@ -164,6 +164,14 @@ namespace TellMe.iOS
                 Spinner.Hidden = false;
                 playing = true;
             }
+        }
+
+        public static StoryView Create(StoryDTO story)
+        {
+            var arr = NSBundle.MainBundle.LoadNib("StoryView", null, null);
+            var v = ObjCRuntime.Runtime.GetNSObject<StoryView>(arr.ValueAt(0));
+            v.Story = story;
+            return v;
         }
 
         public void StopPlaying()

@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using TellMe.DAL.Types.PushNotifications;
+using System.Collections.Generic;
 
 namespace TellMe.DAL.Types.Services
 {
@@ -19,20 +20,22 @@ namespace TellMe.DAL.Types.Services
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<Tribe, int> _tribeRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
-
+        private readonly IRepository<Friendship, int> _friendshipRepository;
 
         public TribeService(
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService,
             IRepository<Notification, int> notificationRepository,
             IRepository<Tribe, int> tribeRepository,
-            IRepository<TribeMember, int> tribeMemberRepository)
+            IRepository<TribeMember, int> tribeMemberRepository,
+            IRepository<Friendship, int> friendshipRepository)
         {
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
             _notificationRepository = notificationRepository;
             _tribeRepository = tribeRepository;
             _tribeMemberRepository = tribeMemberRepository;
+            _friendshipRepository = friendshipRepository;
         }
         public async Task<TribeDTO> CreateAsync(string currentUserId, TribeDTO dto)
         {
@@ -44,7 +47,7 @@ namespace TellMe.DAL.Types.Services
                 CreatorId = currentUserId,
                 Members = dto.Members.Select(x => new TribeMember
                 {
-                    UserId = x.Id,
+                    UserId = x.UserId,
                     Status = TribeMemberStatus.Invited
                 }).ToList()
             };
@@ -53,20 +56,15 @@ namespace TellMe.DAL.Types.Services
             await _tribeRepository.SaveAsync(entity, true);
 
             var creator = await _userRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
-            var result = Mapper.Map<TribeDTO>(entity);
-            result.MembershipStatus = TribeMemberStatus.Creator;
-            Mapper.Map<ApplicationUser, TribeDTO>(creator, result);
-            var notifications = entity.Members.Where(x => x.Status != TribeMemberStatus.Creator).Select(x => new Notification
-            {
-                Date = now,
-                Type = NotificationTypeEnum.TribeInvite,
-                RecipientId = x.UserId,
-                Extra = result,
-                Text = $"{result.CreatorName} invited you to join a tribe \"{result.Name}\""
-            }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            var result = new TribeDTO
+            {
+                MembershipStatus = TribeMemberStatus.Creator
+            };
+            Mapper.Map<Tribe, TribeDTO>(entity, result);
+            Mapper.Map<ApplicationUser, TribeDTO>(creator, result);
+            await InviteMembersToTribeAsync(entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
+            result.Members = Mapper.Map<List<TribeMemberDTO>>(entity.Members);
             return result;
         }
 
@@ -134,6 +132,72 @@ namespace TellMe.DAL.Types.Services
             await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
 
             return TribeMemberStatus.Joined;
+        }
+
+        public async Task<TribeDTO> GetAsync(string userId, int tribeId)
+        {
+            var tribe = await _tribeRepository.GetQueryable(true)
+            .Include(x => x.Members)
+            .ThenInclude(x => x.User)
+            .Include(x => x.Creator)
+            .FirstOrDefaultAsync(x => x.Id == tribeId)
+            .ConfigureAwait(false);
+
+            var result = Mapper.Map<TribeDTO>(tribe, x =>
+            {
+                x.Items["UserId"] = userId;
+                x.Items["Members"] = true;
+            });
+            return result;
+        }
+
+        public async Task<TribeDTO> UpdateAsync(string currentUserId, TribeDTO dto)
+        {
+            var tribe = await _tribeRepository
+            .GetQueryable()
+            .Include(x => x.Members)
+            .FirstOrDefaultAsync(x => x.Id == dto.Id)
+            .ConfigureAwait(false);
+            tribe.Name = dto.Name;
+
+            var newMembers = dto.Members
+                .Where(member => !tribe.Members.Any(x => x.UserId == member.UserId))
+                .Select(member => new TribeMember
+                {
+                    UserId = member.UserId,
+                    Status = TribeMemberStatus.Invited
+                }).ToList();
+            newMembers.ForEach(tribe.Members.Add);
+
+            var result = Mapper.Map<TribeDTO>(tribe, x => x.Items["UserId"] = currentUserId);
+            await InviteMembersToTribeAsync(newMembers, result).ConfigureAwait(false);
+            result.Members = Mapper.Map<List<TribeMemberDTO>>(tribe.Members);
+            return result;
+        }
+
+        public async Task<bool> IsTribeCreatorAsync(string userId, int tribeId)
+        {
+            var result = await _tribeRepository
+            .GetQueryable(true)
+            .AnyAsync(x => x.Id == tribeId && x.CreatorId == userId)
+            .ConfigureAwait(false);
+            return result;
+        }
+
+        private async Task InviteMembersToTribeAsync(IEnumerable<TribeMember> members, TribeDTO result)
+        {
+            var now = DateTime.UtcNow;
+            var notifications = members.Select(x => new Notification
+            {
+                Date = now,
+                Type = NotificationTypeEnum.TribeInvite,
+                RecipientId = x.UserId,
+                Extra = result,
+                Text = $"{result.CreatorName} invited you to join a tribe \"{result.Name}\""
+            }).ToArray();
+
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
         }
     }
 }
