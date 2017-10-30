@@ -14,7 +14,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public LocalStoriesDataService()
         {
             this._dbPath = Constants.LocalDbPath;
-            using (var conn = new SQLiteConnection(_dbPath))
+            using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
                 conn.CreateTable<StoryDTO>();
                 conn.CreateTable<UpdateInfo>();
@@ -24,7 +24,7 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task DeleteAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 c.DeleteAll<StoryDTO>();
@@ -34,7 +34,10 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task SaveStoriesAsync(ICollection<StoryDTO> stories)
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
+            if (stories == null)
+                return;
+            
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
                 foreach (var story in stories)
@@ -45,18 +48,22 @@ namespace TellMe.Core.Types.DataServices.Local
             }).ConfigureAwait(false);
         }
 
-        public async Task<DataResult<ICollection<StoryDTO>>> GetAllAsync(string userId = null)
+        public async Task<DataResult<ICollection<StoryDTO>>> GetAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath);
-            var query = conn.Table<StoryDTO>();
-            if (userId != null)
-            {
-                query = query.Where(x => x.SenderId == userId || x.ReceiverId == userId);
-            }
-
-            var result = await query.ToListAsync().ConfigureAwait(false);
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            var result = await conn.Table<StoryDTO>().ToListAsync().ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Stories").ConfigureAwait(false);
             return new DataResult<ICollection<StoryDTO>>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
+        }
+
+        public async Task SaveAsync(StoryDTO story)
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            {
+                c.InsertOrReplace(story, typeof(StoryDTO));
+                c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Stories" });
+            }).ConfigureAwait(false);
         }
     }
 }

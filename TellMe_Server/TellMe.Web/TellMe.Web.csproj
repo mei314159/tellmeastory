@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0"/>
     <PackageReference Include="Hangfire.AspNetCore" Version="1.6.17"/>
     <PackageReference Include="Hangfire" Version="1.6.17"/>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="7.2.0"/>
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0"/>
@@ -21,7 +22,6 @@
     <ProjectReference Include="..\TellMe.DAL\TellMe.DAL.csproj"/>
   </ItemGroup>
   <ItemGroup>
-  <!-- CopyToOutputDirectory = { Always, PreserveNewest, Never } -->
-  <Content Include="*.p12" CopyToPublishDirectory="Always" />
-</ItemGroup>
+    <Content Include="*.p12" CopyToPublishDirectory="Always"/>
+  </ItemGroup>
 </Project>

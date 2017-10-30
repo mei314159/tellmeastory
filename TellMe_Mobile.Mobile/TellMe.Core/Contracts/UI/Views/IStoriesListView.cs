@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
     public interface IStoriesListView : IView
     {
-        void ShowSuccessMessage(string message);
+        void ShowSuccessMessage(string message, Action complete = null);
 
         void DisplayStories(ICollection<StoryDTO> stories);
     }

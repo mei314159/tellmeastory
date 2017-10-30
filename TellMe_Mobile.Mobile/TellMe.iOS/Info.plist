@@ -7,7 +7,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.10</string>
+	<string>1.0.19</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
@@ -38,5 +38,11 @@
 	<string>Tell Me a Story need an access to your camera to record the stories</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Tell Me a Story need an access to your microphone to record the stories</string>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>Tell Me a Story need an access to your media library to allow you to choose a userpic</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Tell Me a Story need an access to your photo library to allow you to choose a userpic</string>
 </dict>
 </plist>

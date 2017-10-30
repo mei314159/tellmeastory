@@ -23,11 +23,6 @@ namespace TellMe.DAL.Types.Services
     {
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
-
-        private readonly IRepository<Contact, int> _contactRepository;
-
-
-
         private readonly PushSettings _pushSettings;
 
         private readonly IHostingEnvironment _environment;
@@ -35,13 +30,11 @@ namespace TellMe.DAL.Types.Services
         public PushNotificationsService(
             IRepository<ApplicationUser, string> UserRepository,
             IRepository<PushNotificationClient, int> pushTokenRepository,
-            IRepository<Contact, int> contactRepository,
             IOptions<PushSettings> pushSettings,
             IHostingEnvironment environment)
         {
             _userRepository = UserRepository;
             _pushTokenRepository = pushTokenRepository;
-            _contactRepository = contactRepository;
             _pushSettings = pushSettings.Value;
             _environment = environment;
         }
@@ -76,9 +69,9 @@ namespace TellMe.DAL.Types.Services
             _pushTokenRepository.PreCommitSave();
         }
 
-        public async Task SendStoryRequestPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string requestSenderId)
+        public async Task SendPushNotificationAsync(params Notification[] notifications)
         {
-            var receiverIds = storyDTOs.Select(x => x.SenderId).ToArray();
+            var receiverIds = notifications.Select(x => x.RecipientId).ToArray();
             var pushNotificationClients = await _pushTokenRepository
                                         .GetQueryable()
                                         .AsNoTracking()
@@ -86,87 +79,23 @@ namespace TellMe.DAL.Types.Services
                                         .ToListAsync()
                                         .ConfigureAwait(false);
 
-            var user = await _userRepository
-                        .GetQueryable()
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(x => x.Id == requestSenderId)
-                        .ConfigureAwait(false);
-                        
-            var receiverContacts = await _contactRepository
-                                    .GetQueryable()
-                                    .AsNoTracking()
-                                    .Where(x =>
-                                    receiverIds.Contains(x.UserId)
-                                    && x.PhoneNumberDigits == user.PhoneNumberDigits)
-                                    .Select(x => new { x.UserId, x.Name })
-                                    .ToListAsync()
-                                    .ConfigureAwait(false);
-                                    
-            var notifications = storyDTOs.Select(storyDTO =>
+            var pushNotifications = notifications.Select(n =>
             {
-                var contact = receiverContacts.FirstOrDefault(x => x.UserId == requestSenderId);
-                string senderName = contact?.Name ?? user.PhoneNumber;
-                var notification = new IosNotification<StoryDTO>
+                var notification = new IosNotification<object>
                 {
                     Data = new IosNotificationAPS
                     {
-                        Message = $"{senderName} requested a story: {storyDTO.Title}"
+                        Message = n.Text
                     },
-                    Extra = storyDTO,
-                    NotificationType = NotificationTypeEnum.StoryRequest,
+                    Extra = n.Extra,
+                    NotificationType = n.Type,
                 };
 
-                var pushClients = pushNotificationClients.Where(x => x.UserId == storyDTO.SenderId).ToArray();
-                return new Tuple<IosNotification<StoryDTO>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients);
+                var pushClients = pushNotificationClients.Where(x => x.UserId == n.RecipientId).ToArray();
+                return new Tuple<IosNotification<object>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients);
             }).ToArray();
 
-            Task.Run(() => SendIosPushNotification<StoryDTO>(notifications));
-        }
-
-        public async Task SendStoryPushNotificationAsync(IReadOnlyCollection<StoryDTO> storyDTOs, string senderId)
-        {
-            var receiverIds = storyDTOs.Select(x => x.ReceiverId).ToArray();
-            var pushNotificationClients = await _pushTokenRepository
-                                        .GetQueryable()
-                                        .AsNoTracking()
-                                        .Where(a => receiverIds.Contains(a.UserId) && a.OsType == OsType.iOS)
-                                        .ToListAsync()
-                                        .ConfigureAwait(false);
-
-            var user = await _userRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == senderId)
-            .ConfigureAwait(false);
-            var senderContacts = await _contactRepository
-                        .GetQueryable()
-                        .AsNoTracking()
-                        .Where(x =>
-                        receiverIds.Contains(x.UserId)
-                        && x.PhoneNumberDigits == user.PhoneNumberDigits)
-                        .Select(x => new { x.UserId, x.Name })
-                        .ToListAsync()
-                        .ConfigureAwait(false);
-
-            var notifications = storyDTOs.Select(storyDTO =>
-            {
-                var contact = senderContacts.FirstOrDefault(x => x.UserId == storyDTO.ReceiverId);
-                string senderName = contact?.Name ?? user.PhoneNumber;
-
-                var notification = new IosNotification<StoryDTO>
-                {
-                    Data = new IosNotificationAPS
-                    {
-                        Message = $"{senderName} sent a story: {storyDTO.Title}"
-                    },
-                    Extra = storyDTO,
-                    NotificationType = NotificationTypeEnum.Story,
-                };
-                var pushClients = pushNotificationClients.Where(x => x.UserId == storyDTO.ReceiverId).ToArray();
-                return new Tuple<IosNotification<StoryDTO>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients);
-            }).ToArray();
-
-            Task.Run(() => SendIosPushNotification<StoryDTO>(notifications));
+            Task.Run(() => SendIosPushNotification<object>(pushNotifications));
         }
 
         public void SendIosPushNotification<T>(params Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>[] notifications)

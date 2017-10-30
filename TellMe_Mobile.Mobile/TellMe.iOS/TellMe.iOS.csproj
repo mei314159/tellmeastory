@@ -91,32 +91,40 @@
     <Reference Include="FluentValidation">
       <HintPath>..\packages\FluentValidation.7.1.1\lib\netstandard1.0\FluentValidation.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.5\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLite-net">
-      <HintPath>..\packages\sqlite-net-pcl.1.4.118\lib\netstandard1.1\SQLite-net.dll</HintPath>
-    </Reference>
     <Reference Include="MonoTouch.Dialog-1" />
     <Reference Include="SDWebImage">
       <HintPath>..\packages\Xamarin.SDWebImage.3.7.5\lib\Xamarin.iOS\SDWebImage.dll</HintPath>
     </Reference>
+    <Reference Include="SQLiteNetStandard">
+      <HintPath>..\packages\sqlite-net-standard.1.5.1\lib\netstandard1.1\SQLiteNetStandard.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLiteNetExtensions">
+      <HintPath>..\packages\SQLiteNetExtensionsCore.2.0.0\lib\netstandard1.5\SQLiteNetExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLiteNetExtensionsAsync">
+      <HintPath>..\packages\SQLiteNetExtensionsCore.Async.2.0.0\lib\netstandard1.5\SQLiteNetExtensionsAsync.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+    </Reference>
+    <Reference Include="HockeySDK.iOSBindings">
+      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\First.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\First.imageset\vector.pdf" />
-    <ImageAsset Include="Assets.xcassets\Second.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\Second.imageset\vector.pdf" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contacts.imageset\contacts%402x.png" />
@@ -127,6 +135,21 @@
     <ImageAsset Include="Assets.xcassets\Play.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Play.imageset\play%403x.png" />
     <ImageAsset Include="Assets.xcassets\Play.imageset\play%402x.png" />
+    <ImageAsset Include="Assets.xcassets\UserPic.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\UserPic.imageset\user_pic%403x.png" />
+    <ImageAsset Include="Assets.xcassets\UserPic.imageset\user_pic%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Bell.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Bell.imageset\bell%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Bell.imageset\bell%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Storytellers.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Storytellers.imageset\storytellers%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Storytellers.imageset\storytellers%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\profile%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Account.imageset\profile%402x.png" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%402x.png" />
+    <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -140,14 +163,26 @@
     <Folder Include="Core\DTO\" />
     <Folder Include="Controllers\" />
     <Folder Include="Assets.xcassets\Play.imageset\" />
+    <Folder Include="Assets.xcassets\Account.imageset\" />
+    <Folder Include="Assets.xcassets\UserPic.imageset\" />
+    <Folder Include="Assets.xcassets\Bell.imageset\" />
+    <Folder Include="Assets.xcassets\Storytellers.imageset\" />
+    <Folder Include="Assets.xcassets\Account.imageset\" />
+    <Folder Include="Assets.xcassets\AddGroup.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
-    <InterfaceDefinition Include="Views\Cells\ContactsListCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\StorytellersListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
     <InterfaceDefinition Include="Story.storyboard" />
+    <InterfaceDefinition Include="Views\InputPopupView.xib" />
+    <InterfaceDefinition Include="Views\Cells\NotificationCenterCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
+    <InterfaceDefinition Include="Views\StoryView.xib" />
+    <InterfaceDefinition Include="Views\Cells\TribesListCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\TribeMembersListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -161,13 +196,12 @@
     <Compile Include="Core\UI\TextInput.cs" />
     <Compile Include="Extensions\ViewExtensions.cs" />
     <Compile Include="Core\Providers\ContactsProvider.cs" />
-    <Compile Include="Views\Cells\ContactsListCell.cs" />
-    <Compile Include="Views\Cells\ContactsListCell.designer.cs">
-      <DependentUpon>ContactsListCell.cs</DependentUpon>
+    <Compile Include="Views\Cells\StorytellersListCell.cs" />
+    <Compile Include="Views\Cells\StorytellersListCell.designer.cs">
+      <DependentUpon>StorytellersListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\Router.cs" />
     <Compile Include="Core\DTO\PushNotification.cs" />
-    <Compile Include="Core\DTO\NotificationTypeEnum.cs" />
     <Compile Include="Core\DTO\IosNotificationAPS.cs" />
     <Compile Include="Views\Cells\StoriesListCell.cs" />
     <Compile Include="Views\Cells\StoriesListCell.designer.cs">
@@ -181,14 +215,6 @@
     <Compile Include="Views\CustomPicker\ModalPickerViewController.cs" />
     <Compile Include="Core\UI\Button.cs" />
     <Compile Include="Core\UI\Label.cs" />
-    <Compile Include="Controllers\ContactDetailsViewController.cs" />
-    <Compile Include="Controllers\ContactDetailsViewController.designer.cs">
-      <DependentUpon>ContactDetailsViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controllers\ContactsViewController.cs" />
-    <Compile Include="Controllers\ContactsViewController.designer.cs">
-      <DependentUpon>ContactsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\OutputDelegate.cs" />
     <Compile Include="Controllers\PreviewVideoController.cs" />
     <Compile Include="Controllers\PreviewVideoController.designer.cs">
@@ -202,25 +228,68 @@
     <Compile Include="Controllers\RecordVideoController.designer.cs">
       <DependentUpon>RecordVideoController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\SendStoryDetailsViewController.cs" />
-    <Compile Include="Controllers\SendStoryDetailsViewController.designer.cs">
-      <DependentUpon>SendStoryDetailsViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controllers\SignUpPhoneController.cs" />
-    <Compile Include="Controllers\SignUpPhoneController.designer.cs">
-      <DependentUpon>SignUpPhoneController.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\StoriesListViewController.cs" />
     <Compile Include="Controllers\StoriesListViewController.designer.cs">
       <DependentUpon>StoriesListViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\ImportContactsController.cs" />
-    <Compile Include="Controllers\ImportContactsController.designer.cs">
-      <DependentUpon>ImportContactsController.cs</DependentUpon>
+    <Compile Include="Views\CustomPopUpView.cs" />
+    <Compile Include="Views\Overlay.cs" />
+    <Compile Include="Core\UI\Picture.cs" />
+    <Compile Include="Views\InputPopupView.cs" />
+    <Compile Include="Views\InputPopupView.designer.cs">
+      <DependentUpon>InputPopupView.cs</DependentUpon>
     </Compile>
-    <Compile Include="RequestStoryViewController.cs" />
-    <Compile Include="RequestStoryViewController.designer.cs">
-      <DependentUpon>RequestStoryViewController.cs</DependentUpon>
+    <Compile Include="Views\Cells\NotificationCenterCell.cs" />
+    <Compile Include="Views\Cells\NotificationCenterCell.designer.cs">
+      <DependentUpon>NotificationCenterCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Cells\NotificationCenterStoryCell.cs" />
+    <Compile Include="Views\Cells\NotificationCenterStoryCell.designer.cs">
+      <DependentUpon>NotificationCenterStoryCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\InitialAuthController.cs" />
+    <Compile Include="Controllers\InitialAuthController.designer.cs">
+      <DependentUpon>InitialAuthController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\NotificationCenterController.cs" />
+    <Compile Include="Controllers\NotificationCenterController.designer.cs">
+      <DependentUpon>NotificationCenterController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SignInController.cs" />
+    <Compile Include="Controllers\SignInController.designer.cs">
+      <DependentUpon>SignInController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SignUpController.cs" />
+    <Compile Include="Controllers\SignUpController.designer.cs">
+      <DependentUpon>SignUpController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\StorytellersController.cs" />
+    <Compile Include="Controllers\StorytellersController.designer.cs">
+      <DependentUpon>StorytellersController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\UploadPictureController.cs" />
+    <Compile Include="Controllers\UploadPictureController.designer.cs">
+      <DependentUpon>UploadPictureController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\SendStoryViewController.designer.cs" />
+    <Compile Include="Controllers\SendStoryViewController.cs" />
+    <Compile Include="Controllers\RequestStoryController.cs" />
+    <Compile Include="Controllers\RequestStoryController.designer.cs">
+      <DependentUpon>RequestStoryController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StoryView.cs" />
+    <Compile Include="Views\StoryView.designer.cs">
+      <DependentUpon>StoryView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Cells\TribesListCell.cs" />
+    <Compile Include="Views\Cells\TribesListCell.designer.cs">
+      <DependentUpon>TribesListCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\CreateTribeController.cs" />
+    <Compile Include="Controllers\ViewTribeController.cs" />
+    <Compile Include="Views\Cells\TribeMembersListCell.cs" />
+    <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
+      <DependentUpon>TribeMembersListCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

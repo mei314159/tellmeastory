@@ -8,12 +8,10 @@ namespace TellMe.Core.Contracts.UI.Views
     public delegate void RequestStoryEventHandler(ICollection<StoryDTO> requestedStories);
     public interface IRequestStoryView : IView
     {
-        ITextInput StoryName { get; }
-
+        ICollection<ContactDTO> Recipients { get; }
+        ITextInput StoryTitle { get; }
         IButton SendButton { get; }
-
-        void DisplayRecipients(ICollection<ContactDTO> selectedItems);
-        void ShowSuccessMessage(string message, Action complete);
-        void Close(ICollection<StoryDTO> requestedStories);
+        void ShowSuccessMessage(string message, Action complete = null);
+        void Close(ICollection<StoryRequestDTO> requestedStories);
     }
 }

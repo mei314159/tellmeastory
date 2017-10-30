@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SQLite;
+using SQLiteNetExtensions.Extensions;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Local
@@ -11,7 +12,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public AccountService()
         {
             this._dbPath = Constants.LocalDbPath;
-            using (var conn = new SQLiteConnection(_dbPath))
+            using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
                 conn.CreateTable<AuthenticationInfoDTO>();
             }
@@ -19,25 +20,29 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public void SaveAuthInfo(AuthenticationInfoDTO authInfo)
         {
-            var conn = new SQLiteConnection(this._dbPath);
-            conn.RunInTransaction(() =>
+            using (var conn = new SQLiteConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
-                if (authInfo == null)
-                {
-                    conn.DeleteAll<AuthenticationInfoDTO>();
-                }
-                else
-                {
-                    conn.InsertOrReplace(authInfo, typeof(AuthenticationInfoDTO));
-                }
-            });
+                conn.RunInTransaction(() =>
+               {
+                   if (authInfo == null)
+                   {
+                       conn.DeleteAll<AuthenticationInfoDTO>();
+                   }
+                   else
+                   {
+                       conn.InsertOrReplaceWithChildren(authInfo);
+                   }
+               });
+            }
         }
 
         public AuthenticationInfoDTO GetAuthInfo()
         {
-            var conn = new SQLiteConnection(this._dbPath);
-            var result = conn.Query<AuthenticationInfoDTO>("SELECT * FROM AuthenticationInfo").FirstOrDefault();
-            return result;
+            using (var conn = new SQLiteConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
+            {
+                var result = conn.GetAllWithChildren<AuthenticationInfoDTO>().FirstOrDefault();
+                return result;
+            }
         }
     }
 }

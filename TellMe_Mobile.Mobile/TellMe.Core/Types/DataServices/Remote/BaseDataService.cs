@@ -241,6 +241,11 @@ namespace TellMe.Core.Types.DataServices.Remote
                 {
                     App.Instance.AuthInfo = result.Data;
                 }
+                else if (result.Error.Code == "905" || result.Error.Code == "906")
+                {
+                    App.Instance.Authenticate();
+                }
+
                 return result;
             }
 

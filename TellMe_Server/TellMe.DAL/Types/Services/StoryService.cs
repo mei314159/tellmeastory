@@ -11,153 +11,248 @@ using AutoMapper;
 using TellMe.DAL.Contracts.PushNotification;
 using System;
 using AutoMapper.QueryableExtensions;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Services
 {
     public class StoryService : IStoryService
     {
         private readonly IRepository<Story, int> _storyRepository;
-        private readonly IRepository<Contact, int> _contactRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-
         private readonly IPushNotificationsService _pushNotificationsService;
+        private readonly IRepository<Notification, int> _notificationRepository;
+
+        private readonly IRepository<StoryRequestStatus, int> _storyRequestStatusRepository;
+        private readonly IRepository<StoryRequest, int> _storyRequestRepository;
+        private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
+        private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         public StoryService(
             IRepository<Story, int> storyRepository,
-            IRepository<Contact, int> contactRepository,
             IRepository<ApplicationUser, string> userRepository,
-            IPushNotificationsService pushNotificationsService)
+            IPushNotificationsService pushNotificationsService,
+            IRepository<Notification, int> notificationRepository,
+            IRepository<StoryRequestStatus, int> storyRequestStatusRepository,
+            IRepository<StoryRequest, int> storyRequestRepository,
+            IRepository<StoryReceiver, int> storyReceiverRepository,
+            IRepository<TribeMember, int> tribeMemberRepository)
         {
             _storyRepository = storyRepository;
-            _contactRepository = contactRepository;
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
+            _notificationRepository = notificationRepository;
+            _storyRequestStatusRepository = storyRequestStatusRepository;
+            _storyRequestRepository = storyRequestRepository;
+            _storyReceiverRepository = storyReceiverRepository;
+            _tribeMemberRepository = tribeMemberRepository;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, string userId = null)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int skip)
         {
-            var stories = _storyRepository
-                            .GetQueryable()
-                            .AsNoTracking();
+            var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
+            var receivers = _storyReceiverRepository.GetQueryable(true);
 
-            if (userId != null)
-            {
-                stories = stories
-                .Where(x => (x.SenderId == currentUserId && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == currentUserId));
-            }
-            else
-            {
-                stories = stories.Where(x => x.SenderId == currentUserId || x.ReceiverId == currentUserId);
-            }
+            receivers = from receiver in receivers
+                        join tribeMember in tribeMembers
+                        on receiver.TribeId equals tribeMember.TribeId into gj
+                        from tb in gj.DefaultIfEmpty()
+                        where
+                            receiver.UserId == currentUserId || (tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
+                        select
+                          receiver;
 
-            var result = await stories
-            .ProjectTo<StoryDTO>()
-            .ToListAsync()
-            .ConfigureAwait(false);
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
+            stories = (from story in stories
+                       join receiver in receivers
+                       on story.Id equals receiver.StoryId into gj
+                       from st in gj.DefaultIfEmpty()
+                       where story.SenderId == currentUserId || st != null
+                       orderby story.CreateDateUtc
+                       select story)
+                       .Skip(skip)
+                       .Take(20);
 
-            var ids = result
-                    .Select(x => x.SenderId)
-                    .Union(result.Select(x => x.ReceiverId)).ToArray();
-            var users = _userRepository.GetQueryable().AsNoTracking().Where(x => ids.Contains(x.Id));
 
-            var contacts = _contactRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .Where(x => x.UserId == currentUserId);
-
-            var nm = await (from user in users
-                            join contact in contacts
-                            on user.PhoneNumberDigits
-                            equals contact.PhoneNumberDigits into gj
-                            from x in gj.DefaultIfEmpty()
-                            select new { Name = x != null ? x.Name : user.PhoneNumber, user.Id })
-            .ToDictionaryAsync(x => x.Id, x => x.Name).ConfigureAwait(false);
-            foreach (var item in result)
-            {
-                item.SenderName = nm[item.SenderId];
-                item.ReceiverName = nm[item.ReceiverId];
-            }
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryDTO>>(list);
 
             return result;
         }
 
-        public async Task<ICollection<StoryDTO>> RequestStoryAsync(string requestSenderId, StoryRequestDTO dto)
+        public async Task<StoryStatus> RejectRequestAsync(string currentUserId, int requestId)
         {
-            var now = DateTime.UtcNow;
-            var entities = new List<Story>();
-
-            foreach (var receiverId in dto.ReceiverIds)
-            {
-                var entity = new Story()
-                {
-                    RequestDateUtc = now,
-                    UpdateDateUtc = now,
-                    Title = dto.Title,
-                    SenderId = receiverId, // story sender is request receiver
-                    ReceiverId = requestSenderId, // story receiver is request sender
-                    Status = StoryStatus.Requested,
-                };
-
-                entities.Add(entity);
-                _storyRepository.Save(entity, false);
-            }
-
-            _storyRepository.PreCommitSave();
-            var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
-
-            var user = await _userRepository
-            .GetQueryable()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == requestSenderId)
-            .ConfigureAwait(false);
-
-            
-            await _pushNotificationsService.SendStoryRequestPushNotificationAsync(storyDTOs, requestSenderId).ConfigureAwait(false);
-
-            return storyDTOs;
+            var result = await SetRequestStatus(currentUserId, requestId, StoryStatus.Ignored).ConfigureAwait(false);
+            return result;
         }
 
-        public async Task<ICollection<StoryDTO>> SendStoryAsync(string senderId, SendStoryDTO dto)
+        public async Task<ICollection<StoryRequestDTO>> RequestStoryAsync(string requestSenderId, IEnumerable<StoryRequestDTO> requests)
         {
-            var now = DateTime.UtcNow;
-            var entities = new List<Story>();
-            if (dto.Id.HasValue)
-            {
-                var entity = await _storyRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == dto.Id).ConfigureAwait(false);
-                entity.VideoUrl = dto.VideoUrl;
-                entity.PreviewUrl = dto.PreviewUrl;
-                entity.Status = StoryStatus.Sent;
-                entity.UpdateDateUtc = now;
-                entity.CreateDateUtc = now;
-                _storyRepository.Save(entity, false);
-                entities.Add(entity);
-            }
-            else
-            {
-                foreach (var receiverId in dto.ReceiverIds)
-                {
-                    var entity = new Story()
-                    {
-                        CreateDateUtc = now,
-                        UpdateDateUtc = now,
-                        Title = dto.Title,
-                        SenderId = senderId,
-                        ReceiverId = receiverId,
-                        Status = StoryStatus.Sent,
-                        VideoUrl = dto.VideoUrl,
-                        PreviewUrl = dto.PreviewUrl
-                    };
+            var entities = Mapper.Map<List<StoryRequest>>(requests);
+            entities.ForEach(x => x.SenderId = requestSenderId);
+            _storyRequestRepository.AddRange(entities, true);
 
-                    entities.Add(entity);
-                    _storyRepository.Save(entity, false);
+            var tribeIds = requests.Select(x => x.TribeId).Where(x => x != null).ToList();
+            var tribeMembers = await _tribeMemberRepository.GetQueryable(true).Where(x => tribeIds.Contains(x.TribeId))
+            .Select(x => new
+            {
+                TribeId = x.TribeId,
+                TribeName = x.Tribe.Name,
+                x.UserId
+            }).ToListAsync().ConfigureAwait(false);
+
+            var now = DateTime.UtcNow;
+
+            var entityIds = entities.Select(x => x.Id).ToArray();
+            var requestDTOs = await _storyRequestRepository
+            .GetQueryable(true)
+            .Include(x => x.Sender)
+            .Include(x => x.Receiver)
+            .Where(x => entityIds.Contains(x.Id))
+            .ProjectTo<StoryRequestDTO>()
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+            var notifications = requestDTOs.SelectMany(requestDTO =>
+            {
+                if (requestDTO.TribeId == null)
+                {
+                    return new[] {new Notification
+                    {
+                        Date = now,
+                        Type = NotificationTypeEnum.StoryRequest,
+                        RecipientId = requestDTO.UserId,
+                        Extra = requestDTO,
+                        Text = $"{requestDTO.SenderName} would like you to tell a story about {requestDTO.Title}"
+                    }};
                 }
 
+                return tribeMembers.Where(x => x.TribeId == requestDTO.TribeId && x.UserId != requestSenderId).Select(x => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.StoryRequest,
+                    RecipientId = x.UserId,
+                    Extra = requestDTO,
+                    Text = $"[{x.TribeName}]: {requestDTO.SenderName} would like you to tell a story about \"{requestDTO.Title}\""
+                });
+            }).ToArray();
+
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            return requestDTOs;
+        }
+
+        public async Task<StoryDTO> SendStoryAsync(string senderId, SendStoryDTO dto)
+        {
+            var now = DateTime.UtcNow;
+
+            var entity = new Story()
+            {
+                CreateDateUtc = now,
+                Title = dto.Title,
+                SenderId = senderId,
+                VideoUrl = dto.VideoUrl,
+                PreviewUrl = dto.PreviewUrl,
+                RequestId = dto.RequestId
+            };
+
+            StoryRequest request;
+            if (dto.RequestId.HasValue)
+            {
+                request = await _storyRequestRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == dto.RequestId).ConfigureAwait(false);
+                entity.Receivers = new[] { new StoryReceiver
+                {
+                    UserId = request.TribeId == null ? request.SenderId : null,
+                    TribeId = request.TribeId
+                }};
             }
-            _storyRepository.PreCommitSave();
-            var storyDTOs = Mapper.Map<List<StoryDTO>>(entities);
+            else if (dto.Receivers?.Count > 0)
+            {
+                entity.Receivers = dto.Receivers.Select(x => new StoryReceiver
+                {
+                    UserId = x.TribeId == null ? x.UserId : null,
+                    TribeId = x.TribeId
+                }).ToArray();
+            }
 
-            await _pushNotificationsService.SendStoryPushNotificationAsync(storyDTOs, senderId).ConfigureAwait(false);
+            _storyRepository.Save(entity, true);
+            if (dto.RequestId.HasValue)
+            {
+                await SetRequestStatus(senderId, dto.RequestId.Value, StoryStatus.Sent).ConfigureAwait(false);
+            }
 
-            return storyDTOs;
+            entity = await _storyRepository
+            .GetQueryable(true)
+            .Include(x => x.Sender)
+            .Include(x => x.Receivers)
+            .FirstOrDefaultAsync(x => x.Id == entity.Id)
+            .ConfigureAwait(false);
+
+            var storyDTO = Mapper.Map<StoryDTO>(entity);
+
+
+            var tribeIds = storyDTO.Receivers.Where(x => x.TribeId != null).Select(x => x.TribeId).ToList();
+            var tribeMembers = await _tribeMemberRepository.GetQueryable(true).Where(x => tribeIds.Contains(x.TribeId))
+            .Select(x => new
+            {
+                TribeId = x.TribeId,
+                TribeName = x.Tribe.Name,
+                x.UserId
+            })
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+            var notifications = storyDTO.Receivers.SelectMany(receiver =>
+            {
+                if (receiver.TribeId == null)
+                {
+                    return new[]{
+                    new Notification
+                    {
+                        Date = now,
+                        Type = NotificationTypeEnum.Story,
+                        RecipientId = receiver.UserId,
+                        Extra = storyDTO,
+                        Text = $"{storyDTO.SenderName} has shared with you a story about \"{storyDTO.Title}\""
+                    }};
+                }
+
+                return tribeMembers.Where(x => x.TribeId == receiver.TribeId).Select(x => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.Story,
+                    RecipientId = x.UserId,
+                    Extra = storyDTO,
+                    Text = $"[{x.TribeName}]: {storyDTO.SenderName} has shared with you a story about \"{storyDTO.Title}\""
+                });
+            }).ToArray();
+
+            _notificationRepository.AddRange(notifications, true);
+            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            return storyDTO;
+        }
+
+        private async Task<StoryStatus> SetRequestStatus(string currentUserId, int requestId, StoryStatus status)
+        {
+            var requestStatus = await _storyRequestStatusRepository
+            .GetQueryable()
+            .FirstOrDefaultAsync(x => x.RequestId == requestId && x.UserId == currentUserId)
+            .ConfigureAwait(false);
+            if (requestStatus == null)
+            {
+                requestStatus = new StoryRequestStatus
+                {
+                    RequestId = requestId,
+                    UserId = currentUserId,
+                    Status = StoryStatus.Ignored
+                };
+            }
+
+            await _storyRequestStatusRepository.SaveAsync(requestStatus, true).ConfigureAwait(false);
+
+            return requestStatus.Status;
         }
     }
 }

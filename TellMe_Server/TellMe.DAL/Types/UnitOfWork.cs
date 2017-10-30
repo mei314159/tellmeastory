@@ -35,6 +35,12 @@ namespace TellMe.DAL.Types
 			_dbContext?.SaveChanges();
 		}
 
+		public virtual async Task PreCommitSaveAsync()
+		{
+			if (_dbContext != null)
+				await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+		}
+
 		public virtual void Commit()
 		{
 			_dbContext?.SaveChanges();

@@ -15,12 +15,31 @@ namespace TellMe.DAL
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            builder.Entity<Friendship>().HasOne(x => x.User).WithMany(x => x.Friends).HasForeignKey(x => x.UserId);
+            builder.Entity<Friendship>().HasOne(x => x.Friend).WithMany().HasForeignKey(x => x.FriendId);
             builder.Entity<ApplicationUser>().HasMany(x => x.PushNotificationClients).WithOne(x => x.User).HasForeignKey(x => x.UserId);
-            builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
-            builder.Entity<Story>().HasOne(x => x.Receiver).WithMany(x => x.ReceivedStories).HasForeignKey(x => x.ReceiverId);
-            builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
 
+            builder.Entity<Story>().HasOne(x => x.Request).WithMany(x => x.Stories).HasForeignKey(x => x.RequestId);
+            builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
+
+            builder.Entity<StoryReceiver>().HasOne(x => x.Story).WithMany(x => x.Receivers).HasForeignKey(x => x.StoryId);
+            builder.Entity<StoryReceiver>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
+            builder.Entity<StoryReceiver>().HasOne(x => x.Tribe).WithMany().HasForeignKey(x => x.TribeId);
+
+            builder.Entity<StoryRequest>().HasOne(x => x.Sender).WithMany().HasForeignKey(x => x.SenderId);
+            builder.Entity<StoryRequest>().HasOne(x => x.Receiver).WithMany().HasForeignKey(x => x.UserId);
+            builder.Entity<StoryRequest>().HasOne(x => x.Tribe).WithMany().HasForeignKey(x => x.TribeId);
+            builder.Entity<StoryRequest>().HasMany(x => x.Stories).WithOne(x => x.Request).HasForeignKey(x => x.RequestId);
+            builder.Entity<StoryRequest>().HasMany(x => x.Statuses).WithOne(x => x.Request).HasForeignKey(x => x.RequestId);
+
+            builder.Entity<Tribe>().HasMany(x => x.Members).WithOne(x => x.Tribe).HasForeignKey(x => x.TribeId);
+            builder.Entity<Tribe>().HasOne(x => x.Creator).WithMany().HasForeignKey(x => x.CreatorId);
+            builder.Entity<TribeMember>().HasOne(x => x.User).WithMany(x => x.Tribes).HasForeignKey(x => x.UserId);
+
+            builder.Entity<Notification>().HasOne(x => x.Recipient).WithMany().HasForeignKey(x => x.RecipientId);
+            builder.Entity<Notification>().Property(x => x._extra).HasColumnName("Extra");
+            // builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
+            // builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
             base.OnModelCreating(builder);
         }
     }

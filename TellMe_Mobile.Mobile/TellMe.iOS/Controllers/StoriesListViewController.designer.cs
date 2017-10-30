@@ -16,30 +16,52 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem RequestStoryButton { get; set; }
+        UIKit.UIBarButtonItem AccountSettingsButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem SendStoryButton { get; set; }
+        UIKit.UIActivityIndicatorView ActivityIndicator { get; set; }
 
-        [Action ("RequestStoryButtonTouched:")]
+        [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void RequestStoryButtonTouched (UIKit.UIBarButtonItem sender);
+        UIKit.UIBarButtonItem Notifications { get; set; }
 
-        [Action ("SendStoryButtonTouched:")]
+        [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SendStoryButtonTouched (UIKit.UIBarButtonItem sender);
+        UIKit.UIBarButtonItem Storytellers { get; set; }
+
+        [Action ("AccountSettingsButton_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void AccountSettingsButton_Activated (UIKit.UIBarButtonItem sender);
+
+        [Action ("Notifications_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void Notifications_Activated (UIKit.UIBarButtonItem sender);
+
+        [Action ("Storytellers_Activated:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void Storytellers_Activated (UIKit.UIBarButtonItem sender);
 
         void ReleaseDesignerOutlets ()
         {
-            if (RequestStoryButton != null) {
-                RequestStoryButton.Dispose ();
-                RequestStoryButton = null;
+            if (AccountSettingsButton != null) {
+                AccountSettingsButton.Dispose ();
+                AccountSettingsButton = null;
             }
 
-            if (SendStoryButton != null) {
-                SendStoryButton.Dispose ();
-                SendStoryButton = null;
+            if (ActivityIndicator != null) {
+                ActivityIndicator.Dispose ();
+                ActivityIndicator = null;
+            }
+
+            if (Notifications != null) {
+                Notifications.Dispose ();
+                Notifications = null;
+            }
+
+            if (Storytellers != null) {
+                Storytellers.Dispose ();
+                Storytellers = null;
             }
         }
     }

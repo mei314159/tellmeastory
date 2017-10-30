@@ -7,6 +7,7 @@ using TellMe.Core;
 using TellMe.Core.Contracts.UI.Views;
 using System.IO;
 using TellMe.Core.Contracts.DTO;
+using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
@@ -27,7 +28,8 @@ namespace TellMe.iOS
         }
 
         public string VideoPath { get; set; }
-        public StoryDTO RequestedStory { get; set; }
+        public StoryRequestDTO StoryRequest { get; set; }
+        public NotificationDTO RequestNotification { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -59,7 +61,7 @@ namespace TellMe.iOS
         partial void SendButtonTouched(Button sender)
         {
             goNext = true;
-            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, RequestedStory);
+            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, StoryRequest, RequestNotification);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -100,18 +102,7 @@ namespace TellMe.iOS
             }
         }
 
-		public void ShowErrorMessage(string title, string message = null)
-		{
-			InvokeOnMainThread(() =>
-			{
-				UIAlertController alert = UIAlertController
-					.Create(title,
-							message ?? string.Empty,
-							UIAlertControllerStyle.Alert);
-				alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
-				this.PresentViewController(alert, true, null);
-			});
-		}
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
         public void SavePreviewImage()
 		{

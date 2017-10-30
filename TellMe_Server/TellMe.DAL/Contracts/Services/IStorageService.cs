@@ -7,5 +7,8 @@ namespace TellMe.DAL.Contracts.Services
     public interface IStorageService : IService
     {
         Task<UploadMediaDTO> UploadAsync(Stream videoStream, string videoBlobName, Stream previewImageStream, string previewImageBlobName);
+
+        Task<ProfilePictureDTO> UploadProfilePictureAsync(Stream profilePictureStream, string profilePictureBlobName);
+
     }
 }

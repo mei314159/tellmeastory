@@ -3,11 +3,11 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Validation
 {
-    public class RequestStoryValidator : AbstractValidator<StoryRequestDTO>
+    public class RequestStoryValidator : AbstractValidator<RequestStoryDTO>
     {
         public RequestStoryValidator()
         {
-            this.RuleFor(x => x.Title).NotEmpty().WithMessage("Story title is required.");
+            this.RuleForEach(x => x.Requests).Must(x => !string.IsNullOrWhiteSpace(x.Title)).WithMessage("Story title is required.");
         }
     }
 }

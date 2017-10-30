@@ -3,8 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using TellMe.DAL;
+using TellMe.DAL.Types.Domain;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Migrations
 {
@@ -136,13 +140,12 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
-                    b.Property<string>("CountryCode")
-                        .HasMaxLength(2);
-
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FullName");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -156,15 +159,11 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<string>("PasswordHash");
 
-                    b.Property<int>("PhoneCountryCode")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValue(1);
-
                     b.Property<string>("PhoneNumber");
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
-                    b.Property<long>("PhoneNumberDigits");
+                    b.Property<string>("PictureUrl");
 
                     b.Property<string>("SecurityStamp");
 
@@ -186,24 +185,51 @@ namespace TellMe.DAL.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("TellMe.DAL.Types.Domain.Contact", b =>
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Friendship", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("FriendId");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<int>("Status");
 
-                    b.Property<long>("PhoneNumberDigits");
+                    b.Property<DateTime>("UpdateDate");
 
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FriendId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Contact");
+                    b.ToTable("Friendship");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<bool>("Handled");
+
+                    b.Property<string>("RecipientId");
+
+                    b.Property<string>("Text");
+
+                    b.Property<int>("Type");
+
+                    b.Property<string>("_extra")
+                        .HasColumnName("Extra");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("TellMe.DAL.Types.Domain.PushNotificationClient", b =>
@@ -249,31 +275,135 @@ namespace TellMe.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime?>("CreateDateUtc");
+                    b.Property<DateTime>("CreateDateUtc");
 
                     b.Property<string>("PreviewUrl");
 
-                    b.Property<string>("ReceiverId");
-
-                    b.Property<DateTime?>("RequestDateUtc");
+                    b.Property<int?>("RequestId");
 
                     b.Property<string>("SenderId");
 
-                    b.Property<int>("Status");
-
                     b.Property<string>("Title");
-
-                    b.Property<DateTime>("UpdateDateUtc");
 
                     b.Property<string>("VideoUrl");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasIndex("RequestId");
 
                     b.HasIndex("SenderId");
 
                     b.ToTable("Story");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryReceiver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("StoryId");
+
+                    b.Property<int?>("TribeId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoryId");
+
+                    b.HasIndex("TribeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StoryReceiver");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDateUtc");
+
+                    b.Property<string>("SenderId");
+
+                    b.Property<string>("Title");
+
+                    b.Property<int?>("TribeId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("TribeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StoryRequest");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryRequestStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("RequestId");
+
+                    b.Property<int>("Status");
+
+                    b.Property<int?>("TribeId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestId");
+
+                    b.HasIndex("TribeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StoryRequestStatus");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Tribe", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDateUtc");
+
+                    b.Property<string>("CreatorId");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("Tribe");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.TribeMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Status");
+
+                    b.Property<int>("TribeId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TribeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TribeMember");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -321,11 +451,22 @@ namespace TellMe.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("TellMe.DAL.Types.Domain.Contact", b =>
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Friendship", b =>
                 {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId");
+
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
-                        .WithMany("Contacts")
+                        .WithMany("Friends")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Notification", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId");
                 });
 
             modelBuilder.Entity("TellMe.DAL.Types.Domain.PushNotificationClient", b =>
@@ -337,13 +478,79 @@ namespace TellMe.DAL.Migrations
 
             modelBuilder.Entity("TellMe.DAL.Types.Domain.Story", b =>
                 {
-                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Receiver")
-                        .WithMany("ReceivedStories")
-                        .HasForeignKey("ReceiverId");
+                    b.HasOne("TellMe.DAL.Types.Domain.StoryRequest", "Request")
+                        .WithMany("Stories")
+                        .HasForeignKey("RequestId");
 
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Sender")
                         .WithMany("SentStories")
                         .HasForeignKey("SenderId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryReceiver", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.Story", "Story")
+                        .WithMany("Receivers")
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
+                        .WithMany()
+                        .HasForeignKey("TribeId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryRequest", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
+                        .WithMany()
+                        .HasForeignKey("TribeId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.StoryRequestStatus", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.StoryRequest", "Request")
+                        .WithMany("Statuses")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
+                        .WithMany()
+                        .HasForeignKey("TribeId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Tribe", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.TribeMember", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
+                        .WithMany("Members")
+                        .HasForeignKey("TribeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
+                        .WithMany("Tribes")
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

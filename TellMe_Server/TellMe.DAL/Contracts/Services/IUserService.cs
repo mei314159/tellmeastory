@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.DAL.Contracts.Domain;
+using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Contracts.Services
@@ -8,10 +10,15 @@ namespace TellMe.DAL.Contracts.Services
     {
         Task<ApplicationUser> GetAsync(string id);
 
-        bool AddToken(RefreshToken token);
+        Task<bool> AddTokenAsync(RefreshToken token);
 
-        bool ExpireToken(RefreshToken token);
+        Task<bool> ExpireTokenAsync(RefreshToken token);
 
-        RefreshToken GetToken(string refresh_token, string client_id);
+        Task<RefreshToken> GetTokenAsync(string token, string clientId);
+
+        Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int? skip = null);
+
+        Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
+        Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);
     }
 }

@@ -16,7 +16,15 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton ChangePictureButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton SignOutButton { get; set; }
+
+        [Action ("ChangePictureButton_TouchUpInside:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void ChangePictureButton_TouchUpInside (UIKit.UIButton sender);
 
         [Action ("SignOutButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -24,6 +32,11 @@ namespace TellMe.iOS
 
         void ReleaseDesignerOutlets ()
         {
+            if (ChangePictureButton != null) {
+                ChangePictureButton.Dispose ();
+                ChangePictureButton = null;
+            }
+
             if (SignOutButton != null) {
                 SignOutButton.Dispose ();
                 SignOutButton = null;

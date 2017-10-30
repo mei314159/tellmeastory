@@ -5,6 +5,7 @@ using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.Web.DTO;
 using TellMe.Web.Extensions;
+using System;
 
 namespace TellMe.Web.Controllers
 {
@@ -12,21 +13,24 @@ namespace TellMe.Web.Controllers
     public class StoriesController : AuthorizedController
     {
         private readonly IStorageService _storageService;
+        private INotificationService _notificationService;
         private readonly IStoryService _storyService;
         public StoriesController(
-            IHttpContextAccessor httpContextAccessor, 
+            IHttpContextAccessor httpContextAccessor,
             IUserService userService,
             IStoryService storyService,
-            IStorageService storageService) : base(httpContextAccessor, userService)
+            IStorageService storageService,
+            INotificationService notificationService) : base(httpContextAccessor, userService)
         {
             _storyService = storyService;
-            _storageService =storageService;
+            _storageService = storageService;
+            _notificationService = notificationService;
         }
 
         [HttpPost("request")]
-        public async Task<IActionResult> RequestStoryAsync([FromBody] StoryRequestDTO dto)
+        public async Task<IActionResult> RequestStoryAsync([FromBody] RequestStoryDTO dto)
         {
-            var result = await _storyService.RequestStoryAsync(this.UserId, dto);
+            var result = await _storyService.RequestStoryAsync(this.UserId, dto.Requests);
 
             return Ok(result);
         }
@@ -35,22 +39,17 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> SendStoryAsync([FromBody] SendStoryDTO dto)
         {
             var result = await _storyService.SendStoryAsync(this.UserId, dto);
-
+            if (dto.NotificationId.HasValue)
+                await _notificationService.HandleNotificationAsync(dto.NotificationId.Value);
             return Ok(result);
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetStoriesAsync(string userId)
+        [HttpGet("skip/{skip}")]
+        public async Task<IActionResult> GetStoriesAsync(int skip)
         {
-            var stories = await _storyService.GetAllAsync(this.UserId, userId);
-            return Ok(stories);
-        }
+            var result = await _storyService.GetAllAsync(this.UserId, skip < 0 ? 0 : skip);
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetStoriesAsync()
-        {
-            var stories = await _storyService.GetAllAsync(this.UserId);
-            return Ok(stories);
+            return Ok(result);
         }
 
         [HttpPost("upload-media")]
@@ -73,6 +72,14 @@ namespace TellMe.Web.Controllers
             var result = await _storageService.UploadAsync(videoFileStream, videoBlobName, previewImageStream, previewImageBlobName);
 
             return Ok(result);
+        }
+
+        [HttpPost("{storyId}/reject-request")]
+        public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int? notificationId)
+        {
+            var storyStatus = await _storyService.RejectRequestAsync(this.UserId, storyId);
+            await _notificationService.HandleNotificationAsync(notificationId.Value);
+            return Ok(storyStatus);
         }
     }
 }

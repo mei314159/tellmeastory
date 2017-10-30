@@ -9,5 +9,7 @@ namespace TellMe.DAL.Contracts
         public string VideoContainerName { get; set; }
 
         public string ImagePreviewContainerName { get; set; }
+
+        public string ProfilePictureContainerName { get; set; }
     }
 }

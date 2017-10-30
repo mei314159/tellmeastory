@@ -13,24 +13,4 @@ namespace TellMe.DAL.Types.PushNotifications
         [JsonProperty(PropertyName = "extra")]
         public T Extra { get; set; }
     }
-
-    public enum NotificationTypeEnum
-    {
-        StoryRequest = 1,
-        Story = 2
-    }
-
-    public class IosNotificationAPS
-    {
-        [JsonProperty(PropertyName = "alert")]
-        public string Message { get; set; }
-
-
-        [JsonProperty(PropertyName = "badge")]
-        public int? Badge { get; set; }
-
-
-        [JsonProperty(PropertyName = "sound")]
-        public string Sound { get; set; }
-    }
 }

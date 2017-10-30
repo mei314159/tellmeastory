@@ -26,6 +26,9 @@ using Hangfire;
 using TellMe.DAL.Contracts.PushNotification;
 using TellMe.Web.AutoMapper;
 using TellMe.DAL.Types.AzureBlob;
+using FluentValidation.AspNetCore;
+using System.Reflection;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace TellMe.Web
 {
@@ -65,9 +68,10 @@ namespace TellMe.Web
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IContactService, ContactService>();
             services.AddTransient<IStoryService, StoryService>();
             services.AddTransient<IStorageService, StorageService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<ITribeService, TribeService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddSingleton<IHostingEnvironment>(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));
@@ -75,15 +79,20 @@ namespace TellMe.Web
             services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
             ConfigureJwtAuthService(services);
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 1048576 * 500; //500 Megabytes
+            });
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc();
+            services.AddMvc().AddFluentValidation(
+                fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //loggerFactory.AddDebug();
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();

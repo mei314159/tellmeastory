@@ -4,6 +4,10 @@ using TellMe.DAL.Contracts.Repositories;
 using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts.Domain;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
+using System.Linq.Expressions;
+using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Types.Repositories
 {
@@ -33,6 +37,11 @@ namespace TellMe.DAL.Types.Repositories
             return asNoTracking ? Set.AsNoTracking() : Set;
         }
 
+        public void Detach(TEntity entity)
+        {
+            _unitOfWork.Context.Entry(entity).State = EntityState.Detached;
+        }
+
         public void Save(TEntity entity, bool commit = false)
         {
             if (Equals(entity.Id, default(TKey)))
@@ -47,6 +56,23 @@ namespace TellMe.DAL.Types.Repositories
             if (commit)
             {
                 _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public async Task SaveAsync(TEntity entity, bool commit = false)
+        {
+            if (Equals(entity.Id, default(TKey)))
+            {
+                await Set.AddAsync(entity).ConfigureAwait(false);
+            }
+            else
+            {
+                Set.Attach(entity);
+            }
+
+            if (commit)
+            {
+                await _unitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
             }
         }
 
@@ -65,6 +91,45 @@ namespace TellMe.DAL.Types.Repositories
             if (commit)
             {
                 _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public void RemoveAll(List<TEntity> deletedMembers, bool commit)
+        {
+            Set.RemoveRange(deletedMembers);
+            if (commit)
+            {
+                _unitOfWork.PreCommitSave();
+            }
+        }
+
+        public void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
+        where TProperty : class
+        {
+            _unitOfWork.Context.Entry(entity).Reference(property);
+        }
+
+        public void LoadProperty<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, TProperty>> property)
+        where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadProperty(entity, property);
+            }
+        }
+
+        public void LoadCollection<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+        where TProperty : class
+        {
+            _unitOfWork.Context.Entry(entity).Collection(propertyExpression);
+        }
+
+        public void LoadCollection<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+        where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadCollection(entity, propertyExpression);
             }
         }
     }
