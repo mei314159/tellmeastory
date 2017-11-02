@@ -236,6 +236,123 @@
             </objects>
             <point key="canvasLocation" x="-145" y="-1230"/>
         </scene>
+        <scene sceneID="33151">
+            <objects>
+                <viewController id="33152" sceneMemberID="viewController" modalPresentationStyle="overCurrentContext" customClass="StoryViewController" storyboardIdentifier="StoryViewController" useStoryboardIdentifierAsRestorationIdentifier="YES">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="33149"/>
+                        <viewControllerLayoutGuide type="bottom" id="33150"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="33153">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" colorSpace="calibratedWhite" white="0" alpha="0"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="33523" translatesAutoresizingMaskIntoConstraints="NO">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" id="33627" translatesAutoresizingMaskIntoConstraints="NO">
+                                        <rect key="frame" x="0.0" y="64" width="375" height="500"/>
+                                        <color key="backgroundColor" colorSpace="calibratedWhite" white="0" alpha="0"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="44841" translatesAutoresizingMaskIntoConstraints="NO" customClass="Picture">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="500"/>
+                                                <constraints>
+                                                    <constraint id="45474" firstAttribute="width" secondItem="44841" secondAttribute="height" multiplier="3:4"/>
+                                                </constraints>
+                                            </imageView>
+                                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="46909">
+                                                <rect key="frame" x="169" y="232" width="37" height="37"/>
+                                            </activityIndicatorView>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint id="33711" firstAttribute="width" secondItem="33627" secondAttribute="height" multiplier="3:4"/>
+                                            <constraint id="45440" firstItem="44841" firstAttribute="width" secondItem="33627" secondAttribute="width"/>
+                                            <constraint id="45508" firstItem="44841" firstAttribute="top" secondItem="33627" secondAttribute="top"/>
+                                            <constraint id="45542" firstItem="44841" firstAttribute="centerX" secondItem="33627" secondAttribute="centerX"/>
+                                            <constraint id="47042" firstItem="46909" firstAttribute="centerX" secondItem="44841" secondAttribute="centerX"/>
+                                            <constraint id="47076" firstItem="46909" firstAttribute="centerY" secondItem="44841" secondAttribute="centerY"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" id="36506" translatesAutoresizingMaskIntoConstraints="NO">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <subviews>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="36986" translatesAutoresizingMaskIntoConstraints="NO" clipsSubviews="YES" customClass="Picture">
+                                                <rect key="frame" x="10" y="10" width="44" height="44"/>
+                                                <constraints>
+                                                    <constraint id="37383" firstItem="36986" firstAttribute="width" constant="44"/>
+                                                    <constraint id="37417" firstAttribute="width" secondItem="36986" secondAttribute="height" multiplier="1:1"/>
+                                                </constraints>
+                                                <rect key="contentStretch" x="0.0" y="0" width="1" height="1"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute keyPath="layer.cornerRadius" type="number">
+                                                        <real key="value" value="22"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="37586" translatesAutoresizingMaskIntoConstraints="NO" customClass="Label">
+                                                <rect key="frame" x="64" y="22" width="42" height="20.5"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                                <constraints>
+                                                    <constraint id="37620" firstItem="37586" firstAttribute="height" constant="44" relation="lessThanOrEqual"/>
+                                                </constraints>
+                                            </label>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint id="36805" firstItem="36506" firstAttribute="height" constant="64"/>
+                                            <constraint id="37518" firstItem="36986" firstAttribute="leading" secondItem="36506" secondAttribute="leading" constant="10"/>
+                                            <constraint id="37552" firstItem="36986" firstAttribute="centerY" secondItem="36506" secondAttribute="centerY"/>
+                                            <constraint id="37720" firstItem="37586" firstAttribute="centerY" secondItem="36986" secondAttribute="centerY"/>
+                                            <constraint id="37754" firstItem="37586" firstAttribute="leading" secondItem="36986" secondAttribute="trailing" constant="10"/>
+                                            <constraint id="37920" firstItem="36506" firstAttribute="trailing" secondItem="37586" secondAttribute="trailing" constant="10" relation="greaterThanOrEqual"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" colorSpace="calibratedWhite" white="0" alpha="0"/>
+                                <constraints>
+                                    <constraint id="33629" firstItem="33627" firstAttribute="width" secondItem="33523" secondAttribute="width"/>
+                                    <constraint id="33630" firstItem="33627" firstAttribute="centerX" secondItem="33523" secondAttribute="centerX"/>
+                                    <constraint id="36771" firstItem="36506" firstAttribute="top" secondItem="33523" secondAttribute="top"/>
+                                    <constraint id="36839" firstItem="36506" firstAttribute="width" secondItem="33523" secondAttribute="width"/>
+                                    <constraint id="36873" firstItem="36506" firstAttribute="centerX" secondItem="33523" secondAttribute="centerX"/>
+                                    <constraint id="36907" firstItem="33627" firstAttribute="top" secondItem="36506" secondAttribute="bottom"/>
+                                </constraints>
+                            </scrollView>
+                            <view contentMode="scaleToFill" id="39996" translatesAutoresizingMaskIntoConstraints="NO">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="20"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint id="40228" firstItem="39996" firstAttribute="height" constant="20"/>
+                                    <constraint id="40262" firstItem="39996" firstAttribute="width" constant="375"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <constraints>
+                            <constraint id="33587" firstItem="33523" firstAttribute="top" secondItem="33149" secondAttribute="bottom"/>
+                            <constraint id="33588" firstItem="33523" firstAttribute="bottom" secondItem="33150" secondAttribute="top"/>
+                            <constraint id="33589" firstItem="33523" firstAttribute="centerX" secondItem="33153" secondAttribute="centerX"/>
+                            <constraint id="33590" firstItem="33523" firstAttribute="width" secondItem="33153" secondAttribute="width"/>
+                            <constraint id="40296" firstItem="39996" firstAttribute="centerX" secondItem="33153" secondAttribute="centerX"/>
+                            <constraint id="40330" firstItem="39996" firstAttribute="top" secondItem="33153" secondAttribute="top"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="ScrollView" destination="33523" id="name-outlet-33523"/>
+                        <outlet property="StoryViewWrapper" destination="33627" id="name-outlet-33627"/>
+                        <outlet property="Title" destination="37586" id="name-outlet-37586"/>
+                        <outlet property="ProfilePicture" destination="36986" id="name-outlet-36986"/>
+                        <outlet property="Preview" destination="44841" id="name-outlet-44841"/>
+                        <outlet property="Spinner" destination="46909" id="name-outlet-46909"/>
+                    </connections>
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="33154" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1704" y="-503"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Contacts" width="192" height="192"/>
@@ -244,6 +361,7 @@
         <image name="Bell" width="25" height="25"/>
         <image name="Storytellers" width="25" height="25"/>
         <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedScreenMetrics key="destination" type="retina47"/>

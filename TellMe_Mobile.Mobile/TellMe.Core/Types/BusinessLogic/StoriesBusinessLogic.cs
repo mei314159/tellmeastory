@@ -94,5 +94,10 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             _router.NavigateRequestStory(this._view, selectedContacts);
         }
+
+        public void ViewStory(StoryDTO story)
+        {
+            _router.NavigateViewStory(this._view, story);
+        }
     }
 }

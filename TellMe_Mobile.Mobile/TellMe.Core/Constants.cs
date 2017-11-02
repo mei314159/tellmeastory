@@ -9,7 +9,7 @@ namespace TellMe.Core
 #if DEBUG
         //public const string ApiHost = "http://localhost:5000";
 		//public const string ApiHost = "http://192.168.0.100:5000";
-        public const string ApiHost = "http://192.168.1.73:5000";
+        public const string ApiHost = "http://192.168.1.10:5000";
 #else
 		public const string ApiHost = "http://tellme-server.azurewebsites.net";
 #endif

@@ -150,6 +150,18 @@ namespace TellMe.iOS.Core
             });
         }
 
+        public void NavigateViewStory(IView view, StoryDTO story)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StoryViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("StoryViewController");
+                targetController.Story = story;
+                targetController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                this.Present(targetController, view, false);
+            });
+        }
+
         public void SwapToAuth()
         {
             this.window.InvokeOnMainThread(() =>
@@ -162,6 +174,7 @@ namespace TellMe.iOS.Core
         private void Present(UIViewController targetController, IView view, bool push = true)
         {
             var controller = (UIViewController)view;
+
             if (controller.NavigationController != null && push)
             {
                 controller.NavigationController.PushViewController(targetController, true);

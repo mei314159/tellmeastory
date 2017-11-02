@@ -291,6 +291,10 @@
     <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
       <DependentUpon>TribeMembersListCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="StoryViewController.cs" />
+    <Compile Include="StoryViewController.designer.cs">
+      <DependentUpon>StoryViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

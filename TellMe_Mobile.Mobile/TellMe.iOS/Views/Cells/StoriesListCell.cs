@@ -25,11 +25,6 @@ namespace TellMe.iOS.Views.Cells
             set => StoryView.Story = value;
         }
 
-        public void EndDisplaying()
-        {
-            StoryView.StopPlaying();
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -10,9 +10,20 @@ using System.CodeDom.Compiler;
 
 namespace TellMe.iOS
 {
-    [Register ("StoryView")]
-    partial class StoryView
+    [Register ("StoryViewController")]
+    partial class StoryViewController
     {
+        [Outlet]
+        UIKit.UINavigationItem NavItem { get; set; }
+
+
+        [Outlet]
+        UIKit.UIScrollView ScrollView { get; set; }
+
+
+        [Outlet]
+        UIKit.UIView StoryViewWrapper { get; set; }
+
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Picture Preview { get; set; }
@@ -23,15 +34,11 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIActivityIndicatorView Spinner { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Label Title { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIView View { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.NSLayoutConstraint ViewHeight { get; set; }
 
         void ReleaseDesignerOutlets ()
         {
@@ -45,19 +52,24 @@ namespace TellMe.iOS
                 ProfilePicture = null;
             }
 
+            if (ScrollView != null) {
+                ScrollView.Dispose ();
+                ScrollView = null;
+            }
+
+            if (Spinner != null) {
+                Spinner.Dispose ();
+                Spinner = null;
+            }
+
+            if (StoryViewWrapper != null) {
+                StoryViewWrapper.Dispose ();
+                StoryViewWrapper = null;
+            }
+
             if (Title != null) {
                 Title.Dispose ();
                 Title = null;
-            }
-
-            if (View != null) {
-                View.Dispose ();
-                View = null;
-            }
-
-            if (ViewHeight != null) {
-                ViewHeight.Dispose ();
-                ViewHeight = null;
             }
         }
     }

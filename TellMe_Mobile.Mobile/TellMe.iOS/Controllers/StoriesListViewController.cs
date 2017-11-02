@@ -93,11 +93,9 @@ namespace TellMe.iOS
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            //var dto = this.storiesList[indexPath.Row];
-            //if (dto.Status != StoryStatus.Requested || dto.ReceiverId == App.Instance.AuthInfo.UserId)
-            //{
-            //    tableView.DeselectRow(indexPath, false);
-            //}
+            var cell = (StoriesListCell)tableView.CellAt(indexPath);
+            tableView.DeselectRow(indexPath, false);
+            _businessLogic.ViewStory(cell.StoryView.Story);
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -105,11 +103,6 @@ namespace TellMe.iOS
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
             return cell;
-        }
-
-        public override void CellDisplayingEnded(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
-        {
-            (cell as StoriesListCell)?.EndDisplaying();
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
 
 namespace TellMe.Core.Contracts
 {
@@ -27,5 +26,6 @@ namespace TellMe.Core.Contracts
         void NavigateNotificationsCenter(IView view);
         void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> members, TribeCreatedHandler complete);
         void SwapToAuth();
+        void NavigateViewStory(IView view, StoryDTO story);
     }
 }
