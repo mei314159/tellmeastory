@@ -10,9 +10,9 @@ namespace TellMe.Core.Contracts
     {
         void NavigateMain();
 
-        void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null);
-        void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null);
-        void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null);
+        void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null);
+        void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null);
+        void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null);
 
         void NavigateRequestStory(IView view, ICollection<ContactDTO> recipients);
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
@@ -23,6 +23,8 @@ namespace TellMe.Core.Contracts
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);
         void NavigateStorytellers(IView view);
+        void NavigateStoryteller(IView view, StorytellerDTO storyteller);
+        void NavigateStoryteller(IView view, string userId);
         void NavigateNotificationsCenter(IView view);
         void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> members, TribeCreatedHandler complete);
         void SwapToAuth();

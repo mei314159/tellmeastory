@@ -150,6 +150,8 @@
     <ImageAsset Include="Assets.xcassets\AddGroup.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%402x.png" />
     <ImageAsset Include="Assets.xcassets\AddGroup.imageset\group%403x.png" />
+    <ImageAsset Include="Resources\Assets.xcassets\RequestStory.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Assets.xcassets\SendStory.imageset\Contents.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -169,6 +171,7 @@
     <Folder Include="Assets.xcassets\Storytellers.imageset\" />
     <Folder Include="Assets.xcassets\Account.imageset\" />
     <Folder Include="Assets.xcassets\AddGroup.imageset\" />
+    <Folder Include="Views\VideoSlider\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -291,9 +294,17 @@
     <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
       <DependentUpon>TribeMembersListCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\VideoSlider\SAResizableBubble.cs" />
+    <Compile Include="Views\VideoSlider\SASliderLeft.cs" />
+    <Compile Include="Views\VideoSlider\SASliderRight.cs" />
+    <Compile Include="Views\VideoSlider\SAVideoRangeSlider.cs" />
     <Compile Include="StoryViewController.cs" />
     <Compile Include="StoryViewController.designer.cs">
       <DependentUpon>StoryViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StorytellerViewController.cs" />
+    <Compile Include="StorytellerViewController.designer.cs">
+      <DependentUpon>StorytellerViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

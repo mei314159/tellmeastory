@@ -9,6 +9,9 @@ namespace TellMe.iOS.Views.Cells
         public static readonly NSString Key = new NSString("StoriesListCell");
         public static readonly UINib Nib;
 
+        public Action<StoryDTO> ProfilePictureTouched { get; set; }
+        public Action<StoryDTO> PreviewTouched { get; set; }
+
         static StoriesListCell()
         {
             Nib = UINib.FromName("StoriesListCell", NSBundle.MainBundle);
@@ -17,6 +20,23 @@ namespace TellMe.iOS.Views.Cells
         protected StoriesListCell(IntPtr handle) : base(handle)
         {
             // Note: this .ctor should not contain any initialization logic.
+        }
+
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+            this.StoryView.OnProfilePictureTouched += StoryView_OnProfilePictureTouched;
+            this.StoryView.OnPreviewTouched += StoryView_OnPreviewTouched;
+        }
+
+        void StoryView_OnProfilePictureTouched(StoryDTO story)
+        {
+            ProfilePictureTouched?.Invoke(story);
+        }
+
+        void StoryView_OnPreviewTouched(StoryDTO story)
+        {
+            PreviewTouched?.Invoke(story);
         }
 
         public StoryDTO Story

@@ -160,6 +160,8 @@ namespace TellMe.iOS
                 switch (dto.User.FriendshipStatus)
                 {
                     case FriendshipStatus.Accepted:
+						_businessLogic.NavigateStoryteller(dto.User);
+                        return;
                     case FriendshipStatus.Rejected:
                     case FriendshipStatus.Requested:
                         return;

@@ -57,7 +57,7 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -65,11 +65,12 @@ namespace TellMe.iOS.Core
                 var recordController = (RecordVideoController)targetController.ViewControllers.First();
                 recordController.StoryRequest = storyRequest;
                 recordController.RequestNotification = notification;
+                recordController.Contact = contact;
                 this.Present(targetController, view, false);
             });
         }
 
-        public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -77,11 +78,12 @@ namespace TellMe.iOS.Core
                 targetController.VideoPath = videoPath;
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
+                targetController.Contact = contact;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -90,6 +92,7 @@ namespace TellMe.iOS.Core
                 targetController.PreviewImagePath = previewImagePath;
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
+                targetController.Contact = contact;
                 this.Present(targetController, view);
             });
         }
@@ -183,6 +186,28 @@ namespace TellMe.iOS.Core
             {
                 controller.PresentViewController(targetController, true, null);
             }
+        }
+
+        public void NavigateStoryteller(IView view, StorytellerDTO storyteller)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.Storyteller = storyteller;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateStoryteller(IView view, string userId)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.StorytellerId = userId;
+                this.Present(targetController, view, true);
+            });
         }
     }
 }

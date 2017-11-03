@@ -7,6 +7,7 @@ namespace TellMe.Core.Contracts.UI.Views
 	{
         StoryRequestDTO StoryRequest { get; }
         NotificationDTO RequestNotification { get; }
+        ContactDTO Contact { get; set; }
         IButton RecordButton { get; }
         string DurationLabel { get; set; }
         void StartCapture(string videoPath);

@@ -15,7 +15,7 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        public TellMe.iOS.StoryView StoryView { get; set; }
+        TellMe.iOS.StoryView StoryView { get; set; }
 
         void ReleaseDesignerOutlets ()
         {

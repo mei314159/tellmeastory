@@ -10,6 +10,8 @@ namespace TellMe.DAL.Contracts.Services
     {
         Task<ApplicationUser> GetAsync(string id);
 
+        Task<StorytellerDTO> GetStorytellerAsync(string currentUserId, string userId);
+
         Task<bool> AddTokenAsync(RefreshToken token);
 
         Task<bool> ExpireTokenAsync(RefreshToken token);

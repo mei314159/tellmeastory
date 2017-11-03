@@ -21,6 +21,7 @@ namespace TellMe.iOS
         private volatile bool loadingMore;
         private volatile bool canLoadMore;
 
+
         public StoriesListViewController(IntPtr handle) : base(handle)
         {
         }
@@ -36,6 +37,7 @@ namespace TellMe.iOS
             this.TableView.TableFooterView = new UIView();
             this.TableView.DelaysContentTouches = false;
             this.TableView.TableFooterView.Hidden = true;
+            this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
 
             Task.Run(() => LoadStoriesAsync(false, true));
@@ -91,18 +93,24 @@ namespace TellMe.iOS
             return tableView.Frame.Width + 64;
         }
 
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            var cell = (StoriesListCell)tableView.CellAt(indexPath);
-            tableView.DeselectRow(indexPath, false);
-            _businessLogic.ViewStory(cell.StoryView.Story);
-        }
-
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
+            cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
+            cell.PreviewTouched = Cell_OnPreviewTouched;
+            cell.UserInteractionEnabled = true;
             return cell;
+        }
+
+        void Cell_OnPreviewTouched(StoryDTO story)
+        {
+            _businessLogic.ViewStory(story);
+        }
+
+        void Cell_OnProfilePictureTouched(StoryDTO story)
+        {
+            _businessLogic.NavigateStoryteller(story);
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

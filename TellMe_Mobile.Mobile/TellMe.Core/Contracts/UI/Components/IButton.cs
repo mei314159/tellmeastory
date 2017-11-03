@@ -4,5 +4,6 @@
     {
         string TitleString { get; set; }
         bool Enabled { get; set; }
+        bool Hidden { get; set; }
     }
 }

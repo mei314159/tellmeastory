@@ -9,9 +9,12 @@ using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
+using TellMe.Core.Contracts.UI.Views;
+using TellMe.iOS.Extensions;
+
 namespace TellMe.iOS
 {
-    public partial class StoryViewController : UIViewController
+    public partial class StoryViewController : UIViewController, IView
     {
         private UIVisualEffectView effectView;
         private UIVisualEffectView EffectView => effectView ?? (effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
@@ -54,9 +57,9 @@ namespace TellMe.iOS
             text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
             text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
-            //Spinner.Hidden = true;
-            //Preview.Hidden = false;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
+            //this.ProfilePicture.UserInteractionEnabled = true;
+            //this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(() => App.Instance.Router.NavigateStoryteller(this, Story.SenderId)));
         }
 
         public override bool PrefersStatusBarHidden()
@@ -88,7 +91,7 @@ namespace TellMe.iOS
                 var offset = recognizer.TranslationInView(View);
                 if (offset.Y < 0)
                     return;
-                
+
                 var newFrame = originalImageFrame;
                 newFrame.Offset(0, offset.Y);
                 View.Frame = newFrame;
@@ -115,8 +118,8 @@ namespace TellMe.iOS
                 _stopPlayingNotification = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(_player.CurrentItem, DidReachEnd);
                 _player.CurrentItem.AddObserver(this, "status", NSKeyValueObservingOptions.New | NSKeyValueObservingOptions.Initial,
                                             AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
-                Spinner.StartAnimating();
                 Spinner.Hidden = false;
+                Spinner.StartAnimating();
                 playing = true;
             }
         }
@@ -125,8 +128,8 @@ namespace TellMe.iOS
         {
             if (this.playing)
             {
-                Spinner.Hidden = true;
                 Spinner.StopAnimating();
+                Spinner.Hidden = true;
                 _stopPlayingNotification?.Dispose();
                 _stopPlayingNotification = null;
                 _player.Pause();
@@ -146,17 +149,29 @@ namespace TellMe.iOS
 
         void DidReachEnd(object sender, NSNotificationEventArgs e)
         {
-            var asset = (AVUrlAsset)_playerItem.Asset;
-            if (!asset.Url.IsFileUrl)
+            if (!_playerAsset.Url.IsFileUrl && _playerAsset.Exportable)
             {
-                var exporter = new AVAssetExportSession(_player.CurrentItem.Asset, AVAssetExportSessionPreset.HighestQuality);
+                var exporter = new AVAssetExportSession(_playerAsset, AVAssetExportSessionPreset.Preset640x480);
                 var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
+                if (File.Exists(videoPath))
+                {
+                    return;
+                }
+                var startTime = new CMTime(0, 1);
+                var timeRange = new CMTimeRange();
+                timeRange.Start = startTime;
+                timeRange.Duration = _playerItem.Duration;
+                exporter.TimeRange = timeRange;
                 exporter.OutputUrl = new NSUrl(videoPath, false);
                 exporter.OutputFileType = AVFileType.QuickTimeMovie;
                 exporter.ExportAsynchronously(() =>
                 {
                     Console.WriteLine(exporter.Status);
                     Console.WriteLine(exporter.Error);
+
+                    Console.WriteLine(exporter.Description);
+                    Console.WriteLine(exporter.DebugDescription);
+
                     Restart();
                 });
             }
@@ -191,6 +206,9 @@ namespace TellMe.iOS
                 base.ObserveValue(keyPath, ofObject, change, context);
             }
         }
+
+        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
 
 
         protected override void Dispose(bool disposing)

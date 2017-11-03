@@ -33,6 +33,7 @@ namespace TellMe.Web.AutoMapper
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
 
                 cfg.CreateMap<StoryReceiver, StoryReceiverDTO>()
+                    .ForMember(x => x.StoryId, x => x.MapFrom(z => z.StoryId))
                     .ForMember(x => x.ReceiverPictureUrl, x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
                     .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
 

@@ -52,6 +52,14 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{userId}/skip/{skip}")]
+        public async Task<IActionResult> GetStoriesAsync(string userId, int skip)
+        {
+            var result = await _storyService.GetAllAsync(userId, this.UserId, skip < 0 ? 0 : skip);
+
+            return Ok(result);
+        }
+
         [HttpPost("upload-media")]
         public async Task<IActionResult> UploadMediaAsync(FileInputDTO dto)
         {

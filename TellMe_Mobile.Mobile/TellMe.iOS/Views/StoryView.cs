@@ -4,7 +4,6 @@ using SDWebImage;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
-using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.iOS
 {
@@ -32,6 +31,11 @@ namespace TellMe.iOS
             base.AwakeFromNib();
 
             this.defaultPicture = UIImage.FromBundle("UserPic");
+
+            this.ProfilePicture.UserInteractionEnabled = true;
+            this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(this.ProfilePictureTouched));
+            this.Preview.UserInteractionEnabled = true;
+            this.Preview.AddGestureRecognizer(new UITapGestureRecognizer(this.PreviewTouched));
         }
 
         public StoryDTO Story
@@ -47,12 +51,26 @@ namespace TellMe.iOS
             }
         }
 
+        public event Action<StoryDTO> OnPreviewTouched;
+
+        public event Action<StoryDTO> OnProfilePictureTouched;
+
         public static StoryView Create(StoryDTO story)
         {
             var arr = NSBundle.MainBundle.LoadNib("StoryView", null, null);
             var v = ObjCRuntime.Runtime.GetNSObject<StoryView>(arr.ValueAt(0));
             v.Story = story;
             return v;
+        }
+
+        void ProfilePictureTouched()
+        {
+            this.OnProfilePictureTouched?.Invoke(story);
+        }
+
+        void PreviewTouched()
+        {
+            this.OnPreviewTouched?.Invoke(story);
         }
 
         private void Initialize()

@@ -42,6 +42,7 @@ namespace TellMe.iOS
 
         public StoryRequestDTO StoryRequest { get; set; }
         public NotificationDTO RequestNotification { get; set; }
+        public ContactDTO Contact { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -78,7 +79,6 @@ namespace TellMe.iOS
 
             Console.WriteLine("Configuring output");
             output = new AVCaptureMovieFileOutput();
-
             long totalSeconds = 10000;
             var preferredTimeScale = 30;
             CMTime maxDuration = new CMTime(totalSeconds, preferredTimeScale);

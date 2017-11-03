@@ -10,6 +10,7 @@ using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.iOS.Views;
+using System.Linq;
 
 namespace TellMe.iOS
 {
@@ -54,7 +55,22 @@ namespace TellMe.iOS
         private void UpdatePreview()
         {
             var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString("{Handle}", UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), foregroundColor: UIColor.Blue));
+            string handleName = null;
+            if (Recipients?.Count == 1)
+            {
+                var contactDTO = Recipients.First();
+                if (contactDTO.Type == ContactType.User)
+                {
+                    handleName = contactDTO.User.UserName;
+                }
+            }
+
+            if (handleName == null)
+            {
+                handleName = "{Handle}";
+            }
+
+            text.Append(new NSAttributedString(handleName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), UIColor.Blue));
             text.Append(new NSAttributedString(","));
             text.Append(new NSAttributedString(App.Instance.AuthInfo.Account.UserName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             text.Append(new NSAttributedString($" would like you to tell a story about: "));
