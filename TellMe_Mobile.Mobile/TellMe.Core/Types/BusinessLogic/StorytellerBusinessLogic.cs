@@ -20,7 +20,6 @@ namespace TellMe.Core.Types.BusinessLogic
         private LocalStorytellersDataService _localStorytellesService;
         private IStorytellerView _view;
         private IRouter _router;
-        private RequestStoryValidator _validator;
         readonly List<StoryDTO> stories = new List<StoryDTO>();
 
         public StorytellerBusinessLogic(RemoteStoriesDataService remoteStoriesService, RemoteStorytellersDataService remoteStorytellesService, IStorytellerView view, IRouter router)
@@ -31,7 +30,6 @@ namespace TellMe.Core.Types.BusinessLogic
             _localStorytellesService = new LocalStorytellersDataService();
             _view = view;
             _router = router;
-            _validator = new RequestStoryValidator();
         }
 
         public async Task LoadStoriesAsync(bool forceRefresh = false)

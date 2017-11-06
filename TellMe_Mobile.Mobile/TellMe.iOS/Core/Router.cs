@@ -143,16 +143,6 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
-        {
-            this.window.InvokeOnMainThread(() =>
-            {
-                var targetController = new ViewTribeController(tribe);
-                targetController.TribeLeft += e;
-                this.Present(targetController, view, true);
-            });
-        }
-
         public void NavigateViewStory(IView view, StoryDTO story)
         {
             this.window.InvokeOnMainThread(() =>
@@ -162,6 +152,60 @@ namespace TellMe.iOS.Core
                 targetController.Story = story;
                 targetController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
                 this.Present(targetController, view, false);
+            });
+        }
+
+        public void NavigateStoryteller(IView view, StorytellerDTO storyteller)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.Storyteller = storyteller;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateStoryteller(IView view, string userId)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.StorytellerId = userId;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = new TribeInfoViewController(tribe);
+                targetController.TribeLeft += e;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
+                targetController.Tribe = tribe;
+                targetController.TribeLeft += e;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribe(IView view, int tribeId, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
+                targetController.TribeId = tribeId;
+                targetController.TribeLeft += e;
+                this.Present(targetController, view, true);
             });
         }
 
@@ -186,28 +230,6 @@ namespace TellMe.iOS.Core
             {
                 controller.PresentViewController(targetController, true, null);
             }
-        }
-
-        public void NavigateStoryteller(IView view, StorytellerDTO storyteller)
-        {
-            this.window.InvokeOnMainThread(() =>
-            {
-
-                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
-                targetController.Storyteller = storyteller;
-                this.Present(targetController, view, true);
-            });
-        }
-
-        public void NavigateStoryteller(IView view, string userId)
-        {
-            this.window.InvokeOnMainThread(() =>
-            {
-
-                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
-                targetController.StorytellerId = userId;
-                this.Present(targetController, view, true);
-            });
         }
     }
 }

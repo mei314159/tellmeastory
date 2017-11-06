@@ -215,7 +215,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ViewTribe(TribeDTO tribe)
         {
-            _router.NavigateViewTribe(_view, tribe, HandleTribeLeftHandler);
+            _router.NavigateTribe(_view, tribe, HandleTribeLeftHandler);
         }
 
         void HandleTribeLeftHandler(TribeDTO tribe)

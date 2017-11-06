@@ -18,7 +18,6 @@ namespace TellMe.Core.Contracts
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
 
         void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, HashSet<string> disabledUserIds = null);
-        void NavigateViewTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
 
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);
@@ -27,7 +26,10 @@ namespace TellMe.Core.Contracts
         void NavigateStoryteller(IView view, string userId);
         void NavigateNotificationsCenter(IView view);
         void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> members, TribeCreatedHandler complete);
-        void SwapToAuth();
         void NavigateViewStory(IView view, StoryDTO story);
+        void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e);
+        void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
+        void NavigateTribe(IView view, int tribeId, TribeLeftHandler e);
+        void SwapToAuth();
     }
 }

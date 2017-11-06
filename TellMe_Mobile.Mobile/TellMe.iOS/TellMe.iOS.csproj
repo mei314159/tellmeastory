@@ -289,7 +289,7 @@
       <DependentUpon>TribesListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Controllers\CreateTribeController.cs" />
-    <Compile Include="Controllers\ViewTribeController.cs" />
+    <Compile Include="Controllers\TribeInfoViewController.cs" />
     <Compile Include="Views\Cells\TribeMembersListCell.cs" />
     <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
       <DependentUpon>TribeMembersListCell.cs</DependentUpon>
@@ -298,13 +298,17 @@
     <Compile Include="Views\VideoSlider\SASliderLeft.cs" />
     <Compile Include="Views\VideoSlider\SASliderRight.cs" />
     <Compile Include="Views\VideoSlider\SAVideoRangeSlider.cs" />
-    <Compile Include="StoryViewController.cs" />
-    <Compile Include="StoryViewController.designer.cs">
+    <Compile Include="Controllers\StorytellerViewController.cs" />
+    <Compile Include="Controllers\StorytellerViewController.designer.cs">
+      <DependentUpon>StorytellerViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\StoryViewController.cs" />
+    <Compile Include="Controllers\StoryViewController.designer.cs">
       <DependentUpon>StoryViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="StorytellerViewController.cs" />
-    <Compile Include="StorytellerViewController.designer.cs">
-      <DependentUpon>StorytellerViewController.cs</DependentUpon>
+    <Compile Include="TribeViewController.cs" />
+    <Compile Include="TribeViewController.designer.cs">
+      <DependentUpon>TribeViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

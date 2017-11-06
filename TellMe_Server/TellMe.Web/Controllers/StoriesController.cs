@@ -60,6 +60,14 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
+        [HttpGet("tribe/{tribeId}/skip/{skip}")]
+        public async Task<IActionResult> GetStoriesAsync(int tribeId, int skip)
+        {
+            var result = await _storyService.GetAllAsync(tribeId, this.UserId, skip < 0 ? 0 : skip);
+
+            return Ok(result);
+        }
+
         [HttpPost("upload-media")]
         public async Task<IActionResult> UploadMediaAsync(FileInputDTO dto)
         {

@@ -12,7 +12,7 @@ using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class ViewTribeBusinessLogic
+    public class ViewTribeInfoBusinessLogic
     {
         private readonly IViewTribeView _view;
         private readonly RemoteTribesDataService _remoteTribeDataService;
@@ -20,7 +20,7 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly CreateTribeValidator _validator;
         private readonly IRouter _router;
 
-        public ViewTribeBusinessLogic(RemoteTribesDataService remoteTribeDataService, IRouter router, IViewTribeView view)
+        public ViewTribeInfoBusinessLogic(RemoteTribesDataService remoteTribeDataService, IRouter router, IViewTribeView view)
         {
             _view = view;
             _router = router;
@@ -108,6 +108,11 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 validationResult.ShowValidationResult(this._view);
             }
+        }
+
+        public void NavigateTribeMember(TribeMemberDTO tribeMember)
+        {
+            _router.NavigateStoryteller(_view, tribeMember.UserId);
         }
 
         public async Task LeaveTribeAsync()

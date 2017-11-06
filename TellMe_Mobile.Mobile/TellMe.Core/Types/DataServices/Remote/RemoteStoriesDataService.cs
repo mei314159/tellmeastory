@@ -28,6 +28,12 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, int skip)
+        {
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/tribe/{tribeId}/skip/{skip}").ConfigureAwait(false);
+            return result;
+        }
+
         public async Task<Result<UploadMediaDTO>> UploadMediaAsync(FileStream videoStream, string videoFileName, FileStream previewImageStream, string previewImageFileName)
         {
 			videoStream.Position = 0;

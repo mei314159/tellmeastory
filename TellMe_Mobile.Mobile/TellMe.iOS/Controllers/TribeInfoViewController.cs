@@ -17,19 +17,19 @@ using TellMe.iOS.Views;
 
 namespace TellMe.iOS.Controllers
 {
-    public class ViewTribeController : DialogViewController, IViewTribeView
+    public class TribeInfoViewController : DialogViewController, IViewTribeView
     {
-        private readonly ViewTribeBusinessLogic _businessLogic;
+        private readonly ViewTribeInfoBusinessLogic _businessLogic;
         private ViewTribeSource DataSource;
 
         public event TribeLeftHandler TribeLeft;
 
         public TribeDTO Tribe { get; set; }
 
-        public ViewTribeController(TribeDTO tribe) : base(UITableViewStyle.Grouped, null, true)
+        public TribeInfoViewController(TribeDTO tribe) : base(UITableViewStyle.Grouped, null, true)
         {
             this.Tribe = tribe;
-            _businessLogic = new ViewTribeBusinessLogic(new RemoteTribesDataService(), App.Instance.Router, this);
+            _businessLogic = new ViewTribeInfoBusinessLogic(new RemoteTribesDataService(), App.Instance.Router, this);
         }
 
         public override void ViewDidLoad()
@@ -69,6 +69,7 @@ namespace TellMe.iOS.Controllers
             DataSource = new ViewTribeSource(this, Tribe);
             DataSource.EditButtonTouched += DataSource_EditButtonTouched;
             DataSource.OnDeleteRow += DataSource_OnDeleteRow;
+            DataSource.OnMemberSelected += DataSource_OnMemberSelected;
             return DataSource;
         }
 
@@ -88,6 +89,11 @@ namespace TellMe.iOS.Controllers
         {
             Tribe.Members.Remove(deletedItem);
             TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+        }
+
+        void DataSource_OnMemberSelected(TribeMemberDTO tribeMember, NSIndexPath indexPath)
+        {
+            _businessLogic.NavigateTribeMember(tribeMember);
         }
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
@@ -217,7 +223,9 @@ namespace TellMe.iOS.Controllers
         private readonly List<TribeMemberDTO> membersList = new List<TribeMemberDTO>();
         private UITableViewCell addMemberCell;
 
-        public Action<TribeMemberDTO, NSIndexPath> OnDeleteRow;
+        public event Action<TribeMemberDTO, NSIndexPath> OnDeleteRow;
+
+        public event Action<TribeMemberDTO, NSIndexPath> OnMemberSelected;
 
         public event Action EditButtonTouched;
 
@@ -284,7 +292,8 @@ namespace TellMe.iOS.Controllers
             }
             else
             {
-
+                var cell = tableView.CellAt(indexPath) as TribeMembersListCell;
+                OnMemberSelected?.Invoke(cell.TribeMember, indexPath);
             }
         }
 

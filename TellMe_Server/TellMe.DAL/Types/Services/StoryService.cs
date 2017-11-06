@@ -84,7 +84,8 @@ namespace TellMe.DAL.Types.Services
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string userId, string currentUserId, int skip)
         {
-            if (userId == currentUserId){
+            if (userId == currentUserId)
+            {
                 return await this.GetAllAsync(currentUserId, skip).ConfigureAwait(false);
             }
 
@@ -109,6 +110,44 @@ namespace TellMe.DAL.Types.Services
                        select story)
                        .Skip(skip)
                        .Take(20);
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryDTO>>(list);
+
+            return result;
+        }
+
+        public async Task<ICollection<StoryDTO>> GetAllAsync(int tribeId, string currentUserId, int skip)
+        {
+            var tribeMember = await _tribeMemberRepository
+            .GetQueryable(true)
+            .FirstOrDefaultAsync(x => x.UserId == currentUserId && x.TribeId == tribeId && (x.Status == TribeMemberStatus.Joined || x.Status == TribeMemberStatus.Creator))
+            .ConfigureAwait(false);
+
+            if (tribeMember == null)
+            {
+                throw new Exception("Tribe is not exist or you're not a member of the tribe");
+            }
+
+            var receivers = _storyReceiverRepository
+            .GetQueryable(true
+            ).Where(x => x.TribeId == tribeId);
+
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
+            stories = (from story in stories
+                       join receiver in receivers
+                       on story.Id equals receiver.StoryId into gj
+                       from st in gj.DefaultIfEmpty()
+                       where st != null
+                       orderby story.CreateDateUtc descending
+                       select story)
+                       .Skip(skip)
+                       .Take(20);
+
+
             var list = await stories.ToListAsync().ConfigureAwait(false);
             var result = Mapper.Map<ICollection<StoryDTO>>(list);
 
