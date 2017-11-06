@@ -53,7 +53,7 @@ namespace TellMe.Web.Controllers
         {
             var status = await _tribeService.AcceptTribeInvitationAsync(this.UserId, tribeId);
             if (notificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(notificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(status);
         }
 
@@ -72,7 +72,7 @@ namespace TellMe.Web.Controllers
         {
             var status = await _tribeService.RejectTribeInvitationAsync(this.UserId, tribeId);
             if (notificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(notificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(status);
         }
     }

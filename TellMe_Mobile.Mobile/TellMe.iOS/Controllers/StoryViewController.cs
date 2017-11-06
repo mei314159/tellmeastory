@@ -62,11 +62,6 @@ namespace TellMe.iOS
             //this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(() => App.Instance.Router.NavigateStoryteller(this, Story.SenderId)));
         }
 
-        public override bool PrefersStatusBarHidden()
-        {
-            return true;
-        }
-
         public override void ViewDidAppear(bool animated)
         {
             Play(this.StoryViewWrapper);

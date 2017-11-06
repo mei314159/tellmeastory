@@ -139,6 +139,11 @@ namespace TellMe.Core.Types.BusinessLogic
             }
         }
 
+        public void ViewStory(StoryDTO story)
+        {
+            _router.NavigateViewStory(_view, story);
+        }
+
         public async Task RejectStoryRequestRequestAsync(NotificationDTO notification, StoryRequestDTO dto)
         {
             var result = await _remoteStoriesDataService.RejectStoryRequestAsync(dto.Id, notification.Id).ConfigureAwait(false);

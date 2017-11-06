@@ -125,7 +125,7 @@ namespace TellMe.DAL.Types.Services
 
             if (tribeMember == null)
             {
-                throw new Exception("Tribe is not exist or you're not a member of the tribe");
+                throw new Exception("Tribe doesn't exist or you're not a member of the tribe");
             }
 
             var receivers = _storyReceiverRepository

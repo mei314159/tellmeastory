@@ -11,5 +11,11 @@ namespace TellMe.Core.Types.DataServices.Remote
             var result = await this.GetAsync<List<NotificationDTO>>($"notifications/skip/{skip}").ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> HandleNotificationAsync(int notificationId)
+        {
+            var result = await this.GetAsync<List<NotificationDTO>>($"notifications/{notificationId}/handled").ConfigureAwait(false);
+            return result;
+        }
     }
 }

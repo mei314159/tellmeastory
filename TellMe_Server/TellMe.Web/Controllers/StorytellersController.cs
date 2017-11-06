@@ -45,7 +45,7 @@ namespace TellMe.Web.Controllers
         {
             var friendshipStatus = await UserService.AddToFriendsAsync(this.UserId, userId);
             if (notificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(notificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(friendshipStatus);
         }
 
@@ -54,7 +54,7 @@ namespace TellMe.Web.Controllers
         {
             var friendshipStatus = await UserService.RejectFriendshipRequestAsync(this.UserId, userId);
             if (notificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(notificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(friendshipStatus);
         }
 

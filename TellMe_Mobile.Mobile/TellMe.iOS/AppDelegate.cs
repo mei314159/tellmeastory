@@ -200,6 +200,8 @@ namespace TellMe.iOS
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.Story)
                 {
+                    var controller = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
+                    App.Instance.Router.NavigateViewStory(controller, ((JObject)notification.Extra).ToObject<StoryDTO>());
                 }
                 else if (notification.NotificationType == NotificationTypeEnum.FriendshipRequest)
                 {

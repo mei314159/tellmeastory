@@ -92,49 +92,55 @@ namespace TellMe.iOS
         {
             tableView.DeselectRow(indexPath, false);
             var dto = notificationsList[indexPath.Row];
-            if (!dto.Handled && dto.Type == NotificationTypeEnum.FriendshipRequest)
+            if (dto.Type == NotificationTypeEnum.FriendshipRequest)
             {
-                var extra = ((JObject)dto.Extra).ToObject<StorytellerDTO>();
-                UIAlertController alert = UIAlertController
-                    .Create("Friendship request",
-                            dto.Text,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectFriendshipTouched(dto, extra)));
-                alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptFriendshipTouched(dto, extra)));
-                this.PresentViewController(alert, true, null);
+                if (!dto.Handled)
+                {
+                    var extra = ((JObject)dto.Extra).ToObject<StorytellerDTO>();
+                    UIAlertController alert = UIAlertController
+                        .Create("Friendship request",
+                                dto.Text,
+                                UIAlertControllerStyle.Alert);
+                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectFriendshipTouched(dto, extra)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptFriendshipTouched(dto, extra)));
+                    this.PresentViewController(alert, true, null);
+                }
             }
-            else if (!dto.Handled && dto.Type == NotificationTypeEnum.StoryRequest)
+            else if (dto.Type == NotificationTypeEnum.StoryRequest)
             {
-                var extra = ((JObject)dto.Extra).ToObject<StoryRequestDTO>();
-                UIAlertController alert = UIAlertController
-                    .Create("Story request",
-                            dto.Text,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectStoryRequestTouched(dto, extra)));
-                alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptStoryRequestTouched(dto, extra)));
-                this.PresentViewController(alert, true, null);
+                if (!dto.Handled)
+                {
+                    var extra = ((JObject)dto.Extra).ToObject<StoryRequestDTO>();
+                    UIAlertController alert = UIAlertController
+                        .Create("Story request",
+                                dto.Text,
+                                UIAlertControllerStyle.Alert);
+                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectStoryRequestTouched(dto, extra)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptStoryRequestTouched(dto, extra)));
+                    this.PresentViewController(alert, true, null);
+                }
             }
-
             else if (dto.Type == NotificationTypeEnum.Story)
             {
                 var extra = ((JObject)dto.Extra).ToObject<StoryDTO>();
-                var storyView = StoryView.Create(extra);
-
-                //TODO Show story
+                businessLogic.ViewStory(extra);
             }
-            else if (!dto.Handled && dto.Type == NotificationTypeEnum.TribeInvite)
+            else if (dto.Type == NotificationTypeEnum.TribeInvite)
             {
-                var extra = ((JObject)dto.Extra).ToObject<TribeDTO>();
-                UIAlertController alert = UIAlertController
-                    .Create("Join a Tribe",
-                            dto.Text,
-                            UIAlertControllerStyle.Alert);
-                alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectTribeInvitationTouched(dto, extra)));
-                alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptTribeInvitationTouched(dto, extra)));
-                this.PresentViewController(alert, true, null);
+                if (!dto.Handled)
+                {
+                    var extra = ((JObject)dto.Extra).ToObject<TribeDTO>();
+                    UIAlertController alert = UIAlertController
+                        .Create("Join a Tribe",
+                                dto.Text,
+                                UIAlertControllerStyle.Alert);
+                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectTribeInvitationTouched(dto, extra)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptTribeInvitationTouched(dto, extra)));
+                    this.PresentViewController(alert, true, null);
+                }
             }
         }
 
@@ -146,7 +152,6 @@ namespace TellMe.iOS
             overlay.PopUp(true);
             await businessLogic.RejectFriendshipRequestAsync(notification, dto);
             overlay.Close();
-
         }
 
         async void AcceptFriendshipTouched(NotificationDTO notification, StorytellerDTO dto)

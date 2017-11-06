@@ -40,7 +40,7 @@ namespace TellMe.Web.Controllers
         {
             var result = await _storyService.SendStoryAsync(this.UserId, dto);
             if (dto.NotificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(dto.NotificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, dto.NotificationId.Value);
             return Ok(result);
         }
 
@@ -94,7 +94,7 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int? notificationId)
         {
             var storyStatus = await _storyService.RejectRequestAsync(this.UserId, storyId);
-            await _notificationService.HandleNotificationAsync(notificationId.Value);
+            await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(storyStatus);
         }
     }

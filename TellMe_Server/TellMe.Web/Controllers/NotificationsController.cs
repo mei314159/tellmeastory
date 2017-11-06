@@ -24,5 +24,12 @@ namespace TellMe.Web.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("{id}/handled")]
+        public async Task<IActionResult> HandleAsync(int id)
+        {
+            await _notificationService.HandleNotificationAsync(this.UserId, id);
+            return Ok();
+        }
     }
 }

@@ -306,8 +306,8 @@
     <Compile Include="Controllers\StoryViewController.designer.cs">
       <DependentUpon>StoryViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="TribeViewController.cs" />
-    <Compile Include="TribeViewController.designer.cs">
+    <Compile Include="Controllers\TribeViewController.cs" />
+    <Compile Include="Controllers\TribeViewController.designer.cs">
       <DependentUpon>TribeViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
