@@ -43,6 +43,7 @@ namespace TellMe.iOS
             this.TableView.DelaysContentTouches = false;
             this.TableView.TableFooterView.Hidden = true;
             this.NavigationController.View.BackgroundColor = UIColor.White;
+            this.TableView.AllowsSelection = false;
             this.defaultPicture = UIImage.FromBundle("UserPic");
 
 
@@ -111,18 +112,19 @@ namespace TellMe.iOS
             return tableView.Frame.Width + 64;
         }
 
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            var cell = (StoriesListCell)tableView.CellAt(indexPath);
-            tableView.DeselectRow(indexPath, false);
-            _businessLogic.ViewStory(cell.Story);
-        }
-
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
+            //cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
+            cell.PreviewTouched = Cell_OnPreviewTouched;
+            cell.UserInteractionEnabled = true;
             return cell;
+        }
+
+        void Cell_OnPreviewTouched(StoryDTO story)
+        {
+            _businessLogic.ViewStory(story);
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

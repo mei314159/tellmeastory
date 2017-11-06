@@ -105,5 +105,10 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             this._view.TribeLeft(tribe);
         }
+
+        public void NavigateStoryteller(StoryDTO story)
+        {
+            _router.NavigateStoryteller(_view, story.SenderId);
+        }
     }
 }
