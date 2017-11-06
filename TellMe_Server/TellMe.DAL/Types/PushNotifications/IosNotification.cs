@@ -12,5 +12,8 @@ namespace TellMe.DAL.Types.PushNotifications
 
         [JsonProperty(PropertyName = "extra")]
         public T Extra { get; set; }
+
+        [JsonProperty(PropertyName = "notificationId")]
+        public int? NotificationId { get; set; }
     }
 }

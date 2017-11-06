@@ -17,14 +17,17 @@ namespace TellMe.Core
         {
         }
 
-        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router)
+        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router, INotificationHandler notificationHandler)
         {
             _localAccountService = localAccountService;
             _dataStorage = dataStorage;
             Router = router;
+            NotificationHandler = notificationHandler;
         }
 
         public IRouter Router { get; set; }
+
+		public INotificationHandler NotificationHandler { get; set; }
 
         public OsType OsType => _dataStorage.OsType;
 
@@ -41,6 +44,7 @@ namespace TellMe.Core
                 _localAccountService.SaveAuthInfo(value);
             }
         }
+
 
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;

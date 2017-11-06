@@ -310,6 +310,7 @@
     <Compile Include="Controllers\TribeViewController.designer.cs">
       <DependentUpon>TribeViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\NotificationHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

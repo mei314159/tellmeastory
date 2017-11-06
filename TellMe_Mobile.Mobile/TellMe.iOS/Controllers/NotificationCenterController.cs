@@ -10,8 +10,6 @@ using TellMe.Core.Types.BusinessLogic;
 using System.Threading.Tasks;
 using System.Collections;
 using TellMe.Core.Contracts.UI.Views;
-using Newtonsoft.Json.Linq;
-using TellMe.iOS.Views;
 using TellMe.iOS.Extensions;
 using TellMe.Core;
 
@@ -30,11 +28,8 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             businessLogic = new NotificationCenterBusinessLogic(
-                App.Instance.Router,
-                new RemoteStoriesDataService(),
-                new RemoteStorytellersDataService(),
+                App.Instance.NotificationHandler,
                 new RemoteNotificationsDataService(),
-                new RemoteTribesDataService(),
                 this);
             this.TableView.TableFooterView = new UIView();
             this.TableView.DataSource = this;
@@ -77,6 +72,7 @@ namespace TellMe.iOS
             if (dto.Type == NotificationTypeEnum.Story)
             {
                 cell = (NotificationCenterStoryCell)tableView.DequeueReusableCell(NotificationCenterStoryCell.Key, indexPath);
+
             }
             else
             {
@@ -92,109 +88,11 @@ namespace TellMe.iOS
         {
             tableView.DeselectRow(indexPath, false);
             var dto = notificationsList[indexPath.Row];
-            if (dto.Type == NotificationTypeEnum.FriendshipRequest)
-            {
-                if (!dto.Handled)
-                {
-                    var extra = ((JObject)dto.Extra).ToObject<StorytellerDTO>();
-                    UIAlertController alert = UIAlertController
-                        .Create("Friendship request",
-                                dto.Text,
-                                UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectFriendshipTouched(dto, extra)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptFriendshipTouched(dto, extra)));
-                    this.PresentViewController(alert, true, null);
-                }
-            }
-            else if (dto.Type == NotificationTypeEnum.StoryRequest)
-            {
-                if (!dto.Handled)
-                {
-                    var extra = ((JObject)dto.Extra).ToObject<StoryRequestDTO>();
-                    UIAlertController alert = UIAlertController
-                        .Create("Story request",
-                                dto.Text,
-                                UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectStoryRequestTouched(dto, extra)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptStoryRequestTouched(dto, extra)));
-                    this.PresentViewController(alert, true, null);
-                }
-            }
-            else if (dto.Type == NotificationTypeEnum.Story)
-            {
-                var extra = ((JObject)dto.Extra).ToObject<StoryDTO>();
-                businessLogic.ViewStory(extra);
-            }
-            else if (dto.Type == NotificationTypeEnum.TribeInvite)
-            {
-                if (!dto.Handled)
-                {
-                    var extra = ((JObject)dto.Extra).ToObject<TribeDTO>();
-                    UIAlertController alert = UIAlertController
-                        .Create("Join a Tribe",
-                                dto.Text,
-                                UIAlertControllerStyle.Alert);
-                    alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectTribeInvitationTouched(dto, extra)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptTribeInvitationTouched(dto, extra)));
-                    this.PresentViewController(alert, true, null);
-                }
-            }
+            businessLogic.HandleNotification(dto);
         }
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
-        async void RejectFriendshipTouched(NotificationDTO notification, StorytellerDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            await businessLogic.RejectFriendshipRequestAsync(notification, dto);
-            overlay.Close();
-        }
-
-        async void AcceptFriendshipTouched(NotificationDTO notification, StorytellerDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            await businessLogic.AcceptFriendshipRequestAsync(notification, dto);
-            overlay.Close();
-        }
-
-        async void RejectStoryRequestTouched(NotificationDTO notification, StoryRequestDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            await businessLogic.RejectStoryRequestRequestAsync(notification, dto);
-            overlay.Close();
-
-        }
-
-        async void AcceptTribeInvitationTouched(NotificationDTO notification, TribeDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            await businessLogic.AcceptTribeInvitationAsync(notification, dto);
-            overlay.Close();
-        }
-
-        async void RejectTribeInvitationTouched(NotificationDTO notification, TribeDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            await businessLogic.RejectTribeInvitationAsync(notification, dto);
-            overlay.Close();
-
-        }
-
-        void AcceptStoryRequestTouched(NotificationDTO notification, StoryRequestDTO dto)
-        {
-            var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
-            businessLogic.AcceptStoryRequestRequest(notification, dto);
-            overlay.Close();
-        }
 
         partial void CloseButton_Activated(UIBarButtonItem sender)
         {

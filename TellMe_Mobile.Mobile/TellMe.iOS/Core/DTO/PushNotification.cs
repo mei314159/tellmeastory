@@ -14,5 +14,8 @@ namespace TellMe.iOS.Core.DTO
 
 		[JsonProperty(PropertyName = "extra")]
         public object Extra { get; set; }
+
+        [JsonProperty(PropertyName = "notificationId")]
+        public int? NotificationId { get; set; }
 	}
 }

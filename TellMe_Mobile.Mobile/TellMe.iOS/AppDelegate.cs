@@ -50,7 +50,8 @@ namespace TellMe.iOS
             var remotePushDataService = new RemotePushDataService();
             var contactsProvider = new ContactsProvider();
             this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
-            App.Instance.Initialize(accountService, applicationDataStorage, new Router(window));
+            var router = new Router(window);
+            App.Instance.Initialize(accountService, applicationDataStorage, router, new NotificationHandler(router));
 
             this.Window = window;
             this.Window.RootViewController = GetInitialViewController(launchOptions);
@@ -193,34 +194,19 @@ namespace TellMe.iOS
                     continue;
                 }
 
-                if (notification.NotificationType == NotificationTypeEnum.StoryRequest)
-                {
-                    var controller = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
-                    App.Instance.Router.NavigateRecordStory(controller, ((JObject)notification.Extra).ToObject<StoryRequestDTO>());
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.Story)
-                {
-                    var controller = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
-                    App.Instance.Router.NavigateViewStory(controller, ((JObject)notification.Extra).ToObject<StoryDTO>());
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.FriendshipRequest)
-                {
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.FriendshipAccepted)
-                {
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.FriendshipRejected)
-                {
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.TribeInvite)
-                {
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.TribeAcceptInvite)
-                {
-                }
-                else if (notification.NotificationType == NotificationTypeEnum.TribeRejectInvite)
-                {
-                }
+                var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault() as IView;
+                if (notification.NotificationId.HasValue)
+                    App.Instance.NotificationHandler
+                       .ProcessNotification(
+                           new NotificationDTO
+                           {
+                               Id = notification.NotificationId.Value,
+                               Text = notification.Data.Message,
+                               Extra = notification.Extra,
+                               Type = notification.NotificationType
+                           },
+                           view,
+                           null);
             }
         }
 
