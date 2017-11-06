@@ -89,8 +89,8 @@ namespace TellMe.iOS
             text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
-            //this.ProfilePicture.UserInteractionEnabled = true;
-            //this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(() => App.Instance.Router.NavigateStoryteller(this, Story.SenderId)));
+            this.ProfilePicture.UserInteractionEnabled = true;
+            this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(() => App.Instance.Router.NavigateStoryteller(Parent, Story.SenderId)));
         }
 
         public override void ViewDidAppear(bool animated)
