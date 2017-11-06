@@ -52,6 +52,14 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{storyId}/receivers")]
+        public async Task<IActionResult> GetStoryReceiversAsync(int storyId)
+        {
+            var result = await _storyService.GetStoryReceiversAsync(this.UserId, storyId);
+
+            return Ok(result);
+        }
+
         [HttpGet("{userId}/skip/{skip}")]
         public async Task<IActionResult> GetStoriesAsync(string userId, int skip)
         {

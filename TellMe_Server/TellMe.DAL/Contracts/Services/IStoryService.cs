@@ -12,6 +12,7 @@ namespace TellMe.DAL.Contracts.Services
         Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int skip);
         Task<ICollection<StoryDTO>> GetAllAsync(string userId, string currentUserId, int skip);
         Task<ICollection<StoryDTO>> GetAllAsync(int tribeId, string currentUserId, int skip);
+        Task<ICollection<StoryReceiverDTO>> GetStoryReceiversAsync(string currentUserId, int storyId);
         Task<StoryStatus> RejectRequestAsync(string currentUserId, int requestId);
     }
 }

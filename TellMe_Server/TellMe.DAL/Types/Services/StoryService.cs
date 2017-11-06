@@ -154,6 +154,20 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
+        public async Task<ICollection<StoryReceiverDTO>> GetStoryReceiversAsync(string currentUserId, int storyId)
+        {
+            var result = await _storyReceiverRepository
+            .GetQueryable(true)
+            .Include(x => x.User)
+            .Include(x => x.Tribe)
+            .Where(x => x.StoryId == storyId)
+            .ProjectTo<StoryReceiverDTO>()
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+            return result;
+        }
+
         public async Task<StoryStatus> RejectRequestAsync(string currentUserId, int requestId)
         {
             var result = await SetRequestStatus(currentUserId, requestId, StoryStatus.Ignored).ConfigureAwait(false);

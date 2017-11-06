@@ -11,11 +11,16 @@ using UIKit;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
+using TellMe.iOS.Views.Cells;
+using System.Collections.Generic;
+using TellMe.Core.Types.DataServices.Remote;
+using System.Threading.Tasks;
 
 namespace TellMe.iOS
 {
-    public partial class StoryViewController : UIViewController, IView
+    public partial class StoryViewController : UIViewController, IView, IUICollectionViewDataSource, IUICollectionViewDelegate
     {
+        private readonly List<StoryReceiverDTO> receiversList = new List<StoryReceiverDTO>();
         private UIVisualEffectView effectView;
         private UIVisualEffectView EffectView => effectView ?? (effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
         AVUrlAsset _playerAsset;
@@ -35,6 +40,7 @@ namespace TellMe.iOS
         private CGRect originalImageFrame;
 
         public StoryDTO Story { get; set; }
+        public IView Parent { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -45,6 +51,31 @@ namespace TellMe.iOS
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction);
             swipeGestureRecognizer.ShouldRecognizeSimultaneously += (gestureRecognizer, otherGestureRecognizer) => true;
             this.View.AddGestureRecognizer(swipeGestureRecognizer);
+            ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
+            ReceiversCollection.DataSource = this;
+            ReceiversCollection.Delegate = this;
+
+            this.LoadReceiversAsync();
+        }
+
+        private async Task LoadReceiversAsync()
+        {
+            var storiesService = new RemoteStoriesDataService();
+
+            var result = await storiesService.GetStoryReceiversAsync(Story.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                receiversList.Clear();
+                receiversList.AddRange(result.Data);
+                InvokeOnMainThread(() =>
+                {
+                    ReceiversCollection.ReloadData();
+                });
+            }
+            else
+            {
+                result.ShowResultError(this);
+            }
         }
 
         private void Initialize()
@@ -221,6 +252,40 @@ namespace TellMe.iOS
             }
 
             base.Dispose(disposing);
+        }
+
+        public nint GetItemsCount(UICollectionView collectionView, nint section)
+        {
+            return receiversList.Count;
+        }
+
+        public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
+            cell.Receiver = this.receiversList[(int)indexPath.Item];
+            cell.UserInteractionEnabled = true;
+            return cell;
+        }
+
+        [Export("collectionView:didSelectItemAtIndexPath:")]
+        public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            collectionView.DeselectItem(indexPath, false);
+            var item = ((ReceiversListCell)collectionView.CellForItem(indexPath)).Receiver;
+            if (item.TribeId != null)
+            {
+                this.DismissViewController(false, () => App.Instance.Router.NavigateTribe(Parent, item.TribeId.Value, HandleTribeLeftHandler));
+            }
+            else
+            {
+                this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, item.UserId));
+            }
+        }
+
+        void HandleTribeLeftHandler(TribeDTO tribe)
+        {
+            receiversList.RemoveAll(x => x.TribeId == tribe.Id);
+            ReceiversCollection.ReloadData();
         }
     }
 }

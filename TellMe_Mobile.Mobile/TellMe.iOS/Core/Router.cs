@@ -146,10 +146,10 @@ namespace TellMe.iOS.Core
         {
             this.window.InvokeOnMainThread(() =>
             {
-
                 var targetController = (StoryViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("StoryViewController");
                 targetController.Story = story;
                 targetController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                targetController.Parent = view;
                 this.Present(targetController, view, false);
             });
         }
