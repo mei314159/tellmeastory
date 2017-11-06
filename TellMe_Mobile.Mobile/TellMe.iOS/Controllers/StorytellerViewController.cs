@@ -104,14 +104,6 @@ namespace TellMe.iOS
             return this.storiesList.Count;
         }
 
-        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-        {
-            if (storiesList.Count == 0 || indexPath.Row >= storiesList.Count)
-                return 64;
-
-            return tableView.Frame.Width + 64;
-        }
-
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
