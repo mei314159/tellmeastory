@@ -1,10 +1,6 @@
 using System;
-using System.IO;
-using AVFoundation;
 using CoreGraphics;
-using CoreMedia;
 using Foundation;
-using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
@@ -15,29 +11,29 @@ using TellMe.iOS.Views.Cells;
 using System.Collections.Generic;
 using TellMe.Core.Types.DataServices.Remote;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace TellMe.iOS
 {
-    public partial class StoryViewController : UIViewController, IView, IUICollectionViewDataSource, IUICollectionViewDelegate
+    public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate
     {
-        private readonly List<StoryReceiverDTO> receiversList = new List<StoryReceiverDTO>();
+        private NSObject willHideNotificationObserver;
+        private NSObject willShowNotificationObserver;
+
+        private readonly List<CommentDTO> commentsList = new List<CommentDTO>();
         private UIVisualEffectView effectView;
         private UIVisualEffectView EffectView => effectView ?? (effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
-        AVUrlAsset _playerAsset;
-        AVPlayerItem _playerItem;
-        AVPlayer _player;
-        AVPlayerLayer _playerLayer;
-        private NSObject _stopPlayingNotification;
-        private bool playing;
-
-        public static NSString AVCustomEditPlayerViewControllerStatusObservationContext = new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
-
+        private RemoteCommentsDataService commentsService;
+        private StoryViewCell storyView;
+        private LoadMoreButtonCell loadMoreButton;
 
         public StoryViewController(IntPtr handle) : base(handle)
         {
         }
 
         private CGRect originalImageFrame;
+        private bool showLoadMoreButton;
+        private int CommentCellOffset => showLoadMoreButton ? 2 : 1;
 
         public StoryDTO Story { get; set; }
         public IView Parent { get; set; }
@@ -48,59 +44,86 @@ namespace TellMe.iOS
             EffectView.Frame = View.Bounds;
             View.AddSubview(EffectView);
             View.SendSubviewToBack(EffectView);
+            commentsService = new RemoteCommentsDataService();
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction);
             swipeGestureRecognizer.ShouldRecognizeSimultaneously += (gestureRecognizer, otherGestureRecognizer) => true;
             this.View.AddGestureRecognizer(swipeGestureRecognizer);
-            ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
-            ReceiversCollection.DataSource = this;
-            ReceiversCollection.Delegate = this;
-
+            NewCommentText.ShouldChangeText += NewCommentText_ShouldChangeText;
+            NewCommentText.Changed += NewCommentText_Changed;
+            TableView.DataSource = this;
+            TableView.Delegate = this;
+            TableView.TableFooterView = new UIView();
+            TableView.AllowsSelection = false;
+            TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+            TableView.RegisterNibForCellReuse(CommentViewCell.Nib, CommentViewCell.Key);
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             this.LoadReceiversAsync();
-        }
-
-        private async Task LoadReceiversAsync()
-        {
-            var storiesService = new RemoteStoriesDataService();
-
-            var result = await storiesService.GetStoryReceiversAsync(Story.Id).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                receiversList.Clear();
-                receiversList.AddRange(result.Data);
-                InvokeOnMainThread(() =>
-                {
-                    ReceiversCollection.ReloadData();
-                });
-            }
-            else
-            {
-                result.ShowResultError(this);
-            }
-        }
-
-        private void Initialize()
-        {
-            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, UIImage.FromBundle("UserPic"));
-            var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
-
-            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, Story.SenderName.Length));
-            text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
-            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
-            this.Title.AttributedText = text;
-            this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
-            this.ProfilePicture.UserInteractionEnabled = true;
-            this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(() => App.Instance.Router.NavigateStoryteller(Parent, Story.SenderId)));
+            this.LoadCommentsAsync();
         }
 
         public override void ViewDidAppear(bool animated)
         {
-            Play(this.StoryViewWrapper);
+            this.storyView.Play();
+            RegisterForKeyboardNotifications();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
-            StopPlaying();
+            this.storyView.StopPlaying();
+
+            if (willHideNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(willHideNotificationObserver);
+            if (willShowNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(willShowNotificationObserver);
+        }
+
+        protected virtual void RegisterForKeyboardNotifications()
+        {
+            this.willHideNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
+            this.willShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
+        }
+
+        public void OnKeyboardNotification(NSNotification notification)
+        {
+            if (!IsViewLoaded)
+                return;
+
+            //Check if the keyboard is becoming visible
+            var visible = notification.Name == UIKeyboard.WillShowNotification;
+
+            //Start an animation, using values from the keyboard
+            UIView.BeginAnimations("AnimateForKeyboard");
+            UIView.SetAnimationBeginsFromCurrentState(true);
+            UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
+
+            //Pass the notification, calculating keyboard height, etc.
+            var keyboardFrame = visible
+                                    ? UIKeyboard.FrameEndFromNotification(notification)
+                                    : UIKeyboard.FrameBeginFromNotification(notification);
+            OnKeyboardChanged(visible, keyboardFrame);
+            //Commit the animation
+            UIView.CommitAnimations();
+        }
+
+        public virtual void OnKeyboardChanged(bool visible, CGRect keyboardFrame)
+        {
+            if (View.Superview == null)
+            {
+                return;
+            }
+
+            if (visible)
+            {
+                BottomOffset.Constant = keyboardFrame.Height;
+                TableView.ContentOffset = new CGPoint(0, TableView.ContentSize.Height);
+                storyView.StopPlaying();
+            }
+            else
+            {
+                BottomOffset.Constant = 0;
+                storyView.Play();
+            }
         }
 
         void HandleAction(UIPanGestureRecognizer recognizer)
@@ -115,177 +138,228 @@ namespace TellMe.iOS
             {
                 // Move the image by adding the offset to the object's frame
                 var offset = recognizer.TranslationInView(View);
-                if (offset.Y < 0)
+                if (offset.Y < 0 || TableView.ContentOffset.Y > 0)
+                {
+                    View.Frame = new CGRect(0, 0, View.Frame.Width, View.Frame.Height);
                     return;
+                }
 
                 var newFrame = originalImageFrame;
                 newFrame.Offset(0, offset.Y);
                 View.Frame = newFrame;
-                if (offset.Y > 150 || recognizer.State == UIGestureRecognizerState.Ended)
+                if ((offset.Y > 150 || recognizer.State == UIGestureRecognizerState.Ended))
                 {
                     this.DismissViewController(true, null);
                 }
             }
         }
 
-        public void Play(UIView target)
-        {
-            if (!this.playing)
-            {
-                AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
-                var cachedVideoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
-                _playerAsset = new AVUrlAsset(File.Exists(cachedVideoPath) ? new NSUrl(cachedVideoPath, false) : NSUrl.FromString(Story.VideoUrl));
-                _playerItem = new AVPlayerItem(_playerAsset);
-                _player = new AVPlayer(_playerItem);
-                _playerLayer = AVPlayerLayer.FromPlayer(_player);
-                _playerLayer.Frame = target.Bounds;
-                _playerLayer.VideoGravity = AVLayerVideoGravity.ResizeAspect;
-                target.Layer.AddSublayer(_playerLayer);
-                _stopPlayingNotification = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(_player.CurrentItem, DidReachEnd);
-                _player.CurrentItem.AddObserver(this, "status", NSKeyValueObservingOptions.New | NSKeyValueObservingOptions.Initial,
-                                            AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
-                Spinner.Hidden = false;
-                Spinner.StartAnimating();
-                playing = true;
-            }
-        }
-
-        public void StopPlaying()
-        {
-            if (this.playing)
-            {
-                Spinner.StopAnimating();
-                Spinner.Hidden = true;
-                _stopPlayingNotification?.Dispose();
-                _stopPlayingNotification = null;
-                _player.Pause();
-                _playerLayer.RemoveFromSuperLayer();
-                _player.CurrentItem.RemoveObserver(this, "status", AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
-                playing = false;
-            }
-        }
-
-
-        public void Restart()
-        {
-            _player.Pause();
-            _player.Seek(CMTime.Zero);
-            _player.Play();
-        }
-
-        void DidReachEnd(object sender, NSNotificationEventArgs e)
-        {
-            if (!_playerAsset.Url.IsFileUrl && _playerAsset.Exportable)
-            {
-                var exporter = new AVAssetExportSession(_playerAsset, AVAssetExportSessionPreset.Preset640x480);
-                var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
-                if (File.Exists(videoPath))
-                {
-                    return;
-                }
-                var startTime = new CMTime(0, 1);
-                var timeRange = new CMTimeRange();
-                timeRange.Start = startTime;
-                timeRange.Duration = _playerItem.Duration;
-                exporter.TimeRange = timeRange;
-                exporter.OutputUrl = new NSUrl(videoPath, false);
-                exporter.OutputFileType = AVFileType.QuickTimeMovie;
-                exporter.ExportAsynchronously(() =>
-                {
-                    Console.WriteLine(exporter.Status);
-                    Console.WriteLine(exporter.Error);
-
-                    Console.WriteLine(exporter.Description);
-                    Console.WriteLine(exporter.DebugDescription);
-
-                    Restart();
-                });
-            }
-            else
-            {
-                Restart();
-            }
-        }
-
-        public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
-        {
-            var ch = new NSObservedChange(change);
-            if (context == AVCustomEditPlayerViewControllerStatusObservationContext.Handle)
-            {
-                AVPlayerItem playerItem = ofObject as AVPlayerItem;
-                if (playerItem.Status == AVPlayerItemStatus.ReadyToPlay)
-                {
-                    Spinner.StopAnimating();
-                    Spinner.Hidden = true;
-                    _player.Play();
-                }
-                else if (playerItem.Status == AVPlayerItemStatus.Failed)
-                {
-                    Spinner.StopAnimating();
-                    Spinner.Hidden = true;
-                    Console.WriteLine(playerItem.Error.LocalizedDescription);
-                    StopPlaying();
-                }
-            }
-            else
-            {
-                base.ObserveValue(keyPath, ofObject, change, context);
-            }
-        }
-
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
         public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
-
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                StopPlaying();
-                _player.Pause();
-                _player.Dispose();
-                _playerItem?.Dispose();
-                _playerLayer?.Dispose();
-                _player = null;
-                _playerItem = null;
-                _playerLayer = null;
+                storyView.StopPlaying();
+                storyView.Dispose();
             }
 
             base.Dispose(disposing);
         }
 
-        public nint GetItemsCount(UICollectionView collectionView, nint section)
+        async partial void SendButtonTouched(NSObject sender)
         {
-            return receiversList.Count;
-        }
+            SendButton.Enabled = false;
+            var text = this.NewCommentText.Text;
+            this.NewCommentText.Text = null;
 
-        public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
-        {
-            var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
-            cell.Receiver = this.receiversList[(int)indexPath.Item];
-            cell.UserInteractionEnabled = true;
-            return cell;
-        }
-
-        [Export("collectionView:didSelectItemAtIndexPath:")]
-        public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
-        {
-            collectionView.DeselectItem(indexPath, false);
-            var item = ((ReceiversListCell)collectionView.CellForItem(indexPath)).Receiver;
-            if (item.TribeId != null)
+            var comment = new CommentDTO
             {
-                this.DismissViewController(false, () => App.Instance.Router.NavigateTribe(Parent, item.TribeId.Value, HandleTribeLeftHandler));
+                Text = text,
+                AuthorId = App.Instance.AuthInfo.Account.Id,
+                AuthorUserName = App.Instance.AuthInfo.Account.UserName,
+                AuthorPictureUrl = App.Instance.AuthInfo.Account.PictureUrl,
+                StoryId = Story.Id,
+                CreateDateUtc = DateTime.UtcNow
+            };
+
+            DisplayComments(true, comment);
+            SendButton.Enabled = true;
+
+            var result = await commentsService.AddCommentAsync(Story.Id, text).ConfigureAwait(false);
+
+            InvokeOnMainThread(() =>
+            {
+                if (result.IsSuccess)
+                {
+                    UpdateComments(comment, result.Data);
+                }
+                else
+                {
+                    DeleteComment(comment);
+                }
+            });
+        }
+
+        private void UpdateComments(CommentDTO comment, CommentDTO newComment)
+        {
+            var index = commentsList.IndexOf(comment);
+            if (index > -1)
+            {
+                comment.Id = newComment.Id;
+                comment.CreateDateUtc = newComment.CreateDateUtc;
+
+                var indexPath = NSIndexPath.FromRowSection(index + CommentCellOffset, 0);
+                if (TableView.IndexPathsForVisibleRows.Any(x => x.Row == indexPath.Row && x.Section == indexPath.Section))
+                {
+                    TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
+                }
+            }
+        }
+
+        private void DeleteComment(CommentDTO comment)
+        {
+            var index = commentsList.IndexOf(comment);
+            if (index > -1)
+            {
+                commentsList.RemoveAt(index);
+                TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index + CommentCellOffset, 0) }, UITableViewRowAnimation.Automatic);
+            }
+        }
+
+        private async Task LoadReceiversAsync()
+        {
+            var storiesService = new RemoteStoriesDataService();
+
+            var result = await storiesService.GetStoryReceiversAsync(Story.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                storyView.DisplayReceivers(result.Data);
             }
             else
             {
-                this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, item.UserId));
+                result.ShowResultError(this);
             }
         }
 
-        void HandleTribeLeftHandler(TribeDTO tribe)
+        private async Task LoadCommentsAsync(DateTime? olderThanUtc = null)
         {
-            receiversList.RemoveAll(x => x.TribeId == tribe.Id);
-            ReceiversCollection.ReloadData();
+            if (loadMoreButton != null)
+                loadMoreButton.Enabled = false;
+            var result = await commentsService.GetCommentsAsync(Story.Id, olderThanUtc).ConfigureAwait(false);
+            if (loadMoreButton != null)
+                loadMoreButton.Enabled = true;
+            if (result.IsSuccess)
+            {
+                this.showLoadMoreButton = result.Data.TotalCount > commentsList.Count + result.Data.Items.Length;
+
+                DisplayComments(false, result.Data.Items);
+            }
+            else
+            {
+                result.ShowResultError(this);
+            }
+        }
+
+        private void DisplayComments(bool addToHead = false, params CommentDTO[] comments)
+        {
+            var scrollToComments = commentsList.Count > 0;
+            if (addToHead)
+                commentsList.AddRange(comments.OrderBy(x => x.CreateDateUtc));
+            else
+                commentsList.InsertRange(0, comments.OrderBy(x => x.CreateDateUtc));
+
+
+            InvokeOnMainThread(() =>
+            {
+                TableView.ReloadData();
+                if (scrollToComments)
+                {
+                    var index = addToHead ? commentsList.Count - comments.Length - 1 + CommentCellOffset : (this.CommentCellOffset);
+                    TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.Top, true);
+                }
+            });
+        }
+
+        void NewCommentText_Changed(object sender, EventArgs e)
+        {
+            var textView = (UITextView)sender;
+            var frame = textView.SizeThatFits(new CGSize(textView.Frame.Width, nfloat.MaxValue));
+            nfloat newHeight = frame.Height > 100 ? 100 : frame.Height;
+            var delta = newHeight - textView.Frame.Height;
+            TableView.SetContentOffset(new CGPoint(0, TableView.ContentOffset.Y + delta), false);
+            textView.Frame = new CGRect(textView.Frame.Location, new CGSize(textView.Frame.Width, newHeight));
+            NewCommentWrapperHeight.Constant = textView.Frame.Height + 10;
+            View.UpdateConstraints();
+        }
+
+        bool NewCommentText_ShouldChangeText(UITextView textView, NSRange range, string replacementString)
+        {
+            string text = textView.Text;
+            string newText = text.Substring(0, (int)range.Location) + replacementString + text.Substring((int)(range.Location + range.Length));
+
+            return newText.Length <= 500; //max length
+        }
+
+        private void Initialize()
+        {
+            storyView = StoryViewCell.Create(Story);
+            storyView.OnProfilePictureTouched += StoryView_OnProfilePictureTouched;
+            storyView.OnReceiverSelected += StoryView_OnReceiverSelected;
+        }
+
+        void StoryView_OnReceiverSelected(StoryReceiverDTO receiver)
+        {
+            if (receiver.TribeId != null)
+            {
+                this.DismissViewController(false, () => App.Instance.Router.NavigateTribe(Parent, receiver.TribeId.Value, storyView.RemoveTribe));
+            }
+            else
+            {
+                this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, receiver.UserId));
+            }
+        }
+
+        void StoryView_OnProfilePictureTouched(StoryDTO story)
+        {
+            this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, story.SenderId));
+        }
+
+        public nint RowsInSection(UITableView tableView, nint section)
+        {
+            return commentsList.Count + CommentCellOffset;
+        }
+
+        public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            if (indexPath.Row == 0)
+            {
+                return this.storyView;
+            }
+
+            if (showLoadMoreButton && indexPath.Row == 1)
+            {
+                if (loadMoreButton == null)
+                {
+                    this.loadMoreButton = LoadMoreButtonCell.Create(async (b) =>
+                    {
+                        await this.LoadCommentsAsync(commentsList.First().CreateDateUtc).ConfigureAwait(false);
+                    }, "More comments");
+                }
+
+                return this.loadMoreButton;
+            }
+
+            var commentCell = TableView.DequeueReusableCell(CommentViewCell.Key, indexPath) as CommentViewCell;
+            commentCell.Comment = commentsList[indexPath.Row - CommentCellOffset];
+            commentCell.ReceiverSelected = CommentCell_ReceiverSelected;
+            return commentCell;
+        }
+
+        private void CommentCell_ReceiverSelected(CommentDTO comment)
+        {
+            this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, comment.AuthorId));
         }
     }
 }

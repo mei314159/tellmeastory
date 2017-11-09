@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
+
     public class RemoteStoriesDataService : BaseDataService
     {
         public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO dto)

@@ -15,6 +15,8 @@ namespace TellMe.iOS.Views.Cells
         public static readonly NSString Key = new NSString("ReceiversListCell");
         public static readonly UINib Nib;
 
+        public Action<StoryReceiverDTO> ReceiverSelected;
+
         static ReceiversListCell()
         {
             Nib = UINib.FromName("ReceiversListCell", NSBundle.MainBundle);
@@ -30,6 +32,14 @@ namespace TellMe.iOS.Views.Cells
             base.AwakeFromNib();
 
             this.defaultPicture = UIImage.FromBundle("UserPic");
+            ProfilePicture.UserInteractionEnabled = true;
+            var g = new UITapGestureRecognizer(() =>
+            {
+                this.ReceiverSelected?.Invoke(Receiver);
+            });
+            g.ShouldRecognizeSimultaneously = (gestureRecognizer, otherGestureRecognizer) => true;
+
+            ProfilePicture.AddGestureRecognizer(g);
         }
 
         public StoryReceiverDTO Receiver

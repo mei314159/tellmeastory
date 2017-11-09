@@ -16,8 +16,8 @@ namespace TellMe.Core.Contracts.DTO
         public string SenderName { get; set; }
         public string SenderPictureUrl { get; set; }
 
-		public DateTime CreateDateUtc { get; set; }
-  
+        public DateTime CreateDateUtc { get; set; }
+
         [SQLiteNetExtensions.Attributes.OneToMany("StoryId", CascadeOperations = SQLiteNetExtensions.Attributes.CascadeOperation.All)]
         public List<StoryReceiverDTO> Receivers { get; set; }
     }

@@ -65,25 +65,25 @@ namespace TellMe.iOS
 
         void ProfilePictureTouched()
         {
-            this.OnProfilePictureTouched?.Invoke(story);
+            this.OnProfilePictureTouched?.Invoke(Story);
         }
 
         void PreviewTouched()
         {
-            this.OnPreviewTouched?.Invoke(story);
+            this.OnPreviewTouched?.Invoke(Story);
         }
 
         private void Initialize()
         {
-            this.ProfilePicture.SetPictureUrl(story.SenderPictureUrl, defaultPicture);
+            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, defaultPicture);
             var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString($"{story.SenderName} sent a story \""));
+            text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
 
-            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, story.SenderName.Length));
+            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, Story.SenderName.Length));
             text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
             text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
-            this.Preview.SetImage(new NSUrl(story.PreviewUrl));
+            this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
         }
 
         protected override void Dispose(bool disposing)
