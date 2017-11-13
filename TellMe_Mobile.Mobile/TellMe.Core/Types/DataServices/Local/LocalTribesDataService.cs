@@ -60,7 +60,7 @@ namespace TellMe.Core.Types.DataServices.Local
         public async Task<DataResult<TribeDTO>> GetAsync(int tribeId)
         {
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
-            var result = await conn.GetWithChildrenAsync<TribeDTO>(tribeId).ConfigureAwait(false);
+            var result = await conn.FindWithChildrenAsync<TribeDTO>(tribeId).ConfigureAwait(false);
             var updateInfo = await conn.FindAsync<UpdateInfo>("Tribes").ConfigureAwait(false);
             return new DataResult<TribeDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
