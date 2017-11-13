@@ -37,6 +37,7 @@ namespace TellMe.iOS
 
         public StoryDTO Story { get; set; }
         public IView Parent { get; set; }
+        public bool DisplayCommentsWhenAppear { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -45,7 +46,11 @@ namespace TellMe.iOS
             View.AddSubview(EffectView);
             View.SendSubviewToBack(EffectView);
             commentsService = new RemoteCommentsDataService();
-            var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction);
+            var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
+            {
+                CancelsTouchesInView = false,
+                ShouldRecognizeSimultaneously = (gestureRecognizer, otherGestureRecognizer) => true
+            };
             swipeGestureRecognizer.ShouldRecognizeSimultaneously += (gestureRecognizer, otherGestureRecognizer) => true;
             this.View.AddGestureRecognizer(swipeGestureRecognizer);
             NewCommentText.ShouldChangeText += NewCommentText_ShouldChangeText;
@@ -56,8 +61,10 @@ namespace TellMe.iOS
             TableView.AllowsSelection = false;
             TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             TableView.RegisterNibForCellReuse(CommentViewCell.Nib, CommentViewCell.Key);
-            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
-            this.LoadReceiversAsync();
+            TableView.DelaysContentTouches = false;
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard){
+                CancelsTouchesInView = false
+            });
             this.LoadCommentsAsync();
         }
 
@@ -228,21 +235,6 @@ namespace TellMe.iOS
             }
         }
 
-        private async Task LoadReceiversAsync()
-        {
-            var storiesService = new RemoteStoriesDataService();
-
-            var result = await storiesService.GetStoryReceiversAsync(Story.Id).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                storyView.DisplayReceivers(result.Data);
-            }
-            else
-            {
-                result.ShowResultError(this);
-            }
-        }
-
         private async Task LoadCommentsAsync(DateTime? olderThanUtc = null)
         {
             if (loadMoreButton != null)
@@ -264,7 +256,12 @@ namespace TellMe.iOS
 
         private void DisplayComments(bool addToHead = false, params CommentDTO[] comments)
         {
-            var scrollToComments = commentsList.Count > 0;
+            var scrollToComments = commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
+            if (DisplayCommentsWhenAppear)
+            {
+                DisplayCommentsWhenAppear = false;
+            }
+
             if (addToHead)
                 commentsList.AddRange(comments.OrderBy(x => x.CreateDateUtc));
             else

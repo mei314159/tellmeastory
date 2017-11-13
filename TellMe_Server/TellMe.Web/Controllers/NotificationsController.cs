@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TellMe.DAL.Contracts.Services;
+using TellMe.Web.Extensions;
 
 namespace TellMe.Web.Controllers
 {
@@ -17,11 +18,19 @@ namespace TellMe.Web.Controllers
             _notificationService = notificationService;
         }
 
-        [HttpGet("skip/{skip}")]
-        public async Task<IActionResult> GetNotificationsAsync(int skip)
+        [HttpGet("older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetNotificationsAsync(long olderThanTicksUtc)
         {
-            var result = await _notificationService.GetNotificationsAsync(this.UserId, skip < 0 ? 0 : skip);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _notificationService.GetNotificationsAsync(this.UserId, olderThanUtc);
 
+            return Ok(result);
+        }
+
+        [HttpGet("active/count")]
+        public async Task<IActionResult> GetActiveNotificationsCountAsync(long olderThanTicksUtc)
+        {
+            var result = await _notificationService.GetActiveNotificationsCountAsync(this.UserId);
             return Ok(result);
         }
 

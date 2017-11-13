@@ -155,6 +155,12 @@
     <ImageAsset Include="Assets.xcassets\Send.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Send.imageset\send%402x.png" />
     <ImageAsset Include="Assets.xcassets\Send.imageset\send%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Comment.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Comment.imageset\comment%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Comment.imageset\comment%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Replay.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Replay.imageset\replay%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Replay.imageset\replay%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -176,6 +182,9 @@
     <Folder Include="Assets.xcassets\AddGroup.imageset\" />
     <Folder Include="Views\VideoSlider\" />
     <Folder Include="Assets.xcassets\Send.imageset\" />
+    <Folder Include="Assets.xcassets\Comment.imageset\" />
+    <Folder Include="Assets.xcassets\Replay.imageset\" />
+    <Folder Include="Views\Badge\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -187,13 +196,12 @@
     <InterfaceDefinition Include="Views\InputPopupView.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterCell.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterStoryCell.xib" />
-    <InterfaceDefinition Include="Views\StoryView.xib" />
     <InterfaceDefinition Include="Views\Cells\TribesListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\TribeMembersListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\ReceiversListCell.xib" />
-    <InterfaceDefinition Include="Views\Cells\StoryViewCell.xib" />
     <InterfaceDefinition Include="Views\Cells\CommentViewCell.xib" />
     <InterfaceDefinition Include="Views\Cells\LoadMoreButtonCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\StoryViewCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -288,10 +296,6 @@
     <Compile Include="Controllers\RequestStoryController.designer.cs">
       <DependentUpon>RequestStoryController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\StoryView.cs" />
-    <Compile Include="Views\StoryView.designer.cs">
-      <DependentUpon>StoryView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\Cells\TribesListCell.cs" />
     <Compile Include="Views\Cells\TribesListCell.designer.cs">
       <DependentUpon>TribesListCell.cs</DependentUpon>
@@ -323,10 +327,6 @@
     <Compile Include="Views\Cells\ReceiversListCell.designer.cs">
       <DependentUpon>ReceiversListCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Cells\StoryViewCell.cs" />
-    <Compile Include="Views\Cells\StoryViewCell.designer.cs">
-      <DependentUpon>StoryViewCell.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\Cells\CommentViewCell.cs" />
     <Compile Include="Views\Cells\CommentViewCell.designer.cs">
       <DependentUpon>CommentViewCell.cs</DependentUpon>
@@ -334,6 +334,11 @@
     <Compile Include="Views\Cells\LoadMoreButtonCell.cs" />
     <Compile Include="Views\Cells\LoadMoreButtonCell.designer.cs">
       <DependentUpon>LoadMoreButtonCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Badge\BadgeView.cs" />
+    <Compile Include="Views\Cells\StoryViewCell.cs" />
+    <Compile Include="Views\Cells\StoryViewCell.designer.cs">
+      <DependentUpon>StoryViewCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -55,7 +55,9 @@ namespace TellMe.iOS
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
             this.SearchBar.SearchButtonClicked += SearchBar_SearchButtonClicked;
             this.TableView.TableFooterView.Hidden = true;
-            UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton);
+            UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton){
+                CancelsTouchesInView = false
+            };
             uITapGestureRecognizer.CancelsTouchesInView = false;
             this.View.AddGestureRecognizer(uITapGestureRecognizer);
             LoadAsync(false);

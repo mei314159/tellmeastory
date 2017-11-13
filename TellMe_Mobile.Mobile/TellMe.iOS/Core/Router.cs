@@ -142,12 +142,13 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewStory(IView view, StoryDTO story)
+        public void NavigateViewStory(IView view, StoryDTO story, bool goToComments = false)
         {
             this.window.InvokeOnMainThread(() =>
             {
                 var targetController = (StoryViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("StoryViewController");
                 targetController.Story = story;
+                targetController.DisplayCommentsWhenAppear = goToComments;
                 targetController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
                 targetController.Parent = view;
                 this.Present(targetController, view, false);

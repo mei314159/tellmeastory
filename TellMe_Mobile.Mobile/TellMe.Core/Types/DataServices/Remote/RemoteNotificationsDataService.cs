@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.DTO;
 
@@ -6,9 +7,16 @@ namespace TellMe.Core.Types.DataServices.Remote
 {
     public class RemoteNotificationsDataService : BaseDataService
     {
-        public async Task<Result<List<NotificationDTO>>> GetNotificationsAsync(int skip)
+        public async Task<Result<List<NotificationDTO>>> GetNotificationsAsync(DateTime? olderThanUtc = null)
         {
-            var result = await this.GetAsync<List<NotificationDTO>>($"notifications/skip/{skip}").ConfigureAwait(false);
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<NotificationDTO>>($"notifications/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<int>> GetActiveNotificationsCountAsync()
+        {
+            var result = await this.GetAsync<int>($"notifications/active/count").ConfigureAwait(false);
             return result;
         }
 

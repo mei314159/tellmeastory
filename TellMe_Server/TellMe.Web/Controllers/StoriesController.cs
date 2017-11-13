@@ -5,6 +5,7 @@ using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.Web.DTO;
 using TellMe.Web.Extensions;
+using System;
 
 namespace TellMe.Web.Controllers
 {
@@ -44,10 +45,11 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
-        [HttpGet("skip/{skip}")]
-        public async Task<IActionResult> GetStoriesAsync(int skip)
+        [HttpGet("older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(long olderThanTicksUtc)
         {
-            var result = await _storyService.GetAllAsync(this.UserId, skip < 0 ? 0 : skip);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(this.UserId, olderThanUtc);
 
             return Ok(result);
         }
@@ -60,18 +62,20 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{userId}/skip/{skip}")]
-        public async Task<IActionResult> GetStoriesAsync(string userId, int skip)
+        [HttpGet("{userId}/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(string userId, long olderThanTicksUtc)
         {
-            var result = await _storyService.GetAllAsync(userId, this.UserId, skip < 0 ? 0 : skip);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(userId, this.UserId, olderThanUtc);
 
             return Ok(result);
         }
 
-        [HttpGet("tribe/{tribeId}/skip/{skip}")]
-        public async Task<IActionResult> GetStoriesAsync(int tribeId, int skip)
+        [HttpGet("tribe/{tribeId}/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(int tribeId, long olderThanTicksUtc)
         {
-            var result = await _storyService.GetAllAsync(tribeId, this.UserId, skip < 0 ? 0 : skip);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(tribeId, this.UserId, olderThanUtc);
 
             return Ok(result);
         }

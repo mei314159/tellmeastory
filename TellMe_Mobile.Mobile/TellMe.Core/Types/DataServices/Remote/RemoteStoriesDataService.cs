@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,21 +17,24 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
-        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int skip)
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(DateTime? olderThanUtc = null)
         {
-            var result = await this.GetAsync<List<StoryDTO>>($"stories/skip/{skip}").ConfigureAwait(false);
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/older-than/{olderThan.Ticks}").ConfigureAwait(false);
             return result;
         }
 
-        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, int skip)
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, DateTime? olderThanUtc = null)
         {
-            var result = await this.GetAsync<List<StoryDTO>>($"stories/{userId}/skip/{skip}").ConfigureAwait(false);
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/{userId}/older-than/{olderThan.Ticks}").ConfigureAwait(false);
             return result;
         }
 
-        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, int skip)
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, DateTime? olderThanUtc = null)
         {
-            var result = await this.GetAsync<List<StoryDTO>>($"stories/tribe/{tribeId}/skip/{skip}").ConfigureAwait(false);
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/tribe/{tribeId}/older-than/{olderThan.Ticks}").ConfigureAwait(false);
             return result;
         }
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Contracts.DTO;
 using System;
+using TellMe.Web.Extensions;
 
 namespace TellMe.Web.Controllers
 {
@@ -22,14 +23,7 @@ namespace TellMe.Web.Controllers
         [HttpGet("older-than/{olderThanTicksUtc}")]
         public async Task<IActionResult> GetAllAsync(int storyId, long olderThanTicksUtc)
         {
-            var dateFromTicks = new DateTime(olderThanTicksUtc);
-            var olderThanUtc = new DateTime(
-                dateFromTicks.Year,
-                dateFromTicks.Month,
-                dateFromTicks.Day,
-                dateFromTicks.Hour,
-                dateFromTicks.Minute,
-                dateFromTicks.Second, DateTimeKind.Utc);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
             var result = await _commentService.GetAllAsync(storyId, this.UserId, olderThanUtc);
 
             return Ok(result);

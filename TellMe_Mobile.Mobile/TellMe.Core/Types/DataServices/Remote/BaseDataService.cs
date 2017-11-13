@@ -50,7 +50,7 @@ namespace TellMe.Core.Types.DataServices.Remote
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && refreshExpiredToken)
                     {
-                        var refreshTokenResult = await this.RefreshAuthTokenAsync().ConfigureAwait(false);
+                        var refreshTokenResult = await this.RefreshAuthTokenAsync();
                         if (refreshTokenResult.IsSuccess)
                         {
                             return await this.GetAsync(uri, resultType, false).ConfigureAwait(false);

@@ -20,5 +20,6 @@ namespace TellMe.Core.Contracts.DTO
 
         [SQLiteNetExtensions.Attributes.OneToMany("StoryId", CascadeOperations = SQLiteNetExtensions.Attributes.CascadeOperation.All)]
         public List<StoryReceiverDTO> Receivers { get; set; }
+        public int CommentsCount { get; set; }
     }
 }

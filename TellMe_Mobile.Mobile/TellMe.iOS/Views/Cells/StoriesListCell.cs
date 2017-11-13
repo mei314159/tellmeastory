@@ -2,15 +2,25 @@
 using Foundation;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
+using TellMe.Core.Types.Extensions;
+using SDWebImage;
+using System.Collections.Generic;
+using CoreGraphics;
+
 namespace TellMe.iOS.Views.Cells
 {
-    public partial class StoriesListCell : UITableViewCell
+    public partial class StoriesListCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
     {
+        private UIImage defaultPicture;
+        private StoryDTO story;
+
         public static readonly NSString Key = new NSString("StoriesListCell");
         public static readonly UINib Nib;
 
         public Action<StoryDTO> ProfilePictureTouched { get; set; }
         public Action<StoryDTO> PreviewTouched { get; set; }
+        public Action<StoryDTO> CommentsButtonTouched { get; set; }
+        public Action<StoryReceiverDTO, StoriesListCell> ReceiverSelected { get; set; }
 
         static StoriesListCell()
         {
@@ -25,34 +35,106 @@ namespace TellMe.iOS.Views.Cells
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
-            this.StoryView.OnProfilePictureTouched += StoryView_OnProfilePictureTouched;
-            this.StoryView.OnPreviewTouched += StoryView_OnPreviewTouched;
-        }
 
-        void StoryView_OnProfilePictureTouched(StoryDTO story)
-        {
-            ProfilePictureTouched?.Invoke(story);
-        }
+            this.defaultPicture = UIImage.FromBundle("UserPic");
 
-        void StoryView_OnPreviewTouched(StoryDTO story)
-        {
-            PreviewTouched?.Invoke(story);
+            this.AddGestureRecognizer(new UITapGestureRecognizer(UIViewTouched)
+            {
+                CancelsTouchesInView = false
+            });
+
+            ReceiversCollection.DelaysContentTouches = false;
+            ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
         }
 
         public StoryDTO Story
         {
-            get => StoryView.Story;
-            set => StoryView.Story = value;
+            get
+            {
+                return story;
+            }
+            set
+            {
+                story = value;
+                this.Initialize();
+            }
+        }
+
+        void UIViewTouched(UITapGestureRecognizer r)
+        {
+            var location = r.LocationOfTouch(0, this);
+            if (ProfilePicture.Frame.Contains(location))
+            {
+                this.ProfilePictureTouched?.Invoke(Story);
+            }
+            else if (Preview.Frame.Contains(location))
+            {
+                this.PreviewTouched?.Invoke(Story);
+            }
+        }
+
+        partial void CommentsButton_TouchUpInside(Button sender)
+        {
+            this.CommentsButtonTouched?.Invoke(Story);
+        }
+
+        private void Initialize()
+        {
+            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, defaultPicture);
+            var text = new NSMutableAttributedString();
+            text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
+
+            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, Story.SenderName.Length));
+            text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
+            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
+            this.Title.AttributedText = text;
+            this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
+            this.CommentsButton.SetTitle($"  {story.CommentsCount}", UIControlState.Normal);
+
+            ReceiversCollection.DataSource = this;
+            ReceiversCollection.Delegate = this;
+            ReceiversCollection.ReloadData();
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                StoryView.Dispose();
+                defaultPicture.Dispose();
             }
 
             base.Dispose(disposing);
+        }
+
+        public nint GetItemsCount(UICollectionView collectionView, nint section)
+        {
+            return Story.Receivers?.Count ?? 0;
+        }
+
+        public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
+            cell.Receiver = Story.Receivers[(int)indexPath.Item];
+            return cell;
+        }
+
+        [Export("collectionView:didSelectItemAtIndexPath:")]
+        public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            var cell = collectionView.CellForItem(indexPath) as ReceiversListCell;
+            if (cell != null)
+            {
+                this.ReceiverSelected?.Invoke(cell.Receiver, this);
+            }
+        }
+
+        public void RemoveTribe(TribeDTO tribe)
+        {
+            Story.Receivers.RemoveAll(x => x.TribeId == tribe.Id);
+            InvokeOnMainThread(() =>
+            {
+                ReceiversCollection.ReloadData();
+            });
         }
     }
 }

@@ -11,11 +11,13 @@ using TellMe.DAL.Contracts.PushNotification;
 using System;
 using AutoMapper.QueryableExtensions;
 using TellMe.DAL.Types.PushNotifications;
+using TellMe.DAL.Contracts;
 
 namespace TellMe.DAL.Types.Services
 {
     public class CommentService : ICommentService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Comment, int> _commentRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<Notification, int> _notificationRepository;
@@ -28,7 +30,8 @@ namespace TellMe.DAL.Types.Services
             IRepository<Notification, int> notificationRepository,
             IRepository<Story, int> storyRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<StoryReceiver, int> storyReceiverRepository)
+            IRepository<StoryReceiver, int> storyReceiverRepository,
+            IUnitOfWork unitOfWork)
         {
             _commentRepository = commentRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -36,29 +39,33 @@ namespace TellMe.DAL.Types.Services
             _storyRepository = storyRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _storyReceiverRepository = storyReceiverRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<CommentDTO> AddCommentAsync(string currentUserId, int storyId, CommentDTO comment)
         {
+            _unitOfWork.BeginTransaction();
             var now = DateTime.UtcNow;
-
             var entity = Mapper.Map<Comment>(comment);
             entity.CreateDateUtc = now;
             entity.AuthorId = currentUserId;
             entity.StoryId = storyId;
+
             await _commentRepository.SaveAsync(entity, true).ConfigureAwait(false);
 
             entity = await _commentRepository.GetQueryable(true).Include(x => x.Author).FirstOrDefaultAsync(x => x.Id == entity.Id).ConfigureAwait(false);
             Mapper.Map(entity, comment);
 
             var story = await _storyRepository
-            .GetQueryable(true)
+            .GetQueryable()
             .Include(x => x.Sender)
             .Where(x => x.Id == comment.StoryId)
-            .Select(x => new { x.Sender.UserName, x.Title })
             .FirstOrDefaultAsync().ConfigureAwait(false);
+            story.CommentsCount++;
+            await _storyRepository.SaveAsync(story, true).ConfigureAwait(false);
 
-            var tribeMembers = _tribeMemberRepository.GetQueryable(true);
+            var tribeMembers = _tribeMemberRepository
+            .GetQueryable(true).Where(x => x.UserId != currentUserId);
             var storyReceivers = _storyReceiverRepository
             .GetQueryable(true)
             .Include(x => x.Tribe)
@@ -84,27 +91,40 @@ namespace TellMe.DAL.Types.Services
                 RecipientId = receiver.UserId,
                 Extra = comment,
                 Text = receiver.TribeName == null
-                       ? $"{comment.AuthorUserName} commented a {story.UserName}'s story \"{story.Title}\""
-                       : $"[{receiver.TribeName}]: {comment.AuthorUserName} commented a {story.UserName}'s story \"{story.Title}\""
+                       ? $"{comment.AuthorUserName} commented a {story.Sender.UserName}'s story \"{story.Title}\""
+                       : $"[{receiver.TribeName}]: {comment.AuthorUserName} commented a {story.Sender.UserName}'s story \"{story.Title}\""
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
+            _unitOfWork.SaveChanges();
+
             await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
             return comment;
         }
 
         public async Task DeleteCommentAsync(string currentUserId, int storyId, int commentId)
         {
+            _unitOfWork.BeginTransaction();
+
             var comment = await _commentRepository
             .GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == commentId && x.StoryId == storyId && x.AuthorId == currentUserId)
             .ConfigureAwait(false);
+
+            var story = await _storyRepository
+            .GetQueryable()
+            .Where(x => x.Id == comment.StoryId)
+            .FirstOrDefaultAsync().ConfigureAwait(false);
+            story.CommentsCount--;
+            await _storyRepository.SaveAsync(story, true).ConfigureAwait(false);
+
             if (comment == null)
             {
                 throw new Exception("Comment was not found or you don't have permissions to delete it");
             }
 
             _commentRepository.Remove(comment, true);
+            _unitOfWork.SaveChanges();
         }
 
         public async Task<BulkDTO<CommentDTO>> GetAllAsync(int storyId, string currentUserId, DateTime olderThanUtc)

@@ -20,20 +20,32 @@ namespace TellMe.DAL.Types.Services
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<IReadOnlyCollection<NotificationDTO>> GetNotificationsAsync(string currentUserId, int skip)
+        public async Task<IReadOnlyCollection<NotificationDTO>> GetNotificationsAsync(string currentUserId, DateTime olderThanUtc)
         {
             var query = await _notificationRepository
             .GetQueryable()
             .AsNoTracking()
-            .Where(x => x.RecipientId == currentUserId)
+            .Where(x => x.Date < olderThanUtc && x.RecipientId == currentUserId)
             .OrderByDescending(x => x.Date)
-            .Skip(skip).Take(10)
+            .Take(10)
             .ToListAsync()
             .ConfigureAwait(false);
 
             var result = Mapper.Map<List<NotificationDTO>>(query);
             return result;
         }
+
+        public async Task<int> GetActiveNotificationsCountAsync(string currentUserId)
+        {
+            var result = await _notificationRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .CountAsync(x => x.RecipientId == currentUserId)
+            .ConfigureAwait(false);
+
+            return result;
+        }
+
 
         public async Task HandleNotificationAsync(string currentUserId, int notificationId)
         {
@@ -45,7 +57,7 @@ namespace TellMe.DAL.Types.Services
             {
                 throw new Exception("Notification doesn't exist or your are not allowed to change it");
             }
-            
+
             notification.Handled = true;
             await _notificationRepository
             .SaveAsync(notification, true)

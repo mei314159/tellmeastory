@@ -101,6 +101,7 @@ namespace TellMe.iOS
             cell.Story = this.storiesList[indexPath.Row];
             cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
             cell.PreviewTouched = Cell_OnPreviewTouched;
+            cell.ReceiverSelected = Cell_OnReceiverTouched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
@@ -113,6 +114,18 @@ namespace TellMe.iOS
         void Cell_OnProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
+        }
+
+        void Cell_OnReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        {
+            _businessLogic.ViewReceiver(receiver, (tribe) =>
+            {
+                cell.RemoveTribe(tribe);
+                if (tribe.Id == Tribe.Id)
+                {
+                    TribeLeft?.Invoke(tribe);
+                }
+            });
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

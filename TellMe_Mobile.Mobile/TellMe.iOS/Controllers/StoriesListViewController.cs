@@ -31,6 +31,7 @@ namespace TellMe.iOS
             base.ViewDidLoad();
             this._businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
+            this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -91,6 +92,8 @@ namespace TellMe.iOS
             cell.Story = this.storiesList[indexPath.Row];
             cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
             cell.PreviewTouched = Cell_OnPreviewTouched;
+            cell.CommentsButtonTouched = Cell_OnCommentsButtonTouched;
+            cell.ReceiverSelected = Cell_OnReceiverTouched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
@@ -103,6 +106,16 @@ namespace TellMe.iOS
         void Cell_OnProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
+        }
+
+        private void Cell_OnCommentsButtonTouched(StoryDTO story)
+        {
+            _businessLogic.ViewStory(story, true);
+        }
+
+        void Cell_OnReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        {
+            _businessLogic.ViewReceiver(receiver, cell.RemoveTribe);
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)

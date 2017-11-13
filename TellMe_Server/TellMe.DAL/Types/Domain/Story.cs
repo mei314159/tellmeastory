@@ -18,5 +18,6 @@ namespace TellMe.DAL.Types.Domain
         public virtual ICollection<StoryReceiver> Receivers { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }
+        public int CommentsCount { get; set; }
     }
 }

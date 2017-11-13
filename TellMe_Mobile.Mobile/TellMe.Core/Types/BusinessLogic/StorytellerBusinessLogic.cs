@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
@@ -39,7 +40,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 stories.Clear();
             }
 
-            var result = await _remoteStoriesService.GetStoriesAsync(_view.Storyteller.Id, stories.Count).ConfigureAwait(false);
+            var result = await _remoteStoriesService.GetStoriesAsync(_view.Storyteller.Id, forceRefresh ? null : stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
@@ -106,6 +107,18 @@ namespace TellMe.Core.Types.BusinessLogic
         public void ViewStory(StoryDTO story)
         {
             _router.NavigateViewStory(this._view, story);
+        }
+
+        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
+        {
+            if (receiver.TribeId != null)
+            {
+                _router.NavigateTribe(_view, receiver.TribeId.Value, onRemoveTribe);
+            }
+            else
+            {
+                _router.NavigateStoryteller(_view, receiver.UserId);
+            }
         }
     }
 }

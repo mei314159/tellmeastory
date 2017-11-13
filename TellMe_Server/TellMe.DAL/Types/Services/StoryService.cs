@@ -26,6 +26,8 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
         private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
+
+        private readonly IRepository<Comment, int> _commentRepository;
         public StoryService(
             IRepository<Story, int> storyRepository,
             IRepository<ApplicationUser, string> userRepository,
@@ -46,7 +48,7 @@ namespace TellMe.DAL.Types.Services
             _tribeMemberRepository = tribeMemberRepository;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int skip)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
             var receivers = _storyReceiverRepository.GetQueryable(true);
@@ -60,6 +62,8 @@ namespace TellMe.DAL.Types.Services
                         select
                           receiver;
 
+
+
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
@@ -69,10 +73,9 @@ namespace TellMe.DAL.Types.Services
                        join receiver in receivers
                        on story.Id equals receiver.StoryId into gj
                        from st in gj.DefaultIfEmpty()
-                       where story.SenderId == currentUserId || st != null
+                       where story.CreateDateUtc < olderThanUtc && (story.SenderId == currentUserId || st != null)
                        orderby story.CreateDateUtc descending
                        select story)
-                       .Skip(skip)
                        .Take(20);
 
 
@@ -82,11 +85,11 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(string userId, string currentUserId, int skip)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string userId, string currentUserId, DateTime olderThanUtc)
         {
             if (userId == currentUserId)
             {
-                return await this.GetAllAsync(currentUserId, skip).ConfigureAwait(false);
+                return await this.GetAllAsync(currentUserId, olderThanUtc).ConfigureAwait(false);
             }
 
             var receivers = _storyReceiverRepository.GetQueryable(true)
@@ -105,10 +108,9 @@ namespace TellMe.DAL.Types.Services
                        join receiver in receivers
                        on story.Id equals receiver.StoryId into gj
                        from st in gj.DefaultIfEmpty()
-                       where st != null
+                       where story.CreateDateUtc < olderThanUtc && st != null
                        orderby story.CreateDateUtc descending
                        select story)
-                       .Skip(skip)
                        .Take(20);
             var list = await stories.ToListAsync().ConfigureAwait(false);
             var result = Mapper.Map<ICollection<StoryDTO>>(list);
@@ -116,7 +118,7 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task<ICollection<StoryDTO>> GetAllAsync(int tribeId, string currentUserId, int skip)
+        public async Task<ICollection<StoryDTO>> GetAllAsync(int tribeId, string currentUserId, DateTime olderThanUtc)
         {
             var tribeMember = await _tribeMemberRepository
             .GetQueryable(true)
@@ -141,10 +143,9 @@ namespace TellMe.DAL.Types.Services
                        join receiver in receivers
                        on story.Id equals receiver.StoryId into gj
                        from st in gj.DefaultIfEmpty()
-                       where st != null
+                       where story.CreateDateUtc < olderThanUtc && st != null
                        orderby story.CreateDateUtc descending
                        select story)
-                       .Skip(skip)
                        .Take(20);
 
 

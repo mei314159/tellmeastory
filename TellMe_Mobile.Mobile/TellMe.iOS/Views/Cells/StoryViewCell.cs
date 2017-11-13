@@ -9,10 +9,11 @@ using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using System.Collections.Generic;
+using TellMe.iOS.Views.Cells;
 
-namespace TellMe.iOS.Views.Cells
+namespace TellMe.iOS
 {
-    public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource
+    public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
     {
         AVUrlAsset _playerAsset;
         AVPlayerItem _playerItem;
@@ -21,7 +22,6 @@ namespace TellMe.iOS.Views.Cells
         public static NSString AVCustomEditPlayerViewControllerStatusObservationContext = new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
         private NSObject _stopPlayingNotification;
         private bool playing;
-        private readonly List<StoryReceiverDTO> receiversList = new List<StoryReceiverDTO>();
         private UIImage defaultPicture;
         private StoryDTO story;
 
@@ -73,6 +73,9 @@ namespace TellMe.iOS.Views.Cells
             this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(this.ProfilePictureTouched));
             this.Preview.UserInteractionEnabled = true;
             this.Preview.AddGestureRecognizer(new UITapGestureRecognizer(this.PreviewTouched));
+
+			ReceiversCollection.DelaysContentTouches = false;
+            ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
         }
 
         public void Play()
@@ -112,9 +115,9 @@ namespace TellMe.iOS.Views.Cells
             }
         }
 
-
-        public void Restart()
+        partial void ReplayButton_Touched(Button sender)
         {
+            ReplayButton.Hidden = true;
             _player.Pause();
             _player.Seek(CMTime.Zero);
             _player.Play();
@@ -144,29 +147,16 @@ namespace TellMe.iOS.Views.Cells
 
                     Console.WriteLine(exporter.Description);
                     Console.WriteLine(exporter.DebugDescription);
-
-                    Restart();
                 });
             }
-            else
-            {
-                Restart();
-            }
+
+            ReplayButton.Hidden = false;
         }
 
-        public void DisplayReceivers(List<StoryReceiverDTO> data)
-        {
-            receiversList.Clear();
-            receiversList.AddRange(data);
-            InvokeOnMainThread(() =>
-            {
-                ReceiversCollection.ReloadData();
-            });
-        }
 
         public void RemoveTribe(TribeDTO tribe)
         {
-            receiversList.RemoveAll(x => x.TribeId == tribe.Id);
+            Story.Receivers.RemoveAll(x => x.TribeId == tribe.Id);
             InvokeOnMainThread(() =>
             {
                 ReceiversCollection.ReloadData();
@@ -201,16 +191,25 @@ namespace TellMe.iOS.Views.Cells
 
         public nint GetItemsCount(UICollectionView collectionView, nint section)
         {
-            return receiversList.Count;
+            return Story.Receivers?.Count ?? 0;
         }
 
         public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
             var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
-            cell.Receiver = this.receiversList[(int)indexPath.Item];
-			cell.ReceiverSelected = ReceiverSelected;
+            cell.Receiver = Story.Receivers[(int)indexPath.Item];
             cell.UserInteractionEnabled = true;
             return cell;
+        }
+
+        [Export("collectionView:didSelectItemAtIndexPath:")]
+        public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            var cell = collectionView.CellForItem(indexPath) as ReceiversListCell;
+            if (cell != null)
+            {
+                this.OnReceiverSelected?.Invoke(cell.Receiver);
+            }
         }
 
         void ProfilePictureTouched()
@@ -221,11 +220,6 @@ namespace TellMe.iOS.Views.Cells
         void PreviewTouched()
         {
             this.OnPreviewTouched?.Invoke(Story);
-        }
-
-        void ReceiverSelected(StoryReceiverDTO receiver)
-        {
-            this.OnReceiverSelected?.Invoke(receiver);
         }
 
         private void Initialize()
@@ -240,8 +234,9 @@ namespace TellMe.iOS.Views.Cells
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
 
-            ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
             ReceiversCollection.DataSource = this;
+            ReceiversCollection.Delegate = this;
+            ReceiversCollection.ReloadData();
         }
 
         protected override void Dispose(bool disposing)

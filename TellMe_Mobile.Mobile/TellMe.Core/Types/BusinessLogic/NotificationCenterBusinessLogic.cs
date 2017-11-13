@@ -42,7 +42,7 @@ namespace TellMe.Core.Types.BusinessLogic
                     notifications.Clear();
                 }
 
-                var result = await _remoteNotificationsDataService.GetNotificationsAsync(notifications.Count).ConfigureAwait(false);
+                var result = await _remoteNotificationsDataService.GetNotificationsAsync(notifications.LastOrDefault()?.Date).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     await _localNotificationsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);

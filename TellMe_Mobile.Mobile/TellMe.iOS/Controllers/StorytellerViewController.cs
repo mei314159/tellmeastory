@@ -110,8 +110,14 @@ namespace TellMe.iOS
             cell.Story = this.storiesList[indexPath.Row];
             //cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
             cell.PreviewTouched = Cell_OnPreviewTouched;
+            cell.ReceiverSelected = Cell_OnReceiverTouched;
             cell.UserInteractionEnabled = true;
             return cell;
+        }
+
+        void Cell_OnReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        {
+            _businessLogic.ViewReceiver(receiver, cell.RemoveTribe);
         }
 
         void Cell_OnPreviewTouched(StoryDTO story)

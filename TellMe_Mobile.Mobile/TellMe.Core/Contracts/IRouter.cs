@@ -26,7 +26,7 @@ namespace TellMe.Core.Contracts
         void NavigateStoryteller(IView view, string userId);
         void NavigateNotificationsCenter(IView view);
         void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> members, TribeCreatedHandler complete);
-        void NavigateViewStory(IView view, StoryDTO story);
+        void NavigateViewStory(IView view, StoryDTO story, bool goToComments = false);
         void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, int tribeId, TribeLeftHandler e);

@@ -8,7 +8,7 @@ using Foundation;
 using System;
 using System.CodeDom.Compiler;
 
-namespace TellMe.iOS.Views.Cells
+namespace TellMe.iOS
 {
     [Register ("StoryViewCell")]
     partial class StoryViewCell
@@ -27,11 +27,19 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Button ReplayButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Label Title { get; set; }
+
+        [Action ("ReplayButton_Touched:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void ReplayButton_Touched (TellMe.iOS.Button sender);
 
         void ReleaseDesignerOutlets ()
         {
@@ -48,6 +56,11 @@ namespace TellMe.iOS.Views.Cells
             if (ReceiversCollection != null) {
                 ReceiversCollection.Dispose ();
                 ReceiversCollection = null;
+            }
+
+            if (ReplayButton != null) {
+                ReplayButton.Dispose ();
+                ReplayButton = null;
             }
 
             if (Spinner != null) {
