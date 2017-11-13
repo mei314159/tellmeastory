@@ -63,15 +63,17 @@ namespace TellMe.Core.Types.BusinessLogic
             this._view.DisplayNotifications(notifications);
         }
 
-        public void HandleNotification(NotificationDTO notification)
+        public async void HandleNotification(NotificationDTO notification)
         {
-            _notificationHandler.ProcessNotification(notification, _view, NotificationProcessed);
+            var result = await _notificationHandler.ProcessNotification(notification).ConfigureAwait(false);
+            if (result.HasValue)
+                await NotificationProcessed(notification.Id, result.Value).ConfigureAwait(false);
         }
 
-        async void NotificationProcessed(int notificationId, bool success)
+        async Task NotificationProcessed(int notificationId, bool success)
         {
             var notification = notifications.FirstOrDefault(x => x.Id == notificationId);
-            notification.Handled = true;
+            notification.Handled = success;
             await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
             _view.ReloadNotification(notification);
         }

@@ -18,7 +18,7 @@ namespace TellMe.iOS.Views.Badge
         /// Initializes a new instance of the <see cref="BadgeView"/> class.
         /// </summary>
         /// <param name="frame">The frame.</param>
-        public BadgeView(RectangleF frame)
+        public BadgeView(CGRect frame)
             : base(frame)
         {
             this.InitState();

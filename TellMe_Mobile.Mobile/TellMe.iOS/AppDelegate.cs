@@ -51,8 +51,8 @@ namespace TellMe.iOS
             var contactsProvider = new ContactsProvider();
             this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
             var router = new Router(window);
-            App.Instance.Initialize(accountService, applicationDataStorage, router, new NotificationHandler(router));
-
+            App.Instance.Initialize(accountService, applicationDataStorage, router);
+            App.Instance.OnNotificationReceived += Instance_OnNotificationReceived;
             this.Window = window;
             this.Window.RootViewController = GetInitialViewController(launchOptions);
             this.Window.MakeKeyAndVisible();
@@ -63,6 +63,7 @@ namespace TellMe.iOS
                 if (notification != null)
                 {
                     ProcessNotification(notification, false);
+                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
                 }
             }
 
@@ -175,17 +176,28 @@ namespace TellMe.iOS
             });
         }
 
-        private void ProcessNotification(NSDictionary userInfo, bool quiet = true)
+        private void ProcessNotification(NSDictionary userInfo, bool quiet = false)
         {
             NSError error = new NSError();
             var pushJson = new NSString(NSJsonSerialization.Serialize(userInfo, 0, out error), NSStringEncoding.UTF8).ToString();
             var notification = JsonConvert.DeserializeObject<PushNotification>(pushJson);
 
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = notification.Data.Badge ?? 1;
+            App.Instance.NotificationReceived(new NotificationDTO
+            {
+                Id = notification.NotificationId.Value,
+                Text = notification.Data.Message,
+                Extra = notification.Extra,
+                Type = notification.NotificationType
+            });
+
+        }
+
+        void Instance_OnNotificationReceived(NotificationDTO notification)
+        {
             var tabBarController = Window.RootViewController as UITabBarController;
             if (tabBarController == null)
                 return;
-
             foreach (var c in tabBarController.ViewControllers)
             {
                 var rootController = c as UINavigationController;
@@ -195,18 +207,8 @@ namespace TellMe.iOS
                 }
 
                 var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault() as IView;
-                if (notification.NotificationId.HasValue)
-                    App.Instance.NotificationHandler
-                       .ProcessNotification(
-                           new NotificationDTO
-                           {
-                               Id = notification.NotificationId.Value,
-                               Text = notification.Data.Message,
-                               Extra = notification.Extra,
-                               Type = notification.NotificationType
-                           },
-                           view,
-                           null);
+                var handler = new NotificationHandler(App.Instance.Router, view).ProcessNotification(notification);
+                return;
             }
         }
 

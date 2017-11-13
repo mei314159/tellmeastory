@@ -12,6 +12,7 @@ using System.Collections;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 using TellMe.Core;
+using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
@@ -28,7 +29,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             businessLogic = new NotificationCenterBusinessLogic(
-                App.Instance.NotificationHandler,
+                new NotificationHandler(App.Instance.Router, this),
                 new RemoteNotificationsDataService(),
                 this);
             this.TableView.TableFooterView = new UIView();
@@ -80,7 +81,18 @@ namespace TellMe.iOS
             }
 
             cell.Notification = dto;
-            return (UITableViewCell)cell;
+            var uiCell = (UITableViewCell)cell;
+
+            if (dto.Handled)
+            {
+                uiCell.BackgroundColor = UIColor.White;
+            }
+            else
+            {
+                uiCell.BackgroundColor = UIColor.FromRGB(237, 242, 250);
+            }
+
+            return uiCell;
         }
 
         [Export("tableView:didSelectRowAtIndexPath:")]

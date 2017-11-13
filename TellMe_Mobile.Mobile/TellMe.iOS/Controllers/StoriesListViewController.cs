@@ -11,6 +11,8 @@ using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Views.Cells;
 using TellMe.Core;
 using TellMe.iOS.Extensions;
+using TellMe.iOS.Views.Badge;
+using CoreGraphics;
 
 namespace TellMe.iOS
 {
@@ -20,7 +22,7 @@ namespace TellMe.iOS
         private List<StoryDTO> storiesList = new List<StoryDTO>();
         private volatile bool loadingMore;
         private volatile bool canLoadMore;
-
+        private BadgeView notificationsBadge;
 
         public StoriesListViewController(IntPtr handle) : base(handle)
         {
@@ -29,7 +31,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this._businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), this, App.Instance.Router);
+            this._businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), new RemoteNotificationsDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -40,7 +42,6 @@ namespace TellMe.iOS
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
-
             Task.Run(() => LoadStoriesAsync(false, true));
 
             ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
@@ -48,6 +49,7 @@ namespace TellMe.iOS
 
         public override void ViewWillAppear(bool animated)
         {
+            _businessLogic.LoadActiveNotificationsCountAsync();
             this.SetToolbarItems(new[]{
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 new UIBarButtonItem("Request a Story", UIBarButtonItemStyle.Plain, RequestStoryButtonTouched),
@@ -182,6 +184,32 @@ namespace TellMe.iOS
         partial void Storytellers_Activated(UIBarButtonItem sender)
         {
             _businessLogic.ShowStorytellers();
+        }
+
+        public void DisplayNotificationsCount(int count)
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (notificationsBadge == null)
+                {
+                    notificationsBadge = new BadgeView(new CGRect(12, -8, 30, 20));
+                    notificationsBadge.Font = UIFont.SystemFontOfSize(12, UIFontWeight.Regular);
+                    notificationsBadge.Hidden = true;
+
+                    Notifications.CustomView = new UIImageView(UIImage.FromBundle("Bell"))
+                    {
+                        Frame = new CGRect(0, 0, 24, 24),
+                    };
+                    Notifications.CustomView.Add(notificationsBadge);
+                    Notifications.CustomView.AddGestureRecognizer(new UITapGestureRecognizer(() =>
+                    {
+                        Notifications_Activated(Notifications);
+                    }));
+                }
+
+                notificationsBadge.Hidden = count == 0;
+                notificationsBadge.Value = count;
+            });
         }
     }
 }

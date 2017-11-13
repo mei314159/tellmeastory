@@ -7,27 +7,28 @@ namespace TellMe.Core
 {
     public sealed class App
     {
-		private AccountService _localAccountService;
+        private AccountService _localAccountService;
         private IApplicationDataStorage _dataStorage;
 
         private static readonly Lazy<App> lazy = new Lazy<App>(() => new App());
         public static App Instance => lazy.Value;
 
+        public event Action<NotificationDTO> OnNotificationReceived;
+
         private App()
         {
         }
 
-        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router, INotificationHandler notificationHandler)
+        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router)
         {
             _localAccountService = localAccountService;
             _dataStorage = dataStorage;
             Router = router;
-            NotificationHandler = notificationHandler;
         }
 
         public IRouter Router { get; set; }
 
-		public INotificationHandler NotificationHandler { get; set; }
+        public INotificationHandler NotificationHandler { get; set; }
 
         public OsType OsType => _dataStorage.OsType;
 
@@ -45,10 +46,14 @@ namespace TellMe.Core
             }
         }
 
-
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;
 
+
+        public void NotificationReceived(NotificationDTO notification)
+        {
+            this.OnNotificationReceived?.Invoke(notification);
+        }
 
         public void LogException(Exception ex)
         {

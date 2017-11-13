@@ -9,5 +9,6 @@ namespace TellMe.Core.Contracts.UI.Views
         void ShowSuccessMessage(string message, Action complete = null);
 
         void DisplayStories(ICollection<StoryDTO> stories);
+        void DisplayNotificationsCount(int count);
     }
 }

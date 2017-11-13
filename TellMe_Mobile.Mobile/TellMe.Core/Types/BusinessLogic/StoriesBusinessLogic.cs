@@ -16,15 +16,21 @@ namespace TellMe.Core.Types.BusinessLogic
     public class StoriesBusinessLogic
     {
         private RemoteStoriesDataService _remoteStoriesService;
+        private RemoteNotificationsDataService _remoteNotificationsService;
         private LocalStoriesDataService _localStoriesService;
         private IStoriesListView _view;
         private IRouter _router;
         private RequestStoryValidator _validator;
         readonly List<StoryDTO> stories = new List<StoryDTO>();
 
-        public StoriesBusinessLogic(RemoteStoriesDataService remoteStoriesService, IStoriesListView view, IRouter router)
+        public StoriesBusinessLogic(
+            RemoteStoriesDataService remoteStoriesService,
+            RemoteNotificationsDataService remoteNotificationsService,
+            IStoriesListView view,
+            IRouter router)
         {
             _remoteStoriesService = remoteStoriesService;
+            _remoteNotificationsService = remoteNotificationsService;
             _localStoriesService = new LocalStoriesDataService();
             _view = view;
             _router = router;
@@ -116,6 +122,20 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 _router.NavigateStoryteller(_view, receiver.UserId);
+            }
+        }
+
+        public async Task LoadActiveNotificationsCountAsync()
+        {
+            var result = await _remoteNotificationsService.GetActiveNotificationsCountAsync().ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this._view.DisplayNotificationsCount(result.Data);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
             }
         }
     }

@@ -22,7 +22,7 @@ namespace TellMe.Core.Types.DataServices.Remote
 
         public async Task<Result> HandleNotificationAsync(int notificationId)
         {
-            var result = await this.GetAsync<List<NotificationDTO>>($"notifications/{notificationId}/handled").ConfigureAwait(false);
+            var result = await this.PostAsync<List<NotificationDTO>>($"notifications/{notificationId}/handled", null).ConfigureAwait(false);
             return result;
         }
     }

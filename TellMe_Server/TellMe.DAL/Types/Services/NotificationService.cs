@@ -40,7 +40,7 @@ namespace TellMe.DAL.Types.Services
             var result = await _notificationRepository
             .GetQueryable()
             .AsNoTracking()
-            .CountAsync(x => x.RecipientId == currentUserId)
+            .CountAsync(x => x.RecipientId == currentUserId && !x.Handled)
             .ConfigureAwait(false);
 
             return result;
