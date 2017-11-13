@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using TellMe.DAL.Contracts.DTO;
 using AutoMapper;
+using System;
 
 namespace TellMe.DAL.Types.Services
 {
@@ -19,14 +20,14 @@ namespace TellMe.DAL.Types.Services
             _notificationRepository = notificationRepository;
         }
 
-        public async Task<IReadOnlyCollection<NotificationDTO>> GetNotificationsAsync(string currentUserId, int skip)
+        public async Task<IReadOnlyCollection<NotificationDTO>> GetNotificationsAsync(string currentUserId, DateTime olderThanUtc)
         {
             var query = await _notificationRepository
             .GetQueryable()
             .AsNoTracking()
-            .Where(x => x.RecipientId == currentUserId)
+            .Where(x => x.Date < olderThanUtc && x.RecipientId == currentUserId)
             .OrderByDescending(x => x.Date)
-            .Skip(skip).Take(10)
+            .Take(10)
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -34,12 +35,29 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task HandleNotificationAsync(int notificationId)
+        public async Task<int> GetActiveNotificationsCountAsync(string currentUserId)
+        {
+            var result = await _notificationRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .CountAsync(x => x.RecipientId == currentUserId && !x.Handled)
+            .ConfigureAwait(false);
+
+            return result;
+        }
+
+
+        public async Task HandleNotificationAsync(string currentUserId, int notificationId)
         {
             var notification = await _notificationRepository
             .GetQueryable()
-            .FirstOrDefaultAsync(x => x.Id == notificationId)
+            .FirstOrDefaultAsync(x => x.Id == notificationId && x.RecipientId == currentUserId)
             .ConfigureAwait(false);
+            if (notification == null)
+            {
+                throw new Exception("Notification doesn't exist or your are not allowed to change it");
+            }
+
             notification.Handled = true;
             await _notificationRepository
             .SaveAsync(notification, true)

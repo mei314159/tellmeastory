@@ -88,6 +88,7 @@ namespace TellMe.DAL.Types.Services
                         Message = n.Text
                     },
                     Extra = n.Extra,
+                    NotificationId = n.Id,
                     NotificationType = n.Type,
                 };
 

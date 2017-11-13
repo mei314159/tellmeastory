@@ -10,8 +10,8 @@ using System.CodeDom.Compiler;
 
 namespace TellMe.iOS
 {
-    [Register ("StoryView")]
-    partial class StoryView
+    [Register ("StoryViewCell")]
+    partial class StoryViewCell
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -23,23 +23,23 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UICollectionView ReceiversCollection { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Button ReplayButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Label Title { get; set; }
 
-        [Outlet]
+        [Action ("ReplayButton_Touched:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIView Video { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIView View { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.NSLayoutConstraint ViewHeight { get; set; }
+        partial void ReplayButton_Touched (TellMe.iOS.Button sender);
 
         void ReleaseDesignerOutlets ()
         {
@@ -53,6 +53,16 @@ namespace TellMe.iOS
                 ProfilePicture = null;
             }
 
+            if (ReceiversCollection != null) {
+                ReceiversCollection.Dispose ();
+                ReceiversCollection = null;
+            }
+
+            if (ReplayButton != null) {
+                ReplayButton.Dispose ();
+                ReplayButton = null;
+            }
+
             if (Spinner != null) {
                 Spinner.Dispose ();
                 Spinner = null;
@@ -61,21 +71,6 @@ namespace TellMe.iOS
             if (Title != null) {
                 Title.Dispose ();
                 Title = null;
-            }
-
-            if (Video != null) {
-                Video.Dispose ();
-                Video = null;
-            }
-
-            if (View != null) {
-                View.Dispose ();
-                View = null;
-            }
-
-            if (ViewHeight != null) {
-                ViewHeight.Dispose ();
-                ViewHeight = null;
             }
         }
     }

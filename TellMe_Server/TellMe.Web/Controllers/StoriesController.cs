@@ -9,6 +9,7 @@ using System;
 
 namespace TellMe.Web.Controllers
 {
+
     [Route("api/stories")]
     public class StoriesController : AuthorizedController
     {
@@ -40,14 +41,41 @@ namespace TellMe.Web.Controllers
         {
             var result = await _storyService.SendStoryAsync(this.UserId, dto);
             if (dto.NotificationId.HasValue)
-                await _notificationService.HandleNotificationAsync(dto.NotificationId.Value);
+                await _notificationService.HandleNotificationAsync(this.UserId, dto.NotificationId.Value);
             return Ok(result);
         }
 
-        [HttpGet("skip/{skip}")]
-        public async Task<IActionResult> GetStoriesAsync(int skip)
+        [HttpGet("older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(long olderThanTicksUtc)
         {
-            var result = await _storyService.GetAllAsync(this.UserId, skip < 0 ? 0 : skip);
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(this.UserId, olderThanUtc);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{storyId}/receivers")]
+        public async Task<IActionResult> GetStoryReceiversAsync(int storyId)
+        {
+            var result = await _storyService.GetStoryReceiversAsync(this.UserId, storyId);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{userId}/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(string userId, long olderThanTicksUtc)
+        {
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(userId, this.UserId, olderThanUtc);
+
+            return Ok(result);
+        }
+
+        [HttpGet("tribe/{tribeId}/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetStoriesAsync(int tribeId, long olderThanTicksUtc)
+        {
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(tribeId, this.UserId, olderThanUtc);
 
             return Ok(result);
         }
@@ -78,7 +106,7 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int? notificationId)
         {
             var storyStatus = await _storyService.RejectRequestAsync(this.UserId, storyId);
-            await _notificationService.HandleNotificationAsync(notificationId.Value);
+            await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(storyStatus);
         }
     }

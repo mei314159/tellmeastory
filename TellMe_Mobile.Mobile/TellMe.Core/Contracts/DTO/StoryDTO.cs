@@ -9,7 +9,6 @@ namespace TellMe.Core.Contracts.DTO
         [SQLite.PrimaryKey]
         public int Id { get; set; }
         public string Title { get; set; }
-        public DateTime CreateDateUtc { get; set; }
         public string VideoUrl { get; set; }
         public string PreviewUrl { get; set; }
 
@@ -17,6 +16,10 @@ namespace TellMe.Core.Contracts.DTO
         public string SenderName { get; set; }
         public string SenderPictureUrl { get; set; }
 
+        public DateTime CreateDateUtc { get; set; }
+
+        [SQLiteNetExtensions.Attributes.OneToMany("StoryId", CascadeOperations = SQLiteNetExtensions.Attributes.CascadeOperation.All)]
         public List<StoryReceiverDTO> Receivers { get; set; }
+        public int CommentsCount { get; set; }
     }
 }

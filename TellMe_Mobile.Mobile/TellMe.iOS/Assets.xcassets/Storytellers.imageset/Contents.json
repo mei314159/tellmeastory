@@ -49,11 +49,13 @@
       "idiom": "ipad"
     },
     {
-      "idiom": "watch"
+      "idiom": "watch",
+      "screen-width": ">145"
     },
     {
       "scale": "2x",
-      "idiom": "watch"
+      "idiom": "watch",
+      "screen-width": ">145"
     },
     {
       "screenWidth": "{130,145}",
@@ -79,6 +81,7 @@
   ],
   "info": {
     "version": 1,
-    "author": "xcode"
+    "author": "xcode",
+    "template-rendering-intent": "template"
   }
 }

@@ -8,7 +8,7 @@ namespace TellMe.Core.Contracts.UI.Views
     {
         StoryRequestDTO StoryRequest { get; }
         NotificationDTO RequestNotification { get; }
-
+        ContactDTO Contact { get; }
         string VideoPath { get; }
 
         string PreviewImagePath { get; }

@@ -30,6 +30,7 @@ namespace TellMe.iOS
         public string VideoPath { get; set; }
         public StoryRequestDTO StoryRequest { get; set; }
         public NotificationDTO RequestNotification { get; set; }
+        public ContactDTO Contact { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -61,7 +62,7 @@ namespace TellMe.iOS
         partial void SendButtonTouched(Button sender)
         {
             goNext = true;
-            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, StoryRequest, RequestNotification);
+            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, StoryRequest, RequestNotification, Contact);
         }
 
         public override void ViewWillDisappear(bool animated)

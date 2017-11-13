@@ -163,6 +163,11 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateCreateTribe(this._view, tribeMembers, TribeCreated);
         }
 
+        public void NavigateStoryteller(StorytellerDTO storyteller)
+        {
+            _router.NavigateStoryteller(_view, storyteller);
+        }
+
         void TribeCreated(TribeDTO tribe)
         {
             contacts.Add(new ContactDTO
@@ -210,7 +215,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ViewTribe(TribeDTO tribe)
         {
-            _router.NavigateViewTribe(_view, tribe, HandleTribeLeftHandler);
+            _router.NavigateTribe(_view, tribe, HandleTribeLeftHandler);
         }
 
         void HandleTribeLeftHandler(TribeDTO tribe)

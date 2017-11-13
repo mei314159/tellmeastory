@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SQLite;
+using SQLiteNetExtensionsAsync.Extensions;
 using TellMe.Core.Contracts.DataServices;
 using TellMe.Core.Contracts.DTO;
 

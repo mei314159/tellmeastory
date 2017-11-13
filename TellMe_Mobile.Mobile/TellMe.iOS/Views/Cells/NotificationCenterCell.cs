@@ -55,6 +55,10 @@ namespace TellMe.iOS.Views.Cells
                     length = storyRequestDTO.ReceiverName.Length;
                     if (!string.IsNullOrWhiteSpace(storyRequestDTO.SenderPictureUrl))
                         PictureView.SetImage(new NSUrl(storyRequestDTO.SenderPictureUrl));
+                    if (!Notification.Handled)
+                    {
+                        this.Accessory = UITableViewCellAccessory.DisclosureIndicator;
+                    }
                     break;
                 case NotificationTypeEnum.FriendshipRequest:
                     var dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();

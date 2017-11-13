@@ -14,7 +14,10 @@ namespace TellMe.DAL.Types.Domain
 
         public virtual StoryRequest Request { get; set; }
         public virtual ApplicationUser Sender { get; set; }
-        
+
         public virtual ICollection<StoryReceiver> Receivers { get; set; }
+
+        public virtual ICollection<Comment> Comments { get; set; }
+        public int CommentsCount { get; set; }
     }
 }

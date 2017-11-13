@@ -30,7 +30,7 @@ namespace TellMe.iOS
         public string PreviewImagePath { get; set; }
 
         public NotificationDTO RequestNotification { get; set; }
-
+        public ContactDTO Contact { get; set; }
 
         public override void ViewDidLoad()
         {

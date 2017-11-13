@@ -88,9 +88,10 @@ namespace TellMe.DAL.Types.Services
             .Select(x => new Notification
             {
                 Date = DateTime.UtcNow,
-                Type = NotificationTypeEnum.TribeRejectInvite,
+                Type = NotificationTypeEnum.LeftTribe,
                 RecipientId = x.UserId,
                 Extra = tribeMemberDTO,
+                Handled = true,
                 Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} has left the tribe"
             }).ToArray();
 
@@ -152,9 +153,10 @@ namespace TellMe.DAL.Types.Services
             .Select(x => new Notification
             {
                 Date = DateTime.UtcNow,
-                Type = NotificationTypeEnum.TribeRejectInvite,
+                Type = NotificationTypeEnum.TribeAcceptInvite,
                 RecipientId = x.UserId,
                 Extra = tribeMemberDTO,
+                Handled = true,
                 Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} joined the tribe"
             }).ToArray();
 

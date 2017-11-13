@@ -15,13 +15,53 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.StoryView StoryView { get; set; }
+        TellMe.iOS.Button CommentsButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Picture Preview { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Picture ProfilePicture { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UICollectionView ReceiversCollection { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Label Title { get; set; }
+
+        [Action ("CommentsButton_TouchUpInside:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void CommentsButton_TouchUpInside (TellMe.iOS.Button sender);
 
         void ReleaseDesignerOutlets ()
         {
-            if (StoryView != null) {
-                StoryView.Dispose ();
-                StoryView = null;
+            if (CommentsButton != null) {
+                CommentsButton.Dispose ();
+                CommentsButton = null;
+            }
+
+            if (Preview != null) {
+                Preview.Dispose ();
+                Preview = null;
+            }
+
+            if (ProfilePicture != null) {
+                ProfilePicture.Dispose ();
+                ProfilePicture = null;
+            }
+
+            if (ReceiversCollection != null) {
+                ReceiversCollection.Dispose ();
+                ReceiversCollection = null;
+            }
+
+            if (Title != null) {
+                Title.Dispose ();
+                Title = null;
             }
         }
     }

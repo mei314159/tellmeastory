@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
@@ -15,15 +16,21 @@ namespace TellMe.Core.Types.BusinessLogic
     public class StoriesBusinessLogic
     {
         private RemoteStoriesDataService _remoteStoriesService;
+        private RemoteNotificationsDataService _remoteNotificationsService;
         private LocalStoriesDataService _localStoriesService;
         private IStoriesListView _view;
         private IRouter _router;
         private RequestStoryValidator _validator;
         readonly List<StoryDTO> stories = new List<StoryDTO>();
 
-        public StoriesBusinessLogic(RemoteStoriesDataService remoteStoriesService, IStoriesListView view, IRouter router)
+        public StoriesBusinessLogic(
+            RemoteStoriesDataService remoteStoriesService,
+            RemoteNotificationsDataService remoteNotificationsService,
+            IStoriesListView view,
+            IRouter router)
         {
             _remoteStoriesService = remoteStoriesService;
+            _remoteNotificationsService = remoteNotificationsService;
             _localStoriesService = new LocalStoriesDataService();
             _view = view;
             _router = router;
@@ -32,34 +39,35 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
-            var localContacts = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
-            if (localContacts.Expired || forceRefresh || clearCache)
+            var localStories = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
+            //if (localStories.Expired || forceRefresh || clearCache)
+            //{
+            if (forceRefresh)
             {
-                if (forceRefresh)
-                {
-                    stories.Clear();
-                }
+                stories.Clear();
+            }
 
-                if (clearCache){
-                    await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
-                }
-                var result = await _remoteStoriesService.GetStoriesAsync(stories.Count).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                    stories.AddRange(result.Data);
-                }
-                else
-                {
-                    result.ShowResultError(this._view);
-                    return;
-                }
+            if (clearCache)
+            {
+                await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
+            }
+            var result = await _remoteStoriesService.GetStoriesAsync(forceRefresh ? null : stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
+                stories.AddRange(result.Data);
             }
             else
             {
-                stories.Clear();
-                stories.AddRange(localContacts.Data);
+                result.ShowResultError(this._view);
+                return;
             }
+            //}
+            //else
+            //{
+            //    stories.Clear();
+            //    stories.AddRange(localStories.Data);
+            //}
 
             this._view.DisplayStories(stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
@@ -93,6 +101,42 @@ namespace TellMe.Core.Types.BusinessLogic
         void RequestStoryRecipientSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
         {
             _router.NavigateRequestStory(this._view, selectedContacts);
+        }
+
+        public void ViewStory(StoryDTO story, bool goToComments = false)
+        {
+            _router.NavigateViewStory(this._view, story, goToComments);
+        }
+
+        public void NavigateStoryteller(StoryDTO story)
+        {
+            _router.NavigateStoryteller(_view, story.SenderId);
+        }
+
+        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
+        {
+            if (receiver.TribeId != null)
+            {
+                _router.NavigateTribe(_view, receiver.TribeId.Value, onRemoveTribe);
+            }
+            else
+            {
+                _router.NavigateStoryteller(_view, receiver.UserId);
+            }
+        }
+
+        public async Task LoadActiveNotificationsCountAsync()
+        {
+            var result = await _remoteNotificationsService.GetActiveNotificationsCountAsync().ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this._view.DisplayNotificationsCount(result.Data);
+            }
+            else
+            {
+                result.ShowResultError(this._view);
+                return;
+            }
         }
     }
 }

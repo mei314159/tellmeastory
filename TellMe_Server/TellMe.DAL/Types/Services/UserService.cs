@@ -277,5 +277,27 @@ namespace TellMe.DAL.Types.Services
 
             return FriendshipStatus.Rejected;
         }
+
+        public async Task<StorytellerDTO> GetStorytellerAsync(string currentUserId, string userId)
+        {
+            var user = await _userRepository
+                .GetQueryable(true)
+                .FirstOrDefaultAsync(x => x.Id == userId).ConfigureAwait(false);
+
+            var friendship = await _friendshipRepository
+            .GetQueryable(true)
+            .FirstOrDefaultAsync(x => x.UserId == currentUserId).ConfigureAwait(false);
+
+            var result = new StorytellerDTO
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                PictureUrl = user.PictureUrl,
+                FriendshipStatus = friendship != null ? friendship.Status : FriendshipStatus.None
+            };
+
+            return result;
+        }
     }
 }

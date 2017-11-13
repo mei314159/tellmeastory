@@ -37,7 +37,7 @@ namespace TellMe.Core.Types.DataServices.Local
         {
             if (items == null)
                 return;
-            
+
             var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
             await conn.RunInTransactionAsync((SQLiteConnection c) =>
             {
@@ -63,6 +63,14 @@ namespace TellMe.Core.Types.DataServices.Local
                 c.InsertOrReplaceWithChildren(storyteller);
                 c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Storytellers" });
             }).ConfigureAwait(false);
+        }
+
+        public async Task<DataResult<StorytellerDTO>> GetAsync(string storytellerId)
+        {
+            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            var result = await conn.Table<StorytellerDTO>().Where(x => x.Id == storytellerId).FirstOrDefaultAsync().ConfigureAwait(false);
+            var updateInfo = await conn.FindAsync<UpdateInfo>("Storytellers").ConfigureAwait(false);
+            return new DataResult<StorytellerDTO>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
     }
 }

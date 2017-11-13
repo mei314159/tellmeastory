@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TellMe.iOS.Controllers;
 using TellMe.Core.Contracts;
@@ -57,7 +56,7 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -65,11 +64,12 @@ namespace TellMe.iOS.Core
                 var recordController = (RecordVideoController)targetController.ViewControllers.First();
                 recordController.StoryRequest = storyRequest;
                 recordController.RequestNotification = notification;
+                recordController.Contact = contact;
                 this.Present(targetController, view, false);
             });
         }
 
-        public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -77,11 +77,12 @@ namespace TellMe.iOS.Core
                 targetController.VideoPath = videoPath;
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
+                targetController.Contact = contact;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null)
+        public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
             this.window.InvokeOnMainThread(() =>
             {
@@ -90,6 +91,7 @@ namespace TellMe.iOS.Core
                 targetController.PreviewImagePath = previewImagePath;
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
+                targetController.Contact = contact;
                 this.Present(targetController, view);
             });
         }
@@ -140,11 +142,68 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
+        public void NavigateViewStory(IView view, StoryDTO story, bool goToComments = false)
         {
             this.window.InvokeOnMainThread(() =>
             {
-                var targetController = new ViewTribeController(tribe);
+                var targetController = (StoryViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("StoryViewController");
+                targetController.Story = story;
+                targetController.DisplayCommentsWhenAppear = goToComments;
+                targetController.ModalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
+                targetController.Parent = view;
+                this.Present(targetController, view, false);
+            });
+        }
+
+        public void NavigateStoryteller(IView view, StorytellerDTO storyteller)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.Storyteller = storyteller;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateStoryteller(IView view, string userId)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+
+                var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
+                targetController.StorytellerId = userId;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = new TribeInfoViewController(tribe);
+                targetController.TribeLeft += e;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
+                targetController.Tribe = tribe;
+                targetController.TribeLeft += e;
+                this.Present(targetController, view, true);
+            });
+        }
+
+        public void NavigateTribe(IView view, int tribeId, TribeLeftHandler e)
+        {
+            this.window.InvokeOnMainThread(() =>
+            {
+                var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
+                targetController.TribeId = tribeId;
                 targetController.TribeLeft += e;
                 this.Present(targetController, view, true);
             });
@@ -162,6 +221,7 @@ namespace TellMe.iOS.Core
         private void Present(UIViewController targetController, IView view, bool push = true)
         {
             var controller = (UIViewController)view;
+
             if (controller.NavigationController != null && push)
             {
                 controller.NavigationController.PushViewController(targetController, true);

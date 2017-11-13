@@ -37,14 +37,23 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 this._view.StoryTitle.Text = _view.StoryRequest.Title;
                 this._view.StoryTitle.Enabled = false;
-                InitButtons();
             }
+            else if (_view.Contact != null)
+            {
+                _recipients = new[] { _view.Contact };
+            }
+
+			InitButtons();
         }
 
         public void InitButtons()
         {
             this._view.SendButton.Enabled = (_view.StoryRequest != null || _recipients != null) && !string.IsNullOrWhiteSpace(_view.StoryTitle.Text);
             this._view.ChooseRecipientsButton.Enabled = _view.StoryRequest == null;
+            if (_view.Contact != null)
+            {
+                _view.ChooseRecipientsButton.Hidden = true;
+            }
         }
 
         public async Task SendAsync()

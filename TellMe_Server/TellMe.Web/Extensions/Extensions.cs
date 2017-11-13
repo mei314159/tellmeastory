@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,17 @@ namespace TellMe.Web.Extensions
             MemoryStream filestream = new MemoryStream();
             await file.CopyToAsync(filestream);
             return filestream.ToArray();
+        }
+
+        public static DateTime GetUtcDateTime(this long ticksUtc){
+            var dateFromTicks = new DateTime(ticksUtc);
+            return new DateTime(
+                dateFromTicks.Year,
+                dateFromTicks.Month,
+                dateFromTicks.Day,
+                dateFromTicks.Hour,
+                dateFromTicks.Minute,
+                dateFromTicks.Second, DateTimeKind.Utc);
         }
     }
 }

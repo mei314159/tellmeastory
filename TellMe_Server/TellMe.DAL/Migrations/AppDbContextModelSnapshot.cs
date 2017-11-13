@@ -185,6 +185,29 @@ namespace TellMe.DAL.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AuthorId");
+
+                    b.Property<DateTime>("CreateDateUtc");
+
+                    b.Property<int>("StoryId");
+
+                    b.Property<string>("Text")
+                        .HasMaxLength(500);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("StoryId");
+
+                    b.ToTable("Comment");
+                });
+
             modelBuilder.Entity("TellMe.DAL.Types.Domain.Friendship", b =>
                 {
                     b.Property<int>("Id")
@@ -274,6 +297,8 @@ namespace TellMe.DAL.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CommentsCount");
 
                     b.Property<DateTime>("CreateDateUtc");
 
@@ -448,6 +473,18 @@ namespace TellMe.DAL.Migrations
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Comment", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.Story", "Story")
+                        .WithMany("Comments")
+                        .HasForeignKey("StoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

@@ -7,6 +7,7 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
+
     public class RemoteStoriesDataService : BaseDataService
     {
         public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO dto)
@@ -16,21 +17,42 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
-        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int skip)
-		{
-            var result = await this.GetAsync<List<StoryDTO>>($"stories/skip/{skip}").ConfigureAwait(false);
-			return result;
-		}
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(DateTime? olderThanUtc = null)
+        {
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, DateTime? olderThanUtc = null)
+        {
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/{userId}/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, DateTime? olderThanUtc = null)
+        {
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this.GetAsync<List<StoryDTO>>($"stories/tribe/{tribeId}/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<List<StoryReceiverDTO>>> GetStoryReceiversAsync(int storyId)
+        {
+            var result = await this.GetAsync<List<StoryReceiverDTO>>($"stories/{storyId}/receivers").ConfigureAwait(false);
+            return result;
+        }
 
         public async Task<Result<UploadMediaDTO>> UploadMediaAsync(FileStream videoStream, string videoFileName, FileStream previewImageStream, string previewImageFileName)
         {
-			videoStream.Position = 0;
+            videoStream.Position = 0;
             previewImageStream.Position = 0;
             var data = new MultipartFormDataContent();
-			data.Add(new StreamContent(videoStream), "VideoFile", videoFileName);
+            data.Add(new StreamContent(videoStream), "VideoFile", videoFileName);
             data.Add(new StreamContent(previewImageStream), "PreviewImageFile", previewImageFileName);
 
-			var result = await SendDataAsync<UploadMediaDTO>("stories/upload-media", HttpMethod.Post, data).ConfigureAwait(false);
+            var result = await SendDataAsync<UploadMediaDTO>("stories/upload-media", HttpMethod.Post, data).ConfigureAwait(false);
             return result;
         }
 
