@@ -35,6 +35,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
             this._businessLogic = new TribeBusinessLogic(new RemoteStoriesDataService(), new RemoteTribesDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -99,24 +100,30 @@ namespace TellMe.iOS
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
-            cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
-            cell.PreviewTouched = Cell_OnPreviewTouched;
-            cell.ReceiverSelected = Cell_OnReceiverTouched;
+            cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
+            cell.PreviewTouched = Cell_PreviewTouched;
+            cell.ReceiverSelected = Cell_ReceiverTouched;
+            cell.LikeButtonTouched = Cell_LikeButtonTouched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
 
-        void Cell_OnPreviewTouched(StoryDTO story)
+        private async void Cell_LikeButtonTouched(StoryDTO story)
+        {
+            await _businessLogic.LikeButtonTouchedAsync(story).ConfigureAwait(false);
+        }
+
+        void Cell_PreviewTouched(StoryDTO story)
         {
             _businessLogic.ViewStory(story);
         }
 
-        void Cell_OnProfilePictureTouched(StoryDTO story)
+        void Cell_ProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
         }
 
-        void Cell_OnReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
         {
             _businessLogic.ViewReceiver(receiver, (tribe) =>
             {
@@ -162,6 +169,19 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
             await _businessLogic.LoadStoriesAsync(forceRefresh).ConfigureAwait(false);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
+        }
+
+        private void OnStoryLikeChanged(StoryDTO story)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var index = storiesList.IndexOf(x => x.Id == story.Id);
+                if (index > -1)
+                {
+                    var cell = TableView.CellAt(NSIndexPath.FromRowSection(index, 0)) as StoriesListCell;
+                    cell?.UpdateLikeButton(story);
+                }
+            });
         }
 
         void RefreshControl_ValueChanged(object sender, EventArgs e)

@@ -14,6 +14,7 @@ namespace TellMe.Core
         public static App Instance => lazy.Value;
 
         public event Action<NotificationDTO> OnNotificationReceived;
+        public event Action<StoryDTO> OnStoryLikeChanged;
 
         private App()
         {
@@ -53,6 +54,10 @@ namespace TellMe.Core
         public void NotificationReceived(NotificationDTO notification)
         {
             this.OnNotificationReceived?.Invoke(notification);
+        }
+
+        public void StoryLikeChanged(StoryDTO story){
+            this.OnStoryLikeChanged?.Invoke(story);
         }
 
         public void LogException(Exception ex)

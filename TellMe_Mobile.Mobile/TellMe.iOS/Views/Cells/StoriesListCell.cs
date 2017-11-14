@@ -20,6 +20,7 @@ namespace TellMe.iOS.Views.Cells
         public Action<StoryDTO> ProfilePictureTouched { get; set; }
         public Action<StoryDTO> PreviewTouched { get; set; }
         public Action<StoryDTO> CommentsButtonTouched { get; set; }
+        public Action<StoryDTO> LikeButtonTouched { get; set; }
         public Action<StoryReceiverDTO, StoriesListCell> ReceiverSelected { get; set; }
 
         static StoriesListCell()
@@ -73,6 +74,11 @@ namespace TellMe.iOS.Views.Cells
             }
         }
 
+        partial void LikeButton_TouchUpInside(Button sender)
+        {
+            this.LikeButtonTouched?.Invoke(Story);
+        }
+
         partial void CommentsButton_TouchUpInside(Button sender)
         {
             this.CommentsButtonTouched?.Invoke(Story);
@@ -89,11 +95,21 @@ namespace TellMe.iOS.Views.Cells
             text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
-            this.CommentsButton.SetTitle($"  {story.CommentsCount}", UIControlState.Normal);
+            this.CommentsButton.SetTitle($"  {Story.CommentsCount}", UIControlState.Normal);
+            UpdateLikeButton(Story);
 
             ReceiversCollection.DataSource = this;
             ReceiversCollection.Delegate = this;
             ReceiversCollection.ReloadData();
+        }
+
+        public void UpdateLikeButton(StoryDTO targetStory)
+        {
+            this.Story.Liked = targetStory.Liked;
+            this.Story.LikesCount = targetStory.LikesCount;
+            this.LikeButton.SetTitle($"  {targetStory.LikesCount}", UIControlState.Normal);
+            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"), UIControlState.Normal);
+            this.LikeButton.TintColor = targetStory.Liked ? UIColor.Red : UIColor.LightGray;
         }
 
         protected override void Dispose(bool disposing)

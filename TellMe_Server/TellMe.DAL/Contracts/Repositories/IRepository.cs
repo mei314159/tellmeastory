@@ -5,10 +5,11 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TellMe.DAL.Contracts.Domain;
 using TellMe.DAL.Types.Domain;
+using TellMe.DAL.Types.Repositories;
 
 namespace TellMe.DAL.Contracts.Repositories
 {
-    public interface IRepository<TEntity, in TKey> where TEntity : class, IEntityBase<TKey>
+    public interface IRepository<TEntity> where TEntity : class, IEntityBase
     {
         IQueryable<TEntity> GetQueryable(bool asNoTracking = false);
 
@@ -22,19 +23,26 @@ namespace TellMe.DAL.Contracts.Repositories
         void AddRange(IEnumerable<TEntity> entity, bool commit = false);
 
         void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
-        where TProperty : class;
-
-        void LoadProperty<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, TProperty>> property)
-        where TProperty : class;
-
-        void LoadCollection<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
             where TProperty : class;
 
-        void LoadCollection<TProperty>(IEnumerable<TEntity> entity, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+        void LoadProperty<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, TProperty>> property)
+            where TProperty : class;
+
+        void LoadCollection<TProperty>(TEntity entity,
+            Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+            where TProperty : class;
+
+        void LoadCollection<TProperty>(IEnumerable<TEntity> entity,
+            Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
             where TProperty : class;
 
         void PreCommitSave();
 
         void Commit();
+    }
+
+    public interface IRepository<TEntity, in TKey> : IRepository<TEntity>
+        where TEntity : class, IEntityBase<TKey>
+    {
     }
 }

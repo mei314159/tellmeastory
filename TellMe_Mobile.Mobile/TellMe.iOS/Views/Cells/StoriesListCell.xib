@@ -53,8 +53,8 @@
                             <action selector="CommentsButton_TouchUpInside:" destination="cxk-wN-pdQ" id="3270" eventType="touchUpInside"/>
                         </connections>
                     </button>
-                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="4826" translatesAutoresizingMaskIntoConstraints="NO" verticalCompressionResistancePriority="699" showsVerticalScrollIndicator="NO" alwaysBounceHorizontal="YES">
-                        <rect key="frame" x="10" y="424" width="317" height="22"/>
+                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="4826" translatesAutoresizingMaskIntoConstraints="NO" showsVerticalScrollIndicator="NO" alwaysBounceHorizontal="YES" horizontalCompressionResistancePriority="700">
+                        <rect key="frame" x="10" y="424.5" width="277" height="22"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="4828" scrollDirection="horizontal">
                             <size key="itemSize" width="22" height="22"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -75,6 +75,19 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </view>
                     </collectionViewCell>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="7175" translatesAutoresizingMaskIntoConstraints="NO" customClass="Button">
+                        <rect key="frame" x="295" y="420" width="30" height="30"/>
+                        <color key="tintColor" colorSpace="calibratedWhite" white="0.666666666666667" alpha="1"/>
+                        <state key="normal" image="Heart">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <constraints>
+                            <constraint id="7606" firstItem="7175" firstAttribute="height" constant="30"/>
+                        </constraints>
+                        <connections>
+                            <action selector="LikeButton_TouchUpInside:" destination="cxk-wN-pdQ" id="8135" eventType="touchUpInside"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint id="2427" firstItem="2396" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="10"/>
@@ -90,8 +103,10 @@
                     <constraint id="2908" firstItem="2400" firstAttribute="trailing" secondItem="2394" secondAttribute="trailing"/>
                     <constraint id="3095" firstItem="2400" firstAttribute="top" secondItem="2394" secondAttribute="bottom" constant="5"/>
                     <constraint id="5738" firstItem="4826" firstAttribute="leading" secondItem="2394" secondAttribute="leading"/>
-                    <constraint id="5815" firstItem="2400" firstAttribute="leading" secondItem="4826" secondAttribute="trailing" constant="8"/>
                     <constraint id="5893" firstItem="4826" firstAttribute="top" secondItem="2394" secondAttribute="bottom" constant="9"/>
+                    <constraint id="7488" firstItem="2400" firstAttribute="leading" secondItem="7175" secondAttribute="trailing" constant="10"/>
+                    <constraint id="7686" firstItem="7175" firstAttribute="centerY" secondItem="2400" secondAttribute="centerY"/>
+                    <constraint id="10086" firstItem="7175" firstAttribute="leading" secondItem="4826" secondAttribute="trailing" constant="8"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -101,6 +116,7 @@
                 <outlet property="ProfilePicture" destination="2396" id="name-outlet-2396"/>
                 <outlet property="CommentsButton" destination="2400" id="name-outlet-2400"/>
                 <outlet property="ReceiversCollection" destination="4826" id="name-outlet-4826"/>
+                <outlet property="LikeButton" destination="7175" id="name-outlet-7175"/>
             </connections>
         </tableViewCell>
     </objects>
@@ -115,5 +131,7 @@
         <image name="Send" width="30" height="30"/>
         <image name="Comment" width="30" height="30"/>
         <image name="Replay" width="64" height="64"/>
+        <image name="Heart" width="30" height="30"/>
+        <image name="Heart-O" width="30" height="30"/>
     </resources>
 </document>

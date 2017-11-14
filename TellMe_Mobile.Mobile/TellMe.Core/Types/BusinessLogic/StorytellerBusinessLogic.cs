@@ -120,5 +120,33 @@ namespace TellMe.Core.Types.BusinessLogic
                 _router.NavigateStoryteller(_view, receiver.UserId);
             }
         }
+
+        public async Task LikeButtonTouchedAsync(StoryDTO story)
+        {
+            var liked = story.Liked;
+            var likeCount = story.LikesCount;
+            story.Liked = !liked;
+            story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
+            App.Instance.StoryLikeChanged(story);
+
+            var result = liked
+                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
+                : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
+
+            if (!result.IsSuccess)
+            {
+                story.Liked = liked;
+                story.LikesCount = likeCount;
+                App.Instance.StoryLikeChanged(story);
+            }
+        }
+
+        public void NavigateStoryteller(StoryDTO story)
+        {
+            if (story.SenderId != App.Instance.AuthInfo.UserId)
+            {
+                _router.NavigateStoryteller(_view, story.SenderId);
+            }
+        }
     }
 }

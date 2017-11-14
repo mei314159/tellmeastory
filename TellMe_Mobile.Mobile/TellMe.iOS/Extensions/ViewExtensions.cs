@@ -1,11 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CoreGraphics;
 using ObjCRuntime;
 using UIKit;
 
 namespace TellMe.iOS.Extensions
 {
+    public static class Extensions
+    {
+        public static int IndexOf<T>(this ICollection<T> source, Func<T, bool> predicate)
+        {
+            for (int i = 0; i < source.Count; i++)
+            {
+                if (predicate(source.ElementAt<T>(i)))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+    }
+
     public static class ViewExtensions
     {
         /// <summary>
