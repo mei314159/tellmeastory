@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FluentValidation;
 using SimpleInjector;
 using TellMe.Core.Contracts;
@@ -41,10 +40,11 @@ namespace TellMe.iOS.Core
             var targetType = typeof(T);
             var registrations =
                 from type in targetType.Assembly.GetExportedTypes()
-                where type.IsClass && !type.IsAbstract && targetType != type && targetType.IsAssignableFrom(type) && type.GetInterfaces().Any()
+                where type.IsClass && !type.IsAbstract && targetType != type && targetType.IsAssignableFrom(type) &&
+                      type.GetInterfaces().Any()
                 select new
                 {
-                Service = type.GetInterfaces().First(x => x != targetType),
+                    Service = type.GetInterfaces().First(x => x != targetType),
                     Implementation = type
                 };
 

@@ -16,7 +16,7 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private readonly IRemoteStoriesDataService _remoteStoriesService;
         private readonly IRemoteNotificationsDataService _remoteNotificationsService;
-        private readonly ILocalStoriesDataService _localStoriesService;        
+        private readonly ILocalStoriesDataService _localStoriesService;
         private readonly IRouter _router;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
@@ -47,7 +47,8 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
             }
-            var result = await _remoteStoriesService.GetStoriesAsync(forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
+            var result = await _remoteStoriesService
+                .GetStoriesAsync(forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
@@ -142,10 +143,10 @@ namespace TellMe.Core.Types.BusinessLogic
             story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
             App.Instance.StoryLikeChanged(story);
 
-            var result = liked 
-                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false) 
+            var result = liked
+                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
                 : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
-            
+
             if (!result.IsSuccess)
             {
                 story.Liked = liked;

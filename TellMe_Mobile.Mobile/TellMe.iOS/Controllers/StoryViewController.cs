@@ -288,7 +288,7 @@ namespace TellMe.iOS
             {
                 return;
             }
-            
+
             var scrollToComments = _commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
             if (DisplayCommentsWhenAppear)
             {

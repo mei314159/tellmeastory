@@ -2,7 +2,7 @@
 
 namespace TellMe.Core.Contracts.BusinessLogic
 {
-    public interface IAccountBusinessLogic: IBusinessLogic
+    public interface IAccountBusinessLogic : IBusinessLogic
     {
         bool IsAuthenticated { get; }
         bool PushIsEnabled { get; set; }

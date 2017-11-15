@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TellMe.Core.Contracts.DTO
 {
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class BulkDTO<T>
     {
         public int TotalCount { get; set; }

@@ -196,6 +196,7 @@ namespace TellMe.DAL.Types.Services
 
                 var story = await _storyRepository
                     .GetQueryable()
+                    .Include(x => x.Sender)
                     .FirstOrDefaultAsync(x => x.Id == storyId)
                     .ConfigureAwait(false);
 

@@ -13,32 +13,32 @@ namespace TellMe.Core.Types.Extensions
             string measure;
             if (ago.TotalMinutes < 60)
             {
-                points = (int)ago.TotalMinutes;
+                points = (int) ago.TotalMinutes;
                 measure = "min";
             }
             else if (ago.TotalHours < 24)
             {
-                points = (int)ago.TotalHours;
+                points = (int) ago.TotalHours;
                 measure = "hour";
             }
             else if (ago.TotalDays < 7)
             {
-                points = (int)ago.TotalDays;
+                points = (int) ago.TotalDays;
                 measure = "day";
             }
             else if (ago.TotalDays < 30)
             {
-                points = ((int)(ago.TotalDays / 7));
+                points = ((int) (ago.TotalDays / 7));
                 measure = "week";
             }
             else if (ago.TotalDays < 365)
             {
-                points = ((int)(ago.TotalDays / 30));
+                points = ((int) (ago.TotalDays / 30));
                 measure = "month";
             }
             else
             {
-                points = ((int)(ago.TotalDays / 365));
+                points = ((int) (ago.TotalDays / 365));
                 measure = "year";
             }
             return string.Format("{0} {1}{2}", points, measure, points == 1 ? string.Empty : "s");

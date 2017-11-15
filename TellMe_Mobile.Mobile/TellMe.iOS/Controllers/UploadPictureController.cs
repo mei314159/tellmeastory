@@ -29,7 +29,8 @@ namespace TellMe.iOS
             _businessLogic.Init();
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
         async partial void ContinueButton_TouchUpInside(UIButton sender)
         {
@@ -55,7 +56,7 @@ namespace TellMe.iOS
         private void PhotoSouceActionSheet_Clicked(object sender, UIButtonEventArgs e)
         {
             var imagePicker = new UIImagePickerController();
-            imagePicker.MediaTypes = new string[] { MobileCoreServices.UTType.Image };
+            imagePicker.MediaTypes = new string[] {MobileCoreServices.UTType.Image};
             if (e.ButtonIndex == 0)
             {
                 imagePicker.SourceType = UIImagePickerControllerSourceType.Camera;
@@ -84,20 +85,19 @@ namespace TellMe.iOS
             {
                 Picture.Image = UIImage.FromImage(originalImage.CGImage, 4, originalImage.Orientation);
                 UIView.Animate(0.2,
-                               () =>
-                               {
-                                   ContinueButton.Enabled = true;
-                                   ContinueButton.BackgroundColor = UIColor.Blue;
-                               }, null);
+                    () =>
+                    {
+                        ContinueButton.Enabled = true;
+                        ContinueButton.BackgroundColor = UIColor.Blue;
+                    }, null);
             }
 
-            ((UIImagePickerController)sender).DismissModalViewController(true);
+            ((UIImagePickerController) sender).DismissModalViewController(true);
         }
 
         private void Handle_Canceled(object sender, EventArgs e)
         {
-            ((UIImagePickerController)sender).DismissModalViewController(true);
+            ((UIImagePickerController) sender).DismissModalViewController(true);
         }
-
     }
 }

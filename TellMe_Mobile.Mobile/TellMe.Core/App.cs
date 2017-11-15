@@ -1,8 +1,5 @@
 ﻿using System;
-using TellMe.Core.Contracts;
-using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Types.DataServices.Local;
 
 namespace TellMe.Core
 {
@@ -18,8 +15,6 @@ namespace TellMe.Core
         public void Initialize()
         {
         }
-
-        public INotificationHandler NotificationHandler { get; set; }
 
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;

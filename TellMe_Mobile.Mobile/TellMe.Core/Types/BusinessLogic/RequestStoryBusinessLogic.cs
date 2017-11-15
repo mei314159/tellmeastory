@@ -16,7 +16,8 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly RequestStoryValidator _validator;
         private readonly ILocalAccountService _localAccountService;
 
-        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, RequestStoryValidator validator, ILocalAccountService localAccountService)
+        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService,
+            RequestStoryValidator validator, ILocalAccountService localAccountService)
         {
             this._remoteStoriesDataService = remoteStoriesDataService;
             _validator = validator;
@@ -36,7 +37,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 {
                     Title = title,
                     UserId = x.Type == ContactType.User ? x.User.Id : null,
-                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?)null
+                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
                 }).ToList()
             };
 

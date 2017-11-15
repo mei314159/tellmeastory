@@ -16,7 +16,8 @@ using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
-    public partial class StoriesListViewController : UITableViewController, IStoriesListView //, IUITableViewDataSourcePrefetching
+    public partial class
+        StoriesListViewController : UITableViewController, IStoriesListView //, IUITableViewDataSourcePrefetching
     {
         private IStoriesBusinessLogic _businessLogic;
         private readonly List<StoryDTO> _storiesList = new List<StoryDTO>();
@@ -46,13 +47,14 @@ namespace TellMe.iOS
             this.NavigationController.View.BackgroundColor = UIColor.White;
             Task.Run(() => LoadStoriesAsync(false, true));
 
-            ((AppDelegate)UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
+            ((AppDelegate) UIApplication.SharedApplication.Delegate).CheckPushNotificationsPermissions();
         }
 
         public override void ViewWillAppear(bool animated)
         {
             _businessLogic.LoadActiveNotificationsCountAsync();
-            this.SetToolbarItems(new[]{
+            this.SetToolbarItems(new[]
+            {
                 new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
                 new UIBarButtonItem("Request a Story", UIBarButtonItemStyle.Plain, RequestStoryButtonTouched),
                 new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace),
@@ -70,7 +72,7 @@ namespace TellMe.iOS
 
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
-            lock (((ICollection)_storiesList).SyncRoot)
+            lock (((ICollection) _storiesList).SyncRoot)
             {
                 var initialCount = _storiesList.Count;
                 _storiesList.Clear();
@@ -82,8 +84,11 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => TableView.ReloadData());
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
-        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
+
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
@@ -209,7 +214,8 @@ namespace TellMe.iOS
                         Frame = new CGRect(0, 0, 24, 24),
                     };
                     Notifications.CustomView.Add(_notificationsBadge);
-                    Notifications.CustomView.AddGestureRecognizer(new UITapGestureRecognizer(() => Notifications_Activated(Notifications)));
+                    Notifications.CustomView.AddGestureRecognizer(
+                        new UITapGestureRecognizer(() => Notifications_Activated(Notifications)));
                 }
 
                 _notificationsBadge.Hidden = count == 0;

@@ -7,7 +7,8 @@ namespace TellMe.Core.Validation
     {
         public RequestStoryValidator()
         {
-            this.RuleForEach(x => x.Requests).Must(x => !string.IsNullOrWhiteSpace(x.Title)).WithMessage("Story title is required.");
+            this.RuleForEach(x => x.Requests).Must(x => !string.IsNullOrWhiteSpace(x.Title))
+                .WithMessage("Story title is required.");
         }
     }
 }

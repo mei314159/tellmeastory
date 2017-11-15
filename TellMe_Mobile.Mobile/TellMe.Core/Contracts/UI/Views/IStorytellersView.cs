@@ -16,6 +16,4 @@ namespace TellMe.Core.Contracts.UI.Views
         void ShowSendRequestPrompt();
         void DeleteRow(ContactDTO contact);
     }
-
-
 }

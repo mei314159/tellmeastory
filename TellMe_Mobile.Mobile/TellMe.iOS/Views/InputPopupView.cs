@@ -12,6 +12,7 @@ namespace TellMe.iOS
         public static readonly UINib Nib;
 
         public delegate void OnSubmitHandler(string email);
+
         public event OnSubmitHandler OnSubmit;
 
         private InputPopupView(CGSize size, bool showCloseButton) : base(size, showCloseButton)
@@ -36,7 +37,7 @@ namespace TellMe.iOS
 
         public static InputPopupView Create(string title, string label, string placeholder)
         {
-            var view = (InputPopupView)Nib.Instantiate(null, null)[0];
+            var view = (InputPopupView) Nib.Instantiate(null, null)[0];
             view.Init(view.Frame.Size, false);
             view.Label.Text = label;
             view.Title.Text = title;

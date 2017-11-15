@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Foundation;
 using Newtonsoft.Json.Linq;
 using TellMe.Core.Contracts.DTO;
@@ -29,10 +28,7 @@ namespace TellMe.iOS.Views.Cells
 
         public NotificationDTO Notification
         {
-            get
-            {
-                return notification;
-            }
+            get { return notification; }
 
             set
             {
@@ -54,7 +50,7 @@ namespace TellMe.iOS.Views.Cells
             nint index = default(nint);
             nint length = default(nint);
 
-            var storyDTO = ((JObject)notification.Extra).ToObject<StoryDTO>();
+            var storyDTO = ((JObject) notification.Extra).ToObject<StoryDTO>();
             index = Notification.Text.IndexOf(storyDTO.SenderName, StringComparison.Ordinal);
             length = storyDTO.SenderName.Length;
             PictureView.SetImage(new NSUrl(storyDTO.SenderPictureUrl));
@@ -62,11 +58,12 @@ namespace TellMe.iOS.Views.Cells
             if (index >= 0)
             {
                 text.AddAttribute(UIStringAttributeKey.Font,
-                                  UIFont.BoldSystemFontOfSize(this.Text.Font.PointSize),
-                                  new NSRange(index, length));
+                    UIFont.BoldSystemFontOfSize(this.Text.Font.PointSize),
+                    new NSRange(index, length));
             }
 
-            text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(), foregroundColor: UIColor.LightGray));
+            text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(),
+                foregroundColor: UIColor.LightGray));
             this.Text.AttributedText = text;
         }
     }

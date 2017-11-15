@@ -13,7 +13,7 @@ namespace TellMe.iOS
         private IRouter _router;
         private ILocalAccountService _localAccountService;
 
-        public ProfileViewController (IntPtr handle) : base (handle)
+        public ProfileViewController(IntPtr handle) : base(handle)
         {
         }
 
@@ -39,6 +39,7 @@ namespace TellMe.iOS
             _router.NavigateSetProfilePicture(this);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
     }
 }

@@ -13,7 +13,7 @@ namespace TellMe.iOS.Extensions
         {
             for (int i = 0; i < source.Count; i++)
             {
-                if (predicate(source.ElementAt<T>(i)))
+                if (predicate(source.ElementAt(i)))
                 {
                     return i;
                 }
@@ -68,7 +68,7 @@ namespace TellMe.iOS.Extensions
         {
             if (view.Superview != null)
             {
-                if (type.IsAssignableFrom(view.Superview.GetType()))
+                if (type.IsInstanceOfType(view.Superview))
                 {
                     return view.Superview;
                 }
@@ -86,7 +86,7 @@ namespace TellMe.iOS.Extensions
             {
                 foreach (var subview in view.Subviews)
                 {
-                    if (type.IsAssignableFrom(subview.GetType()))
+                    if (type.IsInstanceOfType(subview))
                     {
                         yield return subview;
                     }
@@ -115,7 +115,8 @@ namespace TellMe.iOS.Extensions
             return topController;
         }
 
-        public static void SwapController(this UIWindow window, UIViewController newController, UIViewAnimationOptions opt = UIViewAnimationOptions.TransitionFlipFromLeft)
+        public static void SwapController(this UIWindow window, UIViewController newController,
+            UIViewAnimationOptions opt = UIViewAnimationOptions.TransitionFlipFromLeft)
         {
             UIViewController rootViewController = null;
             rootViewController = window.RootViewController;
@@ -135,13 +136,13 @@ namespace TellMe.iOS.Extensions
 
         public static UIViewController GetViewController(this UIView view)
         {
-            var responder = (UIResponder)view;
+            var responder = (UIResponder) view;
             while (responder != null && !(responder is UIViewController))
             {
                 responder = responder.NextResponder;
             }
 
-            return (UIViewController)responder;
+            return (UIViewController) responder;
         }
 
         public static void HideKeyboard(this UIViewController controller)
@@ -196,8 +197,8 @@ namespace TellMe.iOS.Extensions
             {
                 UIAlertController alert = UIAlertController
                     .Create("Success",
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
+                        message ?? string.Empty,
+                        UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, (obj) => complete?.Invoke()));
                 controller.PresentViewController(alert, true, null);
             });
@@ -207,10 +208,10 @@ namespace TellMe.iOS.Extensions
         {
             controller.InvokeOnMainThread(() =>
             {
-                UIAlertController alert = UIAlertController
+                var alert = UIAlertController
                     .Create(title,
-                            message ?? string.Empty,
-                            UIAlertControllerStyle.Alert);
+                        message ?? string.Empty,
+                        UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Cancel, null));
                 controller.PresentViewController(alert, true, null);
             });

@@ -1,5 +1,4 @@
 ﻿using System;
-using CoreGraphics;
 using Foundation;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
@@ -28,10 +27,7 @@ namespace TellMe.iOS.Views.Cells
 
         public CommentDTO Comment
         {
-            get
-            {
-                return comment;
-            }
+            get { return comment; }
             set
             {
                 comment = value;

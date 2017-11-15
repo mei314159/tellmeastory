@@ -1,7 +1,6 @@
 using Foundation;
 using System;
 using UIKit;
-using TellMe.Core;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.DTO;
@@ -26,7 +25,7 @@ namespace TellMe.iOS
         IButton ISendStoryView.SendButton => this.SendButton;
         IButton ISendStoryView.ChooseRecipientsButton => this.ChooseRecipientsButton;
 
-		public StoryRequestDTO StoryRequest { get; set; }
+        public StoryRequestDTO StoryRequest { get; set; }
         public string PreviewImagePath { get; set; }
 
         public NotificationDTO RequestNotification { get; set; }
@@ -40,15 +39,18 @@ namespace TellMe.iOS
             this._businessLogic.Init();
 
             var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString(_businessLogic.GetUsername(), UIFont.BoldSystemFontOfSize(StoryLabel.Font.PointSize)));
+            text.Append(new NSAttributedString(_businessLogic.GetUsername(),
+                UIFont.BoldSystemFontOfSize(StoryLabel.Font.PointSize)));
             text.Append(new NSAttributedString($" has shared with you a story about:"));
             StoryLabel.AttributedText = text;
             this.StoryTitle.EditingChanged += (sender, e) => this._businessLogic.InitButtons();
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message, Action complete) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowSuccessMessage(string message, Action complete) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         partial void ChooseRecipientsButton_TouchUpInside(Button sender)
         {

@@ -86,7 +86,7 @@ namespace TellMe.iOS
 
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
-            lock (((ICollection)_storiesList).SyncRoot)
+            lock (((ICollection) _storiesList).SyncRoot)
             {
                 var initialCount = _storiesList.Count;
                 _storiesList.Clear();
@@ -98,8 +98,11 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => TableView.ReloadData());
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
-        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
+
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {

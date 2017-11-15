@@ -68,7 +68,8 @@ namespace TellMe.iOS
             overlay.Close(true);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
         private bool TextFieldShouldReturn(UITextField textField)
         {
@@ -90,8 +91,10 @@ namespace TellMe.iOS
 
         protected virtual void RegisterForKeyboardNotifications()
         {
-            this._willHideNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
-            this._willShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
+            this._willHideNotificationObserver =
+                NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
+            this._willShowNotificationObserver =
+                NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
         }
 
         public void OnKeyboardNotification(NSNotification notification)
@@ -106,12 +109,12 @@ namespace TellMe.iOS
             UIView.BeginAnimations("AnimateForKeyboard");
             UIView.SetAnimationBeginsFromCurrentState(true);
             UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
-            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve) UIKeyboard.AnimationCurveFromNotification(notification));
 
             //Pass the notification, calculating keyboard height, etc.
             var keyboardFrame = visible
-                                    ? UIKeyboard.FrameEndFromNotification(notification)
-                                    : UIKeyboard.FrameBeginFromNotification(notification);
+                ? UIKeyboard.FrameEndFromNotification(notification)
+                : UIKeyboard.FrameBeginFromNotification(notification);
             OnKeyboardChanged(visible, keyboardFrame);
             //Commit the animation
             UIView.CommitAnimations();

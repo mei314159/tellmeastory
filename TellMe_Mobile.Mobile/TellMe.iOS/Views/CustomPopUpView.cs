@@ -7,6 +7,7 @@ namespace TellMe.iOS.Views
     public class CustomPopUpView : UIView
     {
         public delegate void PopWillCloseHandler();
+
         public event PopWillCloseHandler PopWillClose;
 
         private UIVisualEffectView effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Dark));
@@ -56,10 +57,7 @@ namespace TellMe.iOS.Views
                 {
                     Transform = CGAffineTransform.MakeScale(1, 1);
                     effectView.Alpha = 0.8f;
-                }, delegate
-                {
-                    popAnimationFinish?.Invoke();
-                });
+                }, delegate { popAnimationFinish?.Invoke(); });
             }
             else
             {

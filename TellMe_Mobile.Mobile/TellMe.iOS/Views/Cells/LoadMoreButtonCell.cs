@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Foundation;
 using TellMe.Core.Contracts.UI.Components;
 using UIKit;
@@ -24,20 +23,18 @@ namespace TellMe.iOS.Views.Cells
 
         public bool Enabled
         {
-            get
-            {
-
-                return enabled;
-            }
+            get { return enabled; }
             set
             {
                 enabled = value;
                 InvokeOnMainThread(() =>
                 {
-                    if (value){
+                    if (value)
+                    {
                         Spinner.StopAnimating();
                     }
-                    else{
+                    else
+                    {
                         Spinner.StartAnimating();
                     }
                     Button.Enabled = value;

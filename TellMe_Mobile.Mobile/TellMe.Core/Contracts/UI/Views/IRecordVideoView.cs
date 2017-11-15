@@ -4,7 +4,7 @@ using TellMe.Core.Contracts.UI.Components;
 namespace TellMe.Core.Contracts.UI.Views
 {
     public interface IRecordVideoView : IView
-	{
+    {
         StoryRequestDTO StoryRequest { get; }
         NotificationDTO RequestNotification { get; }
         ContactDTO Contact { get; set; }

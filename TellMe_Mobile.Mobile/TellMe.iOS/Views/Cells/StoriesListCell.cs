@@ -4,8 +4,6 @@ using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using SDWebImage;
-using System.Collections.Generic;
-using CoreGraphics;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -50,10 +48,7 @@ namespace TellMe.iOS.Views.Cells
 
         public StoryDTO Story
         {
-            get
-            {
-                return story;
-            }
+            get { return story; }
             set
             {
                 story = value;
@@ -90,9 +85,12 @@ namespace TellMe.iOS.Views.Cells
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
 
-            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, Story.SenderName.Length));
-            text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
-            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
+            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize),
+                new NSRange(0, Story.SenderName.Length));
+            text.Append(new NSAttributedString(Story.Title,
+                font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
+            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(),
+                foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
             this.CommentsButton.SetTitle($"  {Story.CommentsCount}", UIControlState.Normal);
@@ -108,7 +106,8 @@ namespace TellMe.iOS.Views.Cells
             this.Story.Liked = targetStory.Liked;
             this.Story.LikesCount = targetStory.LikesCount;
             this.LikeButton.SetTitle($"  {targetStory.LikesCount}", UIControlState.Normal);
-            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"), UIControlState.Normal);
+            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"),
+                UIControlState.Normal);
             this.LikeButton.TintColor = targetStory.Liked ? UIColor.Red : UIColor.LightGray;
         }
 
@@ -130,7 +129,7 @@ namespace TellMe.iOS.Views.Cells
         public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
             var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
-            cell.Receiver = Story.Receivers[(int)indexPath.Item];
+            cell.Receiver = Story.Receivers[(int) indexPath.Item];
             return cell;
         }
 
@@ -147,10 +146,7 @@ namespace TellMe.iOS.Views.Cells
         public void RemoveTribe(TribeDTO tribe)
         {
             Story.Receivers.RemoveAll(x => x.TribeId == tribe.Id);
-            InvokeOnMainThread(() =>
-            {
-                ReceiversCollection.ReloadData();
-            });
+            InvokeOnMainThread(() => { ReceiversCollection.ReloadData(); });
         }
     }
 }

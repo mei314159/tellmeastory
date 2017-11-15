@@ -20,7 +20,8 @@ namespace TellMe.Core.Types.Extensions
 
             if (result.ModelState != null)
             {
-                view.ShowErrorMessage("Error", string.Join(Environment.NewLine, result.ModelState.SelectMany(x => x.Value)));
+                view.ShowErrorMessage("Error",
+                    string.Join(Environment.NewLine, result.ModelState.SelectMany(x => x.Value)));
                 return;
             }
 

@@ -7,7 +7,9 @@ using UIKit;
 
 namespace TellMe.iOS.Views.VideoSlider
 {
-    public delegate void GestureStateEndedLeftPositionHandler(SAVideoRangeSlider videoRange, nfloat leftPosition, nfloat rightPosition);
+    public delegate void GestureStateEndedLeftPositionHandler(SAVideoRangeSlider videoRange, nfloat leftPosition,
+        nfloat rightPosition);
+
     [Register("SAVideoRangeSlider")]
     public class SAVideoRangeSlider : UIView
     {
@@ -37,9 +39,10 @@ namespace TellMe.iOS.Views.VideoSlider
         {
             FrameWidth = Frame.Width;
 
-            int thumbWidth = (int)Math.Ceiling(Frame.Width * 0.05);
+            int thumbWidth = (int) Math.Ceiling(Frame.Width * 0.05);
 
-            bgView = new UIControl(new CGRect(thumbWidth - BGVIEWBORDERSSIZE, 0, Frame.Width - (thumbWidth * 2) + BGVIEWBORDERSSIZE * 2, Frame.Height));
+            bgView = new UIControl(new CGRect(thumbWidth - BGVIEWBORDERSSIZE, 0,
+                Frame.Width - (thumbWidth * 2) + BGVIEWBORDERSSIZE * 2, Frame.Height));
             bgView.Layer.BorderColor = UIColor.Gray.CGColor;
             bgView.Layer.BorderWidth = BGVIEWBORDERSSIZE;
             this.AddSubview(bgView);
@@ -107,7 +110,6 @@ namespace TellMe.iOS.Views.VideoSlider
 
         private void SetPopoverBubbleSize(nfloat width, nfloat height)
         {
-
             CGRect currentFrame = popoverBubble.Frame;
             currentFrame.Width = width;
             currentFrame.Height = height;
@@ -117,7 +119,6 @@ namespace TellMe.iOS.Views.VideoSlider
             currentFrame.X = 0;
             currentFrame.Y = 0;
             bubleText.Frame = currentFrame;
-
         }
 
 
@@ -149,12 +150,16 @@ namespace TellMe.iOS.Views.VideoSlider
 
             rightThumb.Center = new CGPoint(rightPosition - inset, rightThumb.Frame.Height / 2);
 
-            topBorder.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width, 0, rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width / 2, SLIDERBORDERSSIZE);
+            topBorder.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width, 0,
+                rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width / 2, SLIDERBORDERSSIZE);
 
-            bottomBorder.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width, bgView.Frame.Height - SLIDERBORDERSSIZE, rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width / 2, SLIDERBORDERSSIZE);
+            bottomBorder.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width,
+                bgView.Frame.Height - SLIDERBORDERSSIZE,
+                rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width / 2, SLIDERBORDERSSIZE);
 
 
-            centerView.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width, centerView.Frame.Y, rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width, centerView.Frame.Height);
+            centerView.Frame = new CGRect(leftThumb.Frame.X + leftThumb.Frame.Width, centerView.Frame.Y,
+                rightThumb.Frame.X - leftThumb.Frame.X - leftThumb.Frame.Width, centerView.Frame.Height);
 
             var frame = popoverBubble.Frame;
             frame.X = centerView.Frame.X + centerView.Frame.Width / 2 - Frame.Width / 2;
@@ -165,7 +170,6 @@ namespace TellMe.iOS.Views.VideoSlider
         {
             if (gesture.State == UIGestureRecognizerState.Began || gesture.State == UIGestureRecognizerState.Changed)
             {
-
                 var translation = gesture.TranslationInView(this);
 
                 leftPosition += translation.X;
@@ -178,7 +182,7 @@ namespace TellMe.iOS.Views.VideoSlider
                     (rightPosition - leftPosition <= leftThumb.Frame.Width + rightThumb.Frame.Width) ||
                     ((this.maxGap > 0) && (this.rightPosition - this.leftPosition > this.maxGap)) ||
                     ((this.minGap > 0) && (this.rightPosition - this.leftPosition < this.minGap))
-                    )
+                )
                 {
                     leftPosition -= translation.X;
                 }
@@ -187,7 +191,6 @@ namespace TellMe.iOS.Views.VideoSlider
                 gesture.SetTranslation(CGPoint.Empty, this);
                 this.SetNeedsLayout();
                 this.DelegateNotification();
-
             }
 
             popoverBubble.Alpha = 1;
@@ -230,7 +233,6 @@ namespace TellMe.iOS.Views.VideoSlider
                 }
 
 
-
                 gesture.SetTranslation(CGPoint.Empty, this);
                 this.SetNeedsLayout();
                 this.DelegateNotification();
@@ -251,7 +253,6 @@ namespace TellMe.iOS.Views.VideoSlider
         {
             if (gesture.State == UIGestureRecognizerState.Began || gesture.State == UIGestureRecognizerState.Changed)
             {
-
                 CGPoint translation = gesture.TranslationInView(this);
 
                 leftPosition += translation.X;
@@ -264,11 +265,9 @@ namespace TellMe.iOS.Views.VideoSlider
                 }
 
 
-
                 gesture.SetTranslation(CGPoint.Empty, this);
                 this.SetNeedsLayout();
                 this.DelegateNotification();
-
             }
 
             popoverBubble.Alpha = 1;
@@ -316,14 +315,14 @@ namespace TellMe.iOS.Views.VideoSlider
                 CGRect rect = new CGRect(tmp.Frame.Location, new CGSize(picWidth, tmp.Frame.Height));
                 tmp.Frame = rect;
                 bgView.AddSubview(tmp);
-                picWidth = (int)tmp.Frame.Size.Width;
+                picWidth = (int) tmp.Frame.Size.Width;
                 halfWayImage.Dispose();
             }
 
 
-            durationSeconds = (nfloat)myAsset.Duration.Seconds;
+            durationSeconds = (nfloat) myAsset.Duration.Seconds;
 
-            int picsCnt = (int)Math.Ceiling(bgView.Frame.Width / picWidth);
+            int picsCnt = (int) Math.Ceiling(bgView.Frame.Width / picWidth);
 
             NSMutableArray allTimes = new NSMutableArray();
 
@@ -356,7 +355,7 @@ namespace TellMe.iOS.Views.VideoSlider
                 currentFrame.X = ii * picWidth;
 
                 currentFrame.Size = new CGSize(picWidth, currentFrame.Height);
-                prefreWidth += (int)currentFrame.Size.Width;
+                prefreWidth += (int) currentFrame.Size.Width;
 
                 if (i == picsCnt - 1)
                 {
@@ -364,7 +363,7 @@ namespace TellMe.iOS.Views.VideoSlider
                 }
 
                 tmp.Frame = currentFrame;
-                int all = (int)((ii + 1) * tmp.Frame.Width);
+                int all = (int) ((ii + 1) * tmp.Frame.Width);
 
                 if (all > bgView.Frame.Width)
                 {
@@ -382,7 +381,6 @@ namespace TellMe.iOS.Views.VideoSlider
         }
 
 
-
         private nfloat LeftPosition()
         {
             return leftPosition * durationSeconds / FrameWidth;
@@ -395,13 +393,10 @@ namespace TellMe.iOS.Views.VideoSlider
         }
 
 
-
         private void HideBubble(UIView popover)
         {
-            UIView.Animate(0.4, 0, UIViewAnimationOptions.CurveEaseIn | UIViewAnimationOptions.AllowUserInteraction, () =>
-            {
-                popoverBubble.Alpha = 0;
-            }, null);
+            UIView.Animate(0.4, 0, UIViewAnimationOptions.CurveEaseIn | UIViewAnimationOptions.AllowUserInteraction,
+                () => { popoverBubble.Alpha = 0; }, null);
 
             didGestureStateEndedLeftPosition?.Invoke(this, leftPosition, rightPosition);
         }

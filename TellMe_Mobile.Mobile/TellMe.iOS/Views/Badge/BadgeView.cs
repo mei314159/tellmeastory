@@ -52,10 +52,7 @@ namespace TellMe.iOS.Views.Badge
         /// <value>The value.</value>
         public int Value
         {
-            get
-            {
-                return this.val;
-            }
+            get { return this.val; }
 
             set
             {
@@ -150,7 +147,8 @@ namespace TellMe.iOS.Views.Badge
 
                     badgeRect.X = 0;
                     badgeRect.Y = 0;
-                    badgeRect.Size = new CGSize((float)Math.Ceiling(badgeRect.Size.Width), (float)Math.Ceiling(badgeRect.Size.Height));
+                    badgeRect.Size = new CGSize((float) Math.Ceiling(badgeRect.Size.Width),
+                        (float) Math.Ceiling(badgeRect.Size.Height));
 
                     return badgeRect.Size;
                 }
@@ -170,10 +168,7 @@ namespace TellMe.iOS.Views.Badge
         /// <value><c>true</c> if hide when zero; otherwise, <c>false</c>.</value>
         public bool HideWhenZero
         {
-            get
-            {
-                return this.hideWhenZero;
-            }
+            get { return this.hideWhenZero; }
 
             set
             {
@@ -216,7 +211,8 @@ namespace TellMe.iOS.Views.Badge
 
                 badgeRect.X = 0;
                 badgeRect.Y = 0;
-                badgeRect.Size = new SizeF((float)Math.Ceiling(badgeRect.Size.Width), (float)Math.Ceiling(badgeRect.Size.Height));
+                badgeRect.Size = new SizeF((float) Math.Ceiling(badgeRect.Size.Width),
+                    (float) Math.Ceiling(badgeRect.Size.Height));
 
                 curContext.SaveState();
 
@@ -225,23 +221,27 @@ namespace TellMe.iOS.Views.Badge
                 curContext.SetFillColor(this.FillColor.CGColor);
 
                 // Line stroke straddles the path, so we need to account for the outer portion
-                badgeRect.Size = new CGSize(badgeRect.Size.Width + (float)Math.Ceiling(this.StrokeWidth / 2), badgeRect.Size.Height + (float)Math.Ceiling(this.StrokeWidth / 2));
+                badgeRect.Size = new CGSize(badgeRect.Size.Width + (float) Math.Ceiling(this.StrokeWidth / 2),
+                    badgeRect.Size.Height + (float) Math.Ceiling(this.StrokeWidth / 2));
 
                 var ctm = new CGPoint(0f, 0f);
 
                 switch (this.Alignment)
                 {
-                case UITextAlignment.Justified:
-                case UITextAlignment.Natural:
-                case UITextAlignment.Center:
-                        ctm = new CGPoint((float)Math.Round((viewBounds.Size.Width - badgeRect.Size.Width) / 2), (float)Math.Round((viewBounds.Size.Height - badgeRect.Size.Height) / 2));
-                    break;
-                case UITextAlignment.Left:
-                        ctm = new CGPoint(0.0f, (float)Math.Round((viewBounds.Size.Height - badgeRect.Size.Height) / 2));
-                    break;
-                case UITextAlignment.Right:
-                        ctm = new CGPoint(viewBounds.Size.Width - badgeRect.Size.Width, (float)Math.Round(viewBounds.Size.Height - badgeRect.Size.Height) / 2);
-                    break;
+                    case UITextAlignment.Justified:
+                    case UITextAlignment.Natural:
+                    case UITextAlignment.Center:
+                        ctm = new CGPoint((float) Math.Round((viewBounds.Size.Width - badgeRect.Size.Width) / 2),
+                            (float) Math.Round((viewBounds.Size.Height - badgeRect.Size.Height) / 2));
+                        break;
+                    case UITextAlignment.Left:
+                        ctm = new CGPoint(0.0f,
+                            (float) Math.Round((viewBounds.Size.Height - badgeRect.Size.Height) / 2));
+                        break;
+                    case UITextAlignment.Right:
+                        ctm = new CGPoint(viewBounds.Size.Width - badgeRect.Size.Width,
+                            (float) Math.Round(viewBounds.Size.Height - badgeRect.Size.Height) / 2);
+                        break;
                 }
 
                 curContext.TranslateCTM(ctm.X, ctm.Y);
@@ -276,10 +276,11 @@ namespace TellMe.iOS.Views.Badge
 
                     using (CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB())
                     {
-                        var shinyColorGradient = new nfloat[8] { 1f, 1f, 1f, 0.8f, 1f, 1f, 1f, 0f };
-                        var shinyLocationGradient = new nfloat[2] { 0f, 1f };
+                        var shinyColorGradient = new nfloat[8] {1f, 1f, 1f, 0.8f, 1f, 1f, 1f, 0f};
+                        var shinyLocationGradient = new nfloat[2] {0f, 1f};
 
-                        using (CGGradient gradient = new CGGradient(colorSpace, shinyColorGradient, shinyLocationGradient))
+                        using (CGGradient gradient =
+                            new CGGradient(colorSpace, shinyColorGradient, shinyLocationGradient))
                         {
                             curContext.SaveState();
                             curContext.BeginPath();
@@ -349,9 +350,9 @@ namespace TellMe.iOS.Views.Badge
 
         private CGPath NewBadgePathForTextSize(CGSize size)
         {
-            float arcRadius = (float)Math.Ceiling((size.Height + this.Pad) / 2.0f);
+            float arcRadius = (float) Math.Ceiling((size.Height + this.Pad) / 2.0f);
 
-            float badgeWidthAdjustment = (float)(size.Width - (size.Height / 2.0f));
+            float badgeWidthAdjustment = (float) (size.Width - (size.Height / 2.0f));
             float badgeWidth = 2.0f * arcRadius;
 
             if (badgeWidthAdjustment > 0.0)
@@ -361,7 +362,7 @@ namespace TellMe.iOS.Views.Badge
 
             CGPath badgePath = new CGPath();
 
-            var m_pi_2 = (float)(Math.PI / 2);
+            var m_pi_2 = (float) (Math.PI / 2);
 
             badgePath.MoveToPoint(arcRadius, 0.0f);
             badgePath.AddArc(arcRadius, arcRadius, arcRadius, 3.0f * m_pi_2, m_pi_2, true);

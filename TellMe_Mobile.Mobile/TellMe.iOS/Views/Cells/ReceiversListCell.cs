@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Foundation;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
@@ -32,10 +31,7 @@ namespace TellMe.iOS.Views.Cells
 
         public StoryReceiverDTO Receiver
         {
-            get
-            {
-                return receiver;
-            }
+            get { return receiver; }
 
             set
             {

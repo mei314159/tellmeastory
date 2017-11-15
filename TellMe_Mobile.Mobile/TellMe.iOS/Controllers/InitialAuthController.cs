@@ -5,7 +5,7 @@ namespace TellMe.iOS
 {
     public partial class InitialAuthController : UIViewController
     {
-        public InitialAuthController (IntPtr handle) : base (handle)
+        public InitialAuthController(IntPtr handle) : base(handle)
         {
         }
 

@@ -8,7 +8,6 @@ using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
-using System.Collections.Generic;
 using TellMe.iOS.Views.Cells;
 
 namespace TellMe.iOS
@@ -19,7 +18,10 @@ namespace TellMe.iOS
         private AVPlayerItem _playerItem;
         private AVPlayer _player;
         private AVPlayerLayer _playerLayer;
-        public static NSString AVCustomEditPlayerViewControllerStatusObservationContext = new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
+
+        public static NSString AVCustomEditPlayerViewControllerStatusObservationContext =
+            new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
+
         private NSObject _stopPlayingNotification;
         private bool playing;
         private UIImage defaultPicture;
@@ -35,10 +37,7 @@ namespace TellMe.iOS
 
         public StoryDTO Story
         {
-            get
-            {
-                return story;
-            }
+            get { return story; }
             set
             {
                 story = value;
@@ -85,16 +84,20 @@ namespace TellMe.iOS
             {
                 AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
                 var cachedVideoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
-                _playerAsset = new AVUrlAsset(File.Exists(cachedVideoPath) ? new NSUrl(cachedVideoPath, false) : NSUrl.FromString(Story.VideoUrl));
+                _playerAsset = new AVUrlAsset(File.Exists(cachedVideoPath)
+                    ? new NSUrl(cachedVideoPath, false)
+                    : NSUrl.FromString(Story.VideoUrl));
                 _playerItem = new AVPlayerItem(_playerAsset);
                 _player = new AVPlayer(_playerItem);
                 _playerLayer = AVPlayerLayer.FromPlayer(_player);
                 _playerLayer.Frame = this.Preview.Bounds;
                 _playerLayer.VideoGravity = AVLayerVideoGravity.ResizeAspect;
                 this.Preview.Layer.AddSublayer(_playerLayer);
-                _stopPlayingNotification = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(_player.CurrentItem, DidReachEnd);
-                _player.CurrentItem.AddObserver(this, "status", NSKeyValueObservingOptions.New | NSKeyValueObservingOptions.Initial,
-                                            AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
+                _stopPlayingNotification =
+                    AVPlayerItem.Notifications.ObserveDidPlayToEndTime(_player.CurrentItem, DidReachEnd);
+                _player.CurrentItem.AddObserver(this, "status",
+                    NSKeyValueObservingOptions.New | NSKeyValueObservingOptions.Initial,
+                    AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
                 Spinner.Hidden = false;
                 Spinner.StartAnimating();
                 playing = true;
@@ -111,7 +114,8 @@ namespace TellMe.iOS
                 _stopPlayingNotification = null;
                 _player.Pause();
                 _playerLayer.RemoveFromSuperLayer();
-                _player.CurrentItem.RemoveObserver(this, "status", AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
+                _player.CurrentItem.RemoveObserver(this, "status",
+                    AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
                 playing = false;
             }
         }
@@ -162,10 +166,7 @@ namespace TellMe.iOS
         public void RemoveTribe(TribeDTO tribe)
         {
             Story.Receivers.RemoveAll(x => x.TribeId == tribe.Id);
-            InvokeOnMainThread(() =>
-            {
-                ReceiversCollection.ReloadData();
-            });
+            InvokeOnMainThread(() => { ReceiversCollection.ReloadData(); });
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -202,7 +203,7 @@ namespace TellMe.iOS
         public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
             var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
-            cell.Receiver = Story.Receivers[(int)indexPath.Item];
+            cell.Receiver = Story.Receivers[(int) indexPath.Item];
             cell.UserInteractionEnabled = true;
             return cell;
         }
@@ -233,9 +234,12 @@ namespace TellMe.iOS
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
 
-            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize), new NSRange(0, Story.SenderName.Length));
-            text.Append(new NSAttributedString(Story.Title, font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
-            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
+            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Title.Font.PointSize),
+                new NSRange(0, Story.SenderName.Length));
+            text.Append(new NSAttributedString(Story.Title,
+                font: UIFont.ItalicSystemFontOfSize(this.Title.Font.PointSize)));
+            text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(),
+                foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
             UpdateLikeButton(Story);
@@ -250,7 +254,8 @@ namespace TellMe.iOS
             this.Story.Liked = targetStory.Liked;
             this.Story.LikesCount = targetStory.LikesCount;
             this.LikeButton.SetTitle($"  {targetStory.LikesCount}", UIControlState.Normal);
-            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"), UIControlState.Normal);
+            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"),
+                UIControlState.Normal);
             this.LikeButton.TintColor = targetStory.Liked ? UIColor.Red : UIColor.LightGray;
         }
 

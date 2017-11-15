@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Contacts;
 using TellMe.Core.Contracts.Providers;
 using TellMe.Core.Contracts.DTO;
@@ -10,7 +9,7 @@ namespace TellMe.iOS.Core.Providers
     {
         public IReadOnlyCollection<PhoneContactDTO> GetContacts()
         {
-            var keysTOFetch = new[] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers };
+            var keysTOFetch = new[] {CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers};
 
             CNContact[] contactList;
             var ContainerId = new CNContactStore().DefaultContainerIdentifier;

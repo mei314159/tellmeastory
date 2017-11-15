@@ -13,11 +13,13 @@ using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
-    public partial class NotificationCenterController : UIViewController, IUITableViewDelegate, IUITableViewDataSource, INotificationsCenterView
+    public partial class NotificationCenterController : UIViewController, IUITableViewDelegate, IUITableViewDataSource,
+        INotificationsCenterView
     {
         private readonly List<NotificationDTO> _notificationsList = new List<NotificationDTO>();
 
         private INotificationCenterBusinessLogic _businessLogic;
+
         public NotificationCenterController(IntPtr handle) : base(handle)
         {
         }
@@ -46,7 +48,7 @@ namespace TellMe.iOS
 
         public void DisplayNotifications(IReadOnlyCollection<NotificationDTO> notifications)
         {
-            lock (((ICollection)_notificationsList).SyncRoot)
+            lock (((ICollection) _notificationsList).SyncRoot)
             {
                 _notificationsList.Clear();
                 _notificationsList.AddRange(notifications);
@@ -66,16 +68,16 @@ namespace TellMe.iOS
             INotificationCenterCell cell;
             if (dto.Type == NotificationTypeEnum.Story)
             {
-                cell = (NotificationCenterStoryCell)tableView.DequeueReusableCell(NotificationCenterStoryCell.Key, indexPath);
-
+                cell = (NotificationCenterStoryCell) tableView.DequeueReusableCell(NotificationCenterStoryCell.Key,
+                    indexPath);
             }
             else
             {
-                cell = (NotificationCenterCell)tableView.DequeueReusableCell(NotificationCenterCell.Key, indexPath);
+                cell = (NotificationCenterCell) tableView.DequeueReusableCell(NotificationCenterCell.Key, indexPath);
             }
 
             cell.Notification = dto;
-            var uiCell = (UITableViewCell)cell;
+            var uiCell = (UITableViewCell) cell;
 
             if (dto.Handled)
             {
@@ -97,7 +99,8 @@ namespace TellMe.iOS
             _businessLogic.HandleNotification(dto);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
 
         partial void CloseButton_Activated(UIBarButtonItem sender)
@@ -108,7 +111,8 @@ namespace TellMe.iOS
         public void ReloadNotification(NotificationDTO notification)
         {
             var index = _notificationsList.IndexOf(notification);
-            InvokeOnMainThread(() => TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.None));
+            InvokeOnMainThread(() =>
+                TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(index, 0)}, UITableViewRowAnimation.None));
         }
     }
 }

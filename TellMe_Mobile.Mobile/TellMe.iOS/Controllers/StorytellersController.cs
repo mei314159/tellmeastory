@@ -15,7 +15,8 @@ using TellMe.iOS.Views;
 
 namespace TellMe.iOS
 {
-    public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource, IUITableViewDelegate
+    public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource,
+        IUITableViewDelegate
     {
         private IStorytellersBusinessLogic _businessLogic;
         private readonly List<ContactDTO> _storytellersList = new List<ContactDTO>();
@@ -55,7 +56,8 @@ namespace TellMe.iOS
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
             this.SearchBar.SearchButtonClicked += SearchBar_SearchButtonClicked;
             this.TableView.TableFooterView.Hidden = true;
-            UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton){
+            UITapGestureRecognizer uITapGestureRecognizer = new UITapGestureRecognizer(HideSearchCancelButton)
+            {
                 CancelsTouchesInView = false
             };
             uITapGestureRecognizer.CancelsTouchesInView = false;
@@ -105,13 +107,13 @@ namespace TellMe.iOS
         public void DisplayContacts(ICollection<ContactDTO> contacts)
         {
             var initialCount = _tribesList.Count + _storytellersList.Count;
-            lock (((ICollection)_storytellersList).SyncRoot)
+            lock (((ICollection) _storytellersList).SyncRoot)
             {
                 _storytellersList.Clear();
                 _storytellersList.AddRange(contacts.Where(x => x.Type == ContactType.User).OrderBy(x => x.Name));
             }
 
-            lock (((ICollection)_tribesList).SyncRoot)
+            lock (((ICollection) _tribesList).SyncRoot)
             {
                 _tribesList.Clear();
                 _tribesList.AddRange(contacts.Where(x => x.Type == ContactType.Tribe).OrderBy(x => x.Name));
@@ -123,9 +125,11 @@ namespace TellMe.iOS
         }
 
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
@@ -141,7 +145,7 @@ namespace TellMe.iOS
             }
 
             var cell = tableView.CellAt(indexPath);
-            tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
+            tableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
         }
 
         [Export("tableView:didSelectRowAtIndexPath:")]
@@ -162,7 +166,7 @@ namespace TellMe.iOS
                 switch (dto.User.FriendshipStatus)
                 {
                     case FriendshipStatus.Accepted:
-						_businessLogic.NavigateStoryteller(dto.User);
+                        _businessLogic.NavigateStoryteller(dto.User);
                         return;
                     case FriendshipStatus.Rejected:
                     case FriendshipStatus.Requested:
@@ -175,19 +179,20 @@ namespace TellMe.iOS
                         title = "Send a Follow Request?";
                         confirmButtonTitle = "Send";
                         break;
-
                 }
 
                 UIAlertController alert = UIAlertController
                     .Create(title, string.Empty, UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create(confirmButtonTitle, UIAlertActionStyle.Default, (x) => SendFriendshipRequest(dto)));
+                alert.AddAction(UIAlertAction.Create(confirmButtonTitle, UIAlertActionStyle.Default,
+                    (x) => SendFriendshipRequest(dto)));
                 this.PresentViewController(alert, true, null);
             }
             else if (indexPath.Section == 1)
             {
                 var dto = this._tribesList[indexPath.Row];
-                if (dto.Tribe.MembershipStatus == TribeMemberStatus.Joined || dto.Tribe.MembershipStatus == TribeMemberStatus.Creator)
+                if (dto.Tribe.MembershipStatus == TribeMemberStatus.Joined ||
+                    dto.Tribe.MembershipStatus == TribeMemberStatus.Creator)
                 {
                     _businessLogic.ViewTribe(dto.Tribe);
                 }
@@ -196,8 +201,10 @@ namespace TellMe.iOS
                     var alert = UIAlertController
                         .Create("Accept invitation to tribe?", string.Empty, UIAlertControllerStyle.Alert);
                     alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, (x) => RejectTribeInvitationTouched(dto)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, (x) => AcceptTribeInvitationTouched(dto)));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive,
+                        (x) => RejectTribeInvitationTouched(dto)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default,
+                        (x) => AcceptTribeInvitationTouched(dto)));
                     this.PresentViewController(alert, true, null);
                 }
             }
@@ -247,7 +254,7 @@ namespace TellMe.iOS
                     return UITableViewCellEditingStyle.None;
             }
 
-            return (UITableViewCellEditingStyle)3;
+            return (UITableViewCellEditingStyle) 3;
         }
 
         [Export("tableView:titleForHeaderInSection:")]
@@ -287,20 +294,22 @@ namespace TellMe.iOS
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
                     TableViewTop.Constant = 0;
-                    NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
-                    {
-                        Enabled = false
-                    }, false);
+                    NavItem.SetRightBarButtonItem(
+                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                        {
+                            Enabled = false
+                        }, false);
                     break;
                 case ContactsMode.FriendsOnly:
                     NavItem.Title = "Choose Tribe Membes";
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
                     TableViewTop.Constant = 0;
-                    NavItem.SetRightBarButtonItem(new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
-                    {
-                        Enabled = false
-                    }, false);
+                    NavItem.SetRightBarButtonItem(
+                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                        {
+                            Enabled = false
+                        }, false);
                     break;
             }
         }
@@ -310,9 +319,10 @@ namespace TellMe.iOS
             InvokeOnMainThread(() =>
             {
                 UIAlertController alert = UIAlertController
-                        .Create("Storytellers not found", "Send a request to join?", UIAlertControllerStyle.Alert);
+                    .Create("Storytellers not found", "Send a request to join?", UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
-                alert.AddAction(UIAlertAction.Create("Send", UIAlertActionStyle.Default, (x) => this.ShowSendRequestToJoinPrompt()));
+                alert.AddAction(UIAlertAction.Create("Send", UIAlertActionStyle.Default,
+                    (x) => this.ShowSendRequestToJoinPrompt()));
                 this.PresentViewController(alert, true, null);
             });
         }
@@ -322,7 +332,8 @@ namespace TellMe.iOS
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.SendFriendshipRequestAsync(contact.User);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+                UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
@@ -331,7 +342,8 @@ namespace TellMe.iOS
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.AcceptTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+                UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
@@ -340,7 +352,8 @@ namespace TellMe.iOS
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.RejectTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+                UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
@@ -350,7 +363,6 @@ namespace TellMe.iOS
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
             await _businessLogic.LoadAsync(forceRefresh, searchText);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
-
         }
 
         [Export("tableView:willDisplayCell:forRowAtIndexPath:")]
@@ -390,7 +402,8 @@ namespace TellMe.iOS
 
         private void ShowSendRequestToJoinPrompt()
         {
-            var popup = InputPopupView.Create("Send request to join", "Please enter an email address to send the invitation", "Email address");
+            var popup = InputPopupView.Create("Send request to join",
+                "Please enter an email address to send the invitation", "Email address");
             popup.KeyboardType = UIKeyboardType.EmailAddress;
             popup.OnSubmit += async (email) => await _businessLogic.SendRequestToJoinPromptAsync(email);
             popup.PopUp(true);
@@ -398,7 +411,8 @@ namespace TellMe.iOS
 
         private void ContinueButtonTouched(object sender, EventArgs e)
         {
-            var selectedContacts = TableView.IndexPathsForSelectedRows.Select(x => x.Section == 0 ? _storytellersList[x.Row] : _tribesList[x.Row]).ToList();
+            var selectedContacts = TableView.IndexPathsForSelectedRows
+                .Select(x => x.Section == 0 ? _storytellersList[x.Row] : _tribesList[x.Row]).ToList();
             RecipientsSelected?.Invoke(selectedContacts);
             if (DismissOnFinish)
             {
@@ -423,7 +437,7 @@ namespace TellMe.iOS
                 index = _storytellersList.IndexOf(contact);
             }
 
-            TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index, section) }, UITableViewRowAnimation.Automatic);
+            TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index, section)}, UITableViewRowAnimation.Automatic);
         }
     }
 }

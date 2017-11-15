@@ -3,7 +3,6 @@ using System;
 using UIKit;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core;
 using TellMe.iOS.Extensions;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.UI.Components;
@@ -17,6 +16,7 @@ namespace TellMe.iOS
     public partial class RequestStoryController : UIViewController, IRequestStoryView
     {
         private IRequestStoryBusinessLogic _businessLogic;
+
         public RequestStoryController(IntPtr handle) : base(handle)
         {
         }
@@ -27,9 +27,11 @@ namespace TellMe.iOS
 
         IButton IRequestStoryView.SendButton => this.SendButton;
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         public override void ViewDidLoad()
         {
@@ -70,11 +72,14 @@ namespace TellMe.iOS
             {
                 handleName = "{Handle}";
             }
-            text.Append(new NSAttributedString(handleName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), UIColor.Blue));
+            text.Append(new NSAttributedString(handleName,
+                UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), UIColor.Blue));
             text.Append(new NSAttributedString(","));
-            text.Append(new NSAttributedString(_businessLogic.GetUsername(), UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
+            text.Append(new NSAttributedString(_businessLogic.GetUsername(),
+                UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             text.Append(new NSAttributedString($" would like you to tell a story about: "));
-            text.Append(new NSAttributedString(StoryTitle.Text, UIFont.ItalicSystemFontOfSize(RequestTextPreview.Font.PointSize)));
+            text.Append(new NSAttributedString(StoryTitle.Text,
+                UIFont.ItalicSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             RequestTextPreview.AttributedText = text;
         }
 

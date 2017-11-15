@@ -33,15 +33,17 @@ namespace TellMe.iOS.Controllers
 
         public override void ViewDidLoad()
         {
-            this.NavigationItem.RightBarButtonItem = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, DoneButtonTouched);
+            this.NavigationItem.RightBarButtonItem =
+                new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, DoneButtonTouched);
 
             _tribeNameElement = new EntryElement("Name", "Enter tribe name", string.Empty);
-            this.Root = new RootElement("New Tribe") {
-                new Section (string.Empty) {
+            this.Root = new RootElement("New Tribe")
+            {
+                new Section(string.Empty)
+                {
                     _tribeNameElement
                 },
-                new Section ("Members") {
-                }
+                new Section("Members")
             };
         }
 
@@ -65,9 +67,9 @@ namespace TellMe.iOS.Controllers
         private async void DoneButtonTouched(object sender, EventArgs e)
         {
             var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
+            overlay.PopUp();
             await _businessLogic.CreateTribeAsync();
-            overlay.Close(true);
+            overlay.Close();
         }
 
         public void Close(TribeDTO tribe)
@@ -77,16 +79,19 @@ namespace TellMe.iOS.Controllers
             this.NavigationController.PopToViewController(this.NavigationController.ViewControllers[index - 2], true);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message, Action complete) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowSuccessMessage(string message, Action complete) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
     }
 
     public class CreateTribeSource : DialogViewController.Source
     {
         private readonly ICollection<StorytellerDTO> _members;
 
-        public CreateTribeSource(DialogViewController controller, ICollection<StorytellerDTO> members) : base(controller)
+        public CreateTribeSource(DialogViewController controller, ICollection<StorytellerDTO> members) : base(
+            controller)
         {
             this._members = members;
             controller.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
@@ -94,9 +99,7 @@ namespace TellMe.iOS.Controllers
 
         public override nint RowsInSection(UITableView tableview, nint section)
         {
-            if (section == 0)
-                return base.RowsInSection(tableview, section);
-            return _members.Count;
+            return section == 0 ? base.RowsInSection(tableview, section) : _members.Count;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -104,7 +107,7 @@ namespace TellMe.iOS.Controllers
             if (indexPath.Section == 0)
                 return base.GetCell(tableView, indexPath);
 
-            var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
+            var cell = (StorytellersListCell) tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath);
             cell.Storyteller = _members.ElementAt(indexPath.Row);
             return cell;
         }

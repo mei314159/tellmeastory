@@ -18,7 +18,8 @@ namespace TellMe.Core.Types.DataServices.Remote
             this._apiProvider = apiProvider;
         }
 
-        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInAsync(string email, string password)
+        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInAsync(string email,
+            string password)
         {
             var data = new Dictionary<string, string>
             {
@@ -27,8 +28,10 @@ namespace TellMe.Core.Types.DataServices.Remote
                 {"password", password},
                 {"client_id", "ios_app"}
             };
-            var result = await this._apiProvider.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
-                                   .ConfigureAwait(false);
+            var result = await this._apiProvider
+                .SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post,
+                    new FormUrlEncodedContent(data), true)
+                .ConfigureAwait(false);
             return result;
         }
 
@@ -47,7 +50,8 @@ namespace TellMe.Core.Types.DataServices.Remote
                 {new StreamContent(profilePictureStream), "File", Guid.NewGuid() + ".jpg"}
             };
 
-            var result = await this._apiProvider.SendDataAsync<ProfilePictureDTO>("account/picture", HttpMethod.Post, data).ConfigureAwait(false);
+            var result = await this._apiProvider
+                .SendDataAsync<ProfilePictureDTO>("account/picture", HttpMethod.Post, data).ConfigureAwait(false);
             return result;
         }
     }
