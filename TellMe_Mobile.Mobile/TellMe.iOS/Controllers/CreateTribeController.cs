@@ -6,38 +6,39 @@ using System;
 using TellMe.Core.Contracts.DTO;
 using System.Collections.Generic;
 using System.Linq;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Remote;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.iOS.Views;
 using TellMe.Core.Contracts.UI.Views;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS.Controllers
 {
     public class CreateTribeController : DialogViewController, ICreateTribeView
     {
-        private readonly CreateTribeBusinessLogic _businessLogic;
-        private EntryElement tribeNameElement;
+        private readonly ICreateTribeBusinessLogic _businessLogic;
+        private EntryElement _tribeNameElement;
         public ICollection<StorytellerDTO> Members { get; private set; }
 
-        public string TribeName => tribeNameElement?.Value;
+        public string TribeName => _tribeNameElement?.Value;
 
         public event TribeCreatedHandler TribeCreated;
 
         public CreateTribeController(ICollection<StorytellerDTO> members) : base(UITableViewStyle.Grouped, null, true)
         {
             this.Members = members;
-            _businessLogic = new CreateTribeBusinessLogic(new RemoteTribesDataService(), this);
+            _businessLogic = IoC.Container.GetInstance<ICreateTribeBusinessLogic>();
+            _businessLogic.View = this;
         }
 
         public override void ViewDidLoad()
         {
             this.NavigationItem.RightBarButtonItem = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, DoneButtonTouched);
 
-            tribeNameElement = new EntryElement("Name", "Enter tribe name", string.Empty);
+            _tribeNameElement = new EntryElement("Name", "Enter tribe name", string.Empty);
             this.Root = new RootElement("New Tribe") {
                 new Section (string.Empty) {
-                    tribeNameElement
+                    _tribeNameElement
                 },
                 new Section ("Members") {
                 }
@@ -61,7 +62,7 @@ namespace TellMe.iOS.Controllers
             return new CreateTribeSource(this, Members);
         }
 
-        async void DoneButtonTouched(object sender, EventArgs e)
+        private async void DoneButtonTouched(object sender, EventArgs e)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
@@ -83,11 +84,11 @@ namespace TellMe.iOS.Controllers
 
     public class CreateTribeSource : DialogViewController.Source
     {
-        private readonly ICollection<StorytellerDTO> members;
+        private readonly ICollection<StorytellerDTO> _members;
 
         public CreateTribeSource(DialogViewController controller, ICollection<StorytellerDTO> members) : base(controller)
         {
-            this.members = members;
+            this._members = members;
             controller.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
         }
 
@@ -95,7 +96,7 @@ namespace TellMe.iOS.Controllers
         {
             if (section == 0)
                 return base.RowsInSection(tableview, section);
-            return members.Count;
+            return _members.Count;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -104,7 +105,7 @@ namespace TellMe.iOS.Controllers
                 return base.GetCell(tableView, indexPath);
 
             var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
-            cell.Storyteller = members.ElementAt(indexPath.Row);
+            cell.Storyteller = _members.ElementAt(indexPath.Row);
             return cell;
         }
     }

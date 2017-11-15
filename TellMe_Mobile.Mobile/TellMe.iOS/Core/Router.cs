@@ -12,28 +12,28 @@ namespace TellMe.iOS.Core
 {
     public class Router : IRouter
     {
-        private readonly UIWindow window;
+        private readonly UIWindow _window;
 
         public Router(UIWindow window)
         {
-            this.window = window;
+            this._window = window;
         }
 
         public void NavigateMain()
         {
-            this.window.InvokeOnMainThread(() => this.window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController()));
+            this._window.InvokeOnMainThread(() => this._window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController()));
         }
 
         public void NavigateRequestStory(IView view, ICollection<ContactDTO> recipients)
         {
             var targetController = (RequestStoryController)UIStoryboard.FromName("Story", null).InstantiateViewController("RequestStoryController");
             targetController.Recipients = recipients;
-            this.Present(targetController, view, true);
+            this.Present(targetController, view);
         }
 
         public void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (StorytellersController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.FriendsAndTribes;
@@ -45,7 +45,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, HashSet<string> disabledUserIds = null)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (StorytellersController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.FriendsOnly;
@@ -58,7 +58,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (UINavigationController)UIStoryboard.FromName("Story", null).InstantiateViewController("RecordVideoController");
                 var recordController = (RecordVideoController)targetController.ViewControllers.First();
@@ -71,7 +71,7 @@ namespace TellMe.iOS.Core
 
         public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (PreviewVideoController)UIStoryboard.FromName("Story", null).InstantiateViewController("PreviewVideoController");
                 targetController.VideoPath = videoPath;
@@ -84,7 +84,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath, StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (SendStoryViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("SendStoryViewController");
                 targetController.VideoPath = videoPath;
@@ -98,7 +98,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateAccountSettings(IView view)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Main", null).InstantiateViewController("ProfileViewController");
                 this.Present(targetController, view);
@@ -107,7 +107,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateSetProfilePicture(IView view)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Auth", null).InstantiateViewController("UploadPictureController");
                 this.Present(targetController, view);
@@ -116,7 +116,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateStorytellers(IView view)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellersController");
                 this.Present(targetController, view);
@@ -125,7 +125,7 @@ namespace TellMe.iOS.Core
 
         public void NavigateNotificationsCenter(IView view)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Main", null).InstantiateViewController("NotificationCenterController");
                 this.Present(targetController, view, false);
@@ -134,17 +134,17 @@ namespace TellMe.iOS.Core
 
         public void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> tribeMembers, TribeCreatedHandler complete)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = new CreateTribeController(tribeMembers);
                 targetController.TribeCreated += complete;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void NavigateViewStory(IView view, StoryDTO story, bool goToComments = false)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (StoryViewController)UIStoryboard.FromName("Main", null).InstantiateViewController("StoryViewController");
                 targetController.Story = story;
@@ -157,64 +157,64 @@ namespace TellMe.iOS.Core
 
         public void NavigateStoryteller(IView view, StorytellerDTO storyteller)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
 
                 var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
                 targetController.Storyteller = storyteller;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void NavigateStoryteller(IView view, string userId)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
 
                 var targetController = (StorytellerViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("StorytellerViewController");
                 targetController.StorytellerId = userId;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = new TribeInfoViewController(tribe);
                 targetController.TribeLeft += e;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
                 targetController.Tribe = tribe;
                 targetController.TribeLeft += e;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void NavigateTribe(IView view, int tribeId, TribeLeftHandler e)
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (TribeViewController)UIStoryboard.FromName("Story", null).InstantiateViewController("TribeViewController");
                 targetController.TribeId = tribeId;
                 targetController.TribeLeft += e;
-                this.Present(targetController, view, true);
+                this.Present(targetController, view);
             });
         }
 
         public void SwapToAuth()
         {
-            this.window.InvokeOnMainThread(() =>
+            this._window.InvokeOnMainThread(() =>
             {
                 var initialController = UIStoryboard.FromName("Auth", null).InstantiateInitialViewController();
-                this.window.SwapController(initialController);
+                this._window.SwapController(initialController);
             });
         }
 

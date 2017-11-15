@@ -1,24 +1,22 @@
 using Foundation;
 using System;
 using UIKit;
-using TellMe.Core;
-using TellMe.Core.Types.DataServices.Remote;
-using TellMe.Core.Types.DataServices.Local;
 using TellMe.iOS.Extensions;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
 using CoreGraphics;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.iOS.Core;
 using TellMe.iOS.Views;
 
 namespace TellMe.iOS
 {
     public partial class SignInController : UIViewController, ISignInView
     {
-        private NSObject willHideNotificationObserver;
-        private NSObject willShowNotificationObserver;
+        private NSObject _willHideNotificationObserver;
+        private NSObject _willShowNotificationObserver;
 
-        private SigninBusinessLogic _businessLogic;
+        private ISigninBusinessLogic _businessLogic;
 
         public ITextInput EmailField => this.Email;
 
@@ -31,11 +29,8 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this._businessLogic = new SigninBusinessLogic(
-                App.Instance.Router,
-                new RemoteAccountDataService(),
-                new AccountService(),
-                this);
+            this._businessLogic = IoC.Container.GetInstance<ISigninBusinessLogic>();
+            _businessLogic.View = this;
             Email.ShouldReturn += TextFieldShouldReturn;
             Password.ShouldReturn += TextFieldShouldReturn;
 
@@ -51,10 +46,10 @@ namespace TellMe.iOS
 
         public override void ViewDidDisappear(bool animated)
         {
-            if (willHideNotificationObserver != null)
-                NSNotificationCenter.DefaultCenter.RemoveObserver(willHideNotificationObserver);
-            if (willShowNotificationObserver != null)
-                NSNotificationCenter.DefaultCenter.RemoveObserver(willShowNotificationObserver);
+            if (_willHideNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(_willHideNotificationObserver);
+            if (_willShowNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(_willShowNotificationObserver);
         }
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
@@ -87,8 +82,8 @@ namespace TellMe.iOS
 
         protected virtual void RegisterForKeyboardNotifications()
         {
-            this.willHideNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
-            this.willShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
+            this._willHideNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
+            this._willShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
         }
 
         public void OnKeyboardNotification(NSNotification notification)

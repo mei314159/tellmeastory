@@ -6,21 +6,20 @@ using System;
 using TellMe.Core.Contracts.DTO;
 using System.Collections.Generic;
 using System.Linq;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Extensions;
 using System.Threading.Tasks;
 using System.Collections;
 using TellMe.Core.Contracts.UI;
-using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.iOS.Core;
 using TellMe.iOS.Views;
 
 namespace TellMe.iOS.Controllers
 {
     public class TribeInfoViewController : DialogViewController, IViewTribeView
     {
-        private readonly ViewTribeInfoBusinessLogic _businessLogic;
-        private ViewTribeSource DataSource;
+        private readonly IViewTribeInfoBusinessLogic _businessLogic;
+        private ViewTribeSource _dataSource;
 
         public event TribeLeftHandler TribeLeft;
 
@@ -29,7 +28,8 @@ namespace TellMe.iOS.Controllers
         public TribeInfoViewController(TribeDTO tribe) : base(UITableViewStyle.Grouped, null, true)
         {
             this.Tribe = tribe;
-            _businessLogic = new ViewTribeInfoBusinessLogic(new RemoteTribesDataService(), App.Instance.Router, this);
+            this._businessLogic = IoC.Container.GetInstance<IViewTribeInfoBusinessLogic>();
+            _businessLogic.View = this;
         }
 
         public override void ViewDidLoad()
@@ -66,11 +66,11 @@ namespace TellMe.iOS.Controllers
 
         public override Source CreateSizingSource(bool unevenRows)
         {
-            DataSource = new ViewTribeSource(this, Tribe);
-            DataSource.EditButtonTouched += DataSource_EditButtonTouched;
-            DataSource.OnDeleteRow += DataSource_OnDeleteRow;
-            DataSource.OnMemberSelected += DataSource_OnMemberSelected;
-            return DataSource;
+            _dataSource = new ViewTribeSource(this, Tribe);
+            _dataSource.EditButtonTouched += DataSource_EditButtonTouched;
+            _dataSource.OnDeleteRow += DataSource_OnDeleteRow;
+            _dataSource.OnMemberSelected += DataSource_OnMemberSelected;
+            return _dataSource;
         }
 
         public async Task LoadAsync(bool forceRefresh)
@@ -80,18 +80,18 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() => this.RefreshControl.EndRefreshing());
         }
 
-        void DataSource_EditButtonTouched()
+        private void DataSource_EditButtonTouched()
         {
             _businessLogic.ChooseMembers();
         }
 
-        void DataSource_OnDeleteRow(TribeMemberDTO deletedItem, NSIndexPath indexPath)
+        private void DataSource_OnDeleteRow(TribeMemberDTO deletedItem, NSIndexPath indexPath)
         {
             Tribe.Members.Remove(deletedItem);
             TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
         }
 
-        void DataSource_OnMemberSelected(TribeMemberDTO tribeMember, NSIndexPath indexPath)
+        private void DataSource_OnMemberSelected(TribeMemberDTO tribeMember, NSIndexPath indexPath)
         {
             _businessLogic.NavigateTribeMember(tribeMember);
         }
@@ -100,7 +100,7 @@ namespace TellMe.iOS.Controllers
 
         public void ShowSuccessMessage(string message, Action complete) => ViewExtensions.ShowSuccessMessage(this, message, complete);
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
             LoadAsync(true);
         }
@@ -155,7 +155,7 @@ namespace TellMe.iOS.Controllers
 
         public void DisplayMembers()
         {
-            DataSource.SetData(Tribe);
+            _dataSource.SetData(Tribe);
             TableView.ReloadData();
         }
 
@@ -220,8 +220,8 @@ namespace TellMe.iOS.Controllers
 
     public class ViewTribeSource : DialogViewController.Source
     {
-        private readonly List<TribeMemberDTO> membersList = new List<TribeMemberDTO>();
-        private UITableViewCell addMemberCell;
+        private readonly List<TribeMemberDTO> _membersList = new List<TribeMemberDTO>();
+        private UITableViewCell _addMemberCell;
 
         public event Action<TribeMemberDTO, NSIndexPath> OnDeleteRow;
 
@@ -237,12 +237,12 @@ namespace TellMe.iOS.Controllers
 
         public void SetData(TribeDTO tribe)
         {
-            var initialCount = membersList.Count;
-            lock (((ICollection)membersList).SyncRoot)
+            var initialCount = _membersList.Count;
+            lock (((ICollection)_membersList).SyncRoot)
             {
-                membersList.Clear();
+                _membersList.Clear();
                 if (tribe.Members != null)
-                    membersList.AddRange(tribe.Members.OrderBy(x => x.UserName));
+                    _membersList.AddRange(tribe.Members.OrderBy(x => x.UserName));
             }
         }
 
@@ -250,7 +250,7 @@ namespace TellMe.iOS.Controllers
         {
             if (section != 1)
                 return base.RowsInSection(tableview, section);
-            return tableview.Editing ? membersList.Count + 1 : membersList.Count;
+            return tableview.Editing ? _membersList.Count + 1 : _membersList.Count;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -260,20 +260,20 @@ namespace TellMe.iOS.Controllers
 
             if (tableView.Editing && indexPath.Row == 0)
             {
-                if (addMemberCell == null)
+                if (_addMemberCell == null)
                 {
-                    addMemberCell = new UITableViewCell();
-                    addMemberCell.TextLabel.Text = "Add Member";
-                    addMemberCell.TextLabel.TextAlignment = UITextAlignment.Center;
-                    addMemberCell.TextLabel.TextColor = UIColor.Blue;
+                    _addMemberCell = new UITableViewCell();
+                    _addMemberCell.TextLabel.Text = "Add Member";
+                    _addMemberCell.TextLabel.TextAlignment = UITextAlignment.Center;
+                    _addMemberCell.TextLabel.TextColor = UIColor.Blue;
                 }
 
-                return addMemberCell;
+                return _addMemberCell;
             }
 
             var cell = tableView.DequeueReusableCell(TribeMembersListCell.Key, indexPath) as TribeMembersListCell;
             var index = tableView.Editing ? indexPath.Row - 1 : indexPath.Row;
-            cell.TribeMember = membersList.ElementAt(index);
+            cell.TribeMember = _membersList.ElementAt(index);
             return cell;
         }
 
@@ -303,7 +303,7 @@ namespace TellMe.iOS.Controllers
             if (result)
             {
                 var index = tableView.Editing ? indexPath.Row - 1 : indexPath.Row;
-                var dto = membersList[index];
+                var dto = _membersList[index];
                 result = dto.Status != TribeMemberStatus.Creator;
             }
 
@@ -326,10 +326,10 @@ namespace TellMe.iOS.Controllers
             return new[] { deleteAction };
         }
 
-        void DeleteRow(UITableViewRowAction action, NSIndexPath indexPath)
+        private void DeleteRow(UITableViewRowAction action, NSIndexPath indexPath)
         {
-            var deletedItem = membersList[(indexPath.Row - 1)];
-            membersList.Remove(deletedItem);
+            var deletedItem = _membersList[(indexPath.Row - 1)];
+            _membersList.Remove(deletedItem);
             OnDeleteRow?.Invoke(deletedItem, indexPath);
         }
     }

@@ -9,33 +9,41 @@ using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views.Cells;
 using System.Collections.Generic;
-using TellMe.Core.Types.DataServices.Remote;
 using System.Threading.Tasks;
 using System.Linq;
+using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.DataServices.Remote;
+using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
     public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate
     {
-        private NSObject willHideNotificationObserver;
-        private NSObject willShowNotificationObserver;
+        private NSObject _willHideNotificationObserver;
+        private NSObject _willShowNotificationObserver;
 
-        private readonly List<CommentDTO> commentsList = new List<CommentDTO>();
-        private UIVisualEffectView effectView;
-        private UIVisualEffectView EffectView => effectView ?? (effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
-        private RemoteCommentsDataService commentsService;
-        private RemoteStoriesDataService _remoteStoriesService;
-        private StoryViewCell storyView;
-        private LoadMoreButtonCell loadMoreButton;
+        private readonly List<CommentDTO> _commentsList = new List<CommentDTO>();
+        private UIVisualEffectView _effectView;
+
+        private UIVisualEffectView EffectView => _effectView ??
+                                                 (_effectView =
+                                                     new UIVisualEffectView(
+                                                         UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
+
+        private IRemoteCommentsDataService _commentsService;
+        private IRemoteStoriesDataService _remoteStoriesService;
+        private IRouter _router;
+        private StoryViewCell _storyView;
+        private LoadMoreButtonCell _loadMoreButton;
 
         public StoryViewController(IntPtr handle) : base(handle)
         {
         }
 
-        private CGRect originalImageFrame;
-        private bool showLoadMoreButton;
+        private CGRect _originalImageFrame;
+        private bool _showLoadMoreButton;
 
-        private int CommentCellOffset => showLoadMoreButton ? 2 : 1;
+        private int CommentCellOffset => _showLoadMoreButton ? 2 : 1;
 
         public StoryDTO Story { get; set; }
         public IView Parent { get; set; }
@@ -48,8 +56,10 @@ namespace TellMe.iOS
             View.AddSubview(EffectView);
             View.SendSubviewToBack(EffectView);
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
-            commentsService = new RemoteCommentsDataService();
-            _remoteStoriesService = new RemoteStoriesDataService();
+
+            _commentsService = IoC.Container.GetInstance<IRemoteCommentsDataService>();
+            _remoteStoriesService = IoC.Container.GetInstance<IRemoteStoriesDataService>();
+            _router = IoC.Container.GetInstance<IRouter>();
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
             {
                 CancelsTouchesInView = false,
@@ -75,24 +85,26 @@ namespace TellMe.iOS
 
         public override void ViewDidAppear(bool animated)
         {
-            this.storyView.Play();
+            this._storyView.Play();
             RegisterForKeyboardNotifications();
         }
 
         public override void ViewWillDisappear(bool animated)
         {
-            this.storyView.StopPlaying();
+            this._storyView.StopPlaying();
 
-            if (willHideNotificationObserver != null)
-                NSNotificationCenter.DefaultCenter.RemoveObserver(willHideNotificationObserver);
-            if (willShowNotificationObserver != null)
-                NSNotificationCenter.DefaultCenter.RemoveObserver(willShowNotificationObserver);
+            if (_willHideNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(_willHideNotificationObserver);
+            if (_willShowNotificationObserver != null)
+                NSNotificationCenter.DefaultCenter.RemoveObserver(_willShowNotificationObserver);
         }
 
         protected virtual void RegisterForKeyboardNotifications()
         {
-            this.willHideNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
-            this.willShowNotificationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
+            this._willHideNotificationObserver =
+                NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillHideNotification, OnKeyboardNotification);
+            this._willShowNotificationObserver =
+                NSNotificationCenter.DefaultCenter.AddObserver(UIKeyboard.WillShowNotification, OnKeyboardNotification);
         }
 
         public void OnKeyboardNotification(NSNotification notification)
@@ -107,12 +119,12 @@ namespace TellMe.iOS
             UIView.BeginAnimations("AnimateForKeyboard");
             UIView.SetAnimationBeginsFromCurrentState(true);
             UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
-            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve) UIKeyboard.AnimationCurveFromNotification(notification));
 
             //Pass the notification, calculating keyboard height, etc.
             var keyboardFrame = visible
-                                    ? UIKeyboard.FrameEndFromNotification(notification)
-                                    : UIKeyboard.FrameBeginFromNotification(notification);
+                ? UIKeyboard.FrameEndFromNotification(notification)
+                : UIKeyboard.FrameBeginFromNotification(notification);
             OnKeyboardChanged(visible, keyboardFrame);
             //Commit the animation
             UIView.CommitAnimations();
@@ -129,24 +141,26 @@ namespace TellMe.iOS
             {
                 BottomOffset.Constant = keyboardFrame.Height;
                 TableView.ContentOffset = new CGPoint(0, TableView.ContentSize.Height);
-                storyView.StopPlaying();
+                _storyView.StopPlaying();
             }
             else
             {
                 BottomOffset.Constant = 0;
-                storyView.Play();
+                _storyView.Play();
             }
         }
 
-        void HandleAction(UIPanGestureRecognizer recognizer)
+        private void HandleAction(UIPanGestureRecognizer recognizer)
         {
             if (recognizer.State == UIGestureRecognizerState.Began)
             {
-                originalImageFrame = View.Frame;
+                _originalImageFrame = View.Frame;
             }
 
             // Move the image if the gesture is valid
-            if (recognizer.State != UIGestureRecognizerState.Cancelled && recognizer.State != UIGestureRecognizerState.Failed && recognizer.State != UIGestureRecognizerState.Possible)
+            if (recognizer.State != UIGestureRecognizerState.Cancelled &&
+                recognizer.State != UIGestureRecognizerState.Failed &&
+                recognizer.State != UIGestureRecognizerState.Possible)
             {
                 // Move the image by adding the offset to the object's frame
                 var offset = recognizer.TranslationInView(View);
@@ -156,7 +170,7 @@ namespace TellMe.iOS
                     return;
                 }
 
-                var newFrame = originalImageFrame;
+                var newFrame = _originalImageFrame;
                 newFrame.Offset(0, offset.Y);
                 View.Frame = newFrame;
                 if ((offset.Y > 150 || recognizer.State == UIGestureRecognizerState.Ended))
@@ -166,15 +180,18 @@ namespace TellMe.iOS
             }
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
-        public void ShowSuccessMessage(string message, Action complete = null) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
+
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                storyView.StopPlaying();
-                storyView.Dispose();
+                _storyView.StopPlaying();
+                _storyView.Dispose();
             }
 
             base.Dispose(disposing);
@@ -199,7 +216,7 @@ namespace TellMe.iOS
             DisplayComments(true, comment);
             SendButton.Enabled = true;
 
-            var result = await commentsService.AddCommentAsync(Story.Id, text).ConfigureAwait(false);
+            var result = await _commentsService.AddCommentAsync(Story.Id, text).ConfigureAwait(false);
 
             InvokeOnMainThread(() =>
             {
@@ -216,40 +233,42 @@ namespace TellMe.iOS
 
         private void UpdateComments(CommentDTO comment, CommentDTO newComment)
         {
-            var index = commentsList.IndexOf(comment);
+            var index = _commentsList.IndexOf(comment);
             if (index > -1)
             {
                 comment.Id = newComment.Id;
                 comment.CreateDateUtc = newComment.CreateDateUtc;
 
                 var indexPath = NSIndexPath.FromRowSection(index + CommentCellOffset, 0);
-                if (TableView.IndexPathsForVisibleRows.Any(x => x.Row == indexPath.Row && x.Section == indexPath.Section))
+                if (TableView.IndexPathsForVisibleRows.Any(
+                    x => x.Row == indexPath.Row && x.Section == indexPath.Section))
                 {
-                    TableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
+                    TableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
                 }
             }
         }
 
         private void DeleteComment(CommentDTO comment)
         {
-            var index = commentsList.IndexOf(comment);
+            var index = _commentsList.IndexOf(comment);
             if (index > -1)
             {
-                commentsList.RemoveAt(index);
-                TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index + CommentCellOffset, 0) }, UITableViewRowAnimation.Automatic);
+                _commentsList.RemoveAt(index);
+                TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index + CommentCellOffset, 0)},
+                    UITableViewRowAnimation.Automatic);
             }
         }
 
         private async Task LoadCommentsAsync(DateTime? olderThanUtc = null)
         {
-            if (loadMoreButton != null)
-                loadMoreButton.Enabled = false;
-            var result = await commentsService.GetCommentsAsync(Story.Id, olderThanUtc).ConfigureAwait(false);
-            if (loadMoreButton != null)
-                loadMoreButton.Enabled = true;
+            if (_loadMoreButton != null)
+                _loadMoreButton.Enabled = false;
+            var result = await _commentsService.GetCommentsAsync(Story.Id, olderThanUtc).ConfigureAwait(false);
+            if (_loadMoreButton != null)
+                _loadMoreButton.Enabled = true;
             if (result.IsSuccess)
             {
-                this.showLoadMoreButton = result.Data.TotalCount > commentsList.Count + result.Data.Items.Length;
+                this._showLoadMoreButton = result.Data.TotalCount > _commentsList.Count + result.Data.Items.Length;
 
                 DisplayComments(false, result.Data.Items);
             }
@@ -261,16 +280,21 @@ namespace TellMe.iOS
 
         private void DisplayComments(bool addToHead = false, params CommentDTO[] comments)
         {
-            var scrollToComments = commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
+            if (comments == null || comments.Length == 0)
+            {
+                return;
+            }
+            
+            var scrollToComments = _commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
             if (DisplayCommentsWhenAppear)
             {
                 DisplayCommentsWhenAppear = false;
             }
 
             if (addToHead)
-                commentsList.AddRange(comments.OrderBy(x => x.CreateDateUtc));
+                _commentsList.AddRange(comments.OrderBy(x => x.CreateDateUtc));
             else
-                commentsList.InsertRange(0, comments.OrderBy(x => x.CreateDateUtc));
+                _commentsList.InsertRange(0, comments.OrderBy(x => x.CreateDateUtc));
 
 
             InvokeOnMainThread(() =>
@@ -278,15 +302,17 @@ namespace TellMe.iOS
                 TableView.ReloadData();
                 if (scrollToComments)
                 {
-                    var index = addToHead ? commentsList.Count - comments.Length - 1 + CommentCellOffset : (this.CommentCellOffset);
+                    var index = addToHead
+                        ? _commentsList.Count - comments.Length - 1 + CommentCellOffset
+                        : (this.CommentCellOffset);
                     TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.Top, true);
                 }
             });
         }
 
-        void NewCommentText_Changed(object sender, EventArgs e)
+        private void NewCommentText_Changed(object sender, EventArgs e)
         {
-            var textView = (UITextView)sender;
+            var textView = (UITextView) sender;
             var frame = textView.SizeThatFits(new CGSize(textView.Frame.Width, nfloat.MaxValue));
             nfloat newHeight = frame.Height > 100 ? 100 : frame.Height;
             var delta = newHeight - textView.Frame.Height;
@@ -296,20 +322,21 @@ namespace TellMe.iOS
             View.UpdateConstraints();
         }
 
-        bool NewCommentText_ShouldChangeText(UITextView textView, NSRange range, string replacementString)
+        private bool NewCommentText_ShouldChangeText(UITextView textView, NSRange range, string replacementString)
         {
             string text = textView.Text;
-            string newText = text.Substring(0, (int)range.Location) + replacementString + text.Substring((int)(range.Location + range.Length));
+            string newText = text.Substring(0, (int) range.Location) + replacementString +
+                             text.Substring((int) (range.Location + range.Length));
 
             return newText.Length <= 500; //max length
         }
 
         private void Initialize()
         {
-            storyView = StoryViewCell.Create(Story);
-            storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
-            storyView.OnReceiverSelected = StoryView_OnReceiverSelected;
-            storyView.OnLikeButtonTouched = StoryView_OnLikeButtonTouched;
+            _storyView = StoryViewCell.Create(Story);
+            _storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
+            _storyView.OnReceiverSelected = StoryView_OnReceiverSelected;
+            _storyView.OnLikeButtonTouched = StoryView_OnLikeButtonTouched;
         }
 
         private async void StoryView_OnLikeButtonTouched(StoryDTO story)
@@ -332,63 +359,65 @@ namespace TellMe.iOS
             }
         }
 
-        void StoryView_OnReceiverSelected(StoryReceiverDTO receiver)
+        private void StoryView_OnReceiverSelected(StoryReceiverDTO receiver)
         {
             if (receiver.TribeId != null)
             {
-                this.DismissViewController(false, () => App.Instance.Router.NavigateTribe(Parent, receiver.TribeId.Value, storyView.RemoveTribe));
+                this.DismissViewController(false,
+                    () => _router.NavigateTribe(Parent, receiver.TribeId.Value, _storyView.RemoveTribe));
             }
             else
             {
-                this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, receiver.UserId));
+                this.DismissViewController(false, () => _router.NavigateStoryteller(Parent, receiver.UserId));
             }
         }
 
-        void StoryView_OnProfilePictureTouched(StoryDTO story)
+        private void StoryView_OnProfilePictureTouched(StoryDTO story)
         {
-            this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, story.SenderId));
+            this.DismissViewController(false, () => _router.NavigateStoryteller(Parent, story.SenderId));
         }
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
-            return commentsList.Count + CommentCellOffset;
+            return _commentsList.Count + CommentCellOffset;
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             if (indexPath.Row == 0)
             {
-                return this.storyView;
+                return this._storyView;
             }
 
-            if (showLoadMoreButton && indexPath.Row == 1)
+            if (_showLoadMoreButton && indexPath.Row == 1)
             {
-                if (loadMoreButton == null)
+                if (_loadMoreButton == null)
                 {
-                    this.loadMoreButton = LoadMoreButtonCell.Create(async (b) =>
-                    {
-                        await this.LoadCommentsAsync(commentsList.First().CreateDateUtc).ConfigureAwait(false);
-                    }, "More comments");
+                    this._loadMoreButton = LoadMoreButtonCell.Create(
+                        async (b) =>
+                        {
+                            await this.LoadCommentsAsync(_commentsList.First().CreateDateUtc).ConfigureAwait(false);
+                        }, "More comments");
                 }
 
-                return this.loadMoreButton;
+                return this._loadMoreButton;
             }
 
             var commentCell = TableView.DequeueReusableCell(CommentViewCell.Key, indexPath) as CommentViewCell;
-            commentCell.Comment = commentsList[indexPath.Row - CommentCellOffset];
+            commentCell.Comment = _commentsList[indexPath.Row - CommentCellOffset];
             commentCell.ReceiverSelected = CommentCell_ReceiverSelected;
             return commentCell;
         }
 
         private void CommentCell_ReceiverSelected(CommentDTO comment)
         {
-            this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, comment.AuthorId));
+            this.DismissViewController(false, () => _router.NavigateStoryteller(Parent, comment.AuthorId));
         }
 
-        void OnStoryLikeChanged(StoryDTO story)
+        private void OnStoryLikeChanged(StoryDTO story)
         {
             if (this.Story.Id == story.Id)
-                storyView.UpdateLikeButton(story);
+                _storyView.UpdateLikeButton(story);
         }
     }
 }

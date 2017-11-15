@@ -1,36 +1,35 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class CreateTribeBusinessLogic
+    public class CreateTribeBusinessLogic : ICreateTribeBusinessLogic
     {
-        private readonly ICreateTribeView _view;
-        private readonly RemoteTribesDataService _remoteTribesService;
-        private readonly LocalTribesDataService _localTribesService;
+        private readonly IRemoteTribesDataService _remoteTribesService;
+        private readonly ILocalTribesDataService _localTribesService;
         private readonly CreateTribeValidator _validator;
+        public ICreateTribeView View { get; set; }
 
-        public CreateTribeBusinessLogic(RemoteTribesDataService remoteTribesService, ICreateTribeView view)
+        public CreateTribeBusinessLogic(IRemoteTribesDataService remoteTribesService, ILocalTribesDataService localTribesService, CreateTribeValidator validator)
         {
-            _view = view;
-            _localTribesService = new LocalTribesDataService();
+            _localTribesService = localTribesService;
+            _validator = validator;
             _remoteTribesService = remoteTribesService;
-            _validator = new CreateTribeValidator();
         }
 
         public async Task CreateTribeAsync()
         {
             var dto = new TribeDTO
             {
-                Name = _view.TribeName,
-                Members = _view.Members.Select(x => new TribeMemberDTO { UserId = x.Id }).ToList()
+                Name = View.TribeName,
+                Members = View.Members.Select(x => new TribeMemberDTO { UserId = x.Id }).ToList()
             };
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
             if (validationResult.IsValid)
@@ -41,16 +40,16 @@ namespace TellMe.Core.Types.BusinessLogic
                 if (result.IsSuccess)
                 {
                     await _localTribesService.SaveAsync(result.Data).ConfigureAwait(false);
-                    this._view.ShowSuccessMessage("Tribe successfully created", () => _view.Close(result.Data));
+                    this.View.ShowSuccessMessage("Tribe successfully created", () => View.Close(result.Data));
                 }
                 else
                 {
-                    result.ShowResultError(this._view);
+                    result.ShowResultError(this.View);
                 }
             }
             else
             {
-                validationResult.ShowValidationResult(this._view);
+                validationResult.ShowValidationResult(this.View);
             }
         }
     }

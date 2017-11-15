@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -7,9 +8,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SDWebImage;
 using TellMe.Core;
+using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.DTO;
 using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.DataServices.Remote;
@@ -25,51 +28,48 @@ namespace TellMe.iOS
     // The UIApplicationDelegate for the application. This class is responsible for launching the
     // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
     [Register("AppDelegate")]
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class AppDelegate : UIApplicationDelegate, IUNUserNotificationCenterDelegate
     {
         // class-level declarations
 
-        public override UIWindow Window
-        {
-            get;
-            set;
-        }
+        public override UIWindow Window { get; set; }
 
-        public AccountBusinessLogic AccountBusinessLogic { get; private set; }
+        private IAccountBusinessLogic AccountBusinessLogic { get; set; }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
             InitializeHockeyApp();
-            SDWebImageManager.SharedManager.ImageDownloader.MaxConcurrentDownloads = 3;
-            SDWebImageManager.SharedManager.ImageCache.ShouldCacheImagesInMemory = false;
-            SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
+            InitializeSDWebImage();
+            var window = new UIWindow(UIScreen.MainScreen.Bounds);
+            IoC.Initialize(window);
 
-            UIWindow window = new UIWindow(UIScreen.MainScreen.Bounds);
-            var accountService = new AccountService();
-            var applicationDataStorage = new ApplicationDataStorage();
-            var remotePushDataService = new RemotePushDataService();
-            var contactsProvider = new ContactsProvider();
-            this.AccountBusinessLogic = new AccountBusinessLogic(applicationDataStorage, accountService, remotePushDataService);
-            var router = new Router(window);
-            App.Instance.Initialize(accountService, applicationDataStorage, router);
+            this.AccountBusinessLogic = IoC.Container.GetInstance<IAccountBusinessLogic>();
+            App.Instance.Initialize();
             App.Instance.OnNotificationReceived += Instance_OnNotificationReceived;
+
             this.Window = window;
             this.Window.RootViewController = GetInitialViewController(launchOptions);
             this.Window.MakeKeyAndVisible();
 
-            if (launchOptions != null)
+            var notification =
+                (NSDictionary) launchOptions?.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
+            if (notification != null)
             {
-                var notification = (NSDictionary)launchOptions.ObjectForKey(UIApplication.LaunchOptionsRemoteNotificationKey);
-                if (notification != null)
-                {
-                    ProcessNotification(notification, false);
-                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
-                }
+                ProcessNotification(notification);
+                UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
             }
 
             UNUserNotificationCenter.Current.Delegate = this;
 
             return true;
+        }
+
+        private void InitializeSDWebImage()
+        {
+            SDWebImageManager.SharedManager.ImageDownloader.MaxConcurrentDownloads = 3;
+            SDWebImageManager.SharedManager.ImageCache.ShouldCacheImagesInMemory = false;
+            SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
         }
 
         private void InitializeHockeyApp()
@@ -102,7 +102,7 @@ namespace TellMe.iOS
             // Here you can undo many of the changes made on entering the background.
         }
 
-        public override async void OnActivated(UIApplication application)
+        public override void OnActivated(UIApplication application)
         {
             if (this.AccountBusinessLogic.IsAuthenticated)
             {
@@ -126,9 +126,11 @@ namespace TellMe.iOS
         }
 
         [Export("userNotificationCenter:willPresentNotification:withCompletionHandler:")]
-        public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+        public virtual void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification,
+            Action<UNNotificationPresentationOptions> completionHandler)
         {
-            completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge | UNNotificationPresentationOptions.Sound);
+            completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Badge |
+                              UNNotificationPresentationOptions.Sound);
         }
 
         public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
@@ -144,8 +146,8 @@ namespace TellMe.iOS
             }
             else
             {
-                UIAlertController alert = UIAlertController.Create(
-                                            "Enable push notifications",
+                var alert = UIAlertController.Create(
+                    "Enable push notifications",
                     "Do you want to get notified about unread messages?",
                     UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
@@ -154,7 +156,6 @@ namespace TellMe.iOS
                     this.AccountBusinessLogic.PushIsEnabled = true;
 
                     RegisterPushNotifications();
-
                 }));
 
                 UIApplication
@@ -167,36 +168,36 @@ namespace TellMe.iOS
 
         private void RegisterPushNotifications()
         {
-            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound | UNAuthorizationOptions.Badge, (granted, error) =>
-            {
-                if (granted)
+            UNUserNotificationCenter.Current.RequestAuthorization(
+                UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound | UNAuthorizationOptions.Badge,
+                (granted, error) =>
                 {
-                    this.InvokeOnMainThread(() => UIApplication.SharedApplication.RegisterForRemoteNotifications());
-                }
-            });
+                    if (granted)
+                    {
+                        this.InvokeOnMainThread(() => UIApplication.SharedApplication.RegisterForRemoteNotifications());
+                    }
+                });
         }
 
         private void ProcessNotification(NSDictionary userInfo, bool quiet = false)
         {
-            NSError error = new NSError();
-            var pushJson = new NSString(NSJsonSerialization.Serialize(userInfo, 0, out error), NSStringEncoding.UTF8).ToString();
+            var pushJson = new NSString(NSJsonSerialization.Serialize(userInfo, 0, out _), NSStringEncoding.UTF8)
+                .ToString();
             var notification = JsonConvert.DeserializeObject<PushNotification>(pushJson);
 
             UIApplication.SharedApplication.ApplicationIconBadgeNumber = notification.Data.Badge ?? 1;
             App.Instance.NotificationReceived(new NotificationDTO
             {
-                Id = notification.NotificationId.Value,
+                Id = notification.NotificationId ?? default(int),
                 Text = notification.Data.Message,
                 Extra = notification.Extra,
                 Type = notification.NotificationType
             });
-
         }
 
-        void Instance_OnNotificationReceived(NotificationDTO notification)
+        private async void Instance_OnNotificationReceived(NotificationDTO notification)
         {
-            var tabBarController = Window.RootViewController as UITabBarController;
-            if (tabBarController == null)
+            if (!(Window.RootViewController is UITabBarController tabBarController))
                 return;
             foreach (var c in tabBarController.ViewControllers)
             {
@@ -206,8 +207,9 @@ namespace TellMe.iOS
                     continue;
                 }
 
-                var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault() as IView;
-                var handler = new NotificationHandler(App.Instance.Router, view).ProcessNotification(notification);
+                var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
+                await IoC.Container.GetInstance<INotificationHandler>().ProcessNotificationAsync(notification, view)
+                    .ConfigureAwait(false);
                 return;
             }
         }
@@ -223,4 +225,3 @@ namespace TellMe.iOS
         }
     }
 }
-

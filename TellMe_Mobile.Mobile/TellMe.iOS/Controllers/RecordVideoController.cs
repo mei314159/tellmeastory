@@ -2,28 +2,28 @@ using Foundation;
 using System;
 using UIKit;
 using AVFoundation;
-using TellMe.Core;
 using CoreMedia;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.Core.Contracts.DTO;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
     public partial class RecordVideoController : UIViewController, IRecordVideoView
     {
-        AVCaptureMovieFileOutput output;
-        AVCaptureDevice device;
-        AVCaptureDevice audioDevice;
+        private AVCaptureMovieFileOutput _output;
+        private AVCaptureDevice _device;
+        private AVCaptureDevice _audioDevice;
 
-        AVCaptureDeviceInput input;
-        AVCaptureDeviceInput audioInput;
-        AVCaptureSession session;
-        AVCaptureVideoPreviewLayer previewlayer;
-        OutputDelegate outputDelegate;
-        private RecordVideoBusinessLogic businessLogic;
+        private AVCaptureDeviceInput _input;
+        private AVCaptureDeviceInput _audioInput;
+        private AVCaptureSession _session;
+        private AVCaptureVideoPreviewLayer _previewlayer;
+        private OutputDelegate _outputDelegate;
+        private IRecordVideoBusinessLogic _businessLogic;
 
         public RecordVideoController(IntPtr handle) : base(handle)
         {
@@ -48,24 +48,24 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
 
-            businessLogic = new RecordVideoBusinessLogic(App.Instance.Router, this);
-
-            session = new AVCaptureSession();
+            _businessLogic = IoC.Container.GetInstance<IRecordVideoBusinessLogic>();
+            _businessLogic.View = this;
+            _session = new AVCaptureSession();
             Console.WriteLine("getting device inputs");
             try
             {
                 //add video capture device
-                device = AVCaptureDevice.GetDefaultDevice(AVMediaType.Video);
-                input = AVCaptureDeviceInput.FromDevice(device);
-                session.AddInput(input);
+                _device = AVCaptureDevice.GetDefaultDevice(AVMediaType.Video);
+                _input = AVCaptureDeviceInput.FromDevice(_device);
+                _session.AddInput(_input);
 
                 //add audio capture device
-                audioDevice = AVCaptureDevice.GetDefaultDevice(AVMediaType.Audio);
-                audioInput = AVCaptureDeviceInput.FromDevice(audioDevice);
-                session.AddInput(audioInput);
-                outputDelegate = new OutputDelegate();
-                outputDelegate.Started += businessLogic.RecordingStarted;
-                outputDelegate.Stopped += businessLogic.RecordingStopped;
+                _audioDevice = AVCaptureDevice.GetDefaultDevice(AVMediaType.Audio);
+                _audioInput = AVCaptureDeviceInput.FromDevice(_audioDevice);
+                _session.AddInput(_audioInput);
+                _outputDelegate = new OutputDelegate();
+                _outputDelegate.Started += _businessLogic.RecordingStarted;
+                _outputDelegate.Stopped += _businessLogic.RecordingStopped;
             }
             catch (Exception ex)
             {
@@ -73,38 +73,38 @@ namespace TellMe.iOS
             }
 
             Console.WriteLine("setting up preview layer");
-            previewlayer = new AVCaptureVideoPreviewLayer(session);
-            previewlayer.Frame = this.PreviewView.Bounds;
-            PreviewView.Layer.AddSublayer(previewlayer);
+            _previewlayer = new AVCaptureVideoPreviewLayer(_session);
+            _previewlayer.Frame = this.PreviewView.Bounds;
+            PreviewView.Layer.AddSublayer(_previewlayer);
 
             Console.WriteLine("Configuring output");
-            output = new AVCaptureMovieFileOutput();
+            _output = new AVCaptureMovieFileOutput();
             long totalSeconds = 10000;
             var preferredTimeScale = 30;
             CMTime maxDuration = new CMTime(totalSeconds, preferredTimeScale);
-            output.MinFreeDiskSpaceLimit = 1024 * 1024;
-            output.MaxRecordedDuration = maxDuration;
+            _output.MinFreeDiskSpaceLimit = 1024 * 1024;
+            _output.MaxRecordedDuration = maxDuration;
 
-            if (session.CanAddOutput(output))
+            if (_session.CanAddOutput(_output))
             {
-                session.AddOutput(output);
+                _session.AddOutput(_output);
             }
 
-            session.SessionPreset = AVCaptureSession.Preset640x480;
+            _session.SessionPreset = AVCaptureSession.Preset640x480;
             Console.WriteLine("About to start running session");
         }
 
         public override void ViewWillAppear(bool animated)
         {
             this.Duration.Text = "00:00";
-            session.StartRunning();
+            _session.StartRunning();
             base.ViewWillAppear(animated);
         }
 
         public override void ViewWillDisappear(bool animated)
         {
-            businessLogic.WillClose();
-            session.StopRunning();
+            _businessLogic.WillClose();
+            _session.StopRunning();
             base.ViewWillDisappear(animated);
         }
 
@@ -112,45 +112,45 @@ namespace TellMe.iOS
 
         public void StartCapture(string videoPath)
         {
-            output.StartRecordingToOutputFile(new NSUrl(videoPath, false), outputDelegate);
+            _output.StartRecordingToOutputFile(new NSUrl(videoPath, false), _outputDelegate);
         }
 
         public void StopCapture()
         {
-            output.StopRecording();
+            _output.StopRecording();
         }
 
         public void SwitchCamera()
         {
-            var type = device.DeviceType;
-            session.StopRunning();
-            var currentPosition = device.Position;
-            this.session.RemoveInput(input);
-            device.Dispose();
-            input.Dispose();
+            var type = _device.DeviceType;
+            _session.StopRunning();
+            var currentPosition = _device.Position;
+            this._session.RemoveInput(_input);
+            _device.Dispose();
+            _input.Dispose();
 
             var newPosition = currentPosition == AVCaptureDevicePosition.Front ? AVCaptureDevicePosition.Back : AVCaptureDevicePosition.Front;
-            device = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaType.Video, newPosition);
-            input = AVCaptureDeviceInput.FromDevice(device);
-            this.session.AddInput(input);
-            session.StartRunning();
+            _device = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaType.Video, newPosition);
+            _input = AVCaptureDeviceInput.FromDevice(_device);
+            this._session.AddInput(_input);
+            _session.StartRunning();
         }
 
         partial void RecordButtonTouched(Button sender)
         {
-            businessLogic.ToggleRecording();
+            _businessLogic.ToggleRecording();
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                output?.Dispose();
-                session?.Dispose();
-                input?.Dispose();
-                audioInput?.Dispose();
-                device?.Dispose();
-                audioDevice?.Dispose();
+                _output?.Dispose();
+                _session?.Dispose();
+                _input?.Dispose();
+                _audioInput?.Dispose();
+                _device?.Dispose();
+                _audioDevice?.Dispose();
             }
             Console.WriteLine(String.Format("{0} controller disposed - {1}", this.GetType(), this.GetHashCode()));
             base.Dispose(disposing);
@@ -158,7 +158,7 @@ namespace TellMe.iOS
 
         partial void SwitchCameraButtonTouched(UIBarButtonItem sender)
         {
-            businessLogic.SwitchCamera();
+            _businessLogic.SwitchCamera();
         }
 
         partial void CloseButtonTouched(UIBarButtonItem sender)

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Foundation;
 using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Remote;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
@@ -18,13 +18,13 @@ namespace TellMe.iOS
 {
     public partial class TribeViewController : UITableViewController, ITribeView
     {
-        private TribeBusinessLogic _businessLogic;
-        private volatile bool loadingMore;
-        private volatile bool canLoadMore;
+        private ITribeViewBusinessLogic _businessLogic;
+        private volatile bool _loadingMore;
+        private volatile bool _canLoadMore;
 
         public event TribeLeftHandler TribeLeft;
 
-        public List<StoryDTO> storiesList = new List<StoryDTO>();
+        private readonly List<StoryDTO> _storiesList = new List<StoryDTO>();
         public TribeDTO Tribe { get; set; }
         public int TribeId { get; set; }
 
@@ -36,7 +36,8 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
-            this._businessLogic = new TribeBusinessLogic(new RemoteStoriesDataService(), new RemoteTribesDataService(), this, App.Instance.Router);
+            this._businessLogic = IoC.Container.GetInstance<ITribeViewBusinessLogic>();
+            _businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
@@ -76,13 +77,13 @@ namespace TellMe.iOS
 
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
-            lock (((ICollection)storiesList).SyncRoot)
+            lock (((ICollection)_storiesList).SyncRoot)
             {
-                var initialCount = storiesList.Count;
-                storiesList.Clear();
-                storiesList.AddRange(stories);
+                var initialCount = _storiesList.Count;
+                _storiesList.Clear();
+                _storiesList.AddRange(stories);
 
-                this.canLoadMore = stories.Count > initialCount;
+                this._canLoadMore = stories.Count > initialCount;
             }
 
             InvokeOnMainThread(() => TableView.ReloadData());
@@ -93,13 +94,13 @@ namespace TellMe.iOS
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
-            return this.storiesList.Count;
+            return this._storiesList.Count;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
-            cell.Story = this.storiesList[indexPath.Row];
+            cell.Story = this._storiesList[indexPath.Row];
             cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
             cell.PreviewTouched = Cell_PreviewTouched;
             cell.ReceiverSelected = Cell_ReceiverTouched;
@@ -113,17 +114,17 @@ namespace TellMe.iOS
             await _businessLogic.LikeButtonTouchedAsync(story).ConfigureAwait(false);
         }
 
-        void Cell_PreviewTouched(StoryDTO story)
+        private void Cell_PreviewTouched(StoryDTO story)
         {
             _businessLogic.ViewStory(story);
         }
 
-        void Cell_ProfilePictureTouched(StoryDTO story)
+        private void Cell_ProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
         }
 
-        void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        private void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
         {
             _businessLogic.ViewReceiver(receiver, (tribe) =>
             {
@@ -137,7 +138,7 @@ namespace TellMe.iOS
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (storiesList.Count - indexPath.Row == 5 && canLoadMore)
+            if (_storiesList.Count - indexPath.Row == 5 && _canLoadMore)
             {
                 LoadMoreAsync();
             }
@@ -145,10 +146,10 @@ namespace TellMe.iOS
 
         private async Task LoadMoreAsync()
         {
-            if (this.loadingMore)
+            if (this._loadingMore)
                 return;
 
-            this.loadingMore = true;
+            this._loadingMore = true;
             InvokeOnMainThread(() =>
             {
                 this.Spinner.StartAnimating();
@@ -161,7 +162,7 @@ namespace TellMe.iOS
                 this.TableView.TableFooterView.Hidden = true;
             });
 
-            this.loadingMore = false;
+            this._loadingMore = false;
         }
 
         private async Task LoadStoriesAsync(bool forceRefresh)
@@ -175,7 +176,7 @@ namespace TellMe.iOS
         {
             InvokeOnMainThread(() =>
             {
-                var index = storiesList.IndexOf(x => x.Id == story.Id);
+                var index = _storiesList.IndexOf(x => x.Id == story.Id);
                 if (index > -1)
                 {
                     var cell = TableView.CellAt(NSIndexPath.FromRowSection(index, 0)) as StoriesListCell;
@@ -184,7 +185,7 @@ namespace TellMe.iOS
             });
         }
 
-        void RefreshControl_ValueChanged(object sender, EventArgs e)
+        private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
             Task.Run(() => LoadStoriesAsync(true));
         }

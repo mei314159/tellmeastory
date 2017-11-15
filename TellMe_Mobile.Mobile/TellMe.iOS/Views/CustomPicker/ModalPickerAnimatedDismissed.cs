@@ -26,7 +26,7 @@ namespace SharpMobileCode.ModalPicker
     public class ModalPickerAnimatedDismissed : UIViewControllerAnimatedTransitioning
     {
         public bool IsPresenting { get; set; }
-        float _transitionDuration = 0.25f;
+        private float _transitionDuration = 0.25f;
 
         public ModalPickerAnimatedDismissed()
         {

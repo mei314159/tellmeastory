@@ -11,21 +11,21 @@ namespace TellMe.iOS.Views.VideoSlider
     [Register("SAVideoRangeSlider")]
     public class SAVideoRangeSlider : UIView
     {
-        AVAssetImageGenerator imageGenerator;
-        UIView bgView;
-        UIView centerView;
-        NSUrl videoUrl;
-        SASliderLeft leftThumb;
-        SASliderRight rightThumb;
-        nfloat FrameWidth;
-        nfloat durationSeconds;
-        SAResizableBubble popoverBubble;
+        private AVAssetImageGenerator imageGenerator;
+        private UIView bgView;
+        private UIView centerView;
+        private NSUrl videoUrl;
+        private SASliderLeft leftThumb;
+        private SASliderRight rightThumb;
+        private nfloat FrameWidth;
+        private nfloat durationSeconds;
+        private SAResizableBubble popoverBubble;
         private nfloat leftPosition;
         private nfloat rightPosition;
         private nint minGap;
         private nint maxGap;
-        const float SLIDERBORDERSSIZE = 6.0f;
-        const float BGVIEWBORDERSSIZE = 3.0f;
+        private const float SLIDERBORDERSSIZE = 6.0f;
+        private const float BGVIEWBORDERSSIZE = 3.0f;
         private UILabel bubleText;
         private UIView topBorder;
         private UIView bottomBorder;
@@ -247,7 +247,7 @@ namespace TellMe.iOS.Views.VideoSlider
         }
 
 
-        void HandleCenterPan(UIPanGestureRecognizer gesture)
+        private void HandleCenterPan(UIPanGestureRecognizer gesture)
         {
             if (gesture.State == UIGestureRecognizerState.Began || gesture.State == UIGestureRecognizerState.Changed)
             {
@@ -281,7 +281,7 @@ namespace TellMe.iOS.Views.VideoSlider
             }
         }
 
-        void getMovieFrame()
+        private void getMovieFrame()
         {
             AVAsset myAsset = new AVUrlAsset(videoUrl);
             this.imageGenerator = new AVAssetImageGenerator(myAsset);

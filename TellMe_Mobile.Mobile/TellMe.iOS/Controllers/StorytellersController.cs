@@ -3,26 +3,25 @@ using System;
 using UIKit;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core;
 using System.Collections;
 using System.Threading.Tasks;
 using TellMe.iOS.Views.Cells;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Extensions;
 using System.Linq;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.iOS.Core;
 using TellMe.iOS.Views;
 
 namespace TellMe.iOS
 {
     public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource, IUITableViewDelegate
     {
-        private StorytellersBusinessLogic _businessLogic;
-        private List<ContactDTO> storytellersList = new List<ContactDTO>();
-        private List<ContactDTO> tribesList = new List<ContactDTO>();
-        private volatile bool loadingMore;
-        private volatile bool canLoadMore;
+        private IStorytellersBusinessLogic _businessLogic;
+        private readonly List<ContactDTO> _storytellersList = new List<ContactDTO>();
+        private readonly List<ContactDTO> _tribesList = new List<ContactDTO>();
+        private volatile bool _loadingMore;
+        private volatile bool _canLoadMore;
 
         public ContactsMode Mode { get; set; }
         public event StorytellerSelectedEventHandler RecipientsSelected;
@@ -40,7 +39,8 @@ namespace TellMe.iOS
         {
             this.SetMode(Mode);
 
-            this._businessLogic = new StorytellersBusinessLogic(new RemoteStorytellersDataService(), new RemoteTribesDataService(), this, App.Instance.Router);
+            this._businessLogic = IoC.Container.GetInstance<IStorytellersBusinessLogic>();
+            _businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
             this.TableView.RegisterNibForCellReuse(TribesListCell.Nib, TribesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -73,7 +73,7 @@ namespace TellMe.iOS
         {
         }
 
-        void HideSearchCancelButton()
+        private void HideSearchCancelButton()
         {
             SearchBar.EndEditing(true);
         }
@@ -104,20 +104,20 @@ namespace TellMe.iOS
 
         public void DisplayContacts(ICollection<ContactDTO> contacts)
         {
-            var initialCount = tribesList.Count + storytellersList.Count;
-            lock (((ICollection)storytellersList).SyncRoot)
+            var initialCount = _tribesList.Count + _storytellersList.Count;
+            lock (((ICollection)_storytellersList).SyncRoot)
             {
-                storytellersList.Clear();
-                storytellersList.AddRange(contacts.Where(x => x.Type == ContactType.User).OrderBy(x => x.Name));
+                _storytellersList.Clear();
+                _storytellersList.AddRange(contacts.Where(x => x.Type == ContactType.User).OrderBy(x => x.Name));
             }
 
-            lock (((ICollection)tribesList).SyncRoot)
+            lock (((ICollection)_tribesList).SyncRoot)
             {
-                tribesList.Clear();
-                tribesList.AddRange(contacts.Where(x => x.Type == ContactType.Tribe).OrderBy(x => x.Name));
+                _tribesList.Clear();
+                _tribesList.AddRange(contacts.Where(x => x.Type == ContactType.Tribe).OrderBy(x => x.Name));
             }
 
-            this.canLoadMore = contacts.Count > initialCount;
+            this._canLoadMore = contacts.Count > initialCount;
 
             InvokeOnMainThread(() => TableView.ReloadData());
         }
@@ -129,7 +129,7 @@ namespace TellMe.iOS
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
-            return section == 0 ? this.storytellersList.Count : this.tribesList.Count;
+            return section == 0 ? this._storytellersList.Count : this._tribesList.Count;
         }
 
         [Export("tableView:didDeselectRowAtIndexPath:")]
@@ -156,7 +156,7 @@ namespace TellMe.iOS
             tableView.DeselectRow(indexPath, false);
             if (indexPath.Section == 0)
             {
-                var dto = this.storytellersList[indexPath.Row];
+                var dto = this._storytellersList[indexPath.Row];
                 string title = null;
                 string confirmButtonTitle = null;
                 switch (dto.User.FriendshipStatus)
@@ -186,7 +186,7 @@ namespace TellMe.iOS
             }
             else if (indexPath.Section == 1)
             {
-                var dto = this.tribesList[indexPath.Row];
+                var dto = this._tribesList[indexPath.Row];
                 if (dto.Tribe.MembershipStatus == TribeMemberStatus.Joined || dto.Tribe.MembershipStatus == TribeMemberStatus.Creator)
                 {
                     _businessLogic.ViewTribe(dto.Tribe);
@@ -208,7 +208,7 @@ namespace TellMe.iOS
         {
             if (indexPath.Section == 0)
             {
-                var dto = storytellersList[indexPath.Row];
+                var dto = _storytellersList[indexPath.Row];
                 return DisabledUserIds?.Contains(dto.UserId) != true;
             }
 
@@ -220,7 +220,7 @@ namespace TellMe.iOS
             if (indexPath.Section == 0)
             {
                 var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
-                cell.Storyteller = this.storytellersList[indexPath.Row].User;
+                cell.Storyteller = this._storytellersList[indexPath.Row].User;
                 cell.TintColor = UIColor.Blue;
 
                 return cell;
@@ -229,7 +229,7 @@ namespace TellMe.iOS
             if (indexPath.Section == 1)
             {
                 var cell = tableView.DequeueReusableCell(TribesListCell.Key, indexPath) as TribesListCell;
-                cell.Tribe = this.tribesList[indexPath.Row].Tribe;
+                cell.Tribe = this._tribesList[indexPath.Row].Tribe;
                 cell.TintColor = UIColor.Blue;
                 return cell;
             }
@@ -242,7 +242,7 @@ namespace TellMe.iOS
         {
             if (indexPath.Section == 0)
             {
-                var dto = storytellersList[indexPath.Row];
+                var dto = _storytellersList[indexPath.Row];
                 if (DisabledUserIds?.Contains(dto.UserId) == true)
                     return UITableViewCellEditingStyle.None;
             }
@@ -322,25 +322,25 @@ namespace TellMe.iOS
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.SendFriendshipRequestAsync(contact.User);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
-        async void AcceptTribeInvitationTouched(ContactDTO contact)
+        private async void AcceptTribeInvitationTouched(ContactDTO contact)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.AcceptTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
-        async void RejectTribeInvitationTouched(ContactDTO contact)
+        private async void RejectTribeInvitationTouched(ContactDTO contact)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.RejectTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) }, UITableViewRowAnimation.None);
             overlay.Close(true);
         }
 
@@ -356,7 +356,7 @@ namespace TellMe.iOS
         [Export("tableView:willDisplayCell:forRowAtIndexPath:")]
         public void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (canLoadMore && (tribesList.Count + storytellersList.Count - indexPath.Row == 5))
+            if (_canLoadMore && (_tribesList.Count + _storytellersList.Count - indexPath.Row == 5))
             {
                 LoadMoreAsync();
             }
@@ -364,10 +364,10 @@ namespace TellMe.iOS
 
         private async Task LoadMoreAsync()
         {
-            if (this.loadingMore)
+            if (this._loadingMore)
                 return;
 
-            this.loadingMore = true;
+            this._loadingMore = true;
             var searchText = this.SearchBar.Text;
             InvokeOnMainThread(() =>
             {
@@ -380,7 +380,7 @@ namespace TellMe.iOS
                 this.ActivityIndicator.StopAnimating();
                 this.TableView.TableFooterView.Hidden = true;
             });
-            this.loadingMore = false;
+            this._loadingMore = false;
         }
 
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
@@ -396,9 +396,9 @@ namespace TellMe.iOS
             popup.PopUp(true);
         }
 
-        void ContinueButtonTouched(object sender, EventArgs e)
+        private void ContinueButtonTouched(object sender, EventArgs e)
         {
-            var selectedContacts = TableView.IndexPathsForSelectedRows.Select(x => x.Section == 0 ? storytellersList[x.Row] : tribesList[x.Row]).ToList();
+            var selectedContacts = TableView.IndexPathsForSelectedRows.Select(x => x.Section == 0 ? _storytellersList[x.Row] : _tribesList[x.Row]).ToList();
             RecipientsSelected?.Invoke(selectedContacts);
             if (DismissOnFinish)
             {
@@ -415,12 +415,12 @@ namespace TellMe.iOS
             if (contact.Type == ContactType.Tribe)
             {
                 section = 1;
-                index = tribesList.IndexOf(contact);
+                index = _tribesList.IndexOf(contact);
             }
             else
             {
                 section = 0;
-                index = storytellersList.IndexOf(contact);
+                index = _storytellersList.IndexOf(contact);
             }
 
             TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index, section) }, UITableViewRowAnimation.Automatic);

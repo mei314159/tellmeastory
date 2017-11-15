@@ -89,9 +89,7 @@ namespace TellMe.iOS
         }
 
 
-
-
-        static UIColor BlendedColor(UIColor color1, nfloat fraction, UIColor color2)
+        private static UIColor BlendedColor(UIColor color1, nfloat fraction, UIColor color2)
         {
             var rgba1 = new nfloat[4];
             var rgba2 = new nfloat[4];

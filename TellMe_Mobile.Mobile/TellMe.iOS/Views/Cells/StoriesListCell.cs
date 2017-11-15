@@ -61,7 +61,7 @@ namespace TellMe.iOS.Views.Cells
             }
         }
 
-        void UIViewTouched(UITapGestureRecognizer r)
+        private void UIViewTouched(UITapGestureRecognizer r)
         {
             var location = r.LocationOfTouch(0, this);
             if (ProfilePicture.Frame.Contains(location))

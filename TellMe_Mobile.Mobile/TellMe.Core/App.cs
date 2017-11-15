@@ -1,5 +1,6 @@
 ﻿using System;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Types.DataServices.Local;
 
@@ -7,48 +8,25 @@ namespace TellMe.Core
 {
     public sealed class App
     {
-        private AccountService _localAccountService;
-        private IApplicationDataStorage _dataStorage;
-
-        private static readonly Lazy<App> lazy = new Lazy<App>(() => new App());
-        public static App Instance => lazy.Value;
-
-        public event Action<NotificationDTO> OnNotificationReceived;
-        public event Action<StoryDTO> OnStoryLikeChanged;
+        private static readonly Lazy<App> Lazy = new Lazy<App>(() => new App());
+        public static App Instance => Lazy.Value;
 
         private App()
         {
         }
 
-        public void Initialize(AccountService localAccountService, IApplicationDataStorage dataStorage, IRouter router)
+        public void Initialize()
         {
-            _localAccountService = localAccountService;
-            _dataStorage = dataStorage;
-            Router = router;
         }
-
-        public IRouter Router { get; set; }
 
         public INotificationHandler NotificationHandler { get; set; }
 
-        public OsType OsType => _dataStorage.OsType;
-
-        public string AppVersion => _dataStorage.AppVersion;
-
-        public AuthenticationInfoDTO AuthInfo
-        {
-            get
-            {
-                return _localAccountService.GetAuthInfo();
-            }
-            set
-            {
-                _localAccountService.SaveAuthInfo(value);
-            }
-        }
+        public AuthenticationInfoDTO AuthInfo { get; set; }
 
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;
+        public event Action<NotificationDTO> OnNotificationReceived;
+        public event Action<StoryDTO> OnStoryLikeChanged;
 
 
         public void NotificationReceived(NotificationDTO notification)
@@ -56,7 +34,8 @@ namespace TellMe.Core
             this.OnNotificationReceived?.Invoke(notification);
         }
 
-        public void StoryLikeChanged(StoryDTO story){
+        public void StoryLikeChanged(StoryDTO story)
+        {
             this.OnStoryLikeChanged?.Invoke(story);
         }
 
@@ -68,12 +47,6 @@ namespace TellMe.Core
         public void LogNetworkException(Exception ex)
         {
             OnNetworkException?.Invoke(ex);
-        }
-
-        public void Authenticate()
-        {
-            AuthInfo = null;
-            Router.SwapToAuth();
         }
     }
 }

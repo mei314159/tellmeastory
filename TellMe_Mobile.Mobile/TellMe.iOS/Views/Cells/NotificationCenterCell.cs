@@ -3,7 +3,6 @@ using CoreText;
 using Foundation;
 using Newtonsoft.Json.Linq;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using SDWebImage;
@@ -25,7 +24,8 @@ namespace TellMe.iOS.Views.Cells
         {
             // Note: this .ctor should not contain any initialization logic.
         }
-        NotificationDTO notification;
+
+        private NotificationDTO notification;
 
         public NotificationDTO Notification
         {

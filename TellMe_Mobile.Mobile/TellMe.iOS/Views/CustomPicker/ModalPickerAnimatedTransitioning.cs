@@ -27,7 +27,7 @@ namespace SharpMobileCode.ModalPicker
     {
         public bool IsPresenting { get; set; }
 
-        float _transitionDuration = 0.25f;
+        private float _transitionDuration = 0.25f;
 
         public ModalPickerAnimatedTransitioning()
         {
@@ -76,7 +76,7 @@ namespace SharpMobileCode.ModalPicker
                                 );
         }
 
-        CGPoint GetStartingPoint(UIInterfaceOrientation orientation)
+        private CGPoint GetStartingPoint(UIInterfaceOrientation orientation)
         {
             var screenBounds = UIScreen.MainScreen.Bounds;
             var coordinate = CGPoint.Empty;
@@ -99,7 +99,7 @@ namespace SharpMobileCode.ModalPicker
             return coordinate;
         }
 
-        CGPoint GetEndingPoint(UIInterfaceOrientation orientation)
+        private CGPoint GetEndingPoint(UIInterfaceOrientation orientation)
         {
             var screenBounds = UIScreen.MainScreen.Bounds;
             var coordinate = CGPoint.Empty;

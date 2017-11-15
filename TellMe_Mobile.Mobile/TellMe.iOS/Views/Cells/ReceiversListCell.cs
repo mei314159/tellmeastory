@@ -8,8 +8,7 @@ namespace TellMe.iOS.Views.Cells
 {
     public partial class ReceiversListCell : UICollectionViewCell
     {
-
-        StoryReceiverDTO receiver;
+        private StoryReceiverDTO receiver;
         private UIImage defaultPicture;
 
         public static readonly NSString Key = new NSString("ReceiversListCell");

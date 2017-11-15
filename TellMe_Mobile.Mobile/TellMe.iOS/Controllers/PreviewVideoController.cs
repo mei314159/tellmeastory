@@ -3,25 +3,25 @@ using System;
 using UIKit;
 using AVFoundation;
 using TellMe.Core.Contracts;
-using TellMe.Core;
 using TellMe.Core.Contracts.UI.Views;
 using System.IO;
 using TellMe.Core.Contracts.DTO;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
     public partial class PreviewVideoController : UIViewController, IView
     {
-        AVPlayer _player;
-        AVPlayerLayer _playerLayer;
-        AVAsset _asset;
-        AVPlayerItem _playerItem;
+        private AVPlayer _player;
+        private AVPlayerLayer _playerLayer;
+        private AVAsset _asset;
+        private AVPlayerItem _playerItem;
 
-        IRouter _router;
-        private volatile bool goNext;
-        private NSObject playerObserver;
-        private string previewImagePath;
+        private IRouter _router;
+        private volatile bool _goNext;
+        private NSObject _playerObserver;
+        private string _previewImagePath;
 
         public PreviewVideoController(IntPtr handle) : base(handle)
         {
@@ -35,8 +35,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            _router = App.Instance.Router;
-
+            _router = IoC.Container.GetInstance<IRouter>();
             var url = new NSUrl(VideoPath, false);
 
             _asset = AVAsset.FromUrl(url);
@@ -50,7 +49,7 @@ namespace TellMe.iOS
 
         public override void ViewDidAppear(bool animated)
         {
-			this.playerObserver = NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notify) =>
+			this._playerObserver = NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notify) =>
 			{
 				_player.Seek(CoreMedia.CMTime.Zero);
 				notify.Dispose();
@@ -61,18 +60,18 @@ namespace TellMe.iOS
 
         partial void SendButtonTouched(Button sender)
         {
-            goNext = true;
-            _router.NavigateStoryDetails(this, VideoPath, previewImagePath, StoryRequest, RequestNotification, Contact);
+            _goNext = true;
+            _router.NavigateStoryDetails(this, VideoPath, _previewImagePath, StoryRequest, RequestNotification, Contact);
         }
 
         public override void ViewWillDisappear(bool animated)
         {
             _player.Pause();
-            NSNotificationCenter.DefaultCenter.RemoveObserver(playerObserver);
-            if (!goNext)
+            NSNotificationCenter.DefaultCenter.RemoveObserver(_playerObserver);
+            if (!_goNext)
             {
                 this.DeleteFile(this.VideoPath);
-                this.DeleteFile(this.previewImagePath);
+                this.DeleteFile(this._previewImagePath);
             }
         }
 
@@ -93,11 +92,10 @@ namespace TellMe.iOS
         {
             using (var manager = new NSFileManager())
             {
-                NSError error = new NSError();
                 if (manager.FileExists(urlpath))
                 {
                     Console.WriteLine("Deleting File");
-                    manager.Remove(urlpath, out error);
+                    manager.Remove(urlpath, out _);
                     Console.WriteLine("Deleted File");
                 }
             }
@@ -105,25 +103,24 @@ namespace TellMe.iOS
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void SavePreviewImage()
+        private void SavePreviewImage()
 		{
 			var imageGenerator = AVAssetImageGenerator.FromAsset(_asset);
 
 			imageGenerator.AppliesPreferredTrackTransform = true;
 
-            var actualTime = _asset.Duration;
-			var cmTime = new CoreMedia.CMTime(1, 30);
+		    var cmTime = new CoreMedia.CMTime(1, 30);
 
-            var imageRef = imageGenerator.CopyCGImageAtTime(cmTime, out actualTime, out NSError error);
+            var imageRef = imageGenerator.CopyCGImageAtTime(cmTime, out _, out _);
             if (imageRef == null)
 				return;
 
 			var image = UIImage.FromImage(imageRef);
 
-            this.previewImagePath = Path.Combine(
+            this._previewImagePath = Path.Combine(
                 Path.GetDirectoryName(VideoPath).TrimEnd('/'), 
                 Path.GetFileNameWithoutExtension(VideoPath) + ".jpg");
-            var dataBytes = image.AsJPEG().Save(this.previewImagePath, true, out error);
+            var dataBytes = image.AsJPEG().Save(this._previewImagePath, true, out _);
 		}
     }
 }

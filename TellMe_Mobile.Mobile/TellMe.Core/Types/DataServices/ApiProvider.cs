@@ -1,18 +1,29 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Net;
-using System.Diagnostics;
+using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.DataServices;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
-using System.Collections.Generic;
 
-namespace TellMe.Core.Types.DataServices.Remote
+namespace TellMe.Core.Types.DataServices
 {
-    public class BaseDataService
+    public class ApiProvider : IApiProvider
     {
+        private readonly ILocalAccountService _localLocalAccountService;
+        private readonly IRouter _router;
+
+        public ApiProvider(ILocalAccountService localLocalAccountService, IRouter router)
+        {
+            _localLocalAccountService = localLocalAccountService;
+            _router = router;
+        }
+
         public async Task<Result<T>> GetAsync<T>(string uri)
         {
             var result = await this.GetAsync(uri, typeof(T));
@@ -34,7 +45,7 @@ namespace TellMe.Core.Types.DataServices.Remote
             {
                 try
                 {
-                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", App.Instance.AuthInfo.AccessToken);
+                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _localLocalAccountService.GetAuthInfo().AccessToken);
                     var response = await webClient.GetAsync(requestUri).ConfigureAwait(false);
                     var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -147,7 +158,7 @@ namespace TellMe.Core.Types.DataServices.Remote
                 {
                     if (!anonymously)
                     {
-                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", App.Instance.AuthInfo.AccessToken);
+                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _localLocalAccountService.GetAuthInfo().AccessToken);
                     }
                     else
                     {
@@ -226,24 +237,28 @@ namespace TellMe.Core.Types.DataServices.Remote
             }
         }
 
-        private async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> RefreshAuthTokenAsync()
+        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> RefreshAuthTokenAsync()
         {
-            if (App.Instance.AuthInfo != null)
+            var authInfo = _localLocalAccountService.GetAuthInfo();
+            if (authInfo != null)
             {
-                var data = new Dictionary<string, string>();
-                data.Add("grant_type", "refresh_token");
-                data.Add("refresh_token", App.Instance.AuthInfo.RefreshToken);
-                data.Add("client_id", "ios_app");
+                var data = new Dictionary<string, string>
+                {
+                    {"grant_type", "refresh_token"},
+                    {"refresh_token", authInfo.RefreshToken},
+                    {"client_id", "ios_app"}
+                };
                 var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
                                    .ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {
-                    App.Instance.AuthInfo = result.Data;
+                    _localLocalAccountService.SaveAuthInfo(result.Data);
                 }
                 else if (result.Error.Code == "905" || result.Error.Code == "906")
                 {
-                    App.Instance.Authenticate();
+                    _localLocalAccountService.SaveAuthInfo(null);
+                    _router.SwapToAuth();
                 }
 
                 return result;

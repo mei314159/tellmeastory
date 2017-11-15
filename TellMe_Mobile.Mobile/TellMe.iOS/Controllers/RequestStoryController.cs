@@ -4,19 +4,19 @@ using UIKit;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core;
-using TellMe.Core.Types.BusinessLogic;
 using TellMe.iOS.Extensions;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.UI.Components;
 using TellMe.iOS.Views;
 using System.Linq;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
     public partial class RequestStoryController : UIViewController, IRequestStoryView
     {
-        private RequestStoryBusinessLogic _businessLogic;
+        private IRequestStoryBusinessLogic _businessLogic;
         public RequestStoryController(IntPtr handle) : base(handle)
         {
         }
@@ -34,7 +34,8 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             StoryTitle.EditingChanged += StoryTitle_EditingChanged;
-            _businessLogic = new RequestStoryBusinessLogic(this, App.Instance.Router, new RemoteStoriesDataService());
+            _businessLogic = IoC.Container.GetInstance<IRequestStoryBusinessLogic>();
+            _businessLogic.View = this;
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             UpdatePreview();
         }
@@ -47,7 +48,7 @@ namespace TellMe.iOS
             overlay.Close();
         }
 
-        void StoryTitle_EditingChanged(object sender, EventArgs e)
+        private void StoryTitle_EditingChanged(object sender, EventArgs e)
         {
             UpdatePreview();
         }
@@ -58,10 +59,10 @@ namespace TellMe.iOS
             string handleName = null;
             if (Recipients?.Count == 1)
             {
-                var contactDTO = Recipients.First();
-                if (contactDTO.Type == ContactType.User)
+                var contactDto = Recipients.First();
+                if (contactDto.Type == ContactType.User)
                 {
-                    handleName = contactDTO.User.UserName;
+                    handleName = contactDto.User.UserName;
                 }
             }
 
