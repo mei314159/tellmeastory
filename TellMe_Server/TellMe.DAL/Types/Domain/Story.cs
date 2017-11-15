@@ -11,6 +11,8 @@ namespace TellMe.DAL.Types.Domain
         public string PreviewUrl { get; set; }
         public int? RequestId { get; set; }
         public string SenderId { get; set; }
+        public int CommentsCount { get; set; }
+        public int LikesCount { get; set; }
 
         public virtual StoryRequest Request { get; set; }
         public virtual ApplicationUser Sender { get; set; }
@@ -18,6 +20,7 @@ namespace TellMe.DAL.Types.Domain
         public virtual ICollection<StoryReceiver> Receivers { get; set; }
 
         public virtual ICollection<Comment> Comments { get; set; }
-        public int CommentsCount { get; set; }
+
+        public virtual ICollection<StoryLike> Likes { get; set; }
     }
 }

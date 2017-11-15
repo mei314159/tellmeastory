@@ -31,6 +31,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
             this._businessLogic = new StoriesBusinessLogic(new RemoteStoriesDataService(), new RemoteNotificationsDataService(), this, App.Instance.Router);
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
@@ -92,30 +93,36 @@ namespace TellMe.iOS
         {
             var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
             cell.Story = this.storiesList[indexPath.Row];
-            cell.ProfilePictureTouched = Cell_OnProfilePictureTouched;
-            cell.PreviewTouched = Cell_OnPreviewTouched;
-            cell.CommentsButtonTouched = Cell_OnCommentsButtonTouched;
-            cell.ReceiverSelected = Cell_OnReceiverTouched;
+            cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
+            cell.PreviewTouched = Cell_PreviewTouched;
+            cell.CommentsButtonTouched = Cell_CommentsButtonTouched;
+            cell.LikeButtonTouched = Cell_LikeButtonTouched;
+            cell.ReceiverSelected = Cell_ReceiverTouched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
 
-        void Cell_OnPreviewTouched(StoryDTO story)
+        private async void Cell_LikeButtonTouched(StoryDTO story)
+        {
+            await _businessLogic.LikeButtonTouchedAsync(story).ConfigureAwait(false);
+        }
+
+        void Cell_PreviewTouched(StoryDTO story)
         {
             _businessLogic.ViewStory(story);
         }
 
-        void Cell_OnProfilePictureTouched(StoryDTO story)
+        void Cell_ProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
         }
 
-        private void Cell_OnCommentsButtonTouched(StoryDTO story)
+        private void Cell_CommentsButtonTouched(StoryDTO story)
         {
             _businessLogic.ViewStory(story, true);
         }
 
-        void Cell_OnReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
+        void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
         {
             _businessLogic.ViewReceiver(receiver, cell.RemoveTribe);
         }
@@ -201,14 +208,24 @@ namespace TellMe.iOS
                         Frame = new CGRect(0, 0, 24, 24),
                     };
                     Notifications.CustomView.Add(notificationsBadge);
-                    Notifications.CustomView.AddGestureRecognizer(new UITapGestureRecognizer(() =>
-                    {
-                        Notifications_Activated(Notifications);
-                    }));
+                    Notifications.CustomView.AddGestureRecognizer(new UITapGestureRecognizer(() => Notifications_Activated(Notifications)));
                 }
 
                 notificationsBadge.Hidden = count == 0;
                 notificationsBadge.Value = count;
+            });
+        }
+
+        public void OnStoryLikeChanged(StoryDTO story)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var index = storiesList.IndexOf(x => x.Id == story.Id);
+                if (index > -1)
+                {
+                    var cell = TableView.CellAt(NSIndexPath.FromRowSection(index, 0)) as StoriesListCell;
+                    cell?.UpdateLikeButton(story);
+                }
             });
         }
     }

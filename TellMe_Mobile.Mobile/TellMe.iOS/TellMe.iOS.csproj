@@ -161,6 +161,12 @@
     <ImageAsset Include="Assets.xcassets\Replay.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Replay.imageset\replay%402x.png" />
     <ImageAsset Include="Assets.xcassets\Replay.imageset\replay%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Heart.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Heart.imageset\heart%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Heart.imageset\heart%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Heart-O.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Heart-O.imageset\heart-o%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Heart-O.imageset\heart-o%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -185,6 +191,8 @@
     <Folder Include="Assets.xcassets\Comment.imageset\" />
     <Folder Include="Assets.xcassets\Replay.imageset\" />
     <Folder Include="Views\Badge\" />
+    <Folder Include="Assets.xcassets\Heart.imageset\" />
+    <Folder Include="Assets.xcassets\Heart-O.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

@@ -68,5 +68,17 @@ namespace TellMe.Core.Types.DataServices.Remote
             var result = await this.PostAsync<StoryStatus>($"stories/{storyId}/reject-request", notificationid).ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> LikeAsync(int storyId)
+        {
+            var result = await this.PostAsync<object>($"stories/{storyId}/like", null).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result> DislikeAsync(int storyId)
+        {
+            var result = await this.PostAsync<object>($"stories/{storyId}/dislike", null).ConfigureAwait(false);
+            return result;
+        }
     }
 }

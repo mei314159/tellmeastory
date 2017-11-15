@@ -5,7 +5,6 @@ using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.Web.DTO;
 using TellMe.Web.Extensions;
-using System;
 
 namespace TellMe.Web.Controllers
 {
@@ -14,7 +13,7 @@ namespace TellMe.Web.Controllers
     public class StoriesController : AuthorizedController
     {
         private readonly IStorageService _storageService;
-        private INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
         private readonly IStoryService _storyService;
         public StoriesController(
             IHttpContextAccessor httpContextAccessor,
@@ -34,6 +33,20 @@ namespace TellMe.Web.Controllers
             var result = await _storyService.RequestStoryAsync(this.UserId, dto.Requests);
 
             return Ok(result);
+        }
+        
+        [HttpPost("{storyId}/like")]
+        public async Task<IActionResult> LikeAsync(int storyId)
+        {
+            await _storyService.LikeAsync(this.UserId, storyId);
+            return Ok();
+        }
+        
+        [HttpPost("{storyId}/dislike")]
+        public async Task<IActionResult> DislikeAsync(int storyId)
+        {
+            await _storyService.DislikeAsync(this.UserId, storyId);
+            return Ok();
         }
 
         [HttpPost("")]

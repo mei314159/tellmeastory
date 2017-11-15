@@ -19,6 +19,10 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Button LikeButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Picture Preview { get; set; }
 
         [Outlet]
@@ -37,11 +41,20 @@ namespace TellMe.iOS.Views.Cells
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void CommentsButton_TouchUpInside (TellMe.iOS.Button sender);
 
+        [Action ("LikeButton_TouchUpInside:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void LikeButton_TouchUpInside (TellMe.iOS.Button sender);
+
         void ReleaseDesignerOutlets ()
         {
             if (CommentsButton != null) {
                 CommentsButton.Dispose ();
                 CommentsButton = null;
+            }
+
+            if (LikeButton != null) {
+                LikeButton.Dispose ();
+                LikeButton = null;
             }
 
             if (Preview != null) {

@@ -18,5 +18,7 @@ namespace TellMe.DAL.Types.Domain
         public virtual ICollection<Story> SentStories { get; set; }
 
         public virtual ICollection<TribeMember> Tribes { get; set; }
+        
+        public virtual ICollection<StoryLike> LikedStories { get; set; }
     }
 }

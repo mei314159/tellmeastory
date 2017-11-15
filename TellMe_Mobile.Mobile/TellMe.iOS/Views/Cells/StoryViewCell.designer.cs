@@ -15,6 +15,10 @@ namespace TellMe.iOS
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        TellMe.iOS.Button LikeButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Picture Preview { get; set; }
 
         [Outlet]
@@ -37,12 +41,21 @@ namespace TellMe.iOS
         [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Label Title { get; set; }
 
+        [Action ("LikeButton_TouchUpInside:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void LikeButton_TouchUpInside (TellMe.iOS.Button sender);
+
         [Action ("ReplayButton_Touched:")]
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void ReplayButton_Touched (TellMe.iOS.Button sender);
 
         void ReleaseDesignerOutlets ()
         {
+            if (LikeButton != null) {
+                LikeButton.Dispose ();
+                LikeButton = null;
+            }
+
             if (Preview != null) {
                 Preview.Dispose ();
                 Preview = null;

@@ -24,6 +24,7 @@ namespace TellMe.iOS
         private UIVisualEffectView effectView;
         private UIVisualEffectView EffectView => effectView ?? (effectView = new UIVisualEffectView(UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
         private RemoteCommentsDataService commentsService;
+        private RemoteStoriesDataService _remoteStoriesService;
         private StoryViewCell storyView;
         private LoadMoreButtonCell loadMoreButton;
 
@@ -33,6 +34,7 @@ namespace TellMe.iOS
 
         private CGRect originalImageFrame;
         private bool showLoadMoreButton;
+
         private int CommentCellOffset => showLoadMoreButton ? 2 : 1;
 
         public StoryDTO Story { get; set; }
@@ -45,7 +47,9 @@ namespace TellMe.iOS
             EffectView.Frame = View.Bounds;
             View.AddSubview(EffectView);
             View.SendSubviewToBack(EffectView);
+            App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
             commentsService = new RemoteCommentsDataService();
+            _remoteStoriesService = new RemoteStoriesDataService();
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
             {
                 CancelsTouchesInView = false,
@@ -62,7 +66,8 @@ namespace TellMe.iOS
             TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             TableView.RegisterNibForCellReuse(CommentViewCell.Nib, CommentViewCell.Key);
             TableView.DelaysContentTouches = false;
-            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard){
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard)
+            {
                 CancelsTouchesInView = false
             });
             this.LoadCommentsAsync();
@@ -302,8 +307,29 @@ namespace TellMe.iOS
         private void Initialize()
         {
             storyView = StoryViewCell.Create(Story);
-            storyView.OnProfilePictureTouched += StoryView_OnProfilePictureTouched;
-            storyView.OnReceiverSelected += StoryView_OnReceiverSelected;
+            storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
+            storyView.OnReceiverSelected = StoryView_OnReceiverSelected;
+            storyView.OnLikeButtonTouched = StoryView_OnLikeButtonTouched;
+        }
+
+        private async void StoryView_OnLikeButtonTouched(StoryDTO story)
+        {
+            var liked = story.Liked;
+            var likeCount = story.LikesCount;
+            story.Liked = !liked;
+            story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
+            App.Instance.StoryLikeChanged(story);
+
+            var result = liked
+                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
+                : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
+
+            if (!result.IsSuccess)
+            {
+                story.Liked = liked;
+                story.LikesCount = likeCount;
+                App.Instance.StoryLikeChanged(story);
+            }
         }
 
         void StoryView_OnReceiverSelected(StoryReceiverDTO receiver)
@@ -357,6 +383,12 @@ namespace TellMe.iOS
         private void CommentCell_ReceiverSelected(CommentDTO comment)
         {
             this.DismissViewController(false, () => App.Instance.Router.NavigateStoryteller(Parent, comment.AuthorId));
+        }
+
+        void OnStoryLikeChanged(StoryDTO story)
+        {
+            if (this.Story.Id == story.Id)
+                storyView.UpdateLikeButton(story);
         }
     }
 }

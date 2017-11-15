@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
 using System.Linq;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Types.Domain;
-using TellMe.Web.DTO;
 using System;
 
 namespace TellMe.Web.AutoMapper
@@ -25,21 +23,35 @@ namespace TellMe.Web.AutoMapper
 
                 cfg.CreateMap<StoryRequest, StoryRequestDTO>()
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
-                    .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.TribeId == null ? z.Sender.PictureUrl : null))
-                    .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.TribeId == null ? z.Sender.UserName : z.Tribe.Name));
+                    .ForMember(x => x.SenderPictureUrl,
+                        x => x.MapFrom(z => z.TribeId == null ? z.Sender.PictureUrl : null))
+                    .ForMember(x => x.ReceiverName,
+                        x => x.MapFrom(z => z.TribeId == null ? z.Sender.UserName : z.Tribe.Name));
 
                 cfg.CreateMap<Story, StoryDTO>()
+                    .ForMember(x => x.Liked, x =>
+                    {
+                        x.PreCondition((e) => e.Items.ContainsKey("UserId"));
+                        x.Condition((e) => e.Likes != null);
+                        x.ResolveUsing((y, a, b, c) =>
+                        {
+                            var result = y.Likes.Any(m => m.UserId == (string) c.Items["UserId"]);
+                            return result;
+                        });
+                    })
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
 
                 cfg.CreateMap<StoryReceiver, StoryReceiverDTO>()
                     .ForMember(x => x.StoryId, x => x.MapFrom(z => z.StoryId))
-                    .ForMember(x => x.ReceiverPictureUrl, x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
-                    .ForMember(x => x.ReceiverName, x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
+                    .ForMember(x => x.ReceiverPictureUrl,
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
+                    .ForMember(x => x.ReceiverName,
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
 
                 cfg.CreateMap<Comment, CommentDTO>()
-                .ForMember(x => x.AuthorPictureUrl, x => x.MapFrom(z => z.Author.PictureUrl))
-                .ForMember(x => x.AuthorUserName, x => x.MapFrom(z => z.Author.UserName));
+                    .ForMember(x => x.AuthorPictureUrl, x => x.MapFrom(z => z.Author.PictureUrl))
+                    .ForMember(x => x.AuthorUserName, x => x.MapFrom(z => z.Author.UserName));
 
                 cfg.CreateMap<CommentDTO, Comment>();
 
@@ -61,20 +73,20 @@ namespace TellMe.Web.AutoMapper
                         x.Condition((e) => e.Members != null);
                         x.ResolveUsing((y, a, b, c) =>
                         {
-                            var result = y.Members.First(m => m.UserId == (string)c.Items["UserId"]).Status;
+                            var result = y.Members.First(m => m.UserId == (string) c.Items["UserId"]).Status;
                             return result;
                         });
                     });
 
                 cfg.CreateMap<TribeMember, TribeMemberDTO>()
-                  .ForMember(x => x.UserName, x => x.MapFrom(y => y.User.UserName))
-                  .ForMember(x => x.FullName, x => x.MapFrom(y => y.User.FullName))
-                  .ForMember(x => x.UserPictureUrl, x => x.MapFrom(y => y.User.PictureUrl));
+                    .ForMember(x => x.UserName, x => x.MapFrom(y => y.User.UserName))
+                    .ForMember(x => x.FullName, x => x.MapFrom(y => y.User.FullName))
+                    .ForMember(x => x.UserPictureUrl, x => x.MapFrom(y => y.User.PictureUrl));
                 cfg.CreateMap<ApplicationUser, TribeDTO>()
-                        .ForMember(x => x.CreatorName, x => x.MapFrom(y => y.UserName))
-                        .ForMember(x => x.CreatorPictureUrl, x => x.MapFrom(y => y.PictureUrl))
-                        .ForMember(x => x.CreatorId, x => x.MapFrom(y => y.Id))
-                        .ForAllOtherMembers(x => x.Ignore());
+                    .ForMember(x => x.CreatorName, x => x.MapFrom(y => y.UserName))
+                    .ForMember(x => x.CreatorPictureUrl, x => x.MapFrom(y => y.PictureUrl))
+                    .ForMember(x => x.CreatorId, x => x.MapFrom(y => y.Id))
+                    .ForAllOtherMembers(x => x.Ignore());
 
 
                 // cfg.CreateMap<TribeDTO, Tribe>()
@@ -82,7 +94,7 @@ namespace TellMe.Web.AutoMapper
 
                 cfg.CreateMap<ApplicationUser, UserDTO>();
                 cfg.CreateMap<Notification, NotificationDTO>()
-                .ForMember(x => x.Extra, x => x.MapFrom(y => y.Extra));
+                    .ForMember(x => x.Extra, x => x.MapFrom(y => y.Extra));
             });
         }
     }

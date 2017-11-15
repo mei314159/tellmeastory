@@ -46,9 +46,10 @@ namespace TellMe.iOS
             }
         }
 
-        public event Action<StoryDTO> OnPreviewTouched;
-        public event Action<StoryDTO> OnProfilePictureTouched;
-        public event Action<StoryReceiverDTO> OnReceiverSelected;
+        public Action<StoryDTO> OnPreviewTouched;
+        public Action<StoryDTO> OnProfilePictureTouched;
+        public Action<StoryDTO> OnLikeButtonTouched;
+        public Action<StoryReceiverDTO> OnReceiverSelected;
 
         public static StoryViewCell Create(StoryDTO story)
         {
@@ -74,7 +75,7 @@ namespace TellMe.iOS
             this.Preview.UserInteractionEnabled = true;
             this.Preview.AddGestureRecognizer(new UITapGestureRecognizer(this.PreviewTouched));
 
-			ReceiversCollection.DelaysContentTouches = false;
+            ReceiversCollection.DelaysContentTouches = false;
             ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
         }
 
@@ -153,6 +154,10 @@ namespace TellMe.iOS
             ReplayButton.Hidden = false;
         }
 
+        partial void LikeButton_TouchUpInside(Button sender)
+        {
+            this.OnLikeButtonTouched?.Invoke(Story);
+        }
 
         public void RemoveTribe(TribeDTO tribe)
         {
@@ -233,10 +238,20 @@ namespace TellMe.iOS
             text.Append(new NSAttributedString("\" " + Story.CreateDateUtc.GetDateString(), foregroundColor: UIColor.LightGray));
             this.Title.AttributedText = text;
             this.Preview.SetImage(new NSUrl(Story.PreviewUrl));
+            UpdateLikeButton(Story);
 
             ReceiversCollection.DataSource = this;
             ReceiversCollection.Delegate = this;
             ReceiversCollection.ReloadData();
+        }
+
+        public void UpdateLikeButton(StoryDTO targetStory)
+        {
+            this.Story.Liked = targetStory.Liked;
+            this.Story.LikesCount = targetStory.LikesCount;
+            this.LikeButton.SetTitle($"  {targetStory.LikesCount}", UIControlState.Normal);
+            this.LikeButton.SetImage(UIImage.FromBundle(targetStory.Liked ? "Heart" : "Heart-O"), UIControlState.Normal);
+            this.LikeButton.TintColor = targetStory.Liked ? UIColor.Red : UIColor.LightGray;
         }
 
         protected override void Dispose(bool disposing)

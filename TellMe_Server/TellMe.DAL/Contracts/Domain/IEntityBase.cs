@@ -1,6 +1,10 @@
 namespace TellMe.DAL.Contracts.Domain
 {
-    public interface IEntityBase<T>
+    public interface IEntityBase
+    {
+    }
+
+    public interface IEntityBase<T> : IEntityBase
     {
         T Id { get; set; }
     }

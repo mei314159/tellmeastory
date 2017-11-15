@@ -11,25 +11,25 @@ using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Types.Repositories
 {
-    public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : class, IEntityBase<TKey>
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntityBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        protected readonly IUnitOfWork UnitOfWork;
 
         public Repository(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            UnitOfWork = unitOfWork;
         }
 
-        protected DbSet<TEntity> Set => _unitOfWork.Context.Set<TEntity>();
+        protected DbSet<TEntity> Set => UnitOfWork.Context.Set<TEntity>();
 
         public void PreCommitSave()
         {
-            _unitOfWork.PreCommitSave();
+            UnitOfWork.PreCommitSave();
         }
 
         public void Commit()
         {
-            _unitOfWork.Commit();
+            UnitOfWork.Commit();
         }
 
         public IQueryable<TEntity> GetQueryable(bool asNoTracking = false)
@@ -39,10 +39,95 @@ namespace TellMe.DAL.Types.Repositories
 
         public void Detach(TEntity entity)
         {
-            _unitOfWork.Context.Entry(entity).State = EntityState.Detached;
+            UnitOfWork.Context.Entry(entity).State = EntityState.Detached;
         }
 
-        public void Save(TEntity entity, bool commit = false)
+        public virtual void Save(TEntity entity, bool commit = false)
+        {
+            Set.Add(entity);
+            if (commit)
+            {
+                UnitOfWork.PreCommitSave();
+            }
+        }
+
+        public virtual async Task SaveAsync(TEntity entity, bool commit = false)
+        {
+            await Set.AddAsync(entity).ConfigureAwait(false);
+            if (commit)
+            {
+                await UnitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
+            }
+        }
+
+        public void AddRange(IEnumerable<TEntity> entity, bool commit = false)
+        {
+            Set.AddRange(entity);
+            if (commit)
+            {
+                UnitOfWork.PreCommitSave();
+            }
+        }
+
+        public void Remove(TEntity entity, bool commit = false)
+        {
+            Set.Remove(entity);
+            if (commit)
+            {
+                UnitOfWork.PreCommitSave();
+            }
+        }
+
+        public void RemoveAll(List<TEntity> deletedMembers, bool commit)
+        {
+            Set.RemoveRange(deletedMembers);
+            if (commit)
+            {
+                UnitOfWork.PreCommitSave();
+            }
+        }
+
+        public void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
+            where TProperty : class
+        {
+            UnitOfWork.Context.Entry(entity).Reference(property);
+        }
+
+        public void LoadProperty<TProperty>(IEnumerable<TEntity> entities,
+            Expression<Func<TEntity, TProperty>> property)
+            where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadProperty(entity, property);
+            }
+        }
+
+        public void LoadCollection<TProperty>(TEntity entity,
+            Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+            where TProperty : class
+        {
+            UnitOfWork.Context.Entry(entity).Collection(propertyExpression);
+        }
+
+        public void LoadCollection<TProperty>(IEnumerable<TEntity> entities,
+            Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
+            where TProperty : class
+        {
+            foreach (var entity in entities)
+            {
+                LoadCollection(entity, propertyExpression);
+            }
+        }
+    }
+
+    public class Repository<TEntity, TKey> : Repository<TEntity>, IRepository<TEntity, TKey> where TEntity : class, IEntityBase<TKey>
+    {
+        public Repository(IUnitOfWork unitOfWork) : base(unitOfWork)
+        {
+        }
+
+        public override void Save(TEntity entity, bool commit = false)
         {
             if (Equals(entity.Id, default(TKey)))
             {
@@ -55,11 +140,11 @@ namespace TellMe.DAL.Types.Repositories
 
             if (commit)
             {
-                _unitOfWork.PreCommitSave();
+                UnitOfWork.PreCommitSave();
             }
         }
 
-        public async Task SaveAsync(TEntity entity, bool commit = false)
+        public override async Task SaveAsync(TEntity entity, bool commit = false)
         {
             if (Equals(entity.Id, default(TKey)))
             {
@@ -72,64 +157,7 @@ namespace TellMe.DAL.Types.Repositories
 
             if (commit)
             {
-                await _unitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
-            }
-        }
-
-        public void AddRange(IEnumerable<TEntity> entity, bool commit = false)
-        {
-            Set.AddRange(entity);
-            if (commit)
-            {
-                _unitOfWork.PreCommitSave();
-            }
-        }
-
-        public void Remove(TEntity entity, bool commit = false)
-        {
-            Set.Remove(entity);
-            if (commit)
-            {
-                _unitOfWork.PreCommitSave();
-            }
-        }
-
-        public void RemoveAll(List<TEntity> deletedMembers, bool commit)
-        {
-            Set.RemoveRange(deletedMembers);
-            if (commit)
-            {
-                _unitOfWork.PreCommitSave();
-            }
-        }
-
-        public void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
-        where TProperty : class
-        {
-            _unitOfWork.Context.Entry(entity).Reference(property);
-        }
-
-        public void LoadProperty<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, TProperty>> property)
-        where TProperty : class
-        {
-            foreach (var entity in entities)
-            {
-                LoadProperty(entity, property);
-            }
-        }
-
-        public void LoadCollection<TProperty>(TEntity entity, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
-        where TProperty : class
-        {
-            _unitOfWork.Context.Entry(entity).Collection(propertyExpression);
-        }
-
-        public void LoadCollection<TProperty>(IEnumerable<TEntity> entities, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression)
-        where TProperty : class
-        {
-            foreach (var entity in entities)
-            {
-                LoadCollection(entity, propertyExpression);
+                await UnitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
             }
         }
     }

@@ -1,14 +1,9 @@
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using TellMe.DAL.Contracts.Services;
 using TellMe.DAL.Types.Domain;
 using TellMe.Web.DTO;
-using TellMe.DAL;
 using Microsoft.AspNetCore.Hosting;
 using TellMe.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
