@@ -15,10 +15,10 @@ namespace TellMe.iOS
 {
     public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
     {
-        AVUrlAsset _playerAsset;
-        AVPlayerItem _playerItem;
-        AVPlayer _player;
-        AVPlayerLayer _playerLayer;
+        private AVUrlAsset _playerAsset;
+        private AVPlayerItem _playerItem;
+        private AVPlayer _player;
+        private AVPlayerLayer _playerLayer;
         public static NSString AVCustomEditPlayerViewControllerStatusObservationContext = new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
         private NSObject _stopPlayingNotification;
         private bool playing;
@@ -124,7 +124,7 @@ namespace TellMe.iOS
             _player.Play();
         }
 
-        void DidReachEnd(object sender, NSNotificationEventArgs e)
+        private void DidReachEnd(object sender, NSNotificationEventArgs e)
         {
             if (!_playerAsset.Url.IsFileUrl && _playerAsset.Exportable)
             {
@@ -217,12 +217,12 @@ namespace TellMe.iOS
             }
         }
 
-        void ProfilePictureTouched()
+        private void ProfilePictureTouched()
         {
             this.OnProfilePictureTouched?.Invoke(Story);
         }
 
-        void PreviewTouched()
+        private void PreviewTouched()
         {
             this.OnPreviewTouched?.Invoke(Story);
         }

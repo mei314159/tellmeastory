@@ -1,19 +1,16 @@
-using Foundation;
 using System;
 using UIKit;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Remote;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 
 namespace TellMe.iOS
 {
     public partial class UploadPictureController : UIViewController, IUploadPictureView
     {
-        private UploadPictureBusinessLogic _businessLogic;
+        private IUploadPictureBusinessLogic _businessLogic;
 
         public IPicture ProfilePicture => this.Picture;
 
@@ -23,8 +20,8 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            _businessLogic = new UploadPictureBusinessLogic(new RemoteAccountDataService(), new AccountService(), this, App.Instance.Router);
-
+            this._businessLogic = IoC.Container.GetInstance<IUploadPictureBusinessLogic>();
+            _businessLogic.View = this;
             View.LayoutIfNeeded();
             Picture.Layer.CornerRadius = Picture.Frame.Width / 2;
             Picture.UserInteractionEnabled = true;
@@ -78,14 +75,12 @@ namespace TellMe.iOS
             PresentModalViewController(imagePicker, true);
         }
 
-        void Handle_FinishedPickingMediaAsync(object sender, UIImagePickerMediaPickedEventArgs e)
+        private void Handle_FinishedPickingMediaAsync(object sender, UIImagePickerMediaPickedEventArgs e)
         {
             if (e.Info[UIImagePickerController.MediaType].ToString() != MobileCoreServices.UTType.Image)
                 return;
 
-            var referenceURL = e.Info[new NSString(UIImagePickerController.ReferenceUrl)] as NSUrl;
-            var originalImage = e.Info[UIImagePickerController.OriginalImage] as UIImage;
-            if (originalImage != null)
+            if (e.Info[UIImagePickerController.OriginalImage] is UIImage originalImage)
             {
                 Picture.Image = UIImage.FromImage(originalImage.CGImage, 4, originalImage.Orientation);
                 UIView.Animate(0.2,
@@ -99,7 +94,7 @@ namespace TellMe.iOS
             ((UIImagePickerController)sender).DismissModalViewController(true);
         }
 
-        void Handle_Canceled(object sender, EventArgs e)
+        private void Handle_Canceled(object sender, EventArgs e)
         {
             ((UIImagePickerController)sender).DismissModalViewController(true);
         }

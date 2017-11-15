@@ -1,4 +1,4 @@
-﻿namespace TellMe.Core.DTO
+﻿namespace TellMe.Core.Contracts.DTO
 {
     public enum NotificationTypeEnum
     {

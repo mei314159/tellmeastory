@@ -1,65 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class StoriesBusinessLogic
+    public class StoriesBusinessLogic : IStoriesBusinessLogic
     {
-        private RemoteStoriesDataService _remoteStoriesService;
-        private RemoteNotificationsDataService _remoteNotificationsService;
-        private LocalStoriesDataService _localStoriesService;
-        private IStoriesListView _view;
-        private IRouter _router;
-        private RequestStoryValidator _validator;
-        readonly List<StoryDTO> stories = new List<StoryDTO>();
+        private readonly IRemoteStoriesDataService _remoteStoriesService;
+        private readonly IRemoteNotificationsDataService _remoteNotificationsService;
+        private readonly ILocalStoriesDataService _localStoriesService;        
+        private readonly IRouter _router;
+        private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
         public StoriesBusinessLogic(
-            RemoteStoriesDataService remoteStoriesService,
-            RemoteNotificationsDataService remoteNotificationsService,
-            IStoriesListView view,
-            IRouter router)
+            IRemoteStoriesDataService remoteStoriesService,
+            IRemoteNotificationsDataService remoteNotificationsService,
+            IRouter router, ILocalStoriesDataService localStoriesService)
         {
             _remoteStoriesService = remoteStoriesService;
             _remoteNotificationsService = remoteNotificationsService;
-            _localStoriesService = new LocalStoriesDataService();
-            _view = view;
             _router = router;
-            _validator = new RequestStoryValidator();
+            _localStoriesService = localStoriesService;
         }
+
+        public IStoriesListView View { get; set; }
 
         public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
-            var localStories = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
+            //var localStories = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
             //if (localStories.Expired || forceRefresh || clearCache)
             //{
             if (forceRefresh)
             {
-                stories.Clear();
+                _stories.Clear();
             }
 
             if (clearCache)
             {
                 await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
             }
-            var result = await _remoteStoriesService.GetStoriesAsync(forceRefresh ? null : stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
+            var result = await _remoteStoriesService.GetStoriesAsync(forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                stories.AddRange(result.Data);
+                _stories.AddRange(result.Data);
             }
             else
             {
-                result.ShowResultError(this._view);
+                result.ShowResultError(this.View);
                 return;
             }
             //}
@@ -69,59 +65,59 @@ namespace TellMe.Core.Types.BusinessLogic
             //    stories.AddRange(localStories.Data);
             //}
 
-            this._view.DisplayStories(stories.OrderByDescending(x => x.CreateDateUtc).ToList());
+            this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
 
 
         public void SendStory()
         {
-            _router.NavigateRecordStory(_view);
+            _router.NavigateRecordStory(View);
         }
 
         public void RequestStory()
         {
-            _router.NavigateChooseRecipients(_view, RequestStoryRecipientSelectedEventHandler, false);
+            _router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
         }
 
         public void AccountSettings()
         {
-            _router.NavigateAccountSettings(_view);
+            _router.NavigateAccountSettings(View);
         }
 
         public void ShowStorytellers()
         {
-            _router.NavigateStorytellers(_view);
+            _router.NavigateStorytellers(View);
         }
 
         public void NotificationsCenter()
         {
-            _router.NavigateNotificationsCenter(_view);
+            _router.NavigateNotificationsCenter(View);
         }
 
-        void RequestStoryRecipientSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
+        private void RequestStoryRecipientSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
         {
-            _router.NavigateRequestStory(this._view, selectedContacts);
+            _router.NavigateRequestStory(this.View, selectedContacts);
         }
 
         public void ViewStory(StoryDTO story, bool goToComments = false)
         {
-            _router.NavigateViewStory(this._view, story, goToComments);
+            _router.NavigateViewStory(this.View, story, goToComments);
         }
 
         public void NavigateStoryteller(StoryDTO story)
         {
-            _router.NavigateStoryteller(_view, story.SenderId);
+            _router.NavigateStoryteller(View, story.SenderId);
         }
 
         public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
         {
             if (receiver.TribeId != null)
             {
-                _router.NavigateTribe(_view, receiver.TribeId.Value, onRemoveTribe);
+                _router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
             }
             else
             {
-                _router.NavigateStoryteller(_view, receiver.UserId);
+                _router.NavigateStoryteller(View, receiver.UserId);
             }
         }
 
@@ -130,12 +126,11 @@ namespace TellMe.Core.Types.BusinessLogic
             var result = await _remoteNotificationsService.GetActiveNotificationsCountAsync().ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                this._view.DisplayNotificationsCount(result.Data);
+                this.View.DisplayNotificationsCount(result.Data);
             }
             else
             {
-                result.ShowResultError(this._view);
-                return;
+                result.ShowResultError(this.View);
             }
         }
 

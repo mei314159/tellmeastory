@@ -27,7 +27,7 @@ namespace TellMe.iOS.Views.Cells
             this.defaultPicture = UIImage.FromBundle("UserPic");
         }
 
-        StorytellerDTO storyteller;
+        private StorytellerDTO storyteller;
         public StorytellerDTO Storyteller
         {
             get

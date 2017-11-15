@@ -58,7 +58,7 @@ namespace TellMe.iOS.Views.Cells
             this.Text.Text = Comment.Text;
         }
 
-        void ProfilePictureTouched()
+        private void ProfilePictureTouched()
         {
             this.ReceiverSelected?.Invoke(Comment);
         }

@@ -1,37 +1,38 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class SignupBusinessLogic
+    public class SignupBusinessLogic : ISignupBusinessLogic
     {
-        private readonly RemoteAccountDataService _remoteAccountDataService;
-        private readonly AccountService _accountService;
-        private readonly ISignUpView _view;
+        private readonly IRemoteAccountDataService _remoteAccountDataService;
+        private readonly ILocalAccountService _localAccountService;
         private readonly IRouter _router;
         private readonly SignUpValidator _signUpValidator;
         private readonly SignInValidator _signInValidator;
 
         public SignupBusinessLogic(
             IRouter router,
-            RemoteAccountDataService remoteAccountDataService,
-            AccountService accountService,
-            ISignUpView view)
+            IRemoteAccountDataService remoteAccountDataService,
+            ILocalAccountService localAccountService,
+            SignUpValidator signUpValidator, SignInValidator signInValidator)
         {
             _router = router;
             _remoteAccountDataService = remoteAccountDataService;
-            _accountService = accountService;
-            _view = view;
-            _signUpValidator = new SignUpValidator();
-            _signInValidator = new SignInValidator();
+            _localAccountService = localAccountService;
+            _signUpValidator = signUpValidator;
+            _signInValidator = signInValidator;
         }
+
+        public ISignUpView View { get; set; }
 
         public void Init()
         {
@@ -40,45 +41,45 @@ namespace TellMe.Core.Types.BusinessLogic
         public async Task SignUpAsync()
         {
             var validationResult = await _signUpValidator
-                .ValidateAsync(_view)
+                .ValidateAsync(View)
                 .ConfigureAwait(false);
 
             if (!validationResult.IsValid)
             {
-                validationResult.ShowValidationResult(this._view);
+                validationResult.ShowValidationResult(this.View);
                 return;
             }
 
             var dto = new SignUpDTO
             {
-                UserName = this._view.UserNameField.Text,
-                Email = this._view.EmailField.Text,
-                FullName = this._view.FullNameField.Text,
-                Password = this._view.PasswordField.Text,
-                ConfirmPassword = this._view.ConfirmPasswordField.Text,
+                UserName = this.View.UserNameField.Text,
+                Email = this.View.EmailField.Text,
+                FullName = this.View.FullNameField.Text,
+                Password = this.View.PasswordField.Text,
+                ConfirmPassword = this.View.ConfirmPasswordField.Text,
             };
 
             var result = await this._remoteAccountDataService.SignUpAsync(dto)
-                                   .ConfigureAwait(false);
+                .ConfigureAwait(false);
 
             if (!result.IsSuccess)
             {
-                result.ShowResultError(this._view);
+                result.ShowResultError(this.View);
                 return;
             }
 
-            _view.InvokeOnMainThread(async () => await SignInAsync(dto).ConfigureAwait(false));
+            View.InvokeOnMainThread(async () => await SignInAsync(dto).ConfigureAwait(false));
         }
 
         private async Task SignInAsync(SignUpDTO dto)
         {
             var validationResult = await _signInValidator
-                    .ValidateAsync(_view)
-                    .ConfigureAwait(false);
+                .ValidateAsync(View)
+                .ConfigureAwait(false);
 
             if (!validationResult.IsValid)
             {
-                validationResult.ShowValidationResult(this._view);
+                validationResult.ShowValidationResult(this.View);
                 return;
             }
 
@@ -87,13 +88,13 @@ namespace TellMe.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (!result.IsSuccess)
             {
-                result.ShowResultError(this._view);
+                result.ShowResultError(this.View);
                 return;
             }
 
             result.Data.AuthDate = DateTime.UtcNow;
-            _accountService.SaveAuthInfo(result.Data);
-            _router.NavigateSetProfilePicture(_view);
+            _localAccountService.SaveAuthInfo(result.Data);
+            _router.NavigateSetProfilePicture(View);
         }
     }
 }

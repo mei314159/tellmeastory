@@ -1,12 +1,12 @@
 using Foundation;
 using System;
 using UIKit;
-using TellMe.Core.Types.BusinessLogic;
 using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Components;
-using TellMe.Core.Types.DataServices.Remote;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
 
@@ -14,7 +14,7 @@ namespace TellMe.iOS
 {
     public partial class SendStoryViewController : UIViewController, ISendStoryView
     {
-        SendStoryBusinessLogic _businessLogic;
+        private ISendStoryBusinessLogic _businessLogic;
 
         public SendStoryViewController(IntPtr handle) : base(handle)
         {
@@ -34,7 +34,8 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            _businessLogic = new SendStoryBusinessLogic(this, App.Instance.Router, new RemoteStoriesDataService());
+            _businessLogic = IoC.Container.GetInstance<ISendStoryBusinessLogic>();
+            _businessLogic.View = this;
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             this._businessLogic.Init();
 

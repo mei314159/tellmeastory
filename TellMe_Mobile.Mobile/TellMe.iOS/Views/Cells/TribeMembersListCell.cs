@@ -27,7 +27,7 @@ namespace TellMe.iOS.Views.Cells
             this.defaultPicture = UIImage.FromBundle("UserPic");
         }
 
-        TribeMemberDTO tribeMember;
+        private TribeMemberDTO tribeMember;
         public TribeMemberDTO TribeMember
         {
             get

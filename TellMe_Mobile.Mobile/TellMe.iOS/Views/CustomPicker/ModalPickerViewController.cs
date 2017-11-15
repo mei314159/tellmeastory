@@ -28,7 +28,7 @@ namespace SharpMobileCode.ModalPicker
 	public class ModalPickerViewController : UIViewController
 	{
 		public event ModalPickerDimissedEventHandler OnModalPickerDismissed;
-		const float _headerBarHeight = 40;
+		private const float _headerBarHeight = 40;
 
 		public UIColor HeaderBackgroundColor { get; set; }
 		public UIColor HeaderTextColor { get; set; }
@@ -62,11 +62,11 @@ namespace SharpMobileCode.ModalPicker
 			}
 		}
 
-		UILabel _headerLabel;
-		UIButton _doneButton;
-		UIButton _cancelButton;
-		UIViewController _parent;
-		UIView _internalView;
+		private UILabel _headerLabel;
+		private UIButton _doneButton;
+		private UIButton _cancelButton;
+		private UIViewController _parent;
+		private UIView _internalView;
 
 		public ModalPickerViewController(ModalPickerType pickerType, string headerText, UIViewController parent)
 		{
@@ -93,7 +93,7 @@ namespace SharpMobileCode.ModalPicker
 			Show();
 		}
 
-		void InitializeControls()
+		private void InitializeControls()
 		{
 			View.BackgroundColor = UIColor.Clear;
 			_internalView = new UIView();
@@ -139,7 +139,7 @@ namespace SharpMobileCode.ModalPicker
 			Add(_internalView);
 		}
 
-		void Show(bool onRotate = false)
+		private void Show(bool onRotate = false)
 		{
 			var buttonSize = new CGSize(71, 30);
 
@@ -207,7 +207,7 @@ namespace SharpMobileCode.ModalPicker
 			_internalView.AddSubview(new UIView(new CGRect(0, 0, internalViewSize.Width, 1)) { BackgroundColor = UIColor.LightGray });
 		}
 
-		void DoneButtonTapped(object sender, EventArgs e)
+		private void DoneButtonTapped(object sender, EventArgs e)
 		{
 			DismissViewController(true, null);
 			if (OnModalPickerDismissed != null)
@@ -216,7 +216,7 @@ namespace SharpMobileCode.ModalPicker
 			}
 		}
 
-		void CancelButtonTapped(object sender, EventArgs e)
+		private void CancelButtonTapped(object sender, EventArgs e)
 		{
 			DismissViewController(true, null);
 		}

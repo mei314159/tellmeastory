@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using SQLite;
 using SQLiteNetExtensionsAsync.Extensions;
 using TellMe.Core.Contracts.DataServices;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Local
 {
-    public class LocalStoriesDataService
+    public class LocalStoriesDataService : ILocalStoriesDataService
     {
         private readonly string _dbPath;
 

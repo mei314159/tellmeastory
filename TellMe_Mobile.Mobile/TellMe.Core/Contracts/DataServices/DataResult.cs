@@ -11,15 +11,9 @@ namespace TellMe.Core.Contracts.DataServices
             UpdateDateUtc = updateDateUtc;
         }
 
-        public DateTime UpdateDateUtc { get; set; }
+        public DateTime UpdateDateUtc { get; }
 
-        public virtual bool Expired
-        {
-            get
-            {
-                return (DateTime.UtcNow - this.UpdateDateUtc).TotalMinutes > 5; //Should be editable
-            }
-        }
+        public virtual bool Expired => (DateTime.UtcNow - this.UpdateDateUtc).TotalMinutes > 5;
     }
 
     public class DataResult<T> : DataResult
@@ -29,14 +23,8 @@ namespace TellMe.Core.Contracts.DataServices
             Data = data;
         }
 
-        public T Data { get; set; }
+        public T Data { get; }
 
-        public override bool Expired
-        {
-            get
-            {
-                return base.Expired || (Data as ICollection)?.Count == 0;
-            }
-        }
+        public override bool Expired => base.Expired || (Data as ICollection)?.Count == 0;
     }
 }

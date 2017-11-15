@@ -1,38 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class RequestStoryBusinessLogic
+    public class RequestStoryBusinessLogic : IRequestStoryBusinessLogic
     {
-        private IRequestStoryView _view;
-        private IRouter _router;
-        private RemoteStoriesDataService _remoteStoriesDataService;
-        private RequestStoryValidator _validator;
+        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
+        private readonly RequestStoryValidator _validator;
 
-        public RequestStoryBusinessLogic(IRequestStoryView _view, IRouter _router, RemoteStoriesDataService remoteStoriesDataService)
+        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, RequestStoryValidator validator)
         {
-            this._view = _view;
-            this._router = _router;
             this._remoteStoriesDataService = remoteStoriesDataService;
-            this._validator = new RequestStoryValidator();
+            _validator = validator;
         }
+
+        public IRequestStoryView View { get; set; }
 
         public async Task SendAsync()
         {
-            this._view.SendButton.Enabled = false;
-            var title = this._view.StoryTitle.Text;
+            this.View.SendButton.Enabled = false;
+            var title = this.View.StoryTitle.Text;
 
             var dto = new RequestStoryDTO
             {
-                Requests = _view.Recipients.Select(x => new StoryRequestDTO
+                Requests = View.Recipients.Select(x => new StoryRequestDTO
                 {
                     Title = title,
                     UserId = x.Type == ContactType.User ? x.User.Id : null,
@@ -46,19 +43,19 @@ namespace TellMe.Core.Types.BusinessLogic
                 var result = await this._remoteStoriesDataService.RequestStoryAsync(dto).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    this._view.ShowSuccessMessage("Story successfully requested", () => _view.Close(result.Data));
+                    this.View.ShowSuccessMessage("Story successfully requested", () => View.Close(result.Data));
                 }
                 else
                 {
-                    result.ShowResultError(this._view);
+                    result.ShowResultError(this.View);
                 }
             }
             else
             {
-                validationResult.ShowValidationResult(this._view);
+                validationResult.ShowValidationResult(this.View);
             }
 
-            _view.InvokeOnMainThread(() => this._view.SendButton.Enabled = true);
+            View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);
         }
     }
 }

@@ -11,12 +11,12 @@ namespace TellMe.iOS
 
         public override void FinishedRecording(AVCaptureFileOutput captureOutput, NSUrl outputFileUrl, NSObject[] connections, NSError error)
         {
-            Stopped.Invoke();
+            Stopped?.Invoke();
         }
 
         public override void DidStartRecording(AVCaptureFileOutput captureOutput, NSUrl outputFileUrl, NSObject[] connections)
         {
-            Started.Invoke(DateTime.Now);
+            Started?.Invoke(DateTime.Now);
         }
     }
 }

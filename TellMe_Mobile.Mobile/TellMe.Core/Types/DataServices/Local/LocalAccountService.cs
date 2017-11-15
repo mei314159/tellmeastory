@@ -1,15 +1,16 @@
 ﻿using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Extensions;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Local
 {
-    public class AccountService
+    public class LocalAccountService : ILocalAccountService
     {
         private readonly string _dbPath;
 
-        public AccountService()
+        public LocalAccountService()
         {
             this._dbPath = Constants.LocalDbPath;
             using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))

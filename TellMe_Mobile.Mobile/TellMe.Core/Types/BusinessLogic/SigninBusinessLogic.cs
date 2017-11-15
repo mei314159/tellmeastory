@@ -1,34 +1,35 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class SigninBusinessLogic
+    public class SigninBusinessLogic : ISigninBusinessLogic
     {
-        private readonly RemoteAccountDataService _remoteAccountDataService;
-        private readonly AccountService _accountService;
-        private readonly ISignInView _view;
+        private readonly IRemoteAccountDataService _remoteAccountDataService;
+        private readonly ILocalAccountService _localAccountService;
         private readonly IRouter _router;
         private readonly SignInValidator _signInValidator;
 
         public SigninBusinessLogic(
             IRouter router,
-            RemoteAccountDataService remoteAccountDataService,
-            AccountService accountService,
-            ISignInView view)
+            IRemoteAccountDataService remoteAccountDataService,
+            ILocalAccountService localAccountService,
+            SignInValidator signInValidator)
         {
             _router = router;
             _remoteAccountDataService = remoteAccountDataService;
-            _accountService = accountService;
-            _view = view;
-            _signInValidator = new SignInValidator();
+            _localAccountService = localAccountService;
+            _signInValidator = signInValidator;
         }
+
+        public ISignInView View { get; set; }
 
         public void Init()
         {
@@ -37,27 +38,25 @@ namespace TellMe.Core.Types.BusinessLogic
         public async Task SignInAsync()
         {
             var validationResult = await _signInValidator
-                .ValidateAsync(_view)
+                .ValidateAsync(View)
                 .ConfigureAwait(false);
 
             if (validationResult.IsValid)
             {
                 var result = await _remoteAccountDataService
-                    .SignInAsync(_view.EmailField.Text, _view.PasswordField.Text)
+                    .SignInAsync(View.EmailField.Text, View.PasswordField.Text)
                     .ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     result.Data.AuthDate = DateTime.UtcNow;
-                    _accountService.SaveAuthInfo(result.Data);
+                    _localAccountService.SaveAuthInfo(result.Data);
                     _router.NavigateMain();
                     return;
                 }
-                result.ShowResultError(this._view);
+                result.ShowResultError(this.View);
             }
 
-            validationResult.ShowValidationResult(this._view);
+            validationResult.ShowValidationResult(this.View);
         }
     }
-
-
 }
