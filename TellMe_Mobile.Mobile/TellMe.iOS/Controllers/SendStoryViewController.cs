@@ -40,7 +40,7 @@ namespace TellMe.iOS
             this._businessLogic.Init();
 
             var text = new NSMutableAttributedString();
-            text.Append(new NSAttributedString(App.Instance.AuthInfo.Account.UserName, UIFont.BoldSystemFontOfSize(StoryLabel.Font.PointSize)));
+            text.Append(new NSAttributedString(_businessLogic.GetUsername(), UIFont.BoldSystemFontOfSize(StoryLabel.Font.PointSize)));
             text.Append(new NSAttributedString($" has shared with you a story about:"));
             StoryLabel.AttributedText = text;
             this.StoryTitle.EditingChanged += (sender, e) => this._businessLogic.InitButtons();

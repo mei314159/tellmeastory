@@ -21,8 +21,6 @@ namespace TellMe.Core
 
         public INotificationHandler NotificationHandler { get; set; }
 
-        public AuthenticationInfoDTO AuthInfo { get; set; }
-
         public event Action<Exception> OnException;
         public event Action<Exception> OnNetworkException;
         public event Action<NotificationDTO> OnNotificationReceived;

@@ -70,10 +70,9 @@ namespace TellMe.iOS
             {
                 handleName = "{Handle}";
             }
-
             text.Append(new NSAttributedString(handleName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize), UIColor.Blue));
             text.Append(new NSAttributedString(","));
-            text.Append(new NSAttributedString(App.Instance.AuthInfo.Account.UserName, UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
+            text.Append(new NSAttributedString(_businessLogic.GetUsername(), UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             text.Append(new NSAttributedString($" would like you to tell a story about: "));
             text.Append(new NSAttributedString(StoryTitle.Text, UIFont.ItalicSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             RequestTextPreview.AttributedText = text;
