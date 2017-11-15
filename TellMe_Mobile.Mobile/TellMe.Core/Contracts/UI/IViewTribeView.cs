@@ -4,7 +4,6 @@ using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.Core.Contracts.UI
 {
-    public delegate void TribeLeftHandler(TribeDTO tribe);
     public interface IViewTribeView : IView
     {
         TribeDTO Tribe { get; set; }

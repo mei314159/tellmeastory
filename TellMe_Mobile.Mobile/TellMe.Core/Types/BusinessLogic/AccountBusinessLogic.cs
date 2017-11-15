@@ -1,41 +1,35 @@
 ﻿using System.Threading.Tasks;
 using TellMe.Core.Contracts;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class AccountBusinessLogic
+    public class AccountBusinessLogic : IAccountBusinessLogic
     {
         private const string PushTokenKey = "PushToken";
         private const string OldPushTokenKey = "OldPushToken";
         private const string PushTokenSentToBackendKey = "PushTokenSentToBackend";
         private const string PushIsEnabledKey = "PushIsEnabled";
 
-
         private readonly IApplicationDataStorage _appDataStorage;
-        private readonly AccountService _accountService;
-        private readonly RemotePushDataService _remotePushDataService;
+        private readonly ILocalAccountService _localAccountService;
+        private readonly IRemotePushDataService _remotePushDataService;
 
-        public AccountBusinessLogic(IApplicationDataStorage _appDataStorage, AccountService _accountService, RemotePushDataService _remotePushDataService)
+        public AccountBusinessLogic(IApplicationDataStorage appDataStorage, ILocalAccountService localAccountService, IRemotePushDataService remotePushDataService)
         {
-            this._appDataStorage = _appDataStorage;
-            this._accountService = _accountService;
-            this._remotePushDataService = _remotePushDataService;
+            this._appDataStorage = appDataStorage;
+            this._localAccountService = localAccountService;
+            this._remotePushDataService = remotePushDataService;
         }
 
-        public bool IsAuthenticated => _accountService.GetAuthInfo() != null;
+        public bool IsAuthenticated => _localAccountService.GetAuthInfo() != null;
 
         public bool PushIsEnabled
         {
-            get
-            {
-                return _appDataStorage.GetBool(PushIsEnabledKey);
-            }
-            set
-            {
-                _appDataStorage.SetBool(PushIsEnabledKey, value);
-            }
+            get => _appDataStorage.GetBool(PushIsEnabledKey);
+            set => _appDataStorage.SetBool(PushIsEnabledKey, value);
         }
 
         public async Task RegisteredForRemoteNotificationsAsync(string pushToken)

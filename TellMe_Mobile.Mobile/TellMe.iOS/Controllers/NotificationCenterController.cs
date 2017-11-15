@@ -1,37 +1,31 @@
 using Foundation;
 using System;
 using UIKit;
-using TellMe.Core.Types.DataServices.Remote;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.iOS.Views.Cells;
-using TellMe.Core.DTO;
-using TellMe.Core.Types.BusinessLogic;
 using System.Threading.Tasks;
 using System.Collections;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
-using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.iOS.Core;
 
 namespace TellMe.iOS
 {
     public partial class NotificationCenterController : UIViewController, IUITableViewDelegate, IUITableViewDataSource, INotificationsCenterView
     {
-        private readonly List<NotificationDTO> notificationsList = new List<NotificationDTO>();
+        private readonly List<NotificationDTO> _notificationsList = new List<NotificationDTO>();
 
-        private NotificationCenterBusinessLogic businessLogic;
-
+        private INotificationCenterBusinessLogic _businessLogic;
         public NotificationCenterController(IntPtr handle) : base(handle)
         {
         }
 
         public override void ViewDidLoad()
         {
-            businessLogic = new NotificationCenterBusinessLogic(
-                new NotificationHandler(App.Instance.Router, this),
-                new RemoteNotificationsDataService(),
-                this);
+            _businessLogic = IoC.Container.GetInstance<INotificationCenterBusinessLogic>();
+            _businessLogic.View = this;
             this.TableView.TableFooterView = new UIView();
             this.TableView.DataSource = this;
             this.TableView.Delegate = this;
@@ -46,16 +40,16 @@ namespace TellMe.iOS
         private async Task LoadNotificationsAsync(bool forceRefresh)
         {
             InvokeOnMainThread(() => TableView.RefreshControl.BeginRefreshing());
-            await businessLogic.LoadNotificationsAsync(forceRefresh).ConfigureAwait(false);
+            await _businessLogic.LoadNotificationsAsync(forceRefresh).ConfigureAwait(false);
             InvokeOnMainThread(() => TableView.RefreshControl.EndRefreshing());
         }
 
         public void DisplayNotifications(IReadOnlyCollection<NotificationDTO> notifications)
         {
-            lock (((ICollection)notificationsList).SyncRoot)
+            lock (((ICollection)_notificationsList).SyncRoot)
             {
-                notificationsList.Clear();
-                notificationsList.AddRange(notifications);
+                _notificationsList.Clear();
+                _notificationsList.AddRange(notifications);
             }
 
             InvokeOnMainThread(() => TableView.ReloadData());
@@ -63,12 +57,12 @@ namespace TellMe.iOS
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
-            return notificationsList.Count;
+            return _notificationsList.Count;
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var dto = notificationsList[indexPath.Row];
+            var dto = _notificationsList[indexPath.Row];
             INotificationCenterCell cell;
             if (dto.Type == NotificationTypeEnum.Story)
             {
@@ -99,8 +93,8 @@ namespace TellMe.iOS
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             tableView.DeselectRow(indexPath, false);
-            var dto = notificationsList[indexPath.Row];
-            businessLogic.HandleNotification(dto);
+            var dto = _notificationsList[indexPath.Row];
+            _businessLogic.HandleNotification(dto);
         }
 
         public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
@@ -113,7 +107,7 @@ namespace TellMe.iOS
 
         public void ReloadNotification(NotificationDTO notification)
         {
-            var index = notificationsList.IndexOf(notification);
+            var index = _notificationsList.IndexOf(notification);
             InvokeOnMainThread(() => TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.None));
         }
     }

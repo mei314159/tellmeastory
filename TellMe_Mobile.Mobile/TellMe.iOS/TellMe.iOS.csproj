@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -122,6 +122,9 @@
     <Reference Include="HockeySDK.iOSBindings">
       <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
     </Reference>
+    <Reference Include="SimpleInjector">
+      <HintPath>..\packages\SimpleInjector.4.0.12\lib\netstandard1.3\SimpleInjector.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -217,6 +220,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\SendStoryViewController.designer.cs">
+      <DependentUpon>SendStoryViewController.cs</DependentUpon>
+    </Compile>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Core\ApplicationDataStorage.cs" />
@@ -298,7 +304,6 @@
     <Compile Include="Controllers\UploadPictureController.designer.cs">
       <DependentUpon>UploadPictureController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\SendStoryViewController.designer.cs" />
     <Compile Include="Controllers\SendStoryViewController.cs" />
     <Compile Include="Controllers\RequestStoryController.cs" />
     <Compile Include="Controllers\RequestStoryController.designer.cs">
@@ -348,6 +353,7 @@
     <Compile Include="Views\Cells\StoryViewCell.designer.cs">
       <DependentUpon>StoryViewCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\IoC.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

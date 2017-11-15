@@ -1,123 +1,135 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class StorytellerBusinessLogic
+    public class StorytellerBusinessLogic : IStorytellerBusinessLogic
     {
-        private RemoteStoriesDataService _remoteStoriesService;
-        private RemoteStorytellersDataService _remoteStorytellesService;
-        private LocalStoriesDataService _localStoriesService;
-        private LocalStorytellersDataService _localStorytellesService;
-        private IStorytellerView _view;
-        private IRouter _router;
-        readonly List<StoryDTO> stories = new List<StoryDTO>();
+        private readonly IRemoteStoriesDataService _remoteStoriesService;
+        private readonly IRemoteStorytellersDataService _remoteStorytellesService;
+        private readonly ILocalStoriesDataService _localStoriesService;
+        private readonly ILocalStorytellersDataService _localStorytellesService;
+        private readonly ILocalAccountService _localLocalAccountService;
+        private readonly IRouter _router;
+        private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public StorytellerBusinessLogic(RemoteStoriesDataService remoteStoriesService, RemoteStorytellersDataService remoteStorytellesService, IStorytellerView view, IRouter router)
+        public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesService,
+            IRemoteStorytellersDataService remoteStorytellesService,
+            IRouter router,
+            ILocalStoriesDataService localStoriesService,
+            ILocalStorytellersDataService localStorytellesService,
+            ILocalAccountService localLocalAccountService)
         {
             _remoteStoriesService = remoteStoriesService;
             _remoteStorytellesService = remoteStorytellesService;
-            _localStoriesService = new LocalStoriesDataService();
-            _localStorytellesService = new LocalStorytellersDataService();
-            _view = view;
             _router = router;
+            _localStoriesService = localStoriesService;
+            _localStorytellesService = localStorytellesService;
+            _localLocalAccountService = localLocalAccountService;
         }
+
+        public IStorytellerView View { get; set; }
 
         public async Task LoadStoriesAsync(bool forceRefresh = false)
         {
             if (forceRefresh)
             {
-                stories.Clear();
+                _stories.Clear();
             }
 
-            var result = await _remoteStoriesService.GetStoriesAsync(_view.Storyteller.Id, forceRefresh ? null : stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
+            var result = await _remoteStoriesService
+                .GetStoriesAsync(View.Storyteller.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
+                .ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                stories.AddRange(result.Data);
+                _stories.AddRange(result.Data);
             }
             else
             {
-                result.ShowResultError(this._view);
+                result.ShowResultError(this.View);
                 return;
             }
 
-            this._view.DisplayStories(stories.OrderByDescending(x => x.CreateDateUtc).ToList());
+            this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
 
         public async Task<bool> InitAsync()
         {
-            if (_view.Storyteller == null)
+            if (View.Storyteller == null)
             {
-                var localStoryteller = await _localStorytellesService.GetAsync(_view.StorytellerId).ConfigureAwait(false);
+                var localStoryteller =
+                    await _localStorytellesService.GetAsync(View.StorytellerId).ConfigureAwait(false);
                 if (localStoryteller.Data == null || localStoryteller.Expired)
                 {
-                    var result = await _remoteStorytellesService.GetByIdAsync(_view.StorytellerId).ConfigureAwait(false);
+                    var result = await _remoteStorytellesService.GetByIdAsync(View.StorytellerId)
+                        .ConfigureAwait(false);
                     if (result.IsSuccess)
                     {
-                        _view.Storyteller = result.Data;
+                        View.Storyteller = result.Data;
                     }
                     else
                     {
-                        result.ShowResultError(this._view);
+                        result.ShowResultError(this.View);
                         return false;
                     }
                 }
                 else
                 {
-                    _view.Storyteller = localStoryteller.Data;
+                    View.Storyteller = localStoryteller.Data;
                 }
             }
 
-            _view.DisplayStoryteller(_view.Storyteller);
+            View.DisplayStoryteller(View.Storyteller);
             return true;
         }
 
         public void SendStory()
         {
-            _router.NavigateRecordStory(_view, contact: new ContactDTO
+            _router.NavigateRecordStory(View, contact: new ContactDTO
             {
                 Type = ContactType.User,
-                UserId = _view.Storyteller.Id,
-                User = _view.Storyteller
+                UserId = View.Storyteller.Id,
+                User = View.Storyteller
             });
         }
 
         public void RequestStory()
         {
-            _router.NavigateRequestStory(this._view, new[] {
+            _router.NavigateRequestStory(this.View, new[]
+            {
                 new ContactDTO
                 {
                     Type = ContactType.User,
-                    UserId = _view.Storyteller.Id,
-                    User = _view.Storyteller
-                }});
+                    UserId = View.Storyteller.Id,
+                    User = View.Storyteller
+                }
+            });
         }
 
         public void ViewStory(StoryDTO story)
         {
-            _router.NavigateViewStory(this._view, story);
+            _router.NavigateViewStory(this.View, story);
         }
 
         public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
         {
             if (receiver.TribeId != null)
             {
-                _router.NavigateTribe(_view, receiver.TribeId.Value, onRemoveTribe);
+                _router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
             }
             else
             {
-                _router.NavigateStoryteller(_view, receiver.UserId);
+                _router.NavigateStoryteller(View, receiver.UserId);
             }
         }
 
@@ -143,9 +155,9 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void NavigateStoryteller(StoryDTO story)
         {
-            if (story.SenderId != App.Instance.AuthInfo.UserId)
+            if (story.SenderId != _localLocalAccountService.GetAuthInfo().UserId)
             {
-                _router.NavigateStoryteller(_view, story.SenderId);
+                _router.NavigateStoryteller(View, story.SenderId);
             }
         }
     }

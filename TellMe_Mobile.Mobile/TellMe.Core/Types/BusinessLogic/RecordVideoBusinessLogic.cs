@@ -2,37 +2,38 @@
 using System.IO;
 using System.Timers;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class RecordVideoBusinessLogic
+    public class RecordVideoBusinessLogic : IRecordVideoBusinessLogic
     {
-        private IRouter _router;
-        private IRecordVideoView _view;
-        private string videoPath;
-        private volatile bool deleteVideo;
-        private volatile bool recording;
-        private DateTime recordStartTime;
-        private Timer recordTimer;
+        private readonly IRouter _router;
+        private readonly Timer _recordTimer;
+        private string _videoPath;
+        private DateTime _recordStartTime;
+        private volatile bool _deleteVideo;
+        private volatile bool _recording;
 
-        public RecordVideoBusinessLogic(IRouter _router, IRecordVideoView _view)
+        public RecordVideoBusinessLogic(IRouter router)
         {
-            this._router = _router;
-			this._view = _view;
-			recordTimer = new Timer(10);
-			recordTimer.Elapsed += RecordTimer_Elapsed;
+            this._router = router;
+			_recordTimer = new Timer(10);
+			_recordTimer.Elapsed += RecordTimer_Elapsed;
         }
+
+        public IRecordVideoView View { get; set; }
 
         public void PreviewStory()
         {
-            _router.NavigatePreviewStory(_view, this.videoPath, _view.StoryRequest, _view.RequestNotification, _view.Contact);
+            _router.NavigatePreviewStory(View, this._videoPath, View.StoryRequest, View.RequestNotification, View.Contact);
         }
 
         public void ToggleRecording()
         {
-			this._view.RecordButton.Enabled = false;
-            if (recording)
+			this.View.RecordButton.Enabled = false;
+            if (_recording)
                 StopRecording();
             else
                 StartRecording();
@@ -40,33 +41,33 @@ namespace TellMe.Core.Types.BusinessLogic
 
         private void DeleteFile(string filePath)
         {
-            if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
-            {
-                Console.WriteLine("Deleting File");
-                File.Delete(filePath);
-                Console.WriteLine("Deleted File");
-            }
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath)) 
+                return;
+            
+            Console.WriteLine("Deleting File");
+            File.Delete(filePath);
+            Console.WriteLine("Deleted File");
         }
 
         public void RecordingStarted(DateTime startDate)
         {
-			recordStartTime = startDate;
-			recordTimer.Start();
-            this._view.RecordButton.Enabled = true;
-			_view.RecordButton.TitleString = "Stop Recording";
+			_recordStartTime = startDate;
+			_recordTimer.Start();
+            this.View.RecordButton.Enabled = true;
+			View.RecordButton.TitleString = "Stop Recording";
         }
 
         public void RecordingStopped()
         {
-			recordTimer?.Stop();
+			_recordTimer?.Stop();
             Console.WriteLine("stopped recording");
-            this._view.RecordButton.Enabled = true;
-            this._view.RecordButton.TitleString = "Record";
+            this.View.RecordButton.Enabled = true;
+            this.View.RecordButton.TitleString = "Record";
 
-            if (deleteVideo)
+            if (_deleteVideo)
             {
-                DeleteFile(this.videoPath);
-                deleteVideo = false;
+                DeleteFile(this._videoPath);
+                _deleteVideo = false;
             }
             else
                 PreviewStory();
@@ -74,33 +75,33 @@ namespace TellMe.Core.Types.BusinessLogic
 
         private void StartRecording()
 		{
-			recording = true;
-            this.videoPath = Path.Combine(Constants.TempVideoStorage, DateTime.Now.Ticks + ".mov");
-            DeleteFile(videoPath);
-            _view.StartCapture(videoPath);
-            Console.WriteLine(videoPath);
+			_recording = true;
+            this._videoPath = Path.Combine(Constants.TempVideoStorage, DateTime.Now.Ticks + ".mov");
+            DeleteFile(_videoPath);
+            View.StartCapture(_videoPath);
+            Console.WriteLine(_videoPath);
         }
 
         private void StopRecording(bool deleteFile = false)
 		{
-            recording = false;
-            _view.StopCapture();
-            this.deleteVideo = deleteFile;
+            _recording = false;
+            View.StopCapture();
+            this._deleteVideo = deleteFile;
         }
 
-        void RecordTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void RecordTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-			TimeSpan duration = (DateTime.Now - recordStartTime);
-			_view.DurationLabel = duration.ToString("ss\\:ff");
+			var duration = (DateTime.Now - _recordStartTime);
+			View.DurationLabel = duration.ToString("ss\\:ff");
 			if (duration.TotalSeconds >= 10)
 			{
-                _view.StopCapture();
+                View.StopCapture();
 			}
 		}
 
         public void WillClose()
         {
-            if (recording)
+            if (_recording)
             {
                 StopRecording(true);
             }
@@ -108,12 +109,12 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void SwitchCamera()
         {
-            if (this.recording)
+            if (this._recording)
             {
                 return;
             }
 
-            _view.SwitchCamera();
+            View.SwitchCamera();
         }
     }
 }

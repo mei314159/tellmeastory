@@ -1,34 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
+using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class NotificationCenterBusinessLogic
+    public class NotificationCenterBusinessLogic : INotificationCenterBusinessLogic
     {
-        readonly INotificationsCenterView _view;
-        readonly RemoteNotificationsDataService _remoteNotificationsDataService;
+        private readonly IRemoteNotificationsDataService _remoteNotificationsDataService;
 
-        readonly LocalNotificationsDataService _localNotificationsDataService;
+        private readonly ILocalNotificationsDataService _localNotificationsDataService;
 
-        readonly List<NotificationDTO> notifications = new List<NotificationDTO>();
+        private readonly List<NotificationDTO> _notifications = new List<NotificationDTO>();
 
-        readonly INotificationHandler _notificationHandler;
+        private readonly INotificationHandler _notificationHandler;
+        
+        public INotificationsCenterView View { get; set; }
+
         public NotificationCenterBusinessLogic(INotificationHandler notificationHandler,
-                                               RemoteNotificationsDataService remoteNotificationsDataService,
-                                               INotificationsCenterView view)
+            IRemoteNotificationsDataService remoteNotificationsDataService, ILocalNotificationsDataService localNotificationsDataService)
         {
             _remoteNotificationsDataService = remoteNotificationsDataService;
+            _localNotificationsDataService = localNotificationsDataService;
             _notificationHandler = notificationHandler;
-            _localNotificationsDataService = new LocalNotificationsDataService();
-            _view = view;
         }
 
         public async Task LoadNotificationsAsync(bool forceRefresh = false)
@@ -39,43 +40,44 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 if (forceRefresh)
                 {
-                    notifications.Clear();
+                    _notifications.Clear();
                 }
 
-                var result = await _remoteNotificationsDataService.GetNotificationsAsync(notifications.LastOrDefault()?.Date).ConfigureAwait(false);
+                var result = await _remoteNotificationsDataService
+                    .GetNotificationsAsync(_notifications.LastOrDefault()?.Date).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     await _localNotificationsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
-                    notifications.AddRange(result.Data);
+                    _notifications.AddRange(result.Data);
                 }
                 else
                 {
-                    result.ShowResultError(this._view);
+                    result.ShowResultError(this.View);
                     return;
                 }
             }
             else
             {
-                notifications.Clear();
-                notifications.AddRange(localEntities.Data);
+                _notifications.Clear();
+                _notifications.AddRange(localEntities.Data);
             }
 
-            this._view.DisplayNotifications(notifications);
+            this.View.DisplayNotifications(_notifications);
         }
 
         public async void HandleNotification(NotificationDTO notification)
         {
-            var result = await _notificationHandler.ProcessNotification(notification).ConfigureAwait(false);
+            var result = await _notificationHandler.ProcessNotificationAsync(notification, View).ConfigureAwait(false);
             if (result.HasValue)
                 await NotificationProcessed(notification.Id, result.Value).ConfigureAwait(false);
         }
 
-        async Task NotificationProcessed(int notificationId, bool success)
+        private async Task NotificationProcessed(int notificationId, bool success)
         {
-            var notification = notifications.FirstOrDefault(x => x.Id == notificationId);
+            var notification = _notifications.FirstOrDefault(x => x.Id == notificationId);
             notification.Handled = success;
             await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
-            _view.ReloadNotification(notification);
+            View.ReloadNotification(notification);
         }
     }
 }

@@ -6,11 +6,12 @@ using SQLite;
 using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using TellMe.Core.Contracts.DataServices;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Types.DataServices.Local
 {
-    public class LocalNotificationsDataService
+    public class LocalNotificationsDataService : ILocalNotificationsDataService
     {
         private readonly string _dbPath;
 

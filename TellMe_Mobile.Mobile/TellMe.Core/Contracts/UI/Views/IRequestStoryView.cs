@@ -5,7 +5,6 @@ using TellMe.Core.Contracts.UI.Components;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
-    public delegate void RequestStoryEventHandler(ICollection<StoryDTO> requestedStories);
     public interface IRequestStoryView : IView
     {
         ICollection<ContactDTO> Recipients { get; }
