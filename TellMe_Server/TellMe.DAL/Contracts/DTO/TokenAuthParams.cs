@@ -1,4 +1,4 @@
-namespace TellMe.Web.DTO
+namespace TellMe.DAL.Contracts.DTO
 {
     public class TokenAuthParams
     {

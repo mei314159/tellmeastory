@@ -7,9 +7,9 @@ using TellMe.DAL.Types.Domain;
 using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts.DTO;
 using AutoMapper;
-using TellMe.DAL.Contracts.PushNotification;
 using System;
 using AutoMapper.QueryableExtensions;
+using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Services
@@ -25,6 +25,7 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<StoryLike> _storyLikeRepository;
+        private readonly IRepository<ApplicationUser> _userRepository;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -34,7 +35,8 @@ namespace TellMe.DAL.Types.Services
             IRepository<StoryRequest, int> storyRequestRepository,
             IRepository<StoryReceiver, int> storyReceiverRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<StoryLike> storyLikeRepository)
+            IRepository<StoryLike> storyLikeRepository,
+            IRepository<ApplicationUser> userRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -44,6 +46,7 @@ namespace TellMe.DAL.Types.Services
             _storyReceiverRepository = storyReceiverRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _storyLikeRepository = storyLikeRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -178,16 +181,16 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
-        public async Task<bool> LikeAsync(string userId, int storyId)
+        public async Task<bool> LikeAsync(string currentUserId, int storyId)
         {
             var liked = await _storyLikeRepository.GetQueryable(true)
-                .AnyAsync(x => x.StoryId == storyId && x.UserId == userId)
+                .AnyAsync(x => x.StoryId == storyId && x.UserId == currentUserId)
                 .ConfigureAwait(false);
             if (!liked)
             {
                 await _storyLikeRepository.SaveAsync(new StoryLike
                 {
-                    UserId = userId,
+                    UserId = currentUserId,
                     StoryId = storyId
                 }, true).ConfigureAwait(false);
 
@@ -198,6 +201,23 @@ namespace TellMe.DAL.Types.Services
 
                 story.LikesCount++;
                 await _storyRepository.SaveAsync(story, true).ConfigureAwait(false);
+
+                var username = await _userRepository
+                    .GetQueryable(true)
+                    .Where(x => x.Id == currentUserId)
+                    .Select(x => x.UserName)
+                    .FirstOrDefaultAsync()
+                    .ConfigureAwait(false);
+                var notification = new Notification
+                {
+                    Date = DateTime.UtcNow,
+                    Type = NotificationTypeEnum.StoryLike,
+                    RecipientId = story.Sender.Id,
+                    Extra = new object(),
+                    Text = $"{username} likes your story \"{story.Title}\""
+                };
+                _notificationRepository.Save(notification, true);
+                await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
 
             return true;
@@ -280,7 +300,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
             return requestDTOs;
         }
 
@@ -288,7 +308,7 @@ namespace TellMe.DAL.Types.Services
         {
             var now = DateTime.UtcNow;
 
-            var entity = new Story()
+            var entity = new Story
             {
                 CreateDateUtc = now,
                 Title = dto.Title,
@@ -375,7 +395,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
             return storyDTO;
         }
 

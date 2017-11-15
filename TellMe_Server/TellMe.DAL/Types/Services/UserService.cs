@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using TellMe.DAL.Contracts.DTO;
 using AutoMapper.QueryableExtensions;
 using System;
-using TellMe.DAL.Contracts.PushNotification;
+using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Services

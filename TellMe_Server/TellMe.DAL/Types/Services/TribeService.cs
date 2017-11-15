@@ -4,12 +4,12 @@ using TellMe.DAL.Contracts.DTO;
 using System;
 using TellMe.DAL.Contracts.Repositories;
 using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Contracts.PushNotification;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using TellMe.DAL.Types.PushNotifications;
 using System.Collections.Generic;
+using TellMe.DAL.Contracts.PushNotifications;
 
 namespace TellMe.DAL.Types.Services
 {
@@ -96,7 +96,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
 
         public async Task<TribeMemberStatus> RejectTribeInvitationAsync(string currentUserId, int tribeId)
@@ -161,7 +161,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
 
             return TribeMemberStatus.Joined;
         }
@@ -237,7 +237,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
 
         private async Task NotifyMemberDeletedFromTribeAsync(IEnumerable<TribeMember> members, TribeDTO result)
@@ -254,7 +254,7 @@ namespace TellMe.DAL.Types.Services
             }).ToArray();
 
             _notificationRepository.AddRange(notifications, true);
-            await _pushNotificationsService.SendPushNotificationAsync(notifications).ConfigureAwait(false);
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
     }
 }

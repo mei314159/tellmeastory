@@ -10,14 +10,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PushSharp.Apple;
 using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Contracts.PushNotification;
+using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Contracts.Repositories;
 using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Types.PushNotifications;
-using TellMe.DAL.Types.Repositories;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.DAL.Types.PushNotifications
 {
     public class PushNotificationsService : IPushNotificationsService
     {
@@ -39,15 +36,17 @@ namespace TellMe.DAL.Types.Services
             _environment = environment;
         }
 
-        public async Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId, string appVersion)
+        public async Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId,
+            string appVersion)
         {
             PushNotificationClient deviceToken = null;
             if (oldToken != null)
             {
                 deviceToken = await _pushTokenRepository
-                .GetQueryable()
-                .FirstOrDefaultAsync(a => a.UserId == userId && a.OsType == osType && a.Token.ToUpper() == oldToken.ToUpper())
-                .ConfigureAwait(false);
+                    .GetQueryable()
+                    .FirstOrDefaultAsync(a =>
+                        a.UserId == userId && a.OsType == osType && a.Token.ToUpper() == oldToken.ToUpper())
+                    .ConfigureAwait(false);
             }
 
             if (deviceToken == null)
@@ -69,15 +68,20 @@ namespace TellMe.DAL.Types.Services
             _pushTokenRepository.PreCommitSave();
         }
 
-        public async Task SendPushNotificationAsync(params Notification[] notifications)
+        public Task SendPushNotificationAsync(Notification notification)
+        {
+            return this.SendPushNotificationsAsync(new[] {notification});
+        }
+
+        public async Task SendPushNotificationsAsync(ICollection<Notification> notifications)
         {
             var receiverIds = notifications.Select(x => x.RecipientId).ToArray();
             var pushNotificationClients = await _pushTokenRepository
-                                        .GetQueryable()
-                                        .AsNoTracking()
-                                        .Where(a => receiverIds.Contains(a.UserId) && a.OsType == OsType.iOS)
-                                        .ToListAsync()
-                                        .ConfigureAwait(false);
+                .GetQueryable()
+                .AsNoTracking()
+                .Where(a => receiverIds.Contains(a.UserId) && a.OsType == OsType.iOS)
+                .ToListAsync()
+                .ConfigureAwait(false);
 
             var pushNotifications = notifications.Select(n =>
             {
@@ -93,13 +97,15 @@ namespace TellMe.DAL.Types.Services
                 };
 
                 var pushClients = pushNotificationClients.Where(x => x.UserId == n.RecipientId).ToArray();
-                return new Tuple<IosNotification<object>, IReadOnlyCollection<PushNotificationClient>>(notification, pushClients);
+                return new Tuple<IosNotification<object>, IReadOnlyCollection<PushNotificationClient>>(notification,
+                    pushClients);
             }).ToArray();
 
             Task.Run(() => SendIosPushNotification<object>(pushNotifications));
         }
 
-        public void SendIosPushNotification<T>(params Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>[] notifications)
+        public void SendIosPushNotification<T>(
+            params Tuple<IosNotification<T>, IReadOnlyCollection<PushNotificationClient>>[] notifications)
         {
             var config = GetApnsConfig();
             var broker = new ApnsServiceBroker(config);
@@ -107,11 +113,10 @@ namespace TellMe.DAL.Types.Services
             {
                 exception.Handle(ex =>
                 {
-
                     // See what kind of exception it was to further diagnose
                     if (ex is ApnsNotificationException)
                     {
-                        var notificationException = (ApnsNotificationException)ex;
+                        var notificationException = (ApnsNotificationException) ex;
 
                         // Deal with the failed notification
                         var apnsNotification = notificationException.Notification;
@@ -159,9 +164,10 @@ namespace TellMe.DAL.Types.Services
         private ApnsConfiguration GetApnsConfig()
         {
             var environment = _pushSettings.IsProductionMode
-                               ? ApnsConfiguration.ApnsServerEnvironment.Production
-                               : ApnsConfiguration.ApnsServerEnvironment.Sandbox;
-            var config = new ApnsConfiguration(environment, Path.Combine(_environment.ContentRootPath, _pushSettings.Certificate), _pushSettings.Password);
+                ? ApnsConfiguration.ApnsServerEnvironment.Production
+                : ApnsConfiguration.ApnsServerEnvironment.Sandbox;
+            var config = new ApnsConfiguration(environment,
+                Path.Combine(_environment.ContentRootPath, _pushSettings.Certificate), _pushSettings.Password);
             return config;
         }
     }

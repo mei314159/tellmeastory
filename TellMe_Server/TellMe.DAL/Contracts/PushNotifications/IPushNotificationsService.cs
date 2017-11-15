@@ -1,14 +1,15 @@
-﻿using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Contracts.DTO;
 
-namespace TellMe.DAL.Contracts.PushNotification
+namespace TellMe.DAL.Contracts.PushNotifications
 {
     public interface IPushNotificationsService
     {
         Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId, string appVersion);
         
-		Task SendPushNotificationAsync(params Notification[] notifications);
+		Task SendPushNotificationAsync(Notification notification);
+        
+        Task SendPushNotificationsAsync(ICollection<Notification> notifications);
     }
 }
