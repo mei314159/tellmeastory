@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace TellMe.DAL.Types.Domain
+﻿namespace TellMe.DAL.Types.Domain
 {
     public class RefreshToken : EntityBase<int>
     {

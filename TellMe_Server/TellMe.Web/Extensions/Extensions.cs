@@ -6,7 +6,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace TellMe.Web.Extensions
 {
-    public static class IFormFileExtensions
+    public static class FormFileExtensions
     {
         public static string GetFilename(this IFormFile file) =>
         ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.ToString().Trim('"');

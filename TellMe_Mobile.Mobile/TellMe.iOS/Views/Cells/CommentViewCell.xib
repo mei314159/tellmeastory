@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <dependencies>
         <deployment identifier="iOS"/>
@@ -14,11 +14,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="75" id="cxk-wN-pdQ" customClass="CommentViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="70" id="cxk-wN-pdQ" customClass="CommentViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxk-wN-pdQ" id="YTl-1W-gDM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="74.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="69"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="UserPic" translatesAutoresizingMaskIntoConstraints="NO" id="1147" customClass="Picture">
@@ -78,6 +78,34 @@
                         <color key="textColor" white="0.66666666666666696" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="5295" translatesAutoresizingMaskIntoConstraints="NO" customClass="Button">
+                        <rect key="frame" x="76" y="49" width="33" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <state key="normal" title="Reply">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <constraints>
+                            <constraint id="5784" firstItem="5295" firstAttribute="height" constant="15"/>
+                            <constraint id="5785" firstItem="5295" firstAttribute="width" constant="33"/>
+                        </constraints>
+                        <connections>
+                            <action selector="ReplyButton_TouchUpInside:" destination="cxk-wN-pdQ" id="5844" eventType="touchUpInside"/>
+                        </connections>
+                    </button>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" id="7120" translatesAutoresizingMaskIntoConstraints="NO" distribution="fillProportionally" clipsSubviews="YES" verticalCompressionResistancePriority="749" verticalHuggingPriority="1">
+                        <rect key="frame" x="40" y="63" width="272" height="2"/>
+                        <subviews/>
+                    </stackView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="17352" translatesAutoresizingMaskIntoConstraints="NO" customClass="Button" hidden="YES">
+                        <rect key="frame" x="119" y="49" width="77" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <state key="normal" title="Show Replies">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="ShowRepliesButton_TouchUpInside:" destination="cxk-wN-pdQ" id="17512" eventType="touchUpInside"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstItem="1147" firstAttribute="top" secondItem="YTl-1W-gDM" secondAttribute="top" constant="5" id="1580"/>
@@ -89,6 +117,15 @@
                     <constraint firstItem="3759" firstAttribute="leading" secondItem="1680" secondAttribute="leading" id="4383"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="3759" secondAttribute="trailing" constant="5" id="4408"/>
                     <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="3759" secondAttribute="bottom" constant="5" id="4530"/>
+                    <constraint id="5782" firstItem="5295" firstAttribute="centerY" secondItem="3759" secondAttribute="centerY"/>
+                    <constraint id="5783" firstItem="5295" firstAttribute="leading" secondItem="3759" secondAttribute="trailing" constant="10"/>
+                    <constraint id="7121" firstItem="7120" firstAttribute="top" secondItem="3759" secondAttribute="bottom"/>
+                    <constraint id="7122" firstItem="YTl-1W-gDM" firstAttribute="trailing" secondItem="7120" secondAttribute="trailing" constant="8"/>
+                    <constraint id="7124" firstItem="7120" firstAttribute="leading" secondItem="3759" secondAttribute="leading"/>
+                    <constraint id="7125" firstItem="YTl-1W-gDM" firstAttribute="bottom" secondItem="7120" secondAttribute="bottom" constant="5"/>
+                    <constraint id="17354" firstItem="17352" firstAttribute="leading" secondItem="5295" secondAttribute="trailing" constant="10"/>
+                    <constraint id="17355" firstItem="17352" firstAttribute="centerY" secondItem="5295" secondAttribute="centerY"/>
+                    <constraint id="17356" firstItem="17352" firstAttribute="height" secondItem="5295" secondAttribute="height"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -97,11 +134,25 @@
                 <outlet property="Text" destination="3216" id="name-outlet-3216"/>
                 <outlet property="Time" destination="3759" id="name-outlet-3759"/>
                 <outlet property="UserName" destination="2394" id="name-outlet-2394"/>
+                <outlet property="ReplyButton" destination="5295" id="name-outlet-5295"/>
+                <outlet property="Replies" destination="7120" id="name-outlet-7120"/>
+                <outlet property="ShowRepliesButton" destination="17352" id="name-outlet-17352"/>
             </connections>
             <point key="canvasLocation" x="-5" y="39"/>
         </tableViewCell>
     </objects>
     <resources>
         <image name="UserPic" width="36" height="36"/>
+        <image name="Contacts" width="192" height="192"/>
+        <image name="Play" width="64" height="64"/>
+        <image name="Bell" width="25" height="25"/>
+        <image name="Storytellers" width="25" height="25"/>
+        <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
+        <image name="Send" width="30" height="30"/>
+        <image name="Comment" width="30" height="30"/>
+        <image name="Replay" width="64" height="64"/>
+        <image name="Heart" width="30" height="30"/>
+        <image name="Heart-O" width="30" height="30"/>
     </resources>
 </document>

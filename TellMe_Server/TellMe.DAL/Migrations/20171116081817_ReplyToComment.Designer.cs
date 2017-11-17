@@ -2,14 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
+using TellMe.DAL;
+using TellMe.DAL.Types.Domain;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171116081817_ReplyToComment")]
+    partial class ReplyToComment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,8 +194,6 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("AuthorId");
 
                     b.Property<DateTime>("CreateDateUtc");
-
-                    b.Property<int>("RepliesCount");
 
                     b.Property<int?>("ReplyToCommentId");
 
@@ -501,7 +506,8 @@ namespace TellMe.DAL.Migrations
 
                     b.HasOne("TellMe.DAL.Types.Domain.Comment", "ReplyToComment")
                         .WithMany()
-                        .HasForeignKey("ReplyToCommentId");
+                        .HasForeignKey("ReplyToCommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("TellMe.DAL.Types.Domain.Story", "Story")
                         .WithMany("Comments")

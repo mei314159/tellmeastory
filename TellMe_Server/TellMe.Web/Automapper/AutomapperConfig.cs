@@ -53,7 +53,11 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.AuthorPictureUrl, x => x.MapFrom(z => z.Author.PictureUrl))
                     .ForMember(x => x.AuthorUserName, x => x.MapFrom(z => z.Author.UserName));
 
-                cfg.CreateMap<CommentDTO, Comment>();
+                cfg.CreateMap<CommentDTO, Comment>()
+                    .ForMember(x => x.Text, x => x.MapFrom(z => z.Text))
+                    .ForMember(x => x.AuthorId, x => x.MapFrom(z => z.AuthorId))
+                    .ForMember(x => x.ReplyToCommentId, x => x.MapFrom(z => z.ReplyToCommentId))
+                    .ForAllOtherMembers(x => x.Ignore());
 
                 cfg.CreateMap<Tribe, TribeDTO>()
                     .ForMember(x => x.CreatorName, x =>

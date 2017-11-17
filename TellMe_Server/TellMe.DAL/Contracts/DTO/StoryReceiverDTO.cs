@@ -1,5 +1,3 @@
-using TellMe.DAL.Types.Domain;
-
 namespace TellMe.DAL.Contracts.DTO
 {
     public class StoryReceiverDTO

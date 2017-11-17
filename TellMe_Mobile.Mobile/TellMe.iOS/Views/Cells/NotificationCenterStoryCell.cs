@@ -24,15 +24,15 @@ namespace TellMe.iOS.Views.Cells
             // Note: this .ctor should not contain any initialization logic.
         }
 
-        private NotificationDTO notification;
+        private NotificationDTO _notification;
 
         public NotificationDTO Notification
         {
-            get { return notification; }
+            get => _notification;
 
             set
             {
-                notification = value;
+                _notification = value;
                 Initialize();
             }
         }
@@ -47,12 +47,10 @@ namespace TellMe.iOS.Views.Cells
 
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString(Notification.Text));
-            nint index = default(nint);
-            nint length = default(nint);
 
-            var storyDTO = ((JObject) notification.Extra).ToObject<StoryDTO>();
-            index = Notification.Text.IndexOf(storyDTO.SenderName, StringComparison.Ordinal);
-            length = storyDTO.SenderName.Length;
+            var storyDTO = ((JObject) _notification.Extra).ToObject<StoryDTO>();
+            nint index = Notification.Text.IndexOf(storyDTO.SenderName, StringComparison.Ordinal);
+            nint length = storyDTO.SenderName.Length;
             PictureView.SetImage(new NSUrl(storyDTO.SenderPictureUrl));
             StoryPreview.SetImage(new NSUrl(storyDTO.PreviewUrl));
             if (index >= 0)

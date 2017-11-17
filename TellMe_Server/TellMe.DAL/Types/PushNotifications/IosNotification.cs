@@ -5,7 +5,7 @@ namespace TellMe.DAL.Types.PushNotifications
     public class IosNotification<T>
     {
         [JsonProperty(PropertyName = "aps")]
-        public IosNotificationAPS Data { get; set; }
+        public IosNotificationAps Data { get; set; }
 
         [JsonProperty(PropertyName = "notificationType")]
         public NotificationTypeEnum NotificationType { get; set; }

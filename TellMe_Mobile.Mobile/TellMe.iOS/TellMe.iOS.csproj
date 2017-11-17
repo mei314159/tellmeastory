@@ -213,6 +213,7 @@
     <InterfaceDefinition Include="Views\Cells\CommentViewCell.xib" />
     <InterfaceDefinition Include="Views\Cells\LoadMoreButtonCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoryViewCell.xib" />
+    <InterfaceDefinition Include="Views\CommentView.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -348,6 +349,10 @@
       <DependentUpon>StoryViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\IoC.cs" />
+    <Compile Include="Views\CommentView.cs" />
+    <Compile Include="Views\CommentView.designer.cs">
+      <DependentUpon>CommentView.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TellMe.Core\TellMe.Core.csproj">

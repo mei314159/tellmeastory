@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using TellMe.DAL.Contracts.Domain;
-using TellMe.DAL.Types.Domain;
+﻿using TellMe.DAL.Contracts.Domain;
 
 namespace TellMe.DAL.Types.Domain
 {

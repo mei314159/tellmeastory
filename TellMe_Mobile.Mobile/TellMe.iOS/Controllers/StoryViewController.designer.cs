@@ -18,11 +18,23 @@ namespace TellMe.iOS
 
 
         [Outlet]
+        TellMe.iOS.Button CancelButton { get; set; }
+
+
+        [Outlet]
+        UIKit.NSLayoutConstraint NewCommentHeight { get; set; }
+
+
+        [Outlet]
         UIKit.UITextView NewCommentText { get; set; }
 
 
         [Outlet]
-        UIKit.NSLayoutConstraint NewCommentWrapperHeight { get; set; }
+        UIKit.UILabel ReplyToLabel { get; set; }
+
+
+        [Outlet]
+        UIKit.NSLayoutConstraint ReplyToWrapperHeight { get; set; }
 
 
         [Outlet]
@@ -31,6 +43,10 @@ namespace TellMe.iOS
 
         [Outlet]
         UIKit.UITableView TableView { get; set; }
+
+
+        [Action ("CancelButtonTouched:forEvent:")]
+        partial void CancelButtonTouched (TellMe.iOS.Button sender, UIKit.UIEvent @event);
 
 
         [Action ("SendButtonTouched:")]
@@ -43,14 +59,29 @@ namespace TellMe.iOS
                 BottomOffset = null;
             }
 
+            if (CancelButton != null) {
+                CancelButton.Dispose ();
+                CancelButton = null;
+            }
+
+            if (NewCommentHeight != null) {
+                NewCommentHeight.Dispose ();
+                NewCommentHeight = null;
+            }
+
             if (NewCommentText != null) {
                 NewCommentText.Dispose ();
                 NewCommentText = null;
             }
 
-            if (NewCommentWrapperHeight != null) {
-                NewCommentWrapperHeight.Dispose ();
-                NewCommentWrapperHeight = null;
+            if (ReplyToLabel != null) {
+                ReplyToLabel.Dispose ();
+                ReplyToLabel = null;
+            }
+
+            if (ReplyToWrapperHeight != null) {
+                ReplyToWrapperHeight.Dispose ();
+                ReplyToWrapperHeight = null;
             }
 
             if (SendButton != null) {

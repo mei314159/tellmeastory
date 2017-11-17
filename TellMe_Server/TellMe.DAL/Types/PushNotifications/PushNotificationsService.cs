@@ -18,19 +18,15 @@ namespace TellMe.DAL.Types.PushNotifications
 {
     public class PushNotificationsService : IPushNotificationsService
     {
-        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
         private readonly PushSettings _pushSettings;
 
         private readonly IHostingEnvironment _environment;
 
-        public PushNotificationsService(
-            IRepository<ApplicationUser, string> UserRepository,
-            IRepository<PushNotificationClient, int> pushTokenRepository,
+        public PushNotificationsService(IRepository<PushNotificationClient, int> pushTokenRepository,
             IOptions<PushSettings> pushSettings,
             IHostingEnvironment environment)
         {
-            _userRepository = UserRepository;
             _pushTokenRepository = pushTokenRepository;
             _pushSettings = pushSettings.Value;
             _environment = environment;
@@ -87,7 +83,7 @@ namespace TellMe.DAL.Types.PushNotifications
             {
                 var notification = new IosNotification<object>
                 {
-                    Data = new IosNotificationAPS
+                    Data = new IosNotificationAps
                     {
                         Message = n.Text
                     },
@@ -101,7 +97,7 @@ namespace TellMe.DAL.Types.PushNotifications
                     pushClients);
             }).ToArray();
 
-            Task.Run(() => SendIosPushNotification<object>(pushNotifications));
+            Task.Run(() => SendIosPushNotification(pushNotifications));
         }
 
         public void SendIosPushNotification<T>(

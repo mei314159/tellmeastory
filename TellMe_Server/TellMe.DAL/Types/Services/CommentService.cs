@@ -50,8 +50,18 @@ namespace TellMe.DAL.Types.Services
             entity.CreateDateUtc = now;
             entity.AuthorId = currentUserId;
             entity.StoryId = storyId;
-
             await _commentRepository.SaveAsync(entity, true).ConfigureAwait(false);
+
+            Comment parentComment = null;
+            if (comment.ReplyToCommentId != null)
+            {
+                parentComment = await _commentRepository
+                    .GetQueryable()
+                    .Where(x => x.Id == comment.ReplyToCommentId)
+                    .FirstOrDefaultAsync().ConfigureAwait(false);
+                parentComment.RepliesCount++;
+                await _commentRepository.SaveAsync(parentComment, true).ConfigureAwait(false);
+            }
 
             entity = await _commentRepository.GetQueryable(true).Include(x => x.Author)
                 .FirstOrDefaultAsync(x => x.Id == entity.Id).ConfigureAwait(false);
@@ -105,6 +115,18 @@ namespace TellMe.DAL.Types.Services
                 Text = $"{comment.AuthorUserName} commented your story \"{story.Title}\""
             });
 
+            if (parentComment != null)
+            {
+                notifications.Add(new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.StoryCommentReply,
+                    RecipientId = parentComment.AuthorId,
+                    Extra = comment,
+                    Text =
+                        $"{comment.AuthorUserName} replied to your comment to the {story.Sender.UserName}'s story \"{story.Title}\""
+                });
+            }
 
             _notificationRepository.AddRange(notifications, true);
             _unitOfWork.SaveChanges();
@@ -119,8 +141,15 @@ namespace TellMe.DAL.Types.Services
 
             var comment = await _commentRepository
                 .GetQueryable()
+                .Include(x => x.ReplyToComment)
                 .FirstOrDefaultAsync(x => x.Id == commentId && x.StoryId == storyId && x.AuthorId == currentUserId)
                 .ConfigureAwait(false);
+
+            if (comment.ReplyToComment != null)
+            {
+                comment.ReplyToComment.RepliesCount--;
+                await _commentRepository.SaveAsync(comment.ReplyToComment, true).ConfigureAwait(false);
+            }
 
             var story = await _storyRepository
                 .GetQueryable()
@@ -128,6 +157,7 @@ namespace TellMe.DAL.Types.Services
                 .FirstOrDefaultAsync().ConfigureAwait(false);
             story.CommentsCount--;
             await _storyRepository.SaveAsync(story, true).ConfigureAwait(false);
+
 
             if (comment == null)
             {
@@ -138,12 +168,14 @@ namespace TellMe.DAL.Types.Services
             _unitOfWork.SaveChanges();
         }
 
-        public async Task<BulkDTO<CommentDTO>> GetAllAsync(int storyId, string currentUserId, DateTime olderThanUtc)
+        public async Task<BulkDTO<CommentDTO>> GetAllAsync(int storyId, string currentUserId, DateTime olderThanUtc,
+            int? replyToCommentId = null)
         {
             var comments = await _commentRepository
                 .GetQueryable(true)
                 .Include(x => x.Author)
-                .Where(x => x.StoryId == storyId && x.CreateDateUtc < olderThanUtc)
+                .Where(x => x.StoryId == storyId && x.CreateDateUtc < olderThanUtc &&
+                            x.ReplyToCommentId == replyToCommentId)
                 .OrderByDescending(x => x.CreateDateUtc)
                 .Take(5)
                 .ProjectTo<CommentDTO>()

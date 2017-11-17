@@ -15,12 +15,9 @@ namespace TellMe.Core.Types.DataServices.Remote
             _apiProvider = apiProvider;
         }
 
-        public async Task<Result<CommentDTO>> AddCommentAsync(int storyId, string text)
+        public async Task<Result<CommentDTO>> AddCommentAsync(CommentDTO comment)
         {
-            var result = await this._apiProvider.PostAsync<CommentDTO>($"stories/{storyId}/comments", new CommentDTO
-            {
-                Text = text
-            }).ConfigureAwait(false);
+            var result = await this._apiProvider.PostAsync<CommentDTO>($"stories/{comment.StoryId}/comments", comment).ConfigureAwait(false);
 
             return result;
         }
@@ -38,6 +35,15 @@ namespace TellMe.Core.Types.DataServices.Remote
             var olderThan = olderThanUtc ?? DateTime.MaxValue;
             var result = await this._apiProvider
                 .GetAsync<BulkDTO<CommentDTO>>($"stories/{storyId}/comments/older-than/{olderThan.Ticks}")
+                .ConfigureAwait(false);
+            return result;
+        }
+        
+        public async Task<Result<BulkDTO<CommentDTO>>> GetRepliesAsync(int storyId, int commentId, DateTime? olderThanUtc = null)
+        {
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this._apiProvider
+                .GetAsync<BulkDTO<CommentDTO>>($"stories/{storyId}/comments/{commentId}/replies/older-than/{olderThan.Ticks}")
                 .ConfigureAwait(false);
             return result;
         }

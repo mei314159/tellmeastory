@@ -11,6 +11,7 @@ using TellMe.iOS.Views.Cells;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using ModelIO;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
@@ -37,13 +38,13 @@ namespace TellMe.iOS
         private IRouter _router;
         private StoryViewCell _storyView;
         private LoadMoreButtonCell _loadMoreButton;
+        private CGRect _originalImageFrame;
+        private bool _showLoadMoreButton;
+        private CommentDTO _replyToComent;
 
         public StoryViewController(IntPtr handle) : base(handle)
         {
         }
-
-        private CGRect _originalImageFrame;
-        private bool _showLoadMoreButton;
 
         private int CommentCellOffset => _showLoadMoreButton ? 2 : 1;
 
@@ -79,6 +80,7 @@ namespace TellMe.iOS
             TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             TableView.RegisterNibForCellReuse(CommentViewCell.Nib, CommentViewCell.Key);
             TableView.DelaysContentTouches = false;
+            SetReplyToBlock(null);
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard)
             {
                 CancelsTouchesInView = false
@@ -122,7 +124,7 @@ namespace TellMe.iOS
             UIView.BeginAnimations("AnimateForKeyboard");
             UIView.SetAnimationBeginsFromCurrentState(true);
             UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
-            UIView.SetAnimationCurve((UIViewAnimationCurve) UIKeyboard.AnimationCurveFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
 
             //Pass the notification, calculating keyboard height, etc.
             var keyboardFrame = visible
@@ -205,6 +207,7 @@ namespace TellMe.iOS
             SendButton.Enabled = false;
             var text = this.NewCommentText.Text;
             this.NewCommentText.Text = null;
+            NewCommentText_Changed(this.NewCommentText, null);
 
             var authInfo = _localAccountService.GetAuthInfo();
             var comment = new CommentDTO
@@ -214,52 +217,67 @@ namespace TellMe.iOS
                 AuthorUserName = authInfo.Account.UserName,
                 AuthorPictureUrl = authInfo.Account.PictureUrl,
                 StoryId = Story.Id,
+                ReplyToCommentId = _replyToComent?.Id,
                 CreateDateUtc = DateTime.UtcNow
             };
+            if (_replyToComent == null)
+            {
+                DisplayComments(true, comment);
+            }
+            else
+            {
+                _replyToComent.RepliesCount++;
+                DisplayReplies(true, _replyToComent, comment);
+            }
 
-            DisplayComments(true, comment);
+            SetReplyToBlock(null);
             SendButton.Enabled = true;
 
-            var result = await _commentsService.AddCommentAsync(Story.Id, text).ConfigureAwait(false);
-
+            var result = await _commentsService.AddCommentAsync(comment).ConfigureAwait(false);
             InvokeOnMainThread(() =>
             {
-                if (result.IsSuccess)
-                {
-                    UpdateComments(comment, result.Data);
-                }
-                else
-                {
-                    DeleteComment(comment);
-                }
+                UpdateComments(comment, result);
             });
         }
 
-        private void UpdateComments(CommentDTO comment, CommentDTO newComment)
+        partial void CancelButtonTouched(Button sender, UIEvent @event)
         {
-            var index = _commentsList.IndexOf(comment);
-            if (index > -1)
-            {
-                comment.Id = newComment.Id;
-                comment.CreateDateUtc = newComment.CreateDateUtc;
+            SetReplyToBlock(null);
+        }
 
-                var indexPath = NSIndexPath.FromRowSection(index + CommentCellOffset, 0);
-                if (TableView.IndexPathsForVisibleRows.Any(
-                    x => x.Row == indexPath.Row && x.Section == indexPath.Section))
-                {
-                    TableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
-                }
+        private void UpdateComments(CommentDTO comment, Result<CommentDTO> result)
+        {
+            if (!result.IsSuccess)
+            {
+                DeleteComment(comment);
+                return;
             }
+
+            comment.Id = result.Data.Id;
+            comment.CreateDateUtc = result.Data.CreateDateUtc;
         }
 
         private void DeleteComment(CommentDTO comment)
         {
-            var index = _commentsList.IndexOf(comment);
-            if (index > -1)
+            if (comment.ReplyToCommentId == null)
             {
-                _commentsList.RemoveAt(index);
-                TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index + CommentCellOffset, 0)},
-                    UITableViewRowAnimation.Automatic);
+                var index = _commentsList.IndexOf(comment);
+                if (index > -1)
+                {
+                    _commentsList.RemoveAt(index);
+                    TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index + CommentCellOffset, 0) },
+                        UITableViewRowAnimation.Automatic);
+                }
+            }
+            else
+            {
+                var index = _commentsList.IndexOf(x => x.Id == comment.ReplyToCommentId);
+                if (index > -1)
+                {
+                    var cell = (CommentViewCell)TableView.CellAt(NSIndexPath.FromRowSection(index + CommentCellOffset, 0));
+                    cell.DeleteComment(comment);
+                    cell.Comment.RepliesCount--;
+                }
             }
         }
 
@@ -282,7 +300,22 @@ namespace TellMe.iOS
             }
         }
 
-        private void DisplayComments(bool addToHead = false, params CommentDTO[] comments)
+        private void DisplayReplies(bool addToHead, CommentDTO replyToComment, params CommentDTO[] comments)
+        {
+            if (comments == null || comments.Length == 0)
+            {
+                return;
+            }
+
+            var index = _commentsList.IndexOf(replyToComment);
+            var replyRowIndexPath = NSIndexPath.FromRowSection(index + CommentCellOffset, 0);
+            var cell = (CommentViewCell)TableView.CellAt(replyRowIndexPath);
+            cell.AddComments(addToHead, comments);
+            TableView.ReloadRows(new[] { replyRowIndexPath }, UITableViewRowAnimation.Automatic);
+            TableView.LayoutSubviews();
+        }
+
+        private void DisplayComments(bool addToHead, params CommentDTO[] comments)
         {
             if (comments == null || comments.Length == 0)
             {
@@ -304,33 +337,33 @@ namespace TellMe.iOS
             InvokeOnMainThread(() =>
             {
                 TableView.ReloadData();
-                if (scrollToComments)
-                {
-                    var index = addToHead
-                        ? _commentsList.Count - comments.Length - 1 + CommentCellOffset
-                        : (this.CommentCellOffset);
-                    TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.Top, true);
-                }
+                if (!scrollToComments)
+                    return;
+
+                var index = addToHead
+                    ? _commentsList.Count - comments.Length - 1 + CommentCellOffset
+                    : this.CommentCellOffset;
+                TableView.ScrollToRow(NSIndexPath.FromRowSection(index, 0), UITableViewScrollPosition.Top, true);
             });
         }
 
         private void NewCommentText_Changed(object sender, EventArgs e)
         {
-            var textView = (UITextView) sender;
+            var textView = (UITextView)sender;
             var frame = textView.SizeThatFits(new CGSize(textView.Frame.Width, nfloat.MaxValue));
-            nfloat newHeight = frame.Height > 100 ? 100 : frame.Height;
+            var newHeight = frame.Height > 100 ? 100 : frame.Height;
             var delta = newHeight - textView.Frame.Height;
             TableView.SetContentOffset(new CGPoint(0, TableView.ContentOffset.Y + delta), false);
             textView.Frame = new CGRect(textView.Frame.Location, new CGSize(textView.Frame.Width, newHeight));
-            NewCommentWrapperHeight.Constant = textView.Frame.Height + 10;
+            NewCommentHeight.Constant = textView.Frame.Height;
             View.UpdateConstraints();
         }
 
         private bool NewCommentText_ShouldChangeText(UITextView textView, NSRange range, string replacementString)
         {
-            string text = textView.Text;
-            string newText = text.Substring(0, (int) range.Location) + replacementString +
-                             text.Substring((int) (range.Location + range.Length));
+            var text = textView.Text;
+            var newText = text.Substring(0, (int)range.Location) + replacementString +
+                          text.Substring((int)(range.Location + range.Length));
 
             return newText.Length <= 500; //max length
         }
@@ -398,7 +431,7 @@ namespace TellMe.iOS
                 if (_loadMoreButton == null)
                 {
                     this._loadMoreButton = LoadMoreButtonCell.Create(
-                        async (b) =>
+                        async b =>
                         {
                             await this.LoadCommentsAsync(_commentsList.First().CreateDateUtc).ConfigureAwait(false);
                         }, "More comments");
@@ -407,10 +440,30 @@ namespace TellMe.iOS
                 return this._loadMoreButton;
             }
 
-            var commentCell = TableView.DequeueReusableCell(CommentViewCell.Key, indexPath) as CommentViewCell;
+            var commentCell = (CommentViewCell)TableView.DequeueReusableCell(CommentViewCell.Key, indexPath);
             commentCell.Comment = _commentsList[indexPath.Row - CommentCellOffset];
             commentCell.ReceiverSelected = CommentCell_ReceiverSelected;
+            commentCell.ReplyButtonTouched = CommentCell_ReplyButtonTouched;
+            commentCell.LoadRepliesButtonTouched = CommentCell_LoadRepliesButtonTouched;
             return commentCell;
+        }
+
+        private async void CommentCell_LoadRepliesButtonTouched(CommentDTO comment)
+        {
+            var olderThanUtc = comment.Replies?.FirstOrDefault()?.CreateDateUtc;
+            var result = await _commentsService.GetRepliesAsync(Story.Id, comment.Id, olderThanUtc).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                InvokeOnMainThread(() =>
+                {
+                    DisplayReplies(false, comment, result.Data.Items);
+                });
+            }
+        }
+
+        private void CommentCell_ReplyButtonTouched(CommentDTO comment)
+        {
+            SetReplyToBlock(comment);
         }
 
         private void CommentCell_ReceiverSelected(CommentDTO comment)
@@ -422,6 +475,24 @@ namespace TellMe.iOS
         {
             if (this.Story.Id == story.Id)
                 _storyView.UpdateLikeButton(story);
+        }
+
+        private void SetReplyToBlock(CommentDTO comment)
+        {
+            _replyToComent = comment;
+            if (comment == null)
+            {
+                ReplyToWrapperHeight.Constant = 0;
+            }
+            else
+            {
+                ReplyToWrapperHeight.Constant = 18;
+                var text = new NSMutableAttributedString();
+                text.Append(new NSAttributedString("Reply to: "));
+                text.Append(new NSAttributedString(comment.AuthorUserName,
+                    UIFont.BoldSystemFontOfSize(ReplyToLabel.Font.PointSize)));
+                ReplyToLabel.AttributedText = text;
+            }
         }
     }
 }

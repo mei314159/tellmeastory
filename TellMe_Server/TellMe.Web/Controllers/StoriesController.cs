@@ -116,10 +116,10 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPost("{storyId}/reject-request")]
-        public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int? notificationId)
+        public async Task<IActionResult> RejectFriendshipRequestAsync(int storyId, [FromBody] int notificationId)
         {
             var storyStatus = await _storyService.RejectRequestAsync(this.UserId, storyId);
-            await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
+            await _notificationService.HandleNotificationAsync(this.UserId, notificationId);
             return Ok(storyStatus);
         }
     }

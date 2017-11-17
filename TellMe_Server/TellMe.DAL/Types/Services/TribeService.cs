@@ -20,22 +20,19 @@ namespace TellMe.DAL.Types.Services
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<Tribe, int> _tribeRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
-        private readonly IRepository<Friendship, int> _friendshipRepository;
 
         public TribeService(
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService,
             IRepository<Notification, int> notificationRepository,
             IRepository<Tribe, int> tribeRepository,
-            IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<Friendship, int> friendshipRepository)
+            IRepository<TribeMember, int> tribeMemberRepository)
         {
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
             _notificationRepository = notificationRepository;
             _tribeRepository = tribeRepository;
             _tribeMemberRepository = tribeMemberRepository;
-            _friendshipRepository = friendshipRepository;
         }
         public async Task<TribeDTO> CreateAsync(string currentUserId, TribeDTO dto)
         {
@@ -61,8 +58,8 @@ namespace TellMe.DAL.Types.Services
             {
                 MembershipStatus = TribeMemberStatus.Creator
             };
-            Mapper.Map<Tribe, TribeDTO>(entity, result);
-            Mapper.Map<ApplicationUser, TribeDTO>(creator, result);
+            Mapper.Map(entity, result);
+            Mapper.Map(creator, result);
             await NotifyMembersAboutInvitationToTribeAsync(entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
             result.Members = Mapper.Map<List<TribeMemberDTO>>(entity.Members);
             return result;

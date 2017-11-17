@@ -72,7 +72,7 @@ namespace TellMe.Web
             services.AddTransient<ITribeService, TribeService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddTransient<ICommentService, CommentService>();
-            services.AddSingleton<IHostingEnvironment>(Environment);
+            services.AddSingleton(Environment);
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
             services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
