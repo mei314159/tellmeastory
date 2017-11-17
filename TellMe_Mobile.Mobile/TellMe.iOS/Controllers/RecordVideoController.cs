@@ -32,10 +32,7 @@ namespace TellMe.iOS
         string IRecordVideoView.DurationLabel
         {
             get => this.Duration.Text;
-            set
-            {
-                InvokeOnMainThread(() => Duration.Text = value);
-            }
+            set { InvokeOnMainThread(() => Duration.Text = value); }
         }
 
         IButton IRecordVideoView.RecordButton => this.RecordButton;
@@ -108,7 +105,8 @@ namespace TellMe.iOS
             base.ViewWillDisappear(animated);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
         public void StartCapture(string videoPath)
         {
@@ -129,8 +127,11 @@ namespace TellMe.iOS
             _device.Dispose();
             _input.Dispose();
 
-            var newPosition = currentPosition == AVCaptureDevicePosition.Front ? AVCaptureDevicePosition.Back : AVCaptureDevicePosition.Front;
-            _device = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaType.Video, newPosition);
+            var newPosition = currentPosition == AVCaptureDevicePosition.Front
+                ? AVCaptureDevicePosition.Back
+                : AVCaptureDevicePosition.Front;
+            _device = AVCaptureDevice.GetDefaultDevice(AVCaptureDeviceType.BuiltInWideAngleCamera, AVMediaType.Video,
+                newPosition);
             _input = AVCaptureDeviceInput.FromDevice(_device);
             this._session.AddInput(_input);
             _session.StartRunning();

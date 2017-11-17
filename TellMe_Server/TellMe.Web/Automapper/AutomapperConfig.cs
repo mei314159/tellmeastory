@@ -1,10 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
 using System.Linq;
+using AutoMapper;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Types.Domain;
-using System;
 
-namespace TellMe.Web.AutoMapper
+namespace TellMe.Web.Automapper
 {
     public static class AutomapperConfig
     {

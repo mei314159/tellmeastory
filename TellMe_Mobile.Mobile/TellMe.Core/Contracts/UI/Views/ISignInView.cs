@@ -7,6 +7,4 @@ namespace TellMe.Core.Contracts.UI.Views
         ITextInput EmailField { get; }
         ITextInput PasswordField { get; }
     }
-
-
 }

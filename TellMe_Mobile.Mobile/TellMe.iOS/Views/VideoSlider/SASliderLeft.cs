@@ -10,7 +10,6 @@
 //
 
 
-
 using System;
 using Foundation;
 using UIKit;
@@ -44,13 +43,16 @@ namespace TellMe.iOS
             var color6 = UIColor.FromRGBA(0.196f, 0.161f, 0.047f, 1.000f);
 
             //// Gradient Declarations
-            var gradient3Colors = new CGColor[] { gradientColor2.CGColor, BlendedColor(gradientColor2, 0.5f, color5).CGColor, color5.CGColor };
-            var gradient3Locations = new nfloat[] { 0.0f, 0.0f, 0.49f };
+            var gradient3Colors = new CGColor[]
+                {gradientColor2.CGColor, BlendedColor(gradientColor2, 0.5f, color5).CGColor, color5.CGColor};
+            var gradient3Locations = new nfloat[] {0.0f, 0.0f, 0.49f};
             var gradient3 = new CGGradient(colorSpace, gradient3Colors, gradient3Locations);
 
             //// Rounded Rectangle Drawing
-            var roundedRectangleRect = new CGRect(bubbleFrame.GetMinX(), bubbleFrame.GetMinY(), bubbleFrame.Width, bubbleFrame.Height);
-            var roundedRectanglePath = UIBezierPath.FromRoundedRect(roundedRectangleRect, UIRectCorner.TopLeft | UIRectCorner.BottomLeft, new CGSize(5.0f, 5.0f));
+            var roundedRectangleRect = new CGRect(bubbleFrame.GetMinX(), bubbleFrame.GetMinY(), bubbleFrame.Width,
+                bubbleFrame.Height);
+            var roundedRectanglePath = UIBezierPath.FromRoundedRect(roundedRectangleRect,
+                UIRectCorner.TopLeft | UIRectCorner.BottomLeft, new CGSize(5.0f, 5.0f));
             roundedRectanglePath.ClosePath();
             context.SaveState();
             roundedRectanglePath.AddClip();
@@ -66,11 +68,26 @@ namespace TellMe.iOS
 
             //// Bezier 3 Drawing
             var bezier3Path = new UIBezierPath();
-            bezier3Path.MoveTo(new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
-            bezier3Path.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
-            bezier3Path.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height));
-            bezier3Path.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
-            bezier3Path.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
+            bezier3Path.MoveTo(new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
+            bezier3Path.AddCurveToPoint(
+                new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
+            bezier3Path.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height));
+            bezier3Path.AddCurveToPoint(
+                new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.35577f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
+            bezier3Path.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.42806f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
             bezier3Path.ClosePath();
             color6.SetFill();
             bezier3Path.Fill();
@@ -78,11 +95,26 @@ namespace TellMe.iOS
 
             //// Bezier Drawing
             var bezierPath = new UIBezierPath();
-            bezierPath.MoveTo(new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
-            bezierPath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
-            bezierPath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height));
-            bezierPath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height), new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
-            bezierPath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width, bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
+            bezierPath.MoveTo(new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
+            bezierPath.AddCurveToPoint(
+                new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
+            bezierPath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.74629f * bubbleFrame.Height));
+            bezierPath.AddCurveToPoint(
+                new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height),
+                new CGPoint(bubbleFrame.GetMinX() + 0.59715f * bubbleFrame.Width,
+                    bubbleFrame.GetMinY() + 0.69415f * bubbleFrame.Height));
+            bezierPath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 0.66944f * bubbleFrame.Width,
+                bubbleFrame.GetMinY() + 0.22486f * bubbleFrame.Height));
             bezierPath.ClosePath();
             color6.SetFill();
             bezierPath.Fill();

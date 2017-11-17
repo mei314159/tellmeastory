@@ -38,14 +38,17 @@ namespace TellMe.iOS.Controllers
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             TableView.AllowsSelectionDuringEditing = true;
-            this.Root = new RootElement(Tribe.Name) {
-                new Section ("Tribe Info") {
+            this.Root = new RootElement(Tribe.Name)
+            {
+                new Section("Tribe Info")
+                {
                     new StringElement("Name", Tribe.Name),
                     new StringElement("Creator", Tribe.CreatorName),
                     new StringElement("Created", Tribe.CreateDateUtc.ToShortDateString()),
                     new StringElement("Your Status", Tribe.MembershipStatus.ToString())
                 },
-                new Section ("Members") {
+                new Section("Members")
+                {
                 }
             };
 
@@ -88,7 +91,7 @@ namespace TellMe.iOS.Controllers
         private void DataSource_OnDeleteRow(TribeMemberDTO deletedItem, NSIndexPath indexPath)
         {
             Tribe.Members.Remove(deletedItem);
-            TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+            TableView.DeleteRows(new[] {indexPath}, UITableViewRowAnimation.Automatic);
         }
 
         private void DataSource_OnMemberSelected(TribeMemberDTO tribeMember, NSIndexPath indexPath)
@@ -96,9 +99,11 @@ namespace TellMe.iOS.Controllers
             _businessLogic.NavigateTribeMember(tribeMember);
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
-        public void ShowSuccessMessage(string message, Action complete) => ViewExtensions.ShowSuccessMessage(this, message, complete);
+        public void ShowSuccessMessage(string message, Action complete) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
 
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
@@ -125,9 +130,10 @@ namespace TellMe.iOS.Controllers
                         leaveButton.TouchUpInside += LeaveButton_TouchUpInside;
                         leaveButton.Frame = new CoreGraphics.CGRect(0, 0, UIScreen.MainScreen.Bounds.Width, 44);
                         leaveButton.SetTitleColor(UIColor.Red, UIControlState.Normal);
-                        Root.Add(new Section(string.Empty) {
-                        new UIViewElement(string.Empty, leaveButton, false)
-                    });
+                        Root.Add(new Section(string.Empty)
+                        {
+                            new UIViewElement(string.Empty, leaveButton, false)
+                        });
                     }
                 });
             }
@@ -142,14 +148,12 @@ namespace TellMe.iOS.Controllers
         private async void LeaveButton_TouchUpInside(object sender, EventArgs e)
         {
             var alert = UIAlertController.Create(
-                                            "Leave a Tribe",
-                    "Do you really want to leave this tribe?",
-                    UIAlertControllerStyle.Alert);
+                "Leave a Tribe",
+                "Do you really want to leave this tribe?",
+                UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-            alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default, async (obj) =>
-            {
-                await _businessLogic.LeaveTribeAsync();
-            }));
+            alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default,
+                async (obj) => { await _businessLogic.LeaveTribeAsync(); }));
             this.PresentViewController(alert, true, null);
         }
 
@@ -163,7 +167,8 @@ namespace TellMe.iOS.Controllers
         {
             if (Tribe.MembershipStatus == TribeMemberStatus.Creator)
             {
-                this.NavigationItem.RightBarButtonItem = new UIBarButtonItem("Edit", UIBarButtonItemStyle.Done, EditButtonTouched);
+                this.NavigationItem.RightBarButtonItem =
+                    new UIBarButtonItem("Edit", UIBarButtonItemStyle.Done, EditButtonTouched);
             }
             else
             {
@@ -202,19 +207,13 @@ namespace TellMe.iOS.Controllers
                 });
             }
 
-            InvokeOnMainThread(() =>
-            {
-                TableView.ReloadData();
-            });
+            InvokeOnMainThread(() => { TableView.ReloadData(); });
         }
 
         public void Close(TribeDTO tribeLeft)
         {
             TribeLeft?.Invoke(tribeLeft);
-            InvokeOnMainThread(() =>
-            {
-                this.NavigationController.PopViewController(true);
-            });
+            InvokeOnMainThread(() => { this.NavigationController.PopViewController(true); });
         }
     }
 
@@ -238,7 +237,7 @@ namespace TellMe.iOS.Controllers
         public void SetData(TribeDTO tribe)
         {
             var initialCount = _membersList.Count;
-            lock (((ICollection)_membersList).SyncRoot)
+            lock (((ICollection) _membersList).SyncRoot)
             {
                 _membersList.Clear();
                 if (tribe.Members != null)
@@ -323,7 +322,7 @@ namespace TellMe.iOS.Controllers
         public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
         {
             var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, "Delete", DeleteRow);
-            return new[] { deleteAction };
+            return new[] {deleteAction};
         }
 
         private void DeleteRow(UITableViewRowAction action, NSIndexPath indexPath)

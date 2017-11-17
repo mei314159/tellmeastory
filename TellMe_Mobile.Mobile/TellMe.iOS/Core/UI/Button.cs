@@ -30,16 +30,8 @@ namespace TellMe.iOS
 
         public string TitleString
         {
-            get
-            {
-                return this.TitleLabel.Text;
-            }
-            set
-            {
-                this.SetTitle(value, UIControlState.Normal);
-            }
+            get { return this.TitleLabel.Text; }
+            set { this.SetTitle(value, UIControlState.Normal); }
         }
-
-
     }
 }

@@ -19,7 +19,8 @@ namespace TellMe.Core.Types.DataServices.Remote
         public async Task<Result<List<NotificationDTO>>> GetNotificationsAsync(DateTime? olderThanUtc = null)
         {
             var olderThan = olderThanUtc ?? DateTime.MaxValue;
-            var result = await this._apiProvider.GetAsync<List<NotificationDTO>>($"notifications/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            var result = await this._apiProvider
+                .GetAsync<List<NotificationDTO>>($"notifications/older-than/{olderThan.Ticks}").ConfigureAwait(false);
             return result;
         }
 
@@ -31,7 +32,9 @@ namespace TellMe.Core.Types.DataServices.Remote
 
         public async Task<Result> HandleNotificationAsync(int notificationId)
         {
-            var result = await this._apiProvider.PostAsync<List<NotificationDTO>>($"notifications/{notificationId}/handled", null).ConfigureAwait(false);
+            var result = await this._apiProvider
+                .PostAsync<List<NotificationDTO>>($"notifications/{notificationId}/handled", null)
+                .ConfigureAwait(false);
             return result;
         }
     }

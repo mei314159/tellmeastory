@@ -49,19 +49,21 @@ namespace TellMe.iOS
 
         public override void ViewDidAppear(bool animated)
         {
-			this._playerObserver = NSNotificationCenter.DefaultCenter.AddObserver(AVPlayerItem.DidPlayToEndTimeNotification, (notify) =>
-			{
-				_player.Seek(CoreMedia.CMTime.Zero);
-				notify.Dispose();
-			});
+            this._playerObserver = NSNotificationCenter.DefaultCenter.AddObserver(
+                AVPlayerItem.DidPlayToEndTimeNotification, (notify) =>
+                {
+                    _player.Seek(CoreMedia.CMTime.Zero);
+                    notify.Dispose();
+                });
 
-			_player.Play();
+            _player.Play();
         }
 
         partial void SendButtonTouched(Button sender)
         {
             _goNext = true;
-            _router.NavigateStoryDetails(this, VideoPath, _previewImagePath, StoryRequest, RequestNotification, Contact);
+            _router.NavigateStoryDetails(this, VideoPath, _previewImagePath, StoryRequest, RequestNotification,
+                Contact);
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -101,26 +103,27 @@ namespace TellMe.iOS
             }
         }
 
-        public void ShowErrorMessage(string title, string message = null) => ViewExtensions.ShowErrorMessage(this, title, message);
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
 
         private void SavePreviewImage()
-		{
-			var imageGenerator = AVAssetImageGenerator.FromAsset(_asset);
+        {
+            var imageGenerator = AVAssetImageGenerator.FromAsset(_asset);
 
-			imageGenerator.AppliesPreferredTrackTransform = true;
+            imageGenerator.AppliesPreferredTrackTransform = true;
 
-		    var cmTime = new CoreMedia.CMTime(1, 30);
+            var cmTime = new CoreMedia.CMTime(1, 30);
 
             var imageRef = imageGenerator.CopyCGImageAtTime(cmTime, out _, out _);
             if (imageRef == null)
-				return;
+                return;
 
-			var image = UIImage.FromImage(imageRef);
+            var image = UIImage.FromImage(imageRef);
 
             this._previewImagePath = Path.Combine(
-                Path.GetDirectoryName(VideoPath).TrimEnd('/'), 
+                Path.GetDirectoryName(VideoPath).TrimEnd('/'),
                 Path.GetFileNameWithoutExtension(VideoPath) + ".jpg");
             var dataBytes = image.AsJPEG().Save(this._previewImagePath, true, out _);
-		}
+        }
     }
 }

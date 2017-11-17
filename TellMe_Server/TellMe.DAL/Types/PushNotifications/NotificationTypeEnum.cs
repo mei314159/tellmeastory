@@ -12,6 +12,7 @@ namespace TellMe.DAL.Types.PushNotifications
         TribeRejectInvite = 8,
         DeleteFromTribe = 9,
         LeftTribe = 10,
-        StoryComment = 11
+        StoryComment = 11,
+        StoryLike = 12
     }
 }

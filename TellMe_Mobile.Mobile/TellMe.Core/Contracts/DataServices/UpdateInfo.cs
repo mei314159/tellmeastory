@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace TellMe.Core.Contracts.DataServices
 {
     [SQLite.Table("UpdateInfo")]

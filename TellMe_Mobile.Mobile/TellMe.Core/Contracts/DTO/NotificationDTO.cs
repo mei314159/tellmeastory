@@ -17,7 +17,7 @@ namespace TellMe.Core.Contracts.DTO
         [SQLiteNetExtensions.Attributes.TextBlob("TypeBlob")]
         public NotificationTypeEnum Type { get; set; }
 
-		public bool Handled { get; set; }
+        public bool Handled { get; set; }
 
         [SQLiteNetExtensions.Attributes.TextBlob("ExtraBlob")]
         public object Extra { get; set; }

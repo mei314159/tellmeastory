@@ -5,21 +5,14 @@ using System.Threading.Tasks;
 using Foundation;
 using HockeyApp.iOS;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.BusinessLogic;
-using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.BusinessLogic;
-using TellMe.Core.Types.DataServices.Local;
-using TellMe.Core.Types.DataServices.Remote;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.DTO;
-using TellMe.iOS.Core.Providers;
-using TellMe.iOS.Extensions;
 using UIKit;
 using UserNotifications;
 
@@ -49,7 +42,7 @@ namespace TellMe.iOS
             App.Instance.OnNotificationReceived += Instance_OnNotificationReceived;
 
             this.Window = window;
-            this.Window.RootViewController = GetInitialViewController(launchOptions);
+            this.Window.RootViewController = GetInitialViewController();
             this.Window.MakeKeyAndVisible();
 
             var notification =
@@ -135,7 +128,7 @@ namespace TellMe.iOS
 
         public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
         {
-            ProcessNotification(userInfo, application.ApplicationState == UIApplicationState.Active);
+            ProcessNotification(userInfo);
         }
 
         public void CheckPushNotificationsPermissions()
@@ -179,7 +172,7 @@ namespace TellMe.iOS
                 });
         }
 
-        private void ProcessNotification(NSDictionary userInfo, bool quiet = false)
+        private void ProcessNotification(NSDictionary userInfo)
         {
             var pushJson = new NSString(NSJsonSerialization.Serialize(userInfo, 0, out _), NSStringEncoding.UTF8)
                 .ToString();
@@ -214,7 +207,7 @@ namespace TellMe.iOS
             }
         }
 
-        private UIViewController GetInitialViewController(NSDictionary launchOptions)
+        private UIViewController GetInitialViewController()
         {
             if (!this.AccountBusinessLogic.IsAuthenticated)
             {

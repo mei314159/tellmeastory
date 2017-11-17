@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
@@ -13,11 +14,14 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly RequestStoryValidator _validator;
+        private readonly ILocalAccountService _localAccountService;
 
-        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, RequestStoryValidator validator)
+        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService,
+            RequestStoryValidator validator, ILocalAccountService localAccountService)
         {
             this._remoteStoriesDataService = remoteStoriesDataService;
             _validator = validator;
+            _localAccountService = localAccountService;
         }
 
         public IRequestStoryView View { get; set; }
@@ -33,7 +37,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 {
                     Title = title,
                     UserId = x.Type == ContactType.User ? x.User.Id : null,
-                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?)null
+                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
                 }).ToList()
             };
 
@@ -56,6 +60,11 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);
+        }
+
+        public string GetUsername()
+        {
+            return _localAccountService.GetAuthInfo().Account.UserName;
         }
     }
 }

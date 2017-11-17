@@ -28,12 +28,10 @@ namespace TellMe.iOS.Views.Cells
         }
 
         private TribeMemberDTO tribeMember;
+
         public TribeMemberDTO TribeMember
         {
-            get
-            {
-                return tribeMember;
-            }
+            get { return tribeMember; }
             set
             {
                 tribeMember = value;

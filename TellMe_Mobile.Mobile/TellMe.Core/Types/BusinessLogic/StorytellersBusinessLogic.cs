@@ -25,7 +25,8 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public StorytellersBusinessLogic(IRemoteStorytellersDataService remoteStorytellersService,
             IRemoteTribesDataService remoteTribesService, IRouter router,
-            ILocalStorytellersDataService localStorytellersService, ILocalTribesDataService localTribesService, EmailValidator emailValidator)
+            ILocalStorytellersDataService localStorytellersService, ILocalTribesDataService localTribesService,
+            EmailValidator emailValidator)
         {
             _remoteStorytellersService = remoteStorytellersService;
             _remoteTribesService = remoteTribesService;

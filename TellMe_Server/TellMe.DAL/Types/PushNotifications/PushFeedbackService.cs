@@ -1,19 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PushSharp.Apple;
 using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.Repositories;
 using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Types.PushNotifications;
-using TellMe.DAL.Types.Repositories;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.DAL.Types.PushNotifications
 {
     public class PushFeedbackService
     {

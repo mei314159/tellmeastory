@@ -10,7 +10,6 @@
 //
 
 
-
 using System;
 using Foundation;
 using UIKit;
@@ -21,7 +20,6 @@ namespace TellMe.iOS
     [Register("SAResizableBubble")]
     public class SAResizableBubble : UIView
     {
-
         public SAResizableBubble(CGRect frame) : base(frame)
         {
         }
@@ -46,8 +44,8 @@ namespace TellMe.iOS
             var bubbleStrokeColor = UIColor.FromRGBA(0.173f, 0.173f, 0.173f, 1.000f);
 
             //// Gradient Declarations
-            var bubbleGradientColors = new CGColor[] { bubbleGradientTop.CGColor, bubbleGradientBottom.CGColor };
-            var bubbleGradientLocations = new nfloat[] { 0.0f, 1.0f };
+            var bubbleGradientColors = new CGColor[] {bubbleGradientTop.CGColor, bubbleGradientBottom.CGColor};
+            var bubbleGradientLocations = new nfloat[] {0.0f, 1.0f};
             var bubbleGradient = new CGGradient(colorSpace, bubbleGradientColors, bubbleGradientLocations);
 
             //// Shadow Declarations
@@ -62,23 +60,33 @@ namespace TellMe.iOS
 
 
             //// Subframes
-            var arrowFrame = new CGRect(bubbleFrame.GetMinX() + NMath.Floor((bubbleFrame.Width - 59.0f) * 0.50462f + 0.5f), bubbleFrame.GetMinY() + bubbleFrame.Height - 46.0f, 59.0f, 46.0f);
+            var arrowFrame =
+                new CGRect(bubbleFrame.GetMinX() + NMath.Floor((bubbleFrame.Width - 59.0f) * 0.50462f + 0.5f),
+                    bubbleFrame.GetMinY() + bubbleFrame.Height - 46.0f, 59.0f, 46.0f);
 
 
             //// Bubble Drawing
             var bubblePath = new UIBezierPath();
             bubblePath.MoveTo(new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMinY() + 28.5f));
             bubblePath.AddLineTo(new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMaxY() - 27.5f));
-            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMaxX() - 25.0f, bubbleFrame.GetMaxY() - 14.5f), new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMaxY() - 20.32f), new CGPoint(bubbleFrame.GetMaxX() - 17.82f, bubbleFrame.GetMaxY() - 14.5f));
+            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMaxX() - 25.0f, bubbleFrame.GetMaxY() - 14.5f),
+                new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMaxY() - 20.32f),
+                new CGPoint(bubbleFrame.GetMaxX() - 17.82f, bubbleFrame.GetMaxY() - 14.5f));
             bubblePath.AddLineTo(new CGPoint(arrowFrame.GetMinX() + 40.5f, arrowFrame.GetMaxY() - 13.5f));
             bubblePath.AddLineTo(new CGPoint(arrowFrame.GetMinX() + 29.5f, arrowFrame.GetMaxY() - 0.5f));
             bubblePath.AddLineTo(new CGPoint(arrowFrame.GetMinX() + 18.5f, arrowFrame.GetMaxY() - 13.5f));
             bubblePath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 26.5f, bubbleFrame.GetMaxY() - 14.5f));
-            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMaxY() - 27.5f), new CGPoint(bubbleFrame.GetMinX() + 19.32f, bubbleFrame.GetMaxY() - 14.5f), new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMaxY() - 20.32f));
+            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMaxY() - 27.5f),
+                new CGPoint(bubbleFrame.GetMinX() + 19.32f, bubbleFrame.GetMaxY() - 14.5f),
+                new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMaxY() - 20.32f));
             bubblePath.AddLineTo(new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMinY() + 28.5f));
-            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 26.5f, bubbleFrame.GetMinY() + 15.5f), new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMinY() + 21.32f), new CGPoint(bubbleFrame.GetMinX() + 19.32f, bubbleFrame.GetMinY() + 15.5f));
+            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMinX() + 26.5f, bubbleFrame.GetMinY() + 15.5f),
+                new CGPoint(bubbleFrame.GetMinX() + 13.5f, bubbleFrame.GetMinY() + 21.32f),
+                new CGPoint(bubbleFrame.GetMinX() + 19.32f, bubbleFrame.GetMinY() + 15.5f));
             bubblePath.AddLineTo(new CGPoint(bubbleFrame.GetMaxX() - 25.0f, bubbleFrame.GetMinY() + 15.5f));
-            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMinY() + 28.5f), new CGPoint(bubbleFrame.GetMaxX() - 17.82f, bubbleFrame.GetMinY() + 15.5f), new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMinY() + 21.32f));
+            bubblePath.AddCurveToPoint(new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMinY() + 28.5f),
+                new CGPoint(bubbleFrame.GetMaxX() - 17.82f, bubbleFrame.GetMinY() + 15.5f),
+                new CGPoint(bubbleFrame.GetMaxX() - 12.0f, bubbleFrame.GetMinY() + 21.32f));
             bubblePath.ClosePath();
             context.SaveState();
             context.SetShadow(outerShadow.ShadowOffset, outerShadow.ShadowBlurRadius, outerShadow.ShadowColor.CGColor);
@@ -117,6 +125,5 @@ namespace TellMe.iOS
             bubblePath.LineWidth = 1.0f;
             bubblePath.Stroke();
         }
-
     }
 }

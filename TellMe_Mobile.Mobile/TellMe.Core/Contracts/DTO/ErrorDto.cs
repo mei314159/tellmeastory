@@ -2,7 +2,6 @@
 
 namespace TellMe.Core.Contracts.DTO
 {
-
     public class ErrorDTO
     {
         [JsonProperty(PropertyName = "error")]

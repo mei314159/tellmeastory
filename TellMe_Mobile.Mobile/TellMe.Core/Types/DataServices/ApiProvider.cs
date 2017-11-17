@@ -29,7 +29,7 @@ namespace TellMe.Core.Types.DataServices
             var result = await this.GetAsync(uri, typeof(T));
             return new Result<T>
             {
-                Data = (T)result.Data,
+                Data = (T) result.Data,
                 ErrorMessage = result.ErrorMessage,
                 IsSuccess = result.IsSuccess,
                 ModelState = result.ModelState,
@@ -45,7 +45,8 @@ namespace TellMe.Core.Types.DataServices
             {
                 try
                 {
-                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _localLocalAccountService.GetAuthInfo().AccessToken);
+                    webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+                        _localLocalAccountService.GetAuthInfo().AccessToken);
                     var response = await webClient.GetAsync(requestUri).ConfigureAwait(false);
                     var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -130,25 +131,29 @@ namespace TellMe.Core.Types.DataServices
             return SendDataAsync<TResult>(uri, data, HttpMethod.Post, anonymously);
         }
 
-        public Task<Result<TResult>> SendDataAsync<TResult>(string uri, object data, HttpMethod method, bool anonymously = false)
+        public Task<Result<TResult>> SendDataAsync<TResult>(string uri, object data, HttpMethod method,
+            bool anonymously = false)
         {
-
             var serializedData = JsonConvert.SerializeObject(data);
             var stringContent = new StringContent(serializedData, System.Text.Encoding.UTF8, "application/json");
 
             return SendDataAsync<TResult>(uri, method, stringContent, anonymously);
         }
 
-        public async Task<Result<TResult>> SendDataAsync<TResult>(string uri, HttpMethod method, HttpContent content, bool anonymously = false, bool refreshExpiredToken = true)
+        public async Task<Result<TResult>> SendDataAsync<TResult>(string uri, HttpMethod method, HttpContent content,
+            bool anonymously = false, bool refreshExpiredToken = true)
         {
-            var result = await SendDataAsync<TResult, Dictionary<string, string[]>>(uri, method, content, anonymously, refreshExpiredToken)
-                .ConfigureAwait(false);
+            var result =
+                await SendDataAsync<TResult, Dictionary<string, string[]>>(uri, method, content, anonymously,
+                        refreshExpiredToken)
+                    .ConfigureAwait(false);
             if (!result.IsSuccess)
                 result.ModelState = result.Error;
             return result;
         }
 
-        public async Task<Result<TResult, TErrorResult>> SendDataAsync<TResult, TErrorResult>(string uri, HttpMethod method, HttpContent content, bool anonymously = false, bool refreshExpiredToken = true)
+        public async Task<Result<TResult, TErrorResult>> SendDataAsync<TResult, TErrorResult>(string uri,
+            HttpMethod method, HttpContent content, bool anonymously = false, bool refreshExpiredToken = true)
         {
             var requestUri = new Uri($"{Constants.ApiHost}/api/{uri}");
 
@@ -158,7 +163,8 @@ namespace TellMe.Core.Types.DataServices
                 {
                     if (!anonymously)
                     {
-                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _localLocalAccountService.GetAuthInfo().AccessToken);
+                        webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+                            _localLocalAccountService.GetAuthInfo().AccessToken);
                     }
                     else
                     {
@@ -195,7 +201,8 @@ namespace TellMe.Core.Types.DataServices
                         var refreshTokenResult = await this.RefreshAuthTokenAsync().ConfigureAwait(false);
                         if (refreshTokenResult.IsSuccess)
                         {
-                            return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, anonymously, false).ConfigureAwait(false);
+                            return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, false, false)
+                                .ConfigureAwait(false);
                         }
 
                         return new Result<TResult, TErrorResult>
@@ -204,7 +211,6 @@ namespace TellMe.Core.Types.DataServices
                             IsNetworkIssue = false,
                             ErrorMessage = refreshTokenResult.Error?.ErrorMessage ?? refreshTokenResult.ErrorMessage
                         };
-
                     }
 
                     var error = JsonConvert.DeserializeObject<TErrorResult>(responseString);
@@ -214,7 +220,6 @@ namespace TellMe.Core.Types.DataServices
                         Error = error,
                         ErrorMessage = response.ReasonPhrase
                     };
-
                 }
                 catch (HttpRequestException ex)
                 {
@@ -248,8 +253,9 @@ namespace TellMe.Core.Types.DataServices
                     {"refresh_token", authInfo.RefreshToken},
                     {"client_id", "ios_app"}
                 };
-                var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth", HttpMethod.Post, new FormUrlEncodedContent(data), true)
-                                   .ConfigureAwait(false);
+                var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth",
+                        HttpMethod.Post, new FormUrlEncodedContent(data), true)
+                    .ConfigureAwait(false);
 
                 if (result.IsSuccess)
                 {

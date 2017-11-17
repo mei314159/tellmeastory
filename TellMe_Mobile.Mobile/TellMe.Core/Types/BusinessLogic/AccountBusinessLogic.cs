@@ -17,7 +17,8 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly ILocalAccountService _localAccountService;
         private readonly IRemotePushDataService _remotePushDataService;
 
-        public AccountBusinessLogic(IApplicationDataStorage appDataStorage, ILocalAccountService localAccountService, IRemotePushDataService remotePushDataService)
+        public AccountBusinessLogic(IApplicationDataStorage appDataStorage, ILocalAccountService localAccountService,
+            IRemotePushDataService remotePushDataService)
         {
             this._appDataStorage = appDataStorage;
             this._localAccountService = localAccountService;
@@ -44,16 +45,18 @@ namespace TellMe.Core.Types.BusinessLogic
                 _appDataStorage.Set(PushTokenKey, pushToken);
             }
 
-			await SyncPushTokenAsync().ConfigureAwait(false);
+            await SyncPushTokenAsync().ConfigureAwait(false);
         }
 
         public async Task SyncPushTokenAsync()
         {
             string pushToken = _appDataStorage.Get<string>(PushTokenKey);
-            if (!string.IsNullOrWhiteSpace(pushToken) && this.IsAuthenticated && !_appDataStorage.GetBool(PushTokenSentToBackendKey))
+            if (!string.IsNullOrWhiteSpace(pushToken) && this.IsAuthenticated &&
+                !_appDataStorage.GetBool(PushTokenSentToBackendKey))
             {
                 string oldDeviceToken = _appDataStorage.Get<string>(OldPushTokenKey);
-                var result = await _remotePushDataService.RegisterAsync(oldDeviceToken, pushToken).ConfigureAwait(false);
+                var result = await _remotePushDataService.RegisterAsync(oldDeviceToken, pushToken)
+                    .ConfigureAwait(false);
                 _appDataStorage.SetBool(PushTokenSentToBackendKey, result.IsSuccess);
             }
         }

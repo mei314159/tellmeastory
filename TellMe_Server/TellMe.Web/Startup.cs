@@ -19,12 +19,13 @@ using TellMe.Web.DTO;
 using TellMe.DAL.Types.Domain;
 using Microsoft.AspNetCore.Identity;
 using Hangfire;
-using TellMe.DAL.Contracts.PushNotification;
-using TellMe.Web.AutoMapper;
 using TellMe.DAL.Types.AzureBlob;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Features;
+using TellMe.DAL.Contracts.PushNotifications;
+using TellMe.DAL.Types.PushNotifications;
+using TellMe.Web.Automapper;
 
 namespace TellMe.Web
 {

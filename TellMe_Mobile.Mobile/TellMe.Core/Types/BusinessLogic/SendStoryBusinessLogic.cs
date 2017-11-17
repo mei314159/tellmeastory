@@ -17,13 +17,16 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly IRouter _router;
         private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly ILocalNotificationsDataService _localNotificationsDataService;
+        private readonly ILocalAccountService _localAccountService;
         private ICollection<ContactDTO> _recipients;
 
-        public SendStoryBusinessLogic(IRouter router, IRemoteStoriesDataService remoteStoriesDataService, ILocalNotificationsDataService localNotificationsDataService)
+        public SendStoryBusinessLogic(IRouter router, IRemoteStoriesDataService remoteStoriesDataService,
+            ILocalNotificationsDataService localNotificationsDataService, ILocalAccountService localAccountService)
         {
             this._router = router;
             this._remoteStoriesDataService = remoteStoriesDataService;
             _localNotificationsDataService = localNotificationsDataService;
+            _localAccountService = localAccountService;
         }
 
         public ISendStoryView View { get; set; }
@@ -37,15 +40,16 @@ namespace TellMe.Core.Types.BusinessLogic
             }
             else if (View.Contact != null)
             {
-                _recipients = new[] { View.Contact };
+                _recipients = new[] {View.Contact};
             }
 
-			InitButtons();
+            InitButtons();
         }
 
         public void InitButtons()
         {
-            this.View.SendButton.Enabled = (View.StoryRequest != null || _recipients != null) && !string.IsNullOrWhiteSpace(View.StoryTitle.Text);
+            this.View.SendButton.Enabled = (View.StoryRequest != null || _recipients != null) &&
+                                           !string.IsNullOrWhiteSpace(View.StoryTitle.Text);
             this.View.ChooseRecipientsButton.Enabled = View.StoryRequest == null;
             if (View.Contact != null)
             {
@@ -77,7 +81,7 @@ namespace TellMe.Core.Types.BusinessLogic
                     dto.Receivers = _recipients.Select(x => new StoryReceiverDTO
                     {
                         UserId = x.Type == ContactType.User ? x.User.Id : null,
-                        TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?)null
+                        TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
                     }).ToList();
                 }
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
@@ -111,6 +115,11 @@ namespace TellMe.Core.Types.BusinessLogic
         public void ChooseRecipients()
         {
             _router.NavigateChooseRecipients(View, HandleStorytellersSelectedEventHandler, true);
+        }
+
+        public string GetUsername()
+        {
+            return _localAccountService.GetAuthInfo().Account.UserName;
         }
 
         private void HandleStorytellersSelectedEventHandler(ICollection<ContactDTO> selectedContacts)

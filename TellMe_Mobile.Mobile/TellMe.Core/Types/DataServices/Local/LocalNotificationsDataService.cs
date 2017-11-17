@@ -18,7 +18,8 @@ namespace TellMe.Core.Types.DataServices.Local
         public LocalNotificationsDataService()
         {
             this._dbPath = Constants.LocalDbPath;
-            using (var conn = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
+            using (var conn = new SQLiteConnection(_dbPath,
+                SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
                 conn.CreateTable<NotificationDTO>();
                 conn.CreateTable<UpdateInfo>();
@@ -27,8 +28,9 @@ namespace TellMe.Core.Types.DataServices.Local
 
         public async Task DeleteAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
-            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            var conn = new SQLiteAsyncConnection(this._dbPath,
+                SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            await conn.RunInTransactionAsync(c =>
             {
                 c.DeleteAll<NotificationDTO>();
                 c.Table<UpdateInfo>().Delete(x => x.TableName == "Notifications");
@@ -40,30 +42,34 @@ namespace TellMe.Core.Types.DataServices.Local
             if (entities == null)
                 return;
 
-            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
-            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            var conn = new SQLiteAsyncConnection(this._dbPath,
+                SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            await conn.RunInTransactionAsync(c =>
             {
                 c.Trace = true;
                 c.InsertOrReplaceAllWithChildren(entities);
-                c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Notifications" });
+                c.InsertOrReplace(new UpdateInfo {UtcDate = DateTime.UtcNow, TableName = "Notifications"});
             }).ConfigureAwait(false);
         }
 
         public async Task<DataResult<NotificationDTO[]>> GetAllAsync()
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
-            var result = (await conn.GetAllWithChildrenAsync<NotificationDTO>().ConfigureAwait(false)).OrderByDescending(x => x.Date).ToArray();
+            var conn = new SQLiteAsyncConnection(this._dbPath,
+                SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            var result = (await conn.GetAllWithChildrenAsync<NotificationDTO>().ConfigureAwait(false))
+                .OrderByDescending(x => x.Date).ToArray();
             var updateInfo = await conn.FindAsync<UpdateInfo>("Notifications").ConfigureAwait(false);
             return new DataResult<NotificationDTO[]>(updateInfo?.UtcDate ?? DateTime.MinValue, result);
         }
 
         public async Task SaveAsync(NotificationDTO notification)
         {
-            var conn = new SQLiteAsyncConnection(this._dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
-            await conn.RunInTransactionAsync((SQLiteConnection c) =>
+            var conn = new SQLiteAsyncConnection(this._dbPath,
+                SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create);
+            await conn.RunInTransactionAsync(c =>
             {
                 c.InsertOrReplace(notification, typeof(NotificationDTO));
-                c.InsertOrReplace(new UpdateInfo { UtcDate = DateTime.UtcNow, TableName = "Notifications" });
+                c.InsertOrReplace(new UpdateInfo {UtcDate = DateTime.UtcNow, TableName = "Notifications"});
             }).ConfigureAwait(false);
         }
     }

@@ -28,12 +28,10 @@ namespace TellMe.iOS.Views.Cells
         }
 
         private StorytellerDTO storyteller;
+
         public StorytellerDTO Storyteller
         {
-            get
-            {
-                return storyteller;
-            }
+            get { return storyteller; }
             set
             {
                 storyteller = value;

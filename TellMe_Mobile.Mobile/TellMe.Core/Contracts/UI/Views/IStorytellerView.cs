@@ -4,7 +4,7 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
-    public interface IStorytellerView:IView
+    public interface IStorytellerView : IView
     {
         void ShowSuccessMessage(string message, Action complete = null);
 

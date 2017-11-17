@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using TellMe.Core.Contracts;
+using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.iOS.Core;
 
@@ -32,6 +33,7 @@ namespace TellMe.iOS
 
         private IRemoteCommentsDataService _commentsService;
         private IRemoteStoriesDataService _remoteStoriesService;
+        private ILocalAccountService _localAccountService;
         private IRouter _router;
         private StoryViewCell _storyView;
         private LoadMoreButtonCell _loadMoreButton;
@@ -59,6 +61,7 @@ namespace TellMe.iOS
 
             _commentsService = IoC.Container.GetInstance<IRemoteCommentsDataService>();
             _remoteStoriesService = IoC.Container.GetInstance<IRemoteStoriesDataService>();
+            _localAccountService = IoC.Container.GetInstance<ILocalAccountService>();
             _router = IoC.Container.GetInstance<IRouter>();
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
             {
@@ -203,12 +206,13 @@ namespace TellMe.iOS
             var text = this.NewCommentText.Text;
             this.NewCommentText.Text = null;
 
+            var authInfo = _localAccountService.GetAuthInfo();
             var comment = new CommentDTO
             {
                 Text = text,
-                AuthorId = App.Instance.AuthInfo.Account.Id,
-                AuthorUserName = App.Instance.AuthInfo.Account.UserName,
-                AuthorPictureUrl = App.Instance.AuthInfo.Account.PictureUrl,
+                AuthorId = authInfo.Account.Id,
+                AuthorUserName = authInfo.Account.UserName,
+                AuthorPictureUrl = authInfo.Account.PictureUrl,
                 StoryId = Story.Id,
                 CreateDateUtc = DateTime.UtcNow
             };
@@ -284,7 +288,7 @@ namespace TellMe.iOS
             {
                 return;
             }
-            
+
             var scrollToComments = _commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
             if (DisplayCommentsWhenAppear)
             {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TellMe.Core.Contracts.DTO
+﻿namespace TellMe.Core.Contracts.DTO
 {
     public class StoryRequestDTO
     {

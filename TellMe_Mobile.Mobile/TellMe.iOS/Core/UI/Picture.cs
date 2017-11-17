@@ -55,7 +55,7 @@ namespace TellMe.iOS
                 this.SetImage(new NSUrl(pictureUrl));
             else if (defaultPicture != null && defaultPicture is UIImage)
             {
-                var defPic = (UIImage)defaultPicture;
+                var defPic = (UIImage) defaultPicture;
                 this.Image = defPic;
             }
         }

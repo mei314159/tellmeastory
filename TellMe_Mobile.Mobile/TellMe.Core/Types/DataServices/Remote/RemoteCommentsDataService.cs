@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.DataServices;
 using TellMe.Core.Contracts.DataServices.Remote;
@@ -28,7 +27,8 @@ namespace TellMe.Core.Types.DataServices.Remote
 
         public async Task<Result> DeleteCommentAsync(int storyId, int commentId)
         {
-            var result = await this._apiProvider.DeleteAsync<object>($"stories/{storyId}/comments/{commentId}", null).ConfigureAwait(false);
+            var result = await this._apiProvider.DeleteAsync<object>($"stories/{storyId}/comments/{commentId}", null)
+                .ConfigureAwait(false);
 
             return result;
         }
@@ -36,7 +36,9 @@ namespace TellMe.Core.Types.DataServices.Remote
         public async Task<Result<BulkDTO<CommentDTO>>> GetCommentsAsync(int storyId, DateTime? olderThanUtc = null)
         {
             var olderThan = olderThanUtc ?? DateTime.MaxValue;
-            var result = await this._apiProvider.GetAsync<BulkDTO<CommentDTO>>($"stories/{storyId}/comments/older-than/{olderThan.Ticks}").ConfigureAwait(false);
+            var result = await this._apiProvider
+                .GetAsync<BulkDTO<CommentDTO>>($"stories/{storyId}/comments/older-than/{olderThan.Ticks}")
+                .ConfigureAwait(false);
             return result;
         }
     }

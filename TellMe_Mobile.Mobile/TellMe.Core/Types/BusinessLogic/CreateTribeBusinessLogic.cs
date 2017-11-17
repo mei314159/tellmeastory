@@ -17,7 +17,8 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly CreateTribeValidator _validator;
         public ICreateTribeView View { get; set; }
 
-        public CreateTribeBusinessLogic(IRemoteTribesDataService remoteTribesService, ILocalTribesDataService localTribesService, CreateTribeValidator validator)
+        public CreateTribeBusinessLogic(IRemoteTribesDataService remoteTribesService,
+            ILocalTribesDataService localTribesService, CreateTribeValidator validator)
         {
             _localTribesService = localTribesService;
             _validator = validator;
@@ -29,7 +30,7 @@ namespace TellMe.Core.Types.BusinessLogic
             var dto = new TribeDTO
             {
                 Name = View.TribeName,
-                Members = View.Members.Select(x => new TribeMemberDTO { UserId = x.Id }).ToList()
+                Members = View.Members.Select(x => new TribeMemberDTO {UserId = x.Id}).ToList()
             };
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
             if (validationResult.IsValid)

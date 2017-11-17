@@ -7,7 +7,6 @@ using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Types.DataServices.Local;
 using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
@@ -21,11 +20,12 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly List<NotificationDTO> _notifications = new List<NotificationDTO>();
 
         private readonly INotificationHandler _notificationHandler;
-        
+
         public INotificationsCenterView View { get; set; }
 
         public NotificationCenterBusinessLogic(INotificationHandler notificationHandler,
-            IRemoteNotificationsDataService remoteNotificationsDataService, ILocalNotificationsDataService localNotificationsDataService)
+            IRemoteNotificationsDataService remoteNotificationsDataService,
+            ILocalNotificationsDataService localNotificationsDataService)
         {
             _remoteNotificationsDataService = remoteNotificationsDataService;
             _localNotificationsDataService = localNotificationsDataService;

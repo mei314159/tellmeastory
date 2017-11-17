@@ -14,6 +14,7 @@ namespace TellMe.Core.Contracts.UI.Views
 
         string ConfirmationCode { get; }
 
-        void ShowCountryPicker(IReadOnlyDictionary<string, string> countries, string selectedCountry, Action<string> callback);
+        void ShowCountryPicker(IReadOnlyDictionary<string, string> countries, string selectedCountry,
+            Action<string> callback);
     }
 }

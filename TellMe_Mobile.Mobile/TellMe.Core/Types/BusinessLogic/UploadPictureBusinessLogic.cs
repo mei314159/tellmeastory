@@ -14,7 +14,8 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly ILocalAccountService _localAccountService;
         private readonly IRouter _router;
 
-        public UploadPictureBusinessLogic(IRemoteAccountDataService remoteAccountDataService, ILocalAccountService localAccountService, IRouter router)
+        public UploadPictureBusinessLogic(IRemoteAccountDataService remoteAccountDataService,
+            ILocalAccountService localAccountService, IRouter router)
         {
             this._remoteAccountDataService = remoteAccountDataService;
             this._localAccountService = localAccountService;

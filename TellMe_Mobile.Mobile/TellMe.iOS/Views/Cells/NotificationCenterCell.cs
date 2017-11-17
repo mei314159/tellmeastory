@@ -1,5 +1,4 @@
 ﻿using System;
-using CoreText;
 using Foundation;
 using Newtonsoft.Json.Linq;
 using TellMe.Core.Contracts.DTO;
@@ -29,10 +28,7 @@ namespace TellMe.iOS.Views.Cells
 
         public NotificationDTO Notification
         {
-            get
-            {
-                return notification;
-            }
+            get { return notification; }
 
             set
             {
@@ -50,7 +46,7 @@ namespace TellMe.iOS.Views.Cells
             switch (Notification.Type)
             {
                 case NotificationTypeEnum.StoryRequest:
-                    var storyRequestDTO = ((JObject)notification.Extra).ToObject<StoryRequestDTO>();
+                    var storyRequestDTO = ((JObject) notification.Extra).ToObject<StoryRequestDTO>();
                     index = Notification.Text.IndexOf(storyRequestDTO.ReceiverName, StringComparison.Ordinal);
                     length = storyRequestDTO.ReceiverName.Length;
                     if (!string.IsNullOrWhiteSpace(storyRequestDTO.SenderPictureUrl))
@@ -61,7 +57,7 @@ namespace TellMe.iOS.Views.Cells
                     }
                     break;
                 case NotificationTypeEnum.FriendshipRequest:
-                    var dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
+                    var dto = ((JObject) notification.Extra).ToObject<StorytellerDTO>();
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
                     if (!Notification.Handled)
@@ -73,21 +69,21 @@ namespace TellMe.iOS.Views.Cells
                         PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipAccepted:
-                    dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
+                    dto = ((JObject) notification.Extra).ToObject<StorytellerDTO>();
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
                     if (!string.IsNullOrWhiteSpace(dto.PictureUrl))
                         PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.FriendshipRejected:
-                    dto = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
+                    dto = ((JObject) notification.Extra).ToObject<StorytellerDTO>();
                     index = Notification.Text.IndexOf(dto.UserName, StringComparison.Ordinal);
                     length = dto.UserName.Length;
                     if (!string.IsNullOrWhiteSpace(dto.PictureUrl))
                         PictureView.SetImage(new NSUrl(dto.PictureUrl));
                     break;
                 case NotificationTypeEnum.TribeInvite:
-                    var tribeDto = ((JObject)notification.Extra).ToObject<TribeDTO>();
+                    var tribeDto = ((JObject) notification.Extra).ToObject<TribeDTO>();
                     index = Notification.Text.IndexOf(tribeDto.CreatorName, StringComparison.Ordinal);
                     length = tribeDto.CreatorName.Length;
                     if (!Notification.Handled)
@@ -98,14 +94,14 @@ namespace TellMe.iOS.Views.Cells
                         PictureView.SetImage(new NSUrl(tribeDto.CreatorPictureUrl));
                     break;
                 case NotificationTypeEnum.TribeAcceptInvite:
-                    var tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
+                    var tribeMemberDto = ((JObject) notification.Extra).ToObject<TribeMemberDTO>();
                     index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
                     length = tribeMemberDto.UserName.Length;
                     if (!string.IsNullOrWhiteSpace(tribeMemberDto.UserPictureUrl))
                         PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
                     break;
                 case NotificationTypeEnum.TribeRejectInvite:
-                    tribeMemberDto = ((JObject)notification.Extra).ToObject<TribeMemberDTO>();
+                    tribeMemberDto = ((JObject) notification.Extra).ToObject<TribeMemberDTO>();
                     index = Notification.Text.IndexOf(tribeMemberDto.UserName, StringComparison.Ordinal);
                     length = tribeMemberDto.UserName.Length;
                     if (!string.IsNullOrWhiteSpace(tribeMemberDto.UserPictureUrl))
@@ -113,12 +109,15 @@ namespace TellMe.iOS.Views.Cells
                     break;
                 default:
                     this.Text.AttributedText = text;
-                    text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(), foregroundColor: UIColor.LightGray));
+                    text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(),
+                        foregroundColor: UIColor.LightGray));
                     return;
             }
 
-            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Text.Font.PointSize), new NSRange(index, length));
-            text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(), foregroundColor: UIColor.LightGray));
+            text.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(this.Text.Font.PointSize),
+                new NSRange(index, length));
+            text.Append(new NSAttributedString(" " + Notification.Date.GetDateString(),
+                foregroundColor: UIColor.LightGray));
             this.Text.AttributedText = text;
         }
     }

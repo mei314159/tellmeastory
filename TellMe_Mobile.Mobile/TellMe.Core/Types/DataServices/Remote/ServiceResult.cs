@@ -2,7 +2,6 @@
 using System.Linq;
 using FluentValidation.Results;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.DataServices.Remote
 {
@@ -24,7 +23,7 @@ namespace TellMe.Core.Types.DataServices.Remote
 
 
         public bool IsValid => this.ValidationResult?.IsValid != false
-                                   && this.Result?.IsSuccess == true;
+                               && this.Result?.IsSuccess == true;
 
 
         public string ErrorsString
@@ -60,43 +59,33 @@ namespace TellMe.Core.Types.DataServices.Remote
         {
         }
 
-        public ServiceResult(ValidationResult validationResult, Result<T> result = null) : base(validationResult, result)
+        public ServiceResult(ValidationResult validationResult, Result<T> result = null) : base(validationResult,
+            result)
         {
         }
 
         public new Result<T> Result
         {
-            get
-            {
-                return (Result<T>)base.Result;
-            }
-            set
-            {
-                base.Result = value;
-            }
+            get { return (Result<T>) base.Result; }
+            set { base.Result = value; }
         }
     }
 
-	public class ServiceResult<T, TError> : ServiceResult
-	{
-		public ServiceResult()
-		{
-		}
+    public class ServiceResult<T, TError> : ServiceResult
+    {
+        public ServiceResult()
+        {
+        }
 
-		public ServiceResult(ValidationResult validationResult, Result<T, TError> result = null) : base(validationResult, result)
-		{
-		}
+        public ServiceResult(ValidationResult validationResult, Result<T, TError> result = null) : base(
+            validationResult, result)
+        {
+        }
 
-		public new Result<T, TError> Result
-		{
-			get
-			{
-				return (Result<T, TError>)base.Result;
-			}
-			set
-			{
-				base.Result = value;
-			}
-		}
-	}
+        public new Result<T, TError> Result
+        {
+            get { return (Result<T, TError>) base.Result; }
+            set { base.Result = value; }
+        }
+    }
 }

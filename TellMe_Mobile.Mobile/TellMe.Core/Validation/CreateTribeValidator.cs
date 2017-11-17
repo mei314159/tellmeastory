@@ -11,7 +11,8 @@ namespace TellMe.Core.Validation
             this.RuleFor(x => x.Name).NotEmpty()
                 .WithMessage("Please enter a tribe name")
                 .MaximumLength(255);
-            this.RuleFor(x => x.Members).Must(x => x?.Any() == true).WithMessage("Tribe should have at least one member.");
+            this.RuleFor(x => x.Members).Must(x => x?.Any() == true)
+                .WithMessage("Tribe should have at least one member.");
         }
     }
 }

@@ -30,15 +30,17 @@ namespace TellMe.iOS.Core
                     if (notification.Handled)
                         return null;
 
-                    var extra = ((JObject)notification.Extra).ToObject<StoryRequestDTO>();
+                    var extra = ((JObject) notification.Extra).ToObject<StoryRequestDTO>();
                     var alert = UIAlertController
                         .Create("Story request",
                             notification.Text,
                             UIAlertControllerStyle.Alert);
                     alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectStoryRequestTouched(notification.Id, extra, promise)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptStoryRequestTouched(notification.Id, extra, view, promise)));
-                    ((UIViewController)view).PresentViewController(alert, true, null);
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive,
+                        x => RejectStoryRequestTouched(notification.Id, extra, promise)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default,
+                        x => AcceptStoryRequestTouched(notification.Id, extra, view, promise)));
+                    ((UIViewController) view).PresentViewController(alert, true, null);
                     result = await promise.Task.ConfigureAwait(false);
 
                     break;
@@ -48,16 +50,18 @@ namespace TellMe.iOS.Core
                     if (notification.Handled)
                         return null;
                     var promise = new TaskCompletionSource<bool?>();
-                    var extra = ((JObject)notification.Extra).ToObject<StorytellerDTO>();
+                    var extra = ((JObject) notification.Extra).ToObject<StorytellerDTO>();
                     var alert = UIAlertController
                         .Create("Friendship request",
                             notification.Text,
                             UIAlertControllerStyle.Alert);
                     alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectFriendshipTouched(notification.Id, extra, promise)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptFriendshipTouched(notification.Id, extra, promise)));
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive,
+                        x => RejectFriendshipTouched(notification.Id, extra, promise)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default,
+                        x => AcceptFriendshipTouched(notification.Id, extra, promise)));
 
-                    ((UIViewController)view).PresentViewController(alert, true, null);
+                    ((UIViewController) view).PresentViewController(alert, true, null);
                     result = await promise.Task.ConfigureAwait(false);
                     break;
                 }
@@ -66,21 +70,23 @@ namespace TellMe.iOS.Core
                     if (notification.Handled)
                         return null;
                     var promise = new TaskCompletionSource<bool?>();
-                    var extra = ((JObject)notification.Extra).ToObject<TribeDTO>();
+                    var extra = ((JObject) notification.Extra).ToObject<TribeDTO>();
                     var alert = UIAlertController
                         .Create("Join a Tribe",
                             notification.Text,
                             UIAlertControllerStyle.Alert);
                     alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
-                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive, x => RejectTribeInvitationTouched(notification.Id, extra, promise)));
-                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default, x => AcceptTribeInvitationTouched(notification.Id, extra, promise)));
-                    ((UIViewController)view).PresentViewController(alert, true, null);
+                    alert.AddAction(UIAlertAction.Create("Reject", UIAlertActionStyle.Destructive,
+                        x => RejectTribeInvitationTouched(notification.Id, extra, promise)));
+                    alert.AddAction(UIAlertAction.Create("Accept", UIAlertActionStyle.Default,
+                        x => AcceptTribeInvitationTouched(notification.Id, extra, promise)));
+                    ((UIViewController) view).PresentViewController(alert, true, null);
                     result = await promise.Task.ConfigureAwait(false);
                     break;
                 }
                 case NotificationTypeEnum.Story:
                 {
-                    var extra = ((JObject)notification.Extra).ToObject<StoryDTO>();
+                    var extra = ((JObject) notification.Extra).ToObject<StoryDTO>();
                     var overlay = new Overlay("Wait");
                     overlay.PopUp();
                     result = await _businessLogic.ViewStory(notification.Id, extra, view).ConfigureAwait(false);
@@ -97,7 +103,8 @@ namespace TellMe.iOS.Core
             return result;
         }
 
-        private async void RejectFriendshipTouched(int notificationId, StorytellerDTO dto, TaskCompletionSource<bool?> promise)
+        private async void RejectFriendshipTouched(int notificationId, StorytellerDTO dto,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
@@ -106,7 +113,8 @@ namespace TellMe.iOS.Core
             promise.SetResult(result);
         }
 
-        private async void AcceptFriendshipTouched(int notificationId, StorytellerDTO dto, TaskCompletionSource<bool?> promise)
+        private async void AcceptFriendshipTouched(int notificationId, StorytellerDTO dto,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
@@ -115,7 +123,8 @@ namespace TellMe.iOS.Core
             promise.SetResult(result);
         }
 
-        private async void RejectStoryRequestTouched(int notificationId, StoryRequestDTO dto, TaskCompletionSource<bool?> promise)
+        private async void RejectStoryRequestTouched(int notificationId, StoryRequestDTO dto,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
@@ -124,7 +133,8 @@ namespace TellMe.iOS.Core
             promise.SetResult(result);
         }
 
-        private async void AcceptTribeInvitationTouched(int notificationId, TribeDTO dto, TaskCompletionSource<bool?> promise)
+        private async void AcceptTribeInvitationTouched(int notificationId, TribeDTO dto,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
@@ -134,7 +144,8 @@ namespace TellMe.iOS.Core
             promise.SetResult(result);
         }
 
-        private async void RejectTribeInvitationTouched(int notificationId, TribeDTO dto, TaskCompletionSource<bool?> promise)
+        private async void RejectTribeInvitationTouched(int notificationId, TribeDTO dto,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
@@ -142,14 +153,15 @@ namespace TellMe.iOS.Core
             overlay.Close();
 
             promise.SetResult(result);
-
         }
 
-        private async void AcceptStoryRequestTouched(int notificationId, StoryRequestDTO dto, IView view, TaskCompletionSource<bool?> promise)
+        private async void AcceptStoryRequestTouched(int notificationId, StoryRequestDTO dto, IView view,
+            TaskCompletionSource<bool?> promise)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp();
-            var result = await _businessLogic.AcceptStoryRequestRequest(notificationId, dto, view).ConfigureAwait(false);
+            var result = await _businessLogic.AcceptStoryRequestRequest(notificationId, dto, view)
+                .ConfigureAwait(false);
             overlay.Close();
             promise.SetResult(result);
         }

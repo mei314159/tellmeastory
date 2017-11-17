@@ -10,5 +10,6 @@ namespace TellMe.Core.Contracts.BusinessLogic
         void InitButtons();
         Task SendAsync();
         void ChooseRecipients();
+        string GetUsername();
     }
 }

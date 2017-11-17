@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace TellMe.Core.Contracts.DataServices
 {

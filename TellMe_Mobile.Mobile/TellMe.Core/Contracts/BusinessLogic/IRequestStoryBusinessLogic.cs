@@ -7,5 +7,6 @@ namespace TellMe.Core.Contracts.BusinessLogic
     {
         IRequestStoryView View { get; set; }
         Task SendAsync();
+        string GetUsername();
     }
 }
