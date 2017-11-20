@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="RegistrationConfirmation_MailTemplate" xml:space="preserve">
+	    <value>Hi, you have been registered in our system.&lt;br/&gt;&lt;br/&gt;
+To confirm your registration click on link below:&lt;br/&gt;
+&lt;a href="{0}"&gt;Confirm Registration&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+If you did not register just ignore this email.&lt;br/&gt;
+Thanks.&lt;br/&gt;
+&lt;a href='{1}'&gt;Tell Me a Story app&lt;/a&gt;</value>
+    </data>
+    <data name="RequestToJoin_MailTemplate" xml:space="preserve">
+	    <value>Hi, you have been invited to join Tell Me a Story App by {0}.&lt;br/&gt;&lt;br/&gt;
+To continue registration click on link below:&lt;br/&gt;
+&lt;a href="{1}"&gt;Sign Up&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+If you don't know {0} just ignore this email.&lt;br/&gt;
+Thanks.&lt;br/&gt;
+&lt;a href='{2}'&gt;Tell Me a Story app&lt;/a&gt;</value>
+    </data>
+</root>

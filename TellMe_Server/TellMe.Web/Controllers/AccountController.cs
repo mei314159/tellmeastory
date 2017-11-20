@@ -15,20 +15,22 @@ namespace TellMe.Web.Controllers
     [Route("api/account")]
     public class AccountController : AuthorizedController
     {
-        private UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHostingEnvironment _environment;
         private readonly IStorageService _storageService;
+        private readonly IUserService _userService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             IHostingEnvironment environment,
             IStorageService storageService,
-            IHttpContextAccessor httpContextAccessor, IUserService userService) :
-             base(httpContextAccessor, userService)
+            IHttpContextAccessor httpContextAccessor, IUserService userService, IUserService userService1) :
+            base(httpContextAccessor, userService)
         {
             this._userManager = userManager;
             _environment = environment;
             _storageService = storageService;
+            _userService = userService1;
         }
 
         [HttpGet("env")]
@@ -43,20 +45,25 @@ namespace TellMe.Web.Controllers
             if (dto != null && ModelState.IsValid)
             {
                 //var formattedPhoneNumber = new Regex(Constants.PhoneNumberCleanupRegex).Replace(dto.PhoneNumber, string.Empty);
-                var result = await _userManager.CreateAsync(new ApplicationUser
+                var applicationUser = new ApplicationUser
                 {
                     UserName = dto.UserName,
                     Email = dto.Email,
                     FullName = dto.FullName,
+                    EmailConfirmed = false,
                     // PhoneNumber = dto.PhoneNumber,
                     // PhoneNumberDigits = long.Parse(formattedPhoneNumber),
                     // PhoneNumberConfirmed = true, //Must be false and confirmed separately by sms
                     // PhoneCountryCode = dto.PhoneCountryCode,
                     // CountryCode = dto.CountryCode
-                }, dto.Password);
+                };
+                var result = await _userManager.CreateAsync(applicationUser, dto.Password);
 
                 if (result.Succeeded)
                 {
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
+                    await _userService.SendRegistrationConfirmationEmailAsync(applicationUser.Id, applicationUser.Email,
+                        token);
                     return Ok();
                 }
 
@@ -64,6 +71,29 @@ namespace TellMe.Web.Controllers
                 {
                     ModelState.AddModelError(error.Code, error.Description);
                 }
+            }
+
+            return BadRequest(ModelState);
+        }
+
+        [HttpGet("confirm/{userId}/{code}")]
+        public async Task<IActionResult> ConfirmEmailAsync(string userId, string code)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return BadRequest("User was not found");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            foreach (var identityError in result.Errors)
+            {
+                ModelState.AddModelError(identityError.Code, identityError.Description);
             }
 
             return BadRequest(ModelState);
@@ -94,10 +124,8 @@ namespace TellMe.Web.Controllers
             {
                 return Ok(uploadResult);
             }
-            else
-            {
-                return this.StatusCode((int)HttpStatusCode.InternalServerError);
-            }
+
+            return this.StatusCode((int) HttpStatusCode.InternalServerError);
         }
     }
 }

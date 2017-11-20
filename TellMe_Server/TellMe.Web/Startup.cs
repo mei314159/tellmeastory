@@ -23,8 +23,11 @@ using TellMe.DAL.Types.AzureBlob;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Localization;
 using TellMe.DAL.Contracts.PushNotifications;
+using TellMe.DAL.Types.Emailing;
 using TellMe.DAL.Types.PushNotifications;
+using TellMe.DAL.Types.Settings;
 using TellMe.Web.Automapper;
 
 namespace TellMe.Web
@@ -52,16 +55,16 @@ namespace TellMe.Web
             services.AddOptions();
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                b => { }));
+                    b => { }));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-                {
-                    options.User.RequireUniqueEmail = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireDigit = true;
-                    options.Password.RequiredLength = 4;
-                    options.Password.RequireLowercase = false;
-                }).AddEntityFrameworkStores<AppDbContext>();
+            {
+                options.User.RequireUniqueEmail = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 4;
+                options.Password.RequireLowercase = false;
+            }).AddEntityFrameworkStores<AppDbContext>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
@@ -72,10 +75,18 @@ namespace TellMe.Web
             services.AddTransient<ITribeService, TribeService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddTransient<ICommentService, CommentService>();
+            services.AddTransient<IMailSender, SendGridMailSender>();
+            services.AddLocalization();
+            services.AddSingleton<IStringLocalizerFactory, ResourceManagerStringLocalizerFactory>();
+            services.AddSingleton(x => x.GetService<IStringLocalizerFactory>()
+                .Create("TellMe.DAL.TellMe", "TellMe.DAL"));
             services.AddSingleton(Environment);
+            
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
             services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
+            services.Configure<SendGridSettings>(Configuration.GetSection("SendGrid"));
+            services.Configure<AppSettings>(Configuration.GetSection("Settings"));
             ConfigureJwtAuthService(services);
 
             services.Configure<FormOptions>(options =>
@@ -134,10 +145,7 @@ namespace TellMe.Web
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
-            {
-                o.TokenValidationParameters = tokenValidationParameters;
-            });
+            }).AddJwtBearer(o => { o.TokenValidationParameters = tokenValidationParameters; });
         }
     }
 }
