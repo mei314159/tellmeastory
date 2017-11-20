@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -19,11 +20,9 @@ namespace TellMe.Web.Controllers
     [Route("api/token")]
     public class TokenController : Controller
     {
-        //some config in the appsettings.json  
-        private IOptions<Audience> _settings;
-        //repository to handler the sqlite database  
-        private IUserService _userService;
-        private UserManager<ApplicationUser> _userManager;
+        private readonly IOptions<Audience> _settings;
+        private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
         public TokenController(IOptions<Audience> settings, IUserService userService, UserManager<ApplicationUser> userManager)
         {
             this._settings = settings;
@@ -44,27 +43,19 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            // if (parameters.grant_type == "phone_number")
-            // {
-            //     return await DoPhoneNumberAsync(parameters);
-            // }
-            // else 
-            if (parameters.grant_type == "password")
+            switch (parameters.grant_type)
             {
-                return await DoPasswordAsync(parameters);
-            }
-            else if (parameters.grant_type == "refresh_token")
-            {
-                return await DoRefreshToken(parameters);
-            }
-            else
-            {
-                return BadRequest(new ResponseData
-                {
-                    Code = "904",
-                    Message = "bad request",
-                    Data = null
-                });
+                case "password":
+                    return await DoPasswordAsync(parameters);
+                case "refresh_token":
+                    return await DoRefreshToken(parameters);
+                default:
+                    return BadRequest(new ResponseData
+                    {
+                        Code = "904",
+                        Message = "bad request",
+                        Data = null
+                    });
             }
         }
 
@@ -85,12 +76,12 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            var refreshToken = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
             var rToken = new RefreshToken
             {
                 ClientId = parameters.client_id,
-                Token = refresh_token,
+                Token = refreshToken,
                 Expired = false,
                 UserId = user.Id
             };
@@ -99,20 +90,17 @@ namespace TellMe.Web.Controllers
             var success = await _userService.AddTokenAsync(rToken);
             if (success)
             {
-                return Ok(GetJwt(parameters.client_id, refresh_token, user));
+                return Ok(GetJwt(parameters.client_id, refreshToken, user));
             }
-            else
+            
+            return BadRequest(new ResponseData
             {
-                return BadRequest(new ResponseData
-                {
-                    Code = "909",
-                    Message = "can not add token to database",
-                    Data = null
-                });
-            }
+                Code = "909",
+                Message = "can not add token to database",
+                Data = null
+            });
         }
-
-        //scenario 2 ï¼š get the access_token by refresh_token  
+        
         private async Task<IActionResult> DoRefreshToken(TokenAuthParams parameters)
         {
             var token = await _userService.GetTokenAsync(parameters.refresh_token, parameters.client_id);
@@ -126,7 +114,7 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            if (token.Expired == true)
+            if (token.Expired)
             {
                 return BadRequest(new ResponseData
                 {
@@ -136,7 +124,7 @@ namespace TellMe.Web.Controllers
                 });
             }
 
-            var refresh_token = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            var refreshToken = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
             token.Expired = true;
             //expire the old refresh_token and add a new refresh_token  
@@ -144,7 +132,7 @@ namespace TellMe.Web.Controllers
             var addFlag = await _userService.AddTokenAsync(new RefreshToken
             {
                 ClientId = parameters.client_id,
-                Token = refresh_token,
+                Token = refreshToken,
                 Expired = false,
                 UserId = token.UserId
             });
@@ -152,29 +140,27 @@ namespace TellMe.Web.Controllers
             if (updateFlag && addFlag)
             {
                 var user = await _userManager.FindByIdAsync(token.UserId);
-                return Ok(GetJwt(parameters.client_id, refresh_token, user));
+                return Ok(GetJwt(parameters.client_id, refreshToken, user));
             }
-            else
+            
+            return BadRequest(new ResponseData
             {
-                return BadRequest(new ResponseData
-                {
-                    Code = "910",
-                    Message = "can not expire token or a new token",
-                    Data = null
-                });
-            }
+                Code = "910",
+                Message = "can not expire token or a new token",
+                Data = null
+            });
         }
 
         //get the jwt token   
-        private string GetJwt(string client_id, string refresh_token, ApplicationUser user)
+        private string GetJwt(string clientId, string refreshToken, ApplicationUser user)
         {
             var now = DateTime.UtcNow;
 
-            var claims = new Claim[]
+            var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64)
+            new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
             };
 
             var symmetricKeyAsBase64 = _settings.Value.Secret;
@@ -194,7 +180,7 @@ namespace TellMe.Web.Controllers
             {
                 access_token = encodedJwt,
                 expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds,
-                refresh_token = refresh_token,
+                refresh_token = refreshToken,
                 user_id = user.Id,
                 account = Mapper.Map<UserDTO>(user)
             };

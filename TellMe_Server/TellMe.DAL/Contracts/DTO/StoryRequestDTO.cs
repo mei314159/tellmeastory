@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace TellMe.DAL.Contracts.DTO
 {
     public class StoryRequestDTO

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq.Expressions;
-using TellMe.DAL.Types.Domain;
 
 namespace TellMe.DAL.Types.Repositories
 {

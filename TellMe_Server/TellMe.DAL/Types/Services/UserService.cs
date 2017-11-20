@@ -6,7 +6,6 @@ using TellMe.DAL.Types.Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using TellMe.DAL.Contracts.DTO;
-using AutoMapper.QueryableExtensions;
 using System;
 using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Types.PushNotifications;

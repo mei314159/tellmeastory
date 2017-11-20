@@ -27,6 +27,15 @@ namespace TellMe.Web.Controllers
 
             return Ok(result);
         }
+        
+        [HttpGet("{replyToCommentId}/replies/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetRepliesAsync(int storyId, long olderThanTicksUtc, int replyToCommentId)
+        {
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _commentService.GetAllAsync(storyId, this.UserId, olderThanUtc, replyToCommentId);
+
+            return Ok(result);
+        }
 
         [HttpPost("")]
         public async Task<IActionResult> AddCommentAsync(int storyId, [FromBody] CommentDTO dto)

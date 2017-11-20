@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Domain;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Types.Domain;
 

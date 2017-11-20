@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace TellMe.DAL.Types.PushNotifications
 {
-    public class IosNotificationAPS
+    public class IosNotificationAps
     {
         [JsonProperty(PropertyName = "alert")]
         public string Message { get; set; }

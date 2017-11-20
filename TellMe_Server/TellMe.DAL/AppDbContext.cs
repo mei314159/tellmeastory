@@ -31,6 +31,9 @@ namespace TellMe.DAL
 
             builder.Entity<Comment>().HasOne(x => x.Story).WithMany(x => x.Comments).HasForeignKey(x => x.StoryId);
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
+            builder.Entity<Comment>().HasOne(x => x.ReplyToComment).WithMany()
+                .HasForeignKey(x => x.ReplyToCommentId)
+                .IsRequired(false);
 
             builder.Entity<StoryReceiver>().HasOne(x => x.Story).WithMany(x => x.Receivers)
                 .HasForeignKey(x => x.StoryId);

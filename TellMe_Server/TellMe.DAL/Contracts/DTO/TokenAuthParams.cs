@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace TellMe.DAL.Contracts.DTO
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class TokenAuthParams
     {
         public string grant_type { get; set; }

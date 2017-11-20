@@ -10,16 +10,12 @@ namespace TellMe.DAL.Types.PushNotifications
 {
     public class PushFeedbackService
     {
-        private readonly IRepository<ApplicationUser, string> _applicationUserRepository;
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
         private readonly PushSettings _pushSettings;
 
-        public PushFeedbackService(
-            IRepository<ApplicationUser, string> applicationUserRepository,
-            IRepository<PushNotificationClient, int> pushTokenRepository,
+        public PushFeedbackService(IRepository<PushNotificationClient, int> pushTokenRepository,
             IOptions<PushSettings> pushSettings)
         {
-            _applicationUserRepository = applicationUserRepository;
             _pushTokenRepository = pushTokenRepository;
             this._pushSettings = pushSettings.Value;
         }

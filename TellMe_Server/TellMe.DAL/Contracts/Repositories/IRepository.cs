@@ -4,8 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TellMe.DAL.Contracts.Domain;
-using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Types.Repositories;
 
 namespace TellMe.DAL.Contracts.Repositories
 {

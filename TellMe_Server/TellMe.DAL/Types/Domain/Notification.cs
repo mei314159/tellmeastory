@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TellMe.DAL.Types.Domain;
 using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Types.Domain

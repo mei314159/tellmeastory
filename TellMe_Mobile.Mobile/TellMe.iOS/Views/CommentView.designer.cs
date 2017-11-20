@@ -7,11 +7,12 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using UIKit;
 
-namespace TellMe.iOS.Views.Cells
+namespace TellMe.iOS
 {
-    [Register ("CommentViewCell")]
-    partial class CommentViewCell
+    [Register ("CommentView")]
+    partial class CommentView
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -19,15 +20,7 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIStackView Replies { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Button ReplyButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button ShowRepliesButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -45,10 +38,6 @@ namespace TellMe.iOS.Views.Cells
         [GeneratedCode ("iOS Designer", "1.0")]
         partial void ReplyButton_TouchUpInside (TellMe.iOS.Button sender);
 
-        [Action ("ShowRepliesButton_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ShowRepliesButton_TouchUpInside (TellMe.iOS.Button sender);
-
         void ReleaseDesignerOutlets ()
         {
             if (ProfilePicture != null) {
@@ -56,19 +45,9 @@ namespace TellMe.iOS.Views.Cells
                 ProfilePicture = null;
             }
 
-            if (Replies != null) {
-                Replies.Dispose ();
-                Replies = null;
-            }
-
             if (ReplyButton != null) {
                 ReplyButton.Dispose ();
                 ReplyButton = null;
-            }
-
-            if (ShowRepliesButton != null) {
-                ShowRepliesButton.Dispose ();
-                ShowRepliesButton = null;
             }
 
             if (Text != null) {
