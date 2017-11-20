@@ -4,9 +4,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
-using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Contracts.Services;
+using TellMe.DAL.Types.Settings;
 
 namespace TellMe.DAL.Types.AzureBlob
 {

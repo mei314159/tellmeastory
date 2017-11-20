@@ -254,7 +254,7 @@ namespace TellMe.DAL.Types.Services
             var tribeMembers = await _tribeMemberRepository.GetQueryable(true).Where(x => tribeIds.Contains(x.TribeId))
                 .Select(x => new
                 {
-                    TribeId = x.TribeId,
+                    x.TribeId,
                     TribeName = x.Tribe.Name,
                     x.UserId
                 }).ToListAsync().ConfigureAwait(false);
@@ -262,7 +262,7 @@ namespace TellMe.DAL.Types.Services
             var now = DateTime.UtcNow;
 
             var entityIds = entities.Select(x => x.Id).ToArray();
-            var requestDTOs = await _storyRequestRepository
+            var requestDtos = await _storyRequestRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
                 .Include(x => x.Receiver)
@@ -271,7 +271,7 @@ namespace TellMe.DAL.Types.Services
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            var notifications = requestDTOs.SelectMany(requestDTO =>
+            var notifications = requestDtos.SelectMany(requestDTO =>
             {
                 if (requestDTO.TribeId == null)
                 {
@@ -302,7 +302,7 @@ namespace TellMe.DAL.Types.Services
 
             _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
-            return requestDTOs;
+            return requestDtos;
         }
 
         public async Task<StoryDTO> SendStoryAsync(string senderId, SendStoryDTO dto)
@@ -347,11 +347,12 @@ namespace TellMe.DAL.Types.Services
                 await SetRequestStatus(senderId, dto.RequestId.Value, StoryStatus.Sent).ConfigureAwait(false);
             }
 
+            var entityId = entity.Id;
             entity = await _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
                 .Include(x => x.Receivers)
-                .FirstOrDefaultAsync(x => x.Id == entity.Id)
+                .FirstOrDefaultAsync(x => x.Id == entityId)
                 .ConfigureAwait(false);
 
             var storyDTO = Mapper.Map<StoryDTO>(entity);

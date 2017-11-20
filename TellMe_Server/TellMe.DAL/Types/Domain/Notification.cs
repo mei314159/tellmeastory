@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TellMe.DAL.Types.PushNotifications;
@@ -8,6 +9,7 @@ namespace TellMe.DAL.Types.Domain
 {
     public class Notification : EntityBase<int>
     {
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal string _extra { get; set; }
 
         public string RecipientId { get; set; }
@@ -23,14 +25,8 @@ namespace TellMe.DAL.Types.Domain
         [NotMapped]
         public object Extra
         {
-            get
-            {
-                return JObject.Parse(_extra);
-            }
-            set
-            {
-                _extra = JsonConvert.SerializeObject(value);
-            }
+            get => JObject.Parse(_extra);
+            set => _extra = JsonConvert.SerializeObject(value);
         }
 
         public virtual ApplicationUser Recipient { get; set; }

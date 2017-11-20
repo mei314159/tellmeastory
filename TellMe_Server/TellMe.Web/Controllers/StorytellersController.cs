@@ -10,7 +10,7 @@ namespace TellMe.Web.Controllers
     [Route("api/storytellers")]
     public class StorytellersController : AuthorizedController
     {
-        private INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
         public StorytellersController(
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,
@@ -59,8 +59,9 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPost("request-to-join")]
-        public IActionResult SendRequestToJoinAsync(string email)
+        public async Task<IActionResult> SendRequestToJoinAsync([FromBody] string email)
         {
+            await UserService.SendRequestToJoinAsync(email, this.UserId);
             return Ok();
         }
     }

@@ -7,8 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using TellMe.DAL.Contracts.DTO;
 using System;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
+using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Types.PushNotifications;
+using TellMe.DAL.Types.Settings;
 
 namespace TellMe.DAL.Types.Services
 {
@@ -20,6 +24,9 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<Friendship, int> _friendshipRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<RefreshToken, int> _refreshTokenRepository;
+        private readonly IMailSender _mailSender;
+        private readonly IStringLocalizer _stringLocalizer;
+        private readonly AppSettings _appSettings;
 
         public UserService(
             IRepository<ApplicationUser, string> userRepository,
@@ -27,7 +34,10 @@ namespace TellMe.DAL.Types.Services
             IRepository<Friendship, int> friendshipRepository,
             IPushNotificationsService pushNotificationsService,
             IRepository<Notification, int> notificationRepository,
-            IRepository<TribeMember, int> tribeMemberRepository)
+            IRepository<TribeMember, int> tribeMemberRepository,
+            IMailSender mailSender,
+            IOptions<AppSettings> emailingSettings,
+            IStringLocalizer stringLocalizer)
         {
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
@@ -35,14 +45,19 @@ namespace TellMe.DAL.Types.Services
             _pushNotificationsService = pushNotificationsService;
             _notificationRepository = notificationRepository;
             _tribeMemberRepository = tribeMemberRepository;
+            _mailSender = mailSender;
+            _stringLocalizer = stringLocalizer;
+            _appSettings = emailingSettings.Value;
         }
+
         public async Task<ApplicationUser> GetAsync(string id)
         {
             var result = await _userRepository.GetQueryable().SingleAsync(a => a.Id == id).ConfigureAwait(false);
             return result;
         }
 
-        public async Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int? skip = null)
+        public async Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment,
+            ContactsMode mode, int skip)
         {
             string uppercaseFragment = null;
             var userQuery = _userRepository
@@ -55,33 +70,33 @@ namespace TellMe.DAL.Types.Services
                 var words = uppercaseFragment.Split(' ');
 
                 userQuery = userQuery
-                .Where(x => x.NormalizedUserName.StartsWith(uppercaseFragment)
-                         || x.NormalizedEmail == uppercaseFragment
-                         || words.All(y => x.FullName.ToUpper().Contains(y)));
+                    .Where(x => x.NormalizedUserName.StartsWith(uppercaseFragment)
+                                || x.NormalizedEmail == uppercaseFragment
+                                || words.All(y => x.FullName.ToUpper().Contains(y)));
             }
 
             var friends = _friendshipRepository
-            .GetQueryable(true)
-            .Where(x => x.UserId == currentUserId);
+                .GetQueryable(true)
+                .Where(x => x.UserId == currentUserId);
 
             var users =
             (from user in userQuery
-             join friend in friends on user.Id equals friend.FriendId into gj
-             from x in gj.DefaultIfEmpty()
-             select new ContactDTO
-             {
-                 Type = ContactType.User,
-                 Name = user.UserName,
-                 UserId = user.Id,
-                 User = new StorytellerDTO
-                 {
-                     Id = user.Id,
-                     UserName = user.UserName,
-                     FullName = user.FullName,
-                     PictureUrl = user.PictureUrl,
-                     FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
-                 }
-             });
+                join friend in friends on user.Id equals friend.FriendId into gj
+                from x in gj.DefaultIfEmpty()
+                select new ContactDTO
+                {
+                    Type = ContactType.User,
+                    Name = user.UserName,
+                    UserId = user.Id,
+                    User = new StorytellerDTO
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        FullName = user.FullName,
+                        PictureUrl = user.PictureUrl,
+                        FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
+                    }
+                });
 
             if (string.IsNullOrWhiteSpace(fragment) || mode != ContactsMode.Normal)
             {
@@ -123,8 +138,43 @@ namespace TellMe.DAL.Types.Services
                 contacts = users.Concat(tribes);
             }
 
-            var result = await contacts.OrderBy(x => x.Type).ThenBy(x => x.Name).Skip(skip.Value).ToListAsync().ConfigureAwait(false);
+            var result = await contacts.OrderBy(x => x.Type).ThenBy(x => x.Name).Skip(skip).ToListAsync()
+                .ConfigureAwait(false);
             return result;
+        }
+
+        public async Task SendRegistrationConfirmationEmailAsync(string userId, string email, string confirmationToken)
+        {
+            const string displayName = "TellMeAStoryApp";
+            const string mailSubject = "Registration confirmation";
+
+            var mailBody = string.Format(
+                _stringLocalizer["RegistrationConfirmation_MailTemplate"],
+                $"{_appSettings.Host}/api/account/confirm/{userId}/{confirmationToken}",
+                _appSettings.Host);
+
+            await _mailSender
+                .SendAsync(_appSettings.SupportEmail, displayName, mailSubject, mailBody, new[] {email}, true)
+                .ConfigureAwait(false);
+        }
+
+        public async Task SendRequestToJoinAsync(string email, string senderUserId)
+        {
+            var user = await _userRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == senderUserId)
+                .ConfigureAwait(false);
+            
+            const string displayName = "TellMeAStoryApp";
+            const string mailSubject = "Registration confirmation";
+
+            var mailBody = string.Format(
+                _stringLocalizer["RequestToJoin_MailTemplate"],
+                user.FullName,
+                $"{_appSettings.Host}/account/signup",
+                _appSettings.Host);
+
+            await _mailSender
+                .SendAsync(_appSettings.SupportEmail, displayName, mailSubject, mailBody, new[] {email}, true)
+                .ConfigureAwait(false);
         }
 
         public async Task<bool> AddTokenAsync(RefreshToken token)
@@ -138,16 +188,19 @@ namespace TellMe.DAL.Types.Services
             await _refreshTokenRepository.SaveAsync(token).ConfigureAwait(false);
             return true;
         }
+
         public Task<RefreshToken> GetTokenAsync(string token, string clientId)
         {
-            return _refreshTokenRepository.GetQueryable().FirstOrDefaultAsync(x => x.ClientId == clientId && x.Token == token);
+            return _refreshTokenRepository.GetQueryable()
+                .FirstOrDefaultAsync(x => x.ClientId == clientId && x.Token == token);
         }
 
         public async Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId)
         {
             var friendships = await _friendshipRepository.GetQueryable()
-            .Where(x => (x.UserId == currentUserId && x.FriendId == userId) || (x.UserId == userId && x.FriendId == currentUserId))
-            .ToListAsync().ConfigureAwait(false);
+                .Where(x => (x.UserId == currentUserId && x.FriendId == userId) ||
+                            (x.UserId == userId && x.FriendId == currentUserId))
+                .ToListAsync().ConfigureAwait(false);
 
             DateTime now = DateTime.UtcNow;
             Friendship myFriendship = null;
@@ -194,7 +247,8 @@ namespace TellMe.DAL.Types.Services
 
             _friendshipRepository.PreCommitSave();
 
-            var user = await _userRepository.GetQueryable().AsNoTracking().FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+            var user = await _userRepository.GetQueryable().AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
             var friend = new StorytellerDTO
             {
                 Id = myFriendship.UserId,
@@ -238,10 +292,11 @@ namespace TellMe.DAL.Types.Services
         public async Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId)
         {
             var friendships = await _friendshipRepository.GetQueryable()
-            .Where(x => (x.UserId == currentUserId && x.FriendId == userId) || (x.UserId == userId && x.FriendId == currentUserId))
-            .ToListAsync().ConfigureAwait(false);
+                .Where(x => (x.UserId == currentUserId && x.FriendId == userId) ||
+                            (x.UserId == userId && x.FriendId == currentUserId))
+                .ToListAsync().ConfigureAwait(false);
 
-            DateTime now = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
             Friendship myFriendship = null;
             if (friendships.Count > 0)
             {
@@ -284,8 +339,8 @@ namespace TellMe.DAL.Types.Services
                 .FirstOrDefaultAsync(x => x.Id == userId).ConfigureAwait(false);
 
             var friendship = await _friendshipRepository
-            .GetQueryable(true)
-            .FirstOrDefaultAsync(x => x.UserId == currentUserId).ConfigureAwait(false);
+                .GetQueryable(true)
+                .FirstOrDefaultAsync(x => x.UserId == currentUserId).ConfigureAwait(false);
 
             var result = new StorytellerDTO
             {
@@ -293,7 +348,7 @@ namespace TellMe.DAL.Types.Services
                 UserName = user.UserName,
                 FullName = user.FullName,
                 PictureUrl = user.PictureUrl,
-                FriendshipStatus = friendship != null ? friendship.Status : FriendshipStatus.None
+                FriendshipStatus = friendship?.Status ?? FriendshipStatus.None
             };
 
             return result;

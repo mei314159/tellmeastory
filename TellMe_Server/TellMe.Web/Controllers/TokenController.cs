@@ -90,7 +90,7 @@ namespace TellMe.Web.Controllers
             var success = await _userService.AddTokenAsync(rToken);
             if (success)
             {
-                return Ok(GetJwt(parameters.client_id, refreshToken, user));
+                return Ok(GetJwt(refreshToken, user));
             }
             
             return BadRequest(new ResponseData
@@ -140,7 +140,7 @@ namespace TellMe.Web.Controllers
             if (updateFlag && addFlag)
             {
                 var user = await _userManager.FindByIdAsync(token.UserId);
-                return Ok(GetJwt(parameters.client_id, refreshToken, user));
+                return Ok(GetJwt(refreshToken, user));
             }
             
             return BadRequest(new ResponseData
@@ -152,7 +152,7 @@ namespace TellMe.Web.Controllers
         }
 
         //get the jwt token   
-        private string GetJwt(string clientId, string refreshToken, ApplicationUser user)
+        private string GetJwt(string refreshToken, ApplicationUser user)
         {
             var now = DateTime.UtcNow;
 

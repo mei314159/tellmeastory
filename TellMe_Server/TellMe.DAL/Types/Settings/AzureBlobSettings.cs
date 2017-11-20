@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Contracts
+namespace TellMe.DAL.Types.Settings
 {
     public class AzureBlobSettings
     {

@@ -7,6 +7,10 @@ namespace TellMe.DAL.Contracts.Services
 {
     public interface IUserService : IService
     {
+        Task SendRegistrationConfirmationEmailAsync(string userId, string email, string confirmationToken);
+        
+        Task SendRequestToJoinAsync(string email, string senderFullName);
+        
         Task<ApplicationUser> GetAsync(string id);
 
         Task<StorytellerDTO> GetStorytellerAsync(string currentUserId, string userId);
@@ -17,7 +21,7 @@ namespace TellMe.DAL.Contracts.Services
 
         Task<RefreshToken> GetTokenAsync(string token, string clientId);
 
-        Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int? skip = null);
+        Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int skip);
 
         Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
         Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);
