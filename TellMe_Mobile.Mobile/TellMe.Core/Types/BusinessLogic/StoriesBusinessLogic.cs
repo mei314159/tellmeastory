@@ -35,9 +35,6 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
-            //var localStories = await _localStoriesService.GetAllAsync().ConfigureAwait(false);
-            //if (localStories.Expired || forceRefresh || clearCache)
-            //{
             if (forceRefresh)
             {
                 _stories.Clear();
@@ -59,12 +56,6 @@ namespace TellMe.Core.Types.BusinessLogic
                 result.ShowResultError(this.View);
                 return;
             }
-            //}
-            //else
-            //{
-            //    stories.Clear();
-            //    stories.AddRange(localStories.Data);
-            //}
 
             this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }

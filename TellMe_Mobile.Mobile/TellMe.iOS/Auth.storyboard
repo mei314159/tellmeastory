@@ -422,7 +422,7 @@
                                 </connections>
                                 <state key="disabled" title="Continue"/>
                             </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="50024" translatesAutoresizingMaskIntoConstraints="NO" clipsSubviews="YES" customClass="Picture" image="UserPic">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="50024" translatesAutoresizingMaskIntoConstraints="NO" clipsSubviews="YES" customClass="Picture" image="UserPic">
                                 <rect key="frame" x="75" y="52" width="225" height="225"/>
                                 <constraints>
                                     <constraint id="50169" firstAttribute="width" secondItem="50024" secondAttribute="height" multiplier="1:1"/>

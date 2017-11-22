@@ -35,6 +35,10 @@ namespace TellMe.Core.Contracts
         void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, int tribeId, TribeLeftHandler e);
+        void NavigateViewEvent(IView view, EventDTO eventDTO);
+        void NavigateCreateEvent(IView view, EventCreatedHandler complete);
+        void NavigateEditEvent(IView view, EventDTO eventDTO);
+        void NavigateEvents(IView view);
         void SwapToAuth();
     }
 }

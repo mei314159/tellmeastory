@@ -63,8 +63,9 @@ namespace TellMe.DAL.Types.Services
                 await _commentRepository.SaveAsync(parentComment, true).ConfigureAwait(false);
             }
 
+            var entityId = entity.Id;
             entity = await _commentRepository.GetQueryable(true).Include(x => x.Author)
-                .FirstOrDefaultAsync(x => x.Id == entity.Id).ConfigureAwait(false);
+                .FirstOrDefaultAsync(x => x.Id == entityId).ConfigureAwait(false);
             Mapper.Map(entity, comment);
 
             var story = await _storyRepository

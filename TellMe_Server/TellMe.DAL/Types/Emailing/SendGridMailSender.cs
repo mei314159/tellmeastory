@@ -47,7 +47,7 @@ namespace TellMe.DAL.Types.Emailing
 
             try
             {
-                var response = await sendGridClient.SendEmailAsync(mail).ConfigureAwait(false);
+                await sendGridClient.SendEmailAsync(mail).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

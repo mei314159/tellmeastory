@@ -228,6 +228,30 @@ namespace TellMe.iOS.Core
             });
         }
 
+        public void NavigateViewEvent(IView view, EventDTO eventDTO)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void NavigateCreateEvent(IView view, EventCreatedHandler complete)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void NavigateEditEvent(IView view, EventDTO eventDTO)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void NavigateEvents(IView view)
+        {
+            this._window.InvokeOnMainThread(() =>
+            {
+                var targetController = IoC.Container.GetInstance<EventsViewController>();
+                this.Present(targetController, view);
+            });
+        }
+
         public void SwapToAuth()
         {
             this._window.InvokeOnMainThread(() =>

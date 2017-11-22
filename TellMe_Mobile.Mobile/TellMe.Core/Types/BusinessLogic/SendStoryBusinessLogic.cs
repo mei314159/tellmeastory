@@ -73,9 +73,11 @@ namespace TellMe.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (uploadResult.IsSuccess)
             {
-                var dto = new SendStoryDTO();
-                dto.Title = title;
-                dto.RequestId = View.StoryRequest?.Id;
+                var dto = new SendStoryDTO
+                {
+                    Title = title,
+                    RequestId = View.StoryRequest?.Id
+                };
                 if (dto.RequestId == null)
                 {
                     dto.Receivers = _recipients.Select(x => new StoryReceiverDTO

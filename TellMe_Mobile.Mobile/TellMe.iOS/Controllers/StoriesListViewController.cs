@@ -11,8 +11,10 @@ using TellMe.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views.Badge;
 using CoreGraphics;
+using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.iOS.Core;
+using TellMe.iOS.Controllers;
 
 namespace TellMe.iOS
 {
@@ -64,6 +66,11 @@ namespace TellMe.iOS
             this.NavigationController.SetToolbarHidden(false, true);
         }
 
+        public override void ViewDidAppear(bool animated)
+        {
+            IoC.Container.GetInstance<IRouter>().NavigateEvents(this);
+        }
+
         [Action("UnwindToStoriesViewController:")]
         public void UnwindToStoriesViewController(UIStoryboardSegue segue)
         {
@@ -97,7 +104,7 @@ namespace TellMe.iOS
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell(StoriesListCell.Key, indexPath) as StoriesListCell;
+            var cell = (StoriesListCell) tableView.DequeueReusableCell(StoriesListCell.Key, indexPath);
             cell.Story = this._storiesList[indexPath.Row];
             cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
             cell.PreviewTouched = Cell_PreviewTouched;
@@ -152,7 +159,7 @@ namespace TellMe.iOS
                 this.ActivityIndicator.StartAnimating();
                 this.TableView.TableFooterView.Hidden = false;
             });
-            await _businessLogic.LoadStoriesAsync(false, false);
+            await _businessLogic.LoadStoriesAsync();
             InvokeOnMainThread(() =>
             {
                 this.ActivityIndicator.StopAnimating();

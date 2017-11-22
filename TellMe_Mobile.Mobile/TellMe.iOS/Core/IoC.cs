@@ -7,6 +7,7 @@ using TellMe.Core.Contracts.DataServices;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Types.DataServices;
+using TellMe.iOS.Controllers;
 using UIKit;
 
 namespace TellMe.iOS.Core
@@ -31,8 +32,14 @@ namespace TellMe.iOS.Core
             RegisterAll<ILocalDataService>(Container);
             Container.Register(typeof(AbstractValidator<>), new[] {typeof(AbstractValidator<>).Assembly});
             RegisterAll<IBusinessLogic>(Container);
-
+            RegisterControllers();
+            
             Container.Verify();
+        }
+
+        private static void RegisterControllers()
+        {
+            Container.Register<EventsViewController>();
         }
 
         private static void RegisterAll<T>(Container container)

@@ -214,6 +214,9 @@
     <InterfaceDefinition Include="Views\Cells\LoadMoreButtonCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoryViewCell.xib" />
     <InterfaceDefinition Include="Views\CommentView.xib" />
+    <InterfaceDefinition Include="Controllers\EventsViewController.xib" />
+    <InterfaceDefinition Include="Views\Cells\EventCell.xib" />
+    <InterfaceDefinition Include="Views\Cells\EventAttendeesListCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -352,6 +355,18 @@
     <Compile Include="Views\CommentView.cs" />
     <Compile Include="Views\CommentView.designer.cs">
       <DependentUpon>CommentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\EventsViewController.cs" />
+    <Compile Include="Controllers\EventsViewController.designer.cs">
+      <DependentUpon>EventsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Cells\EventCell.cs" />
+    <Compile Include="Views\Cells\EventCell.designer.cs">
+      <DependentUpon>EventCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Cells\EventAttendeesListCell.cs" />
+    <Compile Include="Views\Cells\EventAttendeesListCell.designer.cs">
+      <DependentUpon>EventAttendeesListCell.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
