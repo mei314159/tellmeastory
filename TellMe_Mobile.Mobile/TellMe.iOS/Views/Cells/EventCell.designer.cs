@@ -7,6 +7,7 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -15,7 +16,7 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button AcceptButton { get; set; }
+        Button AcceptButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -27,35 +28,35 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label DateDay { get; set; }
+        Label DateDay { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label DateMonth { get; set; }
+        Label DateMonth { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Description { get; set; }
+        Label Description { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button SkipButton { get; set; }
+        Button SkipButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Title { get; set; }
+        Label Title { get; set; }
 
         [Action ("AcceptButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void AcceptButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void AcceptButton_TouchUpInside (Button sender);
 
         [Action ("SkipButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SkipButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void SkipButton_TouchUpInside (Button sender);
 
         void ReleaseDesignerOutlets ()
         {

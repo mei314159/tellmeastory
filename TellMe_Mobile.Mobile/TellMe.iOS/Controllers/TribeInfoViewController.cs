@@ -28,7 +28,7 @@ namespace TellMe.iOS.Controllers
         public TribeInfoViewController(TribeDTO tribe) : base(UITableViewStyle.Grouped, null, true)
         {
             this.Tribe = tribe;
-            this._businessLogic = IoC.Container.GetInstance<IViewTribeInfoBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<IViewTribeInfoBusinessLogic>();
             _businessLogic.View = this;
         }
 

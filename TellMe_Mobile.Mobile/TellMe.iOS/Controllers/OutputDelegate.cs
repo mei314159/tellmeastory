@@ -1,8 +1,8 @@
-﻿using Foundation;
-using System;
+﻿using System;
 using AVFoundation;
+using Foundation;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public class OutputDelegate : AVCaptureFileOutputRecordingDelegate
     {

@@ -6,7 +6,7 @@ using TellMe.Core.Contracts.UI.Components;
 using TellMe.iOS.Extensions;
 using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Core.UI
 {
     [Register("Picture")]
     public class Picture : UIImageView, IPicture

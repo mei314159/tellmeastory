@@ -1,16 +1,17 @@
-using Foundation;
 using System;
-using UIKit;
 using AVFoundation;
 using CoreMedia;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Contracts.UI.Components;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class RecordVideoController : UIViewController, IRecordVideoView
     {
@@ -45,7 +46,7 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
 
-            _businessLogic = IoC.Container.GetInstance<IRecordVideoBusinessLogic>();
+            _businessLogic = IoC.GetInstance<IRecordVideoBusinessLogic>();
             _businessLogic.View = this;
             _session = new AVCaptureSession();
             Console.WriteLine("getting device inputs");

@@ -4,6 +4,7 @@ using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using SDWebImage;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {

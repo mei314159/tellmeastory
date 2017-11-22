@@ -1,12 +1,12 @@
 using System;
-using UIKit;
-using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class UploadPictureController : UIViewController, IUploadPictureView
     {
@@ -20,7 +20,7 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            this._businessLogic = IoC.Container.GetInstance<IUploadPictureBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<IUploadPictureBusinessLogic>();
             _businessLogic.View = this;
             View.LayoutIfNeeded();
             Picture.Layer.CornerRadius = Picture.Frame.Width / 2;

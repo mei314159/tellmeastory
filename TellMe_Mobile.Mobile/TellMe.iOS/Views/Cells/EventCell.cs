@@ -2,6 +2,7 @@
 
 using Foundation;
 using TellMe.Core.Contracts.DTO;
+using TellMe.iOS.Core.UI;
 using UIKit;
 
 namespace TellMe.iOS.Views.Cells
@@ -52,7 +53,7 @@ namespace TellMe.iOS.Views.Cells
             this.ProfilePicture.UserInteractionEnabled = true;
             this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(this.ProfilePictureTouched));
             AttendeesCollection.DelaysContentTouches = false;
-            AttendeesCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
+            AttendeesCollection.RegisterNibForCell(EventAttendeesListCell.Nib, EventAttendeesListCell.Key);
         }
 
         public nint GetItemsCount(UICollectionView collectionView, nint section)
@@ -62,18 +63,18 @@ namespace TellMe.iOS.Views.Cells
 
         public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
-            var cell = collectionView.DequeueReusableCell(ReceiversListCell.Key, indexPath) as ReceiversListCell;
-            cell.Receiver = Event.Attendees[(int)indexPath.Item];
+            var cell = collectionView.DequeueReusableCell(EventAttendeesListCell.Key, indexPath) as EventAttendeesListCell;
+            cell.Attendee = Event.Attendees[(int)indexPath.Item];
             return cell;
         }
 
         [Export("collectionView:didSelectItemAtIndexPath:")]
         public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
         {
-            var cell = collectionView.CellForItem(indexPath) as ReceiversListCell;
+            var cell = collectionView.CellForItem(indexPath) as EventAttendeesListCell;
             if (cell != null)
             {
-                this.AttendeeSelected?.Invoke(cell.Receiver, this);
+                this.AttendeeSelected?.Invoke(cell.Attendee, this);
             }
         }
 

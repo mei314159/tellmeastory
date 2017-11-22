@@ -4,12 +4,12 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("UploadPictureController")]
     partial class UploadPictureController
@@ -20,7 +20,7 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture Picture { get; set; }
+        Picture Picture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]

@@ -1,19 +1,19 @@
-using Foundation;
 using System;
-using UIKit;
-using System.Collections.Generic;
-using TellMe.Core.Contracts.DTO;
 using System.Collections;
-using System.Threading.Tasks;
-using TellMe.iOS.Views.Cells;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.iOS.Extensions;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
+using TellMe.iOS.Views.Cells;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource,
         IUITableViewDelegate
@@ -40,7 +40,7 @@ namespace TellMe.iOS
         {
             this.SetMode(Mode);
 
-            this._businessLogic = IoC.Container.GetInstance<IStorytellersBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<IStorytellersBusinessLogic>();
             _businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(StorytellersListCell.Nib, StorytellersListCell.Key);
             this.TableView.RegisterNibForCellReuse(TribesListCell.Nib, TribesListCell.Key);

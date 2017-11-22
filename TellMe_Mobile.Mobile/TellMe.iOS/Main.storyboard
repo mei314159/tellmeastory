@@ -120,6 +120,11 @@
                     </tableView>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Stories" id="3128">
+                        <barButtonItem key="leftBarButtonItem" image="Calendar" id="2vH-wT-pQh">
+                            <connections>
+                                <action selector="Events_Activated:" destination="3077" id="UtY-sm-Fh4"/>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
                             <barButtonItem image="Account" id="19949">
                                 <connections>
@@ -153,6 +158,7 @@
                     <connections>
                         <outlet property="AccountSettingsButton" destination="19949" id="name-outlet-19949"/>
                         <outlet property="ActivityIndicator" destination="32071" id="name-outlet-32071"/>
+                        <outlet property="Events" destination="2vH-wT-pQh" id="d7j-5Z-R9W"/>
                         <outlet property="Notifications" destination="22104" id="name-outlet-22104"/>
                         <outlet property="Storytellers" destination="24667" id="name-outlet-24667"/>
                     </connections>
@@ -377,6 +383,7 @@
     <resources>
         <image name="Account" width="25" height="25"/>
         <image name="Bell" width="25" height="25"/>
+        <image name="Calendar" width="25" height="25"/>
         <image name="Second" width="16" height="16"/>
         <image name="Send" width="30" height="30"/>
         <image name="Storytellers" width="25" height="25"/>

@@ -4,39 +4,39 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Views
 {
     [Register ("CommentView")]
     partial class CommentView
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button ReplyButton { get; set; }
+        Button ReplyButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Text { get; set; }
+        Label Text { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Time { get; set; }
+        Label Time { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label UserName { get; set; }
+        Label UserName { get; set; }
 
         [Action ("ReplyButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ReplyButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void ReplyButton_TouchUpInside (Button sender);
 
         void ReleaseDesignerOutlets ()
         {

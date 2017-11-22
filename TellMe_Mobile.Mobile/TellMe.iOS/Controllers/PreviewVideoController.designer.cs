@@ -4,12 +4,12 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("PreviewVideoController")]
     partial class PreviewVideoController
@@ -20,11 +20,11 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button SendButton { get; set; }
+        Button SendButton { get; set; }
 
         [Action ("SendButtonTouched:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SendButtonTouched (TellMe.iOS.Button sender);
+        partial void SendButtonTouched (Button sender);
 
         void ReleaseDesignerOutlets ()
         {

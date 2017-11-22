@@ -4,11 +4,11 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
 
-namespace TellMe.iOS
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("StoryViewController")]
     partial class StoryViewController
@@ -18,7 +18,7 @@ namespace TellMe.iOS
 
 
         [Outlet]
-        TellMe.iOS.Button CancelButton { get; set; }
+        Button CancelButton { get; set; }
 
 
         [Outlet]
@@ -46,7 +46,7 @@ namespace TellMe.iOS
 
 
         [Action ("CancelButtonTouched:forEvent:")]
-        partial void CancelButtonTouched (TellMe.iOS.Button sender, UIKit.UIEvent @event);
+        partial void CancelButtonTouched (Button sender, UIKit.UIEvent @event);
 
 
         [Action ("SendButtonTouched:")]

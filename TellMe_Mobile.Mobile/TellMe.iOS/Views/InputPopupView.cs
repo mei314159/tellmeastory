@@ -1,10 +1,9 @@
-using Foundation;
 using System;
-using UIKit;
-using TellMe.iOS.Views;
 using CoreGraphics;
+using Foundation;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Views
 {
     public partial class InputPopupView : CustomPopUpView
     {

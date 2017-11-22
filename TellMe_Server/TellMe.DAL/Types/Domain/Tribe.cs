@@ -13,5 +13,7 @@ namespace TellMe.DAL.Types.Domain
         public virtual ApplicationUser Creator { get; set; }
 
         public virtual ICollection<TribeMember> Members { get; set; }
+        
+        public virtual ICollection<EventAttendee> Events { get; set; }
     }
 }

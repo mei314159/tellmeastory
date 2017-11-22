@@ -1,10 +1,11 @@
 using System;
 using Foundation;
-using UIKit;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Types.Extensions;
+using TellMe.iOS.Core.UI;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Views
 {
     public partial class CommentView : UIView
     {

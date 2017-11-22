@@ -19,5 +19,9 @@ namespace TellMe.DAL.Types.Domain
         public virtual ICollection<TribeMember> Tribes { get; set; }
         
         public virtual ICollection<StoryLike> LikedStories { get; set; }
+        
+        public virtual ICollection<EventAttendee> Events { get; set; }
+        
+        public virtual ICollection<Event> HostedEvents { get; set; }
     }
 }

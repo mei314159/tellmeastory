@@ -20,6 +20,7 @@ namespace TellMe.DAL
             builder.Entity<ApplicationUser>().HasMany(x => x.PushNotificationClients).WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
+            builder.Entity<Story>().HasOne(x => x.Event).WithMany().HasForeignKey(x => x.EventId);
             builder.Entity<Story>().HasOne(x => x.Request).WithMany(x => x.Stories).HasForeignKey(x => x.RequestId);
             builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
 
@@ -28,6 +29,17 @@ namespace TellMe.DAL
             builder.Entity<StoryLike>().HasOne(x => x.Story).WithMany(x => x.Likes).HasForeignKey(x => x.StoryId)
                 .IsRequired();
             builder.Entity<StoryLike>().HasKey(x => new {x.UserId, x.StoryId});
+
+            builder.Entity<Event>().HasOne(x => x.Host).WithMany(x => x.HostedEvents).HasForeignKey(x => x.HostId)
+                .IsRequired();
+            builder.Entity<Event>().HasOne(x => x.StoryRequest).WithOne(x => x.Event)
+                .HasForeignKey<Event>(x => x.StoryRequestId)
+                .IsRequired();
+            builder.Entity<EventAttendee>().HasOne(x => x.User).WithMany(x => x.Events)
+                .HasForeignKey(x => x.UserId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<EventAttendee>().HasOne(x => x.Event).WithMany(x => x.Attendees)
+                .HasForeignKey(x => x.EventId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<EventAttendee>().HasOne(x => x.Tribe).WithMany(x => x.Events).HasForeignKey(x => x.TribeId);
 
             builder.Entity<Comment>().HasOne(x => x.Story).WithMany(x => x.Comments).HasForeignKey(x => x.StoryId);
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);
@@ -43,6 +55,7 @@ namespace TellMe.DAL
             builder.Entity<StoryRequest>().HasOne(x => x.Sender).WithMany().HasForeignKey(x => x.SenderId);
             builder.Entity<StoryRequest>().HasOne(x => x.Receiver).WithMany().HasForeignKey(x => x.UserId);
             builder.Entity<StoryRequest>().HasOne(x => x.Tribe).WithMany().HasForeignKey(x => x.TribeId);
+
             builder.Entity<StoryRequest>().HasMany(x => x.Stories).WithOne(x => x.Request)
                 .HasForeignKey(x => x.RequestId);
             builder.Entity<StoryRequest>().HasMany(x => x.Statuses).WithOne(x => x.Request)
@@ -54,8 +67,6 @@ namespace TellMe.DAL
 
             builder.Entity<Notification>().HasOne(x => x.Recipient).WithMany().HasForeignKey(x => x.RecipientId);
             builder.Entity<Notification>().Property(x => x._extra).HasColumnName("Extra");
-            // builder.Entity<ApplicationUser>().Property(x => x.PhoneCountryCode).HasDefaultValue(1);
-            // builder.Entity<ApplicationUser>().HasMany(x => x.Contacts).WithOne(x => x.User).HasForeignKey(x => x.UserId);
             base.OnModelCreating(builder);
         }
     }

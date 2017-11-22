@@ -1,7 +1,7 @@
 using System;
 using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class InitialAuthController : UIViewController
     {

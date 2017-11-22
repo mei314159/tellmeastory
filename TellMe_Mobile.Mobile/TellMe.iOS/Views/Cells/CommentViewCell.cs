@@ -5,6 +5,7 @@ using TellMe.Core.Contracts.DTO;
 using UIKit;
 using TellMe.Core.Types.Extensions;
 using System.Collections.Generic;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {

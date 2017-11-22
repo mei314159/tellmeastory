@@ -32,6 +32,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
+            this.TableView.RefreshControl = new UIRefreshControl();
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
             this.TableView.DelaysContentTouches = false;
@@ -39,6 +40,11 @@ namespace TellMe.iOS.Controllers
             this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
             LoadEventsAsync(false, true);
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetToolbarHidden(true, true);
         }
 
         public override void DidReceiveMemoryWarning()

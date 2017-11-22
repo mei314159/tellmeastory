@@ -1,15 +1,15 @@
 using System;
-using UIKit;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Contracts.UI.Components;
-using TellMe.iOS.Extensions;
-using Foundation;
 using CoreGraphics;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class SignUpController : UIViewController, ISignUpView
     {
@@ -35,7 +35,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            this._businessLogic = IoC.Container.GetInstance<ISignupBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<ISignupBusinessLogic>();
             _businessLogic.View = this;
             UserName.ShouldReturn += TextFieldShouldReturn;
             Email.ShouldReturn += TextFieldShouldReturn;

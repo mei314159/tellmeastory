@@ -6,11 +6,11 @@ using Foundation;
 using SDWebImage;
 using TellMe.Core;
 using TellMe.Core.Contracts.DTO;
-using UIKit;
 using TellMe.Core.Types.Extensions;
-using TellMe.iOS.Views.Cells;
+using TellMe.iOS.Core.UI;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Views.Cells
 {
     public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
     {

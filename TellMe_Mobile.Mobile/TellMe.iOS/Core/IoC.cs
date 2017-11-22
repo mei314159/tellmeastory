@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FluentValidation;
 using SimpleInjector;
+using SimpleInjector.Diagnostics;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices;
@@ -8,13 +9,14 @@ using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Types.DataServices;
 using TellMe.iOS.Controllers;
+using TellMe.iOS.Core.UI;
 using UIKit;
 
 namespace TellMe.iOS.Core
 {
     public static class IoC
     {
-        public static readonly Container Container;
+        private static readonly Container Container;
 
         static IoC()
         {
@@ -30,16 +32,26 @@ namespace TellMe.iOS.Core
 
             RegisterAll<IRemoteDataService>(Container);
             RegisterAll<ILocalDataService>(Container);
-            Container.Register(typeof(AbstractValidator<>), new[] {typeof(AbstractValidator<>).Assembly});
+            Container.Register(typeof(AbstractValidator<>), new[] { typeof(AbstractValidator<>).Assembly });
             RegisterAll<IBusinessLogic>(Container);
-            RegisterControllers();
-            
+            RegisterControllers(window);
+
             Container.Verify();
         }
 
-        private static void RegisterControllers()
+        public static T GetInstance<T>() where T : class
         {
-            Container.Register<EventsViewController>();
+            return Container.GetInstance<T>();
+        }
+
+        private static void RegisterControllers(UIWindow window)
+        {
+            window.InvokeOnMainThread(() =>
+            {
+                Container.Register<EventsViewController>();
+                var registration = Container.GetRegistration(typeof(EventsViewController)).Registration;
+                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "UIViewController registration");
+            });
         }
 
         private static void RegisterAll<T>(Container container)

@@ -37,7 +37,7 @@ namespace TellMe.iOS
             var window = new UIWindow(UIScreen.MainScreen.Bounds);
             IoC.Initialize(window);
 
-            this.AccountBusinessLogic = IoC.Container.GetInstance<IAccountBusinessLogic>();
+            this.AccountBusinessLogic = IoC.GetInstance<IAccountBusinessLogic>();
             App.Instance.Initialize();
             App.Instance.OnNotificationReceived += Instance_OnNotificationReceived;
 
@@ -201,7 +201,7 @@ namespace TellMe.iOS
                 }
 
                 var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
-                await IoC.Container.GetInstance<INotificationHandler>().ProcessNotificationAsync(notification, view)
+                await IoC.GetInstance<INotificationHandler>().ProcessNotificationAsync(notification, view)
                     .ConfigureAwait(false);
                 return;
             }

@@ -1,15 +1,16 @@
-using Foundation;
 using System;
-using UIKit;
-using AVFoundation;
-using TellMe.Core.Contracts;
-using TellMe.Core.Contracts.UI.Views;
 using System.IO;
+using AVFoundation;
+using Foundation;
+using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class PreviewVideoController : UIViewController, IView
     {
@@ -35,7 +36,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            _router = IoC.Container.GetInstance<IRouter>();
+            _router = IoC.GetInstance<IRouter>();
             var url = new NSUrl(VideoPath, false);
 
             _asset = AVAsset.FromUrl(url);

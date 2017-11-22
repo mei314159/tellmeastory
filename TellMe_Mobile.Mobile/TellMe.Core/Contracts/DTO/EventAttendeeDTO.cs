@@ -7,12 +7,14 @@ namespace TellMe.Core.Contracts.DTO
     {
         [PrimaryKey]
         public int Id { get; set; }
-
+        
         public int StoryId { get; set; }
 
         public string UserId { get; set; }
 
         public int? TribeId { get; set; }
+        
+        public EventAttendeeStatus Status { get; set; }
 
         public string AttendeeName { get; set; }
 

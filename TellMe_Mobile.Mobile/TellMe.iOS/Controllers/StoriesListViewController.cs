@@ -1,25 +1,22 @@
-﻿using Foundation;
-using System;
-using UIKit;
-using TellMe.Core.Contracts.UI.Views;
-using System.Collections.Generic;
-using TellMe.Core.Contracts.DTO;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using TellMe.iOS.Views.Cells;
+using CoreGraphics;
+using Foundation;
 using TellMe.Core;
+using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views.Badge;
-using CoreGraphics;
-using TellMe.Core.Contracts;
-using TellMe.Core.Contracts.BusinessLogic;
-using TellMe.iOS.Core;
-using TellMe.iOS.Controllers;
+using TellMe.iOS.Views.Cells;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
-    public partial class
-        StoriesListViewController : UITableViewController, IStoriesListView //, IUITableViewDataSourcePrefetching
+    public partial class StoriesListViewController : UITableViewController, IStoriesListView
     {
         private IStoriesBusinessLogic _businessLogic;
         private readonly List<StoryDTO> _storiesList = new List<StoryDTO>();
@@ -35,7 +32,7 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
-            this._businessLogic = IoC.Container.GetInstance<IStoriesBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<IStoriesBusinessLogic>();
             _businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
@@ -68,7 +65,7 @@ namespace TellMe.iOS
 
         public override void ViewDidAppear(bool animated)
         {
-            IoC.Container.GetInstance<IRouter>().NavigateEvents(this);
+            //_businessLogic.NavigateEvents();
         }
 
         [Action("UnwindToStoriesViewController:")]
@@ -204,6 +201,11 @@ namespace TellMe.iOS
         partial void Storytellers_Activated(UIBarButtonItem sender)
         {
             _businessLogic.ShowStorytellers();
+        }
+
+        partial void Events_Activated(UIBarButtonItem sender)
+        {
+            _businessLogic.NavigateEvents();
         }
 
         public void DisplayNotificationsCount(int count)

@@ -11,11 +11,11 @@
 
 
 using System;
+using CoreGraphics;
 using Foundation;
 using UIKit;
-using CoreGraphics;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Views.VideoSlider
 {
     [Register("SASliderRight")]
     public class SASliderRight : UIView

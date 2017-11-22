@@ -4,19 +4,19 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("SignInController")]
     partial class SignInController
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.TextInput Email { get; set; }
+        TextInput Email { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -24,7 +24,7 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.TextInput Password { get; set; }
+        TextInput Password { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]

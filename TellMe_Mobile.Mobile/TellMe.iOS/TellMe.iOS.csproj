@@ -170,6 +170,9 @@
     <ImageAsset Include="Assets.xcassets\Heart-O.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Heart-O.imageset\heart-o%403x.png" />
     <ImageAsset Include="Assets.xcassets\Heart-O.imageset\heart-o%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Calendar.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Calendar.imageset\calendar%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Calendar.imageset\calendar%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -196,6 +199,7 @@
     <Folder Include="Views\Badge\" />
     <Folder Include="Assets.xcassets\Heart.imageset\" />
     <Folder Include="Assets.xcassets\Heart-O.imageset\" />
+    <Folder Include="Assets.xcassets\Calendar.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

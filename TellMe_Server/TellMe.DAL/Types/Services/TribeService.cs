@@ -190,7 +190,7 @@ namespace TellMe.DAL.Types.Services
             tribe.Name = dto.Name;
 
             var newMembers = dto.Members
-                .Where(member => !tribe.Members.Any(x => x.UserId == member.UserId))
+                .Where(member => tribe.Members.All(x => x.UserId != member.UserId))
                 .Select(member => new TribeMember
                 {
                     UserId = member.UserId,
@@ -199,7 +199,7 @@ namespace TellMe.DAL.Types.Services
             newMembers.ForEach(tribe.Members.Add);
 
             var deletedMembers = tribe.Members
-                .Where(member => !dto.Members.Any(x => x.UserId == member.UserId)).ToList();
+                .Where(member => dto.Members.All(x => x.UserId != member.UserId)).ToList();
             deletedMembers.ForEach(x => tribe.Members.Remove(x));
 
             _tribeRepository.Save(tribe);

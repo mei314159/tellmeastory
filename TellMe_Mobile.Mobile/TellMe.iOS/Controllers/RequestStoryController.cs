@@ -1,17 +1,18 @@
-using Foundation;
 using System;
-using UIKit;
 using System.Collections.Generic;
-using TellMe.Core.Contracts.DTO;
-using TellMe.iOS.Extensions;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.Core.Contracts.UI.Components;
-using TellMe.iOS.Views;
 using System.Linq;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
+using TellMe.iOS.Extensions;
+using TellMe.iOS.Views;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class RequestStoryController : UIViewController, IRequestStoryView
     {
@@ -36,7 +37,7 @@ namespace TellMe.iOS
         public override void ViewDidLoad()
         {
             StoryTitle.EditingChanged += StoryTitle_EditingChanged;
-            _businessLogic = IoC.Container.GetInstance<IRequestStoryBusinessLogic>();
+            _businessLogic = IoC.GetInstance<IRequestStoryBusinessLogic>();
             _businessLogic.View = this;
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             UpdatePreview();

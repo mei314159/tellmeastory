@@ -14,7 +14,7 @@ using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
 using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class TribeViewController : UITableViewController, ITribeView
     {
@@ -36,7 +36,7 @@ namespace TellMe.iOS
         {
             base.ViewDidLoad();
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
-            this._businessLogic = IoC.Container.GetInstance<ITribeViewBusinessLogic>();
+            this._businessLogic = IoC.GetInstance<ITribeViewBusinessLogic>();
             _businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.RowHeight = UITableView.AutomaticDimension;

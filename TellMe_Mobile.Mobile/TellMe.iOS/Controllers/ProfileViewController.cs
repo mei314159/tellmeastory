@@ -1,12 +1,12 @@
 using System;
-using UIKit;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DataServices.Local;
-using TellMe.iOS.Extensions;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Extensions;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class ProfileViewController : UIViewController, IView
     {
@@ -19,8 +19,8 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            _router = IoC.Container.GetInstance<IRouter>();
-            _localAccountService = IoC.Container.GetInstance<ILocalAccountService>();
+            _router = IoC.GetInstance<IRouter>();
+            _localAccountService = IoC.GetInstance<ILocalAccountService>();
         }
 
         public override void ViewWillAppear(bool animated)

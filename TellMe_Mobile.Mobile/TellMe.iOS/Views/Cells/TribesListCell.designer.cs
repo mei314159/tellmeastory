@@ -7,6 +7,7 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -15,7 +16,7 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label MembershipStatus { get; set; }
+        Label MembershipStatus { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -23,7 +24,7 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
         void ReleaseDesignerOutlets ()
         {

@@ -7,6 +7,7 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -15,19 +16,19 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button CommentsButton { get; set; }
+        Button CommentsButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button LikeButton { get; set; }
+        Button LikeButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture Preview { get; set; }
+        Picture Preview { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -35,15 +36,15 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Title { get; set; }
+        Label Title { get; set; }
 
         [Action ("CommentsButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void CommentsButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void CommentsButton_TouchUpInside (Button sender);
 
         [Action ("LikeButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void LikeButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void LikeButton_TouchUpInside (Button sender);
 
         void ReleaseDesignerOutlets ()
         {

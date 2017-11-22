@@ -1,17 +1,17 @@
-using Foundation;
 using System;
-using UIKit;
-using System.Collections.Generic;
-using TellMe.Core.Contracts.DTO;
-using TellMe.iOS.Views.Cells;
-using System.Threading.Tasks;
 using System.Collections;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.iOS.Extensions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Extensions;
+using TellMe.iOS.Views.Cells;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class NotificationCenterController : UIViewController, IUITableViewDelegate, IUITableViewDataSource,
         INotificationsCenterView
@@ -26,7 +26,7 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            _businessLogic = IoC.Container.GetInstance<INotificationCenterBusinessLogic>();
+            _businessLogic = IoC.GetInstance<INotificationCenterBusinessLogic>();
             _businessLogic.View = this;
             this.TableView.TableFooterView = new UIView();
             this.TableView.DataSource = this;

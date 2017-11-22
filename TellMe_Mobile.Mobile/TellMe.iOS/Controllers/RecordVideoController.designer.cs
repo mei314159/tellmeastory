@@ -4,12 +4,12 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("RecordVideoController")]
     partial class RecordVideoController
@@ -20,7 +20,7 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Label Duration { get; set; }
+        Label Duration { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -28,7 +28,7 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button RecordButton { get; set; }
+        Button RecordButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -40,7 +40,7 @@ namespace TellMe.iOS
 
         [Action ("RecordButtonTouched:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void RecordButtonTouched (TellMe.iOS.Button sender);
+        partial void RecordButtonTouched (Button sender);
 
         [Action ("SwitchCameraButtonTouched:")]
         [GeneratedCode ("iOS Designer", "1.0")]

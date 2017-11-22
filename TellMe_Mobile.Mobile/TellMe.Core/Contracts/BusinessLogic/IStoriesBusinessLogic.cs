@@ -19,5 +19,6 @@ namespace TellMe.Core.Contracts.BusinessLogic
         void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe);
         Task LoadActiveNotificationsCountAsync();
         Task LikeButtonTouchedAsync(StoryDTO story);
+        void NavigateEvents();
     }
 }

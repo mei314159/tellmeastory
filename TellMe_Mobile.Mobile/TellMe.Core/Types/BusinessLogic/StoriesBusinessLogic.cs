@@ -145,5 +145,10 @@ namespace TellMe.Core.Types.BusinessLogic
                 App.Instance.StoryLikeChanged(story);
             }
         }
+
+        public void NavigateEvents()
+        {
+            _router.NavigateEvents(this.View);
+        }
     }
 }

@@ -1,23 +1,23 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using TellMe.Core;
-using TellMe.Core.Contracts.DTO;
-using UIKit;
-using TellMe.Core.Types.Extensions;
-using TellMe.Core.Contracts.UI.Views;
-using TellMe.iOS.Extensions;
-using TellMe.iOS.Views.Cells;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using ModelIO;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
+using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI.Views;
+using TellMe.Core.Types.Extensions;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
+using TellMe.iOS.Extensions;
+using TellMe.iOS.Views.Cells;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate
     {
@@ -60,10 +60,10 @@ namespace TellMe.iOS
             View.SendSubviewToBack(EffectView);
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
 
-            _commentsService = IoC.Container.GetInstance<IRemoteCommentsDataService>();
-            _remoteStoriesService = IoC.Container.GetInstance<IRemoteStoriesDataService>();
-            _localAccountService = IoC.Container.GetInstance<ILocalAccountService>();
-            _router = IoC.Container.GetInstance<IRouter>();
+            _commentsService = IoC.GetInstance<IRemoteCommentsDataService>();
+            _remoteStoriesService = IoC.GetInstance<IRemoteStoriesDataService>();
+            _localAccountService = IoC.GetInstance<ILocalAccountService>();
+            _router = IoC.GetInstance<IRouter>();
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
             {
                 CancelsTouchesInView = false,

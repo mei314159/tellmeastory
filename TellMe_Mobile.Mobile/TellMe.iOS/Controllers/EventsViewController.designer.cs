@@ -17,29 +17,11 @@ namespace TellMe.iOS.Controllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView ActivityIndicator { get; set; }
 
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITableView TableView { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITableView View { get; set; }
-
         void ReleaseDesignerOutlets ()
         {
             if (ActivityIndicator != null) {
                 ActivityIndicator.Dispose ();
                 ActivityIndicator = null;
-            }
-
-            if (TableView != null) {
-                TableView.Dispose ();
-                TableView = null;
-            }
-
-            if (View != null) {
-                View.Dispose ();
-                View = null;
             }
         }
     }

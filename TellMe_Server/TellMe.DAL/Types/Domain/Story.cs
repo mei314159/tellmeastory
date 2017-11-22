@@ -10,12 +10,14 @@ namespace TellMe.DAL.Types.Domain
         public string VideoUrl { get; set; }
         public string PreviewUrl { get; set; }
         public int? RequestId { get; set; }
+        public int? EventId { get; set; }
         public string SenderId { get; set; }
         public int CommentsCount { get; set; }
         public int LikesCount { get; set; }
 
         public virtual StoryRequest Request { get; set; }
         public virtual ApplicationUser Sender { get; set; }
+        public virtual Event Event { get; set; }
 
         public virtual ICollection<StoryReceiver> Receivers { get; set; }
 

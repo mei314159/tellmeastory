@@ -2,7 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
+using TellMe.DAL;
+using TellMe.DAL.Types.Domain;
+using TellMe.DAL.Types.PushNotifications;
 
 namespace TellMe.DAL.Migrations
 {
@@ -208,6 +214,63 @@ namespace TellMe.DAL.Migrations
                     b.ToTable("Comment");
                 });
 
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDateUtc");
+
+                    b.Property<DateTime>("DateUtc");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("HostId")
+                        .IsRequired();
+
+                    b.Property<bool>("ShareStories");
+
+                    b.Property<int>("StoryRequestId");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HostId");
+
+                    b.HasIndex("StoryRequestId")
+                        .IsUnique();
+
+                    b.ToTable("Event");
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.EventAttendee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDateUtc");
+
+                    b.Property<int>("EventId");
+
+                    b.Property<int>("Status");
+
+                    b.Property<int?>("TribeId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("TribeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventAttendee");
+                });
+
             modelBuilder.Entity("TellMe.DAL.Types.Domain.Friendship", b =>
                 {
                     b.Property<int>("Id")
@@ -302,6 +365,8 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<DateTime>("CreateDateUtc");
 
+                    b.Property<int?>("EventId");
+
                     b.Property<int>("LikesCount");
 
                     b.Property<string>("PreviewUrl");
@@ -315,6 +380,8 @@ namespace TellMe.DAL.Migrations
                     b.Property<string>("VideoUrl");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("RequestId");
 
@@ -509,6 +576,36 @@ namespace TellMe.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.Event", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Host")
+                        .WithMany("HostedEvents")
+                        .HasForeignKey("HostId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TellMe.DAL.Types.Domain.StoryRequest", "StoryRequest")
+                        .WithOne("Event")
+                        .HasForeignKey("TellMe.DAL.Types.Domain.Event", "StoryRequestId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("TellMe.DAL.Types.Domain.EventAttendee", b =>
+                {
+                    b.HasOne("TellMe.DAL.Types.Domain.Event", "Event")
+                        .WithMany("Attendees")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
+                        .WithMany("Events")
+                        .HasForeignKey("TribeId");
+
+                    b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
+                        .WithMany("Events")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("TellMe.DAL.Types.Domain.Friendship", b =>
                 {
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "Friend")
@@ -536,6 +633,10 @@ namespace TellMe.DAL.Migrations
 
             modelBuilder.Entity("TellMe.DAL.Types.Domain.Story", b =>
                 {
+                    b.HasOne("TellMe.DAL.Types.Domain.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId");
+
                     b.HasOne("TellMe.DAL.Types.Domain.StoryRequest", "Request")
                         .WithMany("Stories")
                         .HasForeignKey("RequestId");

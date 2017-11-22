@@ -27,7 +27,7 @@ namespace TellMe.iOS.Controllers
         public CreateTribeController(ICollection<StorytellerDTO> members) : base(UITableViewStyle.Grouped, null, true)
         {
             this.Members = members;
-            _businessLogic = IoC.Container.GetInstance<ICreateTribeBusinessLogic>();
+            _businessLogic = IoC.GetInstance<ICreateTribeBusinessLogic>();
             _businessLogic.View = this;
         }
 

@@ -4,12 +4,12 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
-using UIKit;
 
-namespace TellMe.iOS
+using System.CodeDom.Compiler;
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("RequestStoryController")]
     partial class RequestStoryController
@@ -20,15 +20,15 @@ namespace TellMe.iOS
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button SendButton { get; set; }
+        Button SendButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.TextInput StoryTitle { get; set; }
+        TextInput StoryTitle { get; set; }
 
         [Action ("SendButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SendButton_TouchUpInside (TellMe.iOS.Button sender);
+        partial void SendButton_TouchUpInside (Button sender);
 
         void ReleaseDesignerOutlets ()
         {

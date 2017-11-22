@@ -42,6 +42,30 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
 
+                cfg.CreateMap<Event, EventDTO>()
+                    .ForMember(x => x.HostUserName, x => x.MapFrom(z => z.Host.UserName))
+                    .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl));
+
+                cfg.CreateMap<EventDTO, Event>()
+                    .ForMember(x => x.Id, x => x.Ignore())
+                    .ForMember(x => x.HostId, x => x.Ignore())
+                    .ForMember(x => x.CreateDateUtc, x => x.Ignore());
+                
+                cfg.CreateMap<EventAttendeeDTO, EventAttendee>()
+                    .ForMember(x => x.UserId, x =>
+                    {
+                        x.PreCondition(y => y.TribeId == null);
+                        x.MapFrom(z => z.UserId);
+                    })
+                    .ForMember(x => x.TribeId, x => x.MapFrom(z => z.TribeId))
+                    .ForMember(x => x.CreateDateUtc, x => x.ResolveUsing(y => DateTime.UtcNow));
+
+                cfg.CreateMap<EventAttendee, EventAttendeeDTO>()
+                    .ForMember(x => x.AttendeePictureUrl,
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
+                    .ForMember(x => x.AttendeeName,
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
+
                 cfg.CreateMap<StoryReceiver, StoryReceiverDTO>()
                     .ForMember(x => x.StoryId, x => x.MapFrom(z => z.StoryId))
                     .ForMember(x => x.ReceiverPictureUrl,

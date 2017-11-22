@@ -4,11 +4,11 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-using Foundation;
-using System;
-using System.CodeDom.Compiler;
 
-namespace TellMe.iOS
+using Foundation;
+using TellMe.iOS.Core.UI;
+
+namespace TellMe.iOS.Controllers
 {
     [Register ("StorytellerViewController")]
     partial class StorytellerViewController
@@ -22,7 +22,7 @@ namespace TellMe.iOS
 
 
         [Outlet]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
 
         [Outlet]

@@ -7,6 +7,7 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -14,7 +15,7 @@ namespace TellMe.iOS.Views.Cells
     partial class EventAttendeesListCell
     {
         [Outlet]
-        TellMe.iOS.Picture ProfilePicture { get; set; }
+        Picture ProfilePicture { get; set; }
 
         void ReleaseDesignerOutlets ()
         {

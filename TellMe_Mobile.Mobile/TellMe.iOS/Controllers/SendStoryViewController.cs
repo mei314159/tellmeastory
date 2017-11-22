@@ -1,15 +1,16 @@
-using Foundation;
 using System;
-using UIKit;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
-using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
+using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class SendStoryViewController : UIViewController, ISendStoryView
     {
@@ -33,7 +34,7 @@ namespace TellMe.iOS
 
         public override void ViewDidLoad()
         {
-            _businessLogic = IoC.Container.GetInstance<ISendStoryBusinessLogic>();
+            _businessLogic = IoC.GetInstance<ISendStoryBusinessLogic>();
             _businessLogic.View = this;
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             this._businessLogic.Init();

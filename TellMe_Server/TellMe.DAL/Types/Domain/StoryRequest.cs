@@ -8,11 +8,11 @@ namespace TellMe.DAL.Types.Domain
         public string Title { get; set; }
         public DateTime CreateDateUtc { get; set; }
         public string SenderId { get; set; }
-
         public string UserId { get; set; }
         public int? TribeId { get; set; }
         public virtual ApplicationUser Sender { get; set; }
         public virtual ApplicationUser Receiver { get; set; }
+        public virtual Event Event { get; set; }
         public virtual Tribe Tribe { get; set; }
         public virtual ICollection<Story> Stories { get; set; }
 

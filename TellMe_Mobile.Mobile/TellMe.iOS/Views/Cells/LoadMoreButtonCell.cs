@@ -1,6 +1,7 @@
 ﻿using System;
 using Foundation;
 using TellMe.Core.Contracts.UI.Components;
+using TellMe.iOS.Core.UI;
 using UIKit;
 
 namespace TellMe.iOS.Views.Cells

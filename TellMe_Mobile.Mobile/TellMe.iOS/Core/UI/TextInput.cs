@@ -3,7 +3,7 @@ using Foundation;
 using TellMe.Core.Contracts.UI.Components;
 using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Core.UI
 {
     [Register("TextInput")]
     public class TextInput : UITextField, ITextInput

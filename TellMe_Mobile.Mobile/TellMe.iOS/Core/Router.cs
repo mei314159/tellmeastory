@@ -247,7 +247,7 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = IoC.Container.GetInstance<EventsViewController>();
+                var targetController = IoC.GetInstance<EventsViewController>();
                 this.Present(targetController, view);
             });
         }

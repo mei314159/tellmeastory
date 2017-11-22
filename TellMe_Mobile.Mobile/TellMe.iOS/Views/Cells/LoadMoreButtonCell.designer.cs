@@ -7,6 +7,7 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
+using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -18,11 +19,11 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TellMe.iOS.Button Button { get; set; }
+        Button Button { get; set; }
 
 
         [Action ("Button_TouchUpInside:")]
-        partial void Button_TouchUpInside (TellMe.iOS.Button sender);
+        partial void Button_TouchUpInside (Button sender);
 
         void ReleaseDesignerOutlets ()
         {
