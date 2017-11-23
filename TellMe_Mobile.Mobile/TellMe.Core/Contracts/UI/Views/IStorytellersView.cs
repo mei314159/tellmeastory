@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
 {
-    public interface IStorytellersView : IView
+    public interface IStorytellersView : IView, IDismissable
     {
         ContactsMode Mode { get; }
 

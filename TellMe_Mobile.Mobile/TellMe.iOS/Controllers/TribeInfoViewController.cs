@@ -48,8 +48,6 @@ namespace TellMe.iOS.Controllers
                     new StringElement("Your Status", Tribe.MembershipStatus.ToString())
                 },
                 new Section("Members")
-                {
-                }
             };
 
             LoadAsync(false);
@@ -114,10 +112,10 @@ namespace TellMe.iOS.Controllers
         {
             this.Tribe = tribe;
             var root = this.Root[0];
-            (root[0] as StringElement).Value = tribe.Name;
-            (root[1] as StringElement).Value = tribe.CreatorName;
-            (root[2] as StringElement).Value = tribe.CreateDateUtc.ToShortDateString();
-            (root[3] as StringElement).Value = tribe.MembershipStatus.ToString();
+            ((StringElement) root[0]).Value = tribe.Name;
+            ((StringElement) root[1]).Value = tribe.CreatorName;
+            ((StringElement) root[2]).Value = tribe.CreateDateUtc.ToShortDateString();
+            ((StringElement) root[3]).Value = tribe.MembershipStatus.ToString();
 
             if (tribe.MembershipStatus == TribeMemberStatus.Joined)
             {
@@ -145,7 +143,7 @@ namespace TellMe.iOS.Controllers
             });
         }
 
-        private async void LeaveButton_TouchUpInside(object sender, EventArgs e)
+        private void LeaveButton_TouchUpInside(object sender, EventArgs e)
         {
             var alert = UIAlertController.Create(
                 "Leave a Tribe",
@@ -153,7 +151,7 @@ namespace TellMe.iOS.Controllers
                 UIAlertControllerStyle.Alert);
             alert.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
             alert.AddAction(UIAlertAction.Create("Yes, I do", UIAlertActionStyle.Default,
-                async (obj) => { await _businessLogic.LeaveTribeAsync(); }));
+                async obj => { await _businessLogic.LeaveTribeAsync(); }));
             this.PresentViewController(alert, true, null);
         }
 
@@ -165,18 +163,12 @@ namespace TellMe.iOS.Controllers
 
         private void SetEditButton()
         {
-            if (Tribe.MembershipStatus == TribeMemberStatus.Creator)
-            {
-                this.NavigationItem.RightBarButtonItem =
-                    new UIBarButtonItem("Edit", UIBarButtonItemStyle.Done, EditButtonTouched);
-            }
-            else
-            {
-                this.NavigationItem.RightBarButtonItem = null;
-            }
+            this.NavigationItem.RightBarButtonItem = Tribe.MembershipStatus == TribeMemberStatus.Creator
+                ? new UIBarButtonItem("Edit", UIBarButtonItemStyle.Done, EditButtonTouched)
+                : null;
         }
 
-        private async void EditButtonTouched(object sender, EventArgs e)
+        private void EditButtonTouched(object sender, EventArgs e)
         {
             var editing = !TableView.Editing;
             this.NavigationItem.RightBarButtonItem.Title = editing ? "Done" : "Edit";
@@ -188,22 +180,22 @@ namespace TellMe.iOS.Controllers
                 root.Remove(0);
                 root.Insert(0, new EntryElement("Name", "Enter Tribe Name", Tribe.Name));
 
-                TableView.SetEditing(editing, true);
+                TableView.SetEditing(true, true);
             }
             else
             {
                 this.NavigationItem.RightBarButtonItem.Title = "Edit";
                 TableView.RefreshControl.Enabled = true;
-                Tribe.Name = (root[0] as EntryElement).Value;
+                Tribe.Name = ((EntryElement) root[0]).Value;
                 root.Remove(0);
                 root.Insert(0, new StringElement("Name", Tribe.Name));
-                TableView.SetEditing(editing, false);
+                TableView.SetEditing(false, false);
                 var overlay = new Overlay("Wait");
-                overlay.PopUp(true);
+                overlay.PopUp();
                 InvokeInBackground(async () =>
                 {
                     await _businessLogic.SaveAsync().ConfigureAwait(false);
-                    overlay.Close(true);
+                    overlay.Close();
                 });
             }
 
@@ -236,7 +228,6 @@ namespace TellMe.iOS.Controllers
 
         public void SetData(TribeDTO tribe)
         {
-            var initialCount = _membersList.Count;
             lock (((ICollection) _membersList).SyncRoot)
             {
                 _membersList.Clear();
@@ -270,7 +261,7 @@ namespace TellMe.iOS.Controllers
                 return _addMemberCell;
             }
 
-            var cell = tableView.DequeueReusableCell(TribeMembersListCell.Key, indexPath) as TribeMembersListCell;
+            var cell = (TribeMembersListCell) tableView.DequeueReusableCell(TribeMembersListCell.Key, indexPath);
             var index = tableView.Editing ? indexPath.Row - 1 : indexPath.Row;
             cell.TribeMember = _membersList.ElementAt(index);
             return cell;
@@ -291,7 +282,7 @@ namespace TellMe.iOS.Controllers
             }
             else
             {
-                var cell = tableView.CellAt(indexPath) as TribeMembersListCell;
+                var cell = (TribeMembersListCell) tableView.CellAt(indexPath);
                 OnMemberSelected?.Invoke(cell.TribeMember, indexPath);
             }
         }
@@ -314,9 +305,7 @@ namespace TellMe.iOS.Controllers
             if (indexPath.Section != 1)
                 return base.EditingStyleForRow(tableView, indexPath);
 
-            if (indexPath.Row == 0)
-                return UITableViewCellEditingStyle.None;
-            return UITableViewCellEditingStyle.Delete;
+            return indexPath.Row == 0 ? UITableViewCellEditingStyle.None : UITableViewCellEditingStyle.Delete;
         }
 
         public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)

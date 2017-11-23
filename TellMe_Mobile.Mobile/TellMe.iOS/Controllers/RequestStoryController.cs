@@ -22,6 +22,8 @@ namespace TellMe.iOS.Controllers
         {
         }
 
+        public event StoryRequestCreatedEventHandler RequestCreated;
+        
         public ICollection<ContactDTO> Recipients { get; set; }
 
         ITextInput IRequestStoryView.StoryTitle => this.StoryTitle;
@@ -47,7 +49,7 @@ namespace TellMe.iOS.Controllers
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
-            await _businessLogic.SendAsync();
+            await _businessLogic.CreateStoryRequest();
             overlay.Close();
         }
 
@@ -84,9 +86,13 @@ namespace TellMe.iOS.Controllers
             RequestTextPreview.AttributedText = text;
         }
 
-        public void Close(ICollection<StoryRequestDTO> requestedStory)
+        public void Close(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
         {
-            PerformSegue("UnwindToStories", this);
+            RequestCreated?.Invoke(dto, recipients);
+            if (NavigationController != null)
+                this.NavigationController.PopViewController(true);
+            else
+                this.DismissViewController(true, null);
         }
     }
 }

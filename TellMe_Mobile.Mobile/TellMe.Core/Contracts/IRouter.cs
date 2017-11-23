@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
@@ -18,11 +19,15 @@ namespace TellMe.Core.Contracts
         void NavigateStoryDetails(IView view, string videoPath, string previewImagePath,
             StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null);
 
-        void NavigateRequestStory(IView view, ICollection<ContactDTO> recipients);
+        void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients, StoryRequestCreatedEventHandler e);
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
 
         void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
             HashSet<string> disabledUserIds = null);
+
+        void NavigateChooseEventMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
+            HashSet<string> disabledUserIds = null,
+            HashSet<int> disabledTribeIds = null);
 
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);

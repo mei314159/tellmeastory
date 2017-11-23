@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentValidation;
 using SimpleInjector;
 using SimpleInjector.Diagnostics;
@@ -16,11 +20,15 @@ namespace TellMe.iOS.Core
 {
     public static class IoC
     {
+        private static readonly ManualResetEvent ManualResetEvent;
         private static readonly Container Container;
+        private static readonly List<Type> ControllerTypes;
 
         static IoC()
         {
             Container = new Container();
+            ControllerTypes = new List<Type>();
+            ManualResetEvent = new ManualResetEvent(false);
         }
 
         public static void Initialize(UIWindow window)
@@ -32,26 +40,36 @@ namespace TellMe.iOS.Core
 
             RegisterAll<IRemoteDataService>(Container);
             RegisterAll<ILocalDataService>(Container);
-            Container.Register(typeof(AbstractValidator<>), new[] { typeof(AbstractValidator<>).Assembly });
+            Container.Register(typeof(AbstractValidator<>), new[] {typeof(AbstractValidator<>).Assembly});
             RegisterAll<IBusinessLogic>(Container);
-            RegisterControllers(window);
-
+            RegisterControllers();
             Container.Verify();
+            ManualResetEvent.Set();
         }
 
         public static T GetInstance<T>() where T : class
         {
+            ManualResetEvent.WaitOne();
             return Container.GetInstance<T>();
         }
 
-        private static void RegisterControllers(UIWindow window)
+        private static void RegisterControllers()
         {
-            window.InvokeOnMainThread(() =>
+            RegisterController<CreateEventController>();
+            RegisterController<EventsViewController>();
+            
+            foreach (var controllerType in ControllerTypes)
             {
-                Container.Register<EventsViewController>();
-                var registration = Container.GetRegistration(typeof(EventsViewController)).Registration;
-                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent, "UIViewController registration");
-            });
+                Container.GetRegistration(controllerType).Registration
+                    .SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
+                        "UIViewController registration");
+            }
+        }
+
+        private static void RegisterController<T>() where T : class
+        {
+            Container.Register<T>();
+            ControllerTypes.Add(typeof(T));
         }
 
         private static void RegisterAll<T>(Container container)

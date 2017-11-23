@@ -15,14 +15,14 @@ namespace TellMe.Core.Types.BusinessLogic
     {
         private readonly List<EventDTO> _events = new List<EventDTO>();
         private readonly IRouter _router;
-        private readonly IRemoteEventsService _remoteEventsService;
-        private readonly ILocalEventsService _localEventsService;
+        private readonly IRemoteEventsDataService _remoteEventsDataService;
+        private readonly ILocalEventsDataService _localEventsDataService;
 
-        public EventsBusinessLogic(IRouter router, IRemoteEventsService remoteEventsService, ILocalEventsService localEventsService)
+        public EventsBusinessLogic(IRouter router, IRemoteEventsDataService remoteEventsDataService, ILocalEventsDataService localEventsDataService)
         {
             _router = router;
-            _remoteEventsService = remoteEventsService;
-            _localEventsService = localEventsService;
+            _remoteEventsDataService = remoteEventsDataService;
+            _localEventsDataService = localEventsDataService;
         }
 
         public IEventsView View { get; set; }
@@ -33,11 +33,11 @@ namespace TellMe.Core.Types.BusinessLogic
                 _events.Clear();
             }
             
-            var result = await _remoteEventsService
+            var result = await _remoteEventsDataService
                 .GetEventsAsync(forceRefresh ? null : _events.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localEventsService.SaveAllAsync(result.Data).ConfigureAwait(false);
+                await _localEventsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
                 _events.AddRange(result.Data);
             }
             else

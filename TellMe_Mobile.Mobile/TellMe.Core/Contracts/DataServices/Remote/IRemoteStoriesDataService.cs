@@ -8,7 +8,7 @@ namespace TellMe.Core.Contracts.DataServices.Remote
 {
     public interface IRemoteStoriesDataService : IRemoteDataService
     {
-        Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO dto);
+        Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO requestStoryDTO, ICollection<ContactDTO> contacts);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, DateTime? olderThanUtc = null);

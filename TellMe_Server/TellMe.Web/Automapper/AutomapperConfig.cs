@@ -50,7 +50,7 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.Id, x => x.Ignore())
                     .ForMember(x => x.HostId, x => x.Ignore())
                     .ForMember(x => x.CreateDateUtc, x => x.Ignore());
-                
+
                 cfg.CreateMap<EventAttendeeDTO, EventAttendee>()
                     .ForMember(x => x.UserId, x =>
                     {
@@ -64,7 +64,9 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.AttendeePictureUrl,
                         x => x.MapFrom(z => z.TribeId == null ? z.User.PictureUrl : null))
                     .ForMember(x => x.AttendeeName,
-                        x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name));
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.UserName : z.Tribe.Name))
+                    .ForMember(x => x.AttendeeFullName,
+                        x => x.MapFrom(z => z.TribeId == null ? z.User.FullName : null));
 
                 cfg.CreateMap<StoryReceiver, StoryReceiverDTO>()
                     .ForMember(x => x.StoryId, x => x.MapFrom(z => z.StoryId))

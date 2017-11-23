@@ -2,8 +2,8 @@
 {
     public enum ContactsMode
     {
-        Normal,
-        FriendsAndTribes,
-        FriendsOnly
+        DisplayStorytellers,
+        ChooseRecipient,
+        ChooseTribeMembers
     }
 }

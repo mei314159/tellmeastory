@@ -6,7 +6,7 @@ namespace TellMe.Core.Contracts.BusinessLogic
     public interface IRequestStoryBusinessLogic : IBusinessLogic
     {
         IRequestStoryView View { get; set; }
-        Task SendAsync();
+        Task CreateStoryRequest();
         string GetUsername();
     }
 }

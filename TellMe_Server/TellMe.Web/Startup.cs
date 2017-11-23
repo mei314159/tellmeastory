@@ -73,6 +73,7 @@ namespace TellMe.Web
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<ITribeService, TribeService>();
+            services.AddTransient<IEventService, EventService>();
             services.AddTransient<IPushNotificationsService, PushNotificationsService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IMailSender, SendGridMailSender>();

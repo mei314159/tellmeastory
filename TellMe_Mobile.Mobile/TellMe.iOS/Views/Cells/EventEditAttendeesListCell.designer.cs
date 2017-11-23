@@ -11,8 +11,8 @@ using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
 {
-    [Register ("TribeMembersListCell")]
-    partial class TribeMembersListCell
+    [Register ("EventEditAttendeesListCell")]
+    partial class EventEditAttendeesListCell
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]

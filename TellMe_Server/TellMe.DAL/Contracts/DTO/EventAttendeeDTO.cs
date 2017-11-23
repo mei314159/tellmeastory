@@ -7,7 +7,7 @@ namespace TellMe.DAL.Contracts.DTO
     {
         public int Id { get; set; }
         
-        public int StoryId { get; set; }
+        public int EventId { get; set; }
 
         public string UserId { get; set; }
 
@@ -18,6 +18,8 @@ namespace TellMe.DAL.Contracts.DTO
         public DateTime CreateDateUtc { get; set; }
 
         public string AttendeeName { get; set; }
+        
+        public string AttendeeFullName { get; set; }
 
         public string AttendeePictureUrl { get; set; }
     }

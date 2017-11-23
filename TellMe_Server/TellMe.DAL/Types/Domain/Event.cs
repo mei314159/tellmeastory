@@ -17,11 +17,9 @@ namespace TellMe.DAL.Types.Domain
         
         public bool ShareStories { get; set; }
         
-        public int StoryRequestId { get; set; }
-        
-        public virtual StoryRequest StoryRequest { get; set; }
-        
         public virtual ApplicationUser Host { get; set; }
+        
+        public virtual ICollection<StoryRequest> StoryRequests { get; set; }
 
         public virtual ICollection<EventAttendee> Attendees { get; set; }
     }

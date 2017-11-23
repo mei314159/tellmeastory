@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.DataServices;
@@ -18,9 +19,17 @@ namespace TellMe.Core.Types.DataServices.Remote
             _apiProvider = apiProvider;
         }
 
-        public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO dto)
+        public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO requestStoryDTO,
+            ICollection<ContactDTO> contacts)
         {
-            var result = await this._apiProvider.PostAsync<List<StoryRequestDTO>>("stories/request", dto)
+            var requests = contacts.Select(x => new StoryRequestDTO
+            {
+                Title = requestStoryDTO.Title,
+                UserId = x.Type == ContactType.User ? x.User.Id : null,
+                TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
+            }).ToList();
+            var result = await this._apiProvider
+                .PostAsync<List<StoryRequestDTO>>("stories/request", new {Requests = requests})
                 .ConfigureAwait(false);
 
             return result;

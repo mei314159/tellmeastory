@@ -11,7 +11,7 @@ using Foundation;
 namespace TellMe.iOS.Controllers
 {
     [Register ("StorytellersController")]
-    partial class StorytellersController
+    partial class StorytellersViewController
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]

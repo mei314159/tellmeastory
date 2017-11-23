@@ -14,26 +14,26 @@ namespace TellMe.Core.Types.BusinessLogic
 {
     public class StorytellerBusinessLogic : IStorytellerBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesService;
-        private readonly IRemoteStorytellersDataService _remoteStorytellesService;
-        private readonly ILocalStoriesDataService _localStoriesService;
-        private readonly ILocalStorytellersDataService _localStorytellesService;
+        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
+        private readonly IRemoteStorytellersDataService _remoteStorytellesDataService;
+        private readonly ILocalStoriesDataService _localStoriesDataService;
+        private readonly ILocalStorytellersDataService _localStorytellesDataService;
         private readonly ILocalAccountService _localLocalAccountService;
         private readonly IRouter _router;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesService,
-            IRemoteStorytellersDataService remoteStorytellesService,
+        public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService,
+            IRemoteStorytellersDataService remoteStorytellesDataService,
             IRouter router,
-            ILocalStoriesDataService localStoriesService,
-            ILocalStorytellersDataService localStorytellesService,
+            ILocalStoriesDataService localStoriesDataService,
+            ILocalStorytellersDataService localStorytellesDataService,
             ILocalAccountService localLocalAccountService)
         {
-            _remoteStoriesService = remoteStoriesService;
-            _remoteStorytellesService = remoteStorytellesService;
+            _remoteStoriesDataService = remoteStoriesDataService;
+            _remoteStorytellesDataService = remoteStorytellesDataService;
             _router = router;
-            _localStoriesService = localStoriesService;
-            _localStorytellesService = localStorytellesService;
+            _localStoriesDataService = localStoriesDataService;
+            _localStorytellesDataService = localStorytellesDataService;
             _localLocalAccountService = localLocalAccountService;
         }
 
@@ -46,12 +46,12 @@ namespace TellMe.Core.Types.BusinessLogic
                 _stories.Clear();
             }
 
-            var result = await _remoteStoriesService
+            var result = await _remoteStoriesDataService
                 .GetStoriesAsync(View.Storyteller.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
+                await _localStoriesDataService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 _stories.AddRange(result.Data);
             }
             else
@@ -68,10 +68,10 @@ namespace TellMe.Core.Types.BusinessLogic
             if (View.Storyteller == null)
             {
                 var localStoryteller =
-                    await _localStorytellesService.GetAsync(View.StorytellerId).ConfigureAwait(false);
+                    await _localStorytellesDataService.GetAsync(View.StorytellerId).ConfigureAwait(false);
                 if (localStoryteller.Data == null || localStoryteller.Expired)
                 {
-                    var result = await _remoteStorytellesService.GetByIdAsync(View.StorytellerId)
+                    var result = await _remoteStorytellesDataService.GetByIdAsync(View.StorytellerId)
                         .ConfigureAwait(false);
                     if (result.IsSuccess)
                     {
@@ -105,7 +105,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void RequestStory()
         {
-            _router.NavigateRequestStory(this.View, new[]
+            var contacts = new[]
             {
                 new ContactDTO
                 {
@@ -113,9 +113,23 @@ namespace TellMe.Core.Types.BusinessLogic
                     UserId = View.Storyteller.Id,
                     User = View.Storyteller
                 }
-            });
+            };
+            _router.NavigatePrepareStoryRequest(this.View, contacts, CreateStoryRequestAsync);
         }
 
+        private async void CreateStoryRequestAsync(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        {
+            var result = await this._remoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this.View.ShowSuccessMessage("Story successfully requested");
+            }
+            else
+            {
+                result.ShowResultError(this.View);
+            }  
+        }
+        
         public void ViewStory(StoryDTO story)
         {
             _router.NavigateViewStory(this.View, story);
@@ -142,8 +156,8 @@ namespace TellMe.Core.Types.BusinessLogic
             App.Instance.StoryLikeChanged(story);
 
             var result = liked
-                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
-                : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
+                ? await _remoteStoriesDataService.DislikeAsync(story.Id).ConfigureAwait(false)
+                : await _remoteStoriesDataService.LikeAsync(story.Id).ConfigureAwait(false);
 
             if (!result.IsSuccess)
             {

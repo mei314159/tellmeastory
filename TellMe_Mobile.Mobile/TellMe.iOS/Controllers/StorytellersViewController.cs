@@ -15,7 +15,7 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class StorytellersController : UIViewController, IStorytellersView, IUITableViewDataSource,
+    public partial class StorytellersViewController : UIViewController, IStorytellersView, IUITableViewDataSource,
         IUITableViewDelegate
     {
         private IStorytellersBusinessLogic _businessLogic;
@@ -28,11 +28,10 @@ namespace TellMe.iOS.Controllers
         public event StorytellerSelectedEventHandler RecipientsSelected;
         public bool DismissOnFinish { get; set; }
 
-        public string SearchText => SearchBar.Text;
-
         public HashSet<string> DisabledUserIds { get; set; }
+        public HashSet<int> DisabledTribeIds { get; set; }
 
-        public StorytellersController(IntPtr handle) : base(handle)
+        public StorytellersViewController(IntPtr handle) : base(handle)
         {
         }
 
@@ -151,7 +150,7 @@ namespace TellMe.iOS.Controllers
         [Export("tableView:didSelectRowAtIndexPath:")]
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            if (Mode == ContactsMode.FriendsAndTribes || Mode == ContactsMode.FriendsOnly)
+            if (Mode == ContactsMode.ChooseRecipient || Mode == ContactsMode.ChooseTribeMembers)
             {
                 NavItem.RightBarButtonItem.Enabled = tableView.IndexPathsForSelectedRows?.Length > 0;
                 return;
@@ -213,10 +212,18 @@ namespace TellMe.iOS.Controllers
         [Export("tableView:canEditRowAtIndexPath:")]
         public bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
         {
-            if (indexPath.Section == 0)
+            switch (indexPath.Section)
             {
-                var dto = _storytellersList[indexPath.Row];
-                return DisabledUserIds?.Contains(dto.UserId) != true;
+                case 0:
+                {
+                    var dto = _storytellersList[indexPath.Row];
+                    return DisabledUserIds?.Contains(dto.UserId) != true;
+                }
+                case 1:
+                {
+                    var dto = _tribesList[indexPath.Row];
+                    return DisabledTribeIds?.Contains(dto.TribeId.Value) != true;
+                }
             }
 
             return true;
@@ -271,7 +278,7 @@ namespace TellMe.iOS.Controllers
         [Export("numberOfSectionsInTableView:")]
         public nint NumberOfSections(UITableView tableView)
         {
-            return Mode == ContactsMode.FriendsOnly ? 1 : 2;
+            return Mode == ContactsMode.ChooseTribeMembers ? 1 : 2;
         }
 
         partial void AddTribeButton_Activated(UIBarButtonItem sender)
@@ -284,12 +291,12 @@ namespace TellMe.iOS.Controllers
             this.Mode = mode;
             switch (this.Mode)
             {
-                case ContactsMode.Normal:
+                case ContactsMode.DisplayStorytellers:
                     TableView.SetEditing(false, true);
                     NavItem.Title = "Storytellers";
                     TableViewTop.Constant = 44;
                     break;
-                case ContactsMode.FriendsAndTribes:
+                case ContactsMode.ChooseRecipient:
                     NavItem.Title = "Choose recipient";
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
@@ -300,7 +307,7 @@ namespace TellMe.iOS.Controllers
                             Enabled = false
                         }, false);
                     break;
-                case ContactsMode.FriendsOnly:
+                case ContactsMode.ChooseTribeMembers:
                     NavItem.Title = "Choose Tribe Membes";
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
@@ -413,13 +420,10 @@ namespace TellMe.iOS.Controllers
         {
             var selectedContacts = TableView.IndexPathsForSelectedRows
                 .Select(x => x.Section == 0 ? _storytellersList[x.Row] : _tribesList[x.Row]).ToList();
-            RecipientsSelected?.Invoke(selectedContacts);
+            RecipientsSelected?.Invoke(this, selectedContacts);
             if (DismissOnFinish)
             {
-                if (NavigationController != null)
-                    this.NavigationController.PopViewController(true);
-                else
-                    this.DismissViewController(true, null);
+                Dismiss();
             }
         }
 
@@ -438,6 +442,17 @@ namespace TellMe.iOS.Controllers
             }
 
             TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index, section)}, UITableViewRowAnimation.Automatic);
+        }
+
+        public void Dismiss()
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            });
         }
     }
 }

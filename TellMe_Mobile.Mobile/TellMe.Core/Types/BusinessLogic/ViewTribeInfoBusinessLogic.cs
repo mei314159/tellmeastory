@@ -7,6 +7,7 @@ using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.UI;
+using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.Extensions;
 using TellMe.Core.Validation;
 
@@ -66,7 +67,7 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateChooseTribeMembers(View, HandleStorytellerSelectedEventHandler, true, selectedItems);
         }
 
-        private void HandleStorytellerSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
+        private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView, ICollection<ContactDTO> selectedContacts)
         {
             foreach (var contact in selectedContacts)
             {

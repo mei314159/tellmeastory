@@ -26,40 +26,27 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public IRequestStoryView View { get; set; }
 
-        public async Task SendAsync()
+        public async Task CreateStoryRequest()
         {
             this.View.SendButton.Enabled = false;
             var title = this.View.StoryTitle.Text;
 
             var dto = new RequestStoryDTO
             {
-                Requests = View.Recipients.Select(x => new StoryRequestDTO
-                {
-                    Title = title,
-                    UserId = x.Type == ContactType.User ? x.User.Id : null,
-                    TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
-                }).ToList()
+                Title = title
             };
 
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
             if (validationResult.IsValid)
             {
-                var result = await this._remoteStoriesDataService.RequestStoryAsync(dto).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    this.View.ShowSuccessMessage("Story successfully requested", () => View.Close(result.Data));
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                }
+                View.Close(dto, View.Recipients);
             }
             else
             {
                 validationResult.ShowValidationResult(this.View);
             }
 
-            View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);
+            View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);    
         }
 
         public string GetUsername()

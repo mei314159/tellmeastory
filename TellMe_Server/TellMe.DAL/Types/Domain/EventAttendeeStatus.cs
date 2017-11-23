@@ -4,6 +4,7 @@ namespace TellMe.DAL.Types.Domain
     {
         Pending = 0,
         Accepted = 1,
-        Rejected = 2
+        Rejected = 2,
+        Host = 3
     }
 }

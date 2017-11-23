@@ -121,6 +121,14 @@ namespace TellMe.iOS.Controllers
             return cell;
         }
 
+        public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+        {
+            if (_storiesList.Count - indexPath.Row == 5 && _canLoadMore)
+            {
+                LoadMoreAsync();
+            }
+        }
+        
         private async void Cell_LikeButtonTouched(StoryDTO story)
         {
             await _businessLogic.LikeButtonTouchedAsync(story).ConfigureAwait(false);
@@ -139,14 +147,6 @@ namespace TellMe.iOS.Controllers
         private void Cell_ProfilePictureTouched(StoryDTO story)
         {
             _businessLogic.NavigateStoryteller(story);
-        }
-
-        public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
-        {
-            if (_storiesList.Count - indexPath.Row == 5 && _canLoadMore)
-            {
-                LoadMoreAsync();
-            }
         }
 
         private async Task LoadMoreAsync()

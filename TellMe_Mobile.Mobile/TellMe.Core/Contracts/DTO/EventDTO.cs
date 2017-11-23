@@ -23,6 +23,8 @@ namespace TellMe.Core.Contracts.DTO
         public string Title { get; set; }
 
         public string Description { get; set; }
+        
+        public string StoryRequestTitle { get; set; }
 
         public List<EventAttendeeDTO> Attendees { get; set; }
     }

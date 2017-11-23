@@ -32,14 +32,14 @@ namespace TellMe.DAL
 
             builder.Entity<Event>().HasOne(x => x.Host).WithMany(x => x.HostedEvents).HasForeignKey(x => x.HostId)
                 .IsRequired();
-            builder.Entity<Event>().HasOne(x => x.StoryRequest).WithOne(x => x.Event)
-                .HasForeignKey<Event>(x => x.StoryRequestId)
-                .IsRequired();
+            builder.Entity<Event>().HasMany(x => x.StoryRequests).WithOne(x => x.Event)
+                .HasForeignKey(x => x.EventId);
             builder.Entity<EventAttendee>().HasOne(x => x.User).WithMany(x => x.Events)
-                .HasForeignKey(x => x.UserId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<EventAttendee>().HasOne(x => x.Tribe)
+                .WithMany(x => x.Events).HasForeignKey(x => x.TribeId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<EventAttendee>().HasOne(x => x.Event).WithMany(x => x.Attendees)
                 .HasForeignKey(x => x.EventId).IsRequired().OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<EventAttendee>().HasOne(x => x.Tribe).WithMany(x => x.Events).HasForeignKey(x => x.TribeId);
 
             builder.Entity<Comment>().HasOne(x => x.Story).WithMany(x => x.Comments).HasForeignKey(x => x.StoryId);
             builder.Entity<Comment>().HasOne(x => x.Author).WithMany().HasForeignKey(x => x.AuthorId);

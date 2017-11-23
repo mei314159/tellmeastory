@@ -13,9 +13,10 @@ using TellMe.DAL.Types.PushNotifications;
 namespace TellMe.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171123142251_AddEvents3")]
+    partial class AddEvents3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,7 +253,8 @@ namespace TellMe.DAL.Migrations
 
                     b.Property<int?>("TribeId");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -591,8 +593,7 @@ namespace TellMe.DAL.Migrations
 
                     b.HasOne("TellMe.DAL.Types.Domain.Tribe", "Tribe")
                         .WithMany("Events")
-                        .HasForeignKey("TribeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("TribeId");
 
                     b.HasOne("TellMe.DAL.Types.Domain.ApplicationUser", "User")
                         .WithMany("Events")

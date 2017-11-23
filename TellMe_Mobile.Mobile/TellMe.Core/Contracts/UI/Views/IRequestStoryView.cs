@@ -11,6 +11,6 @@ namespace TellMe.Core.Contracts.UI.Views
         ITextInput StoryTitle { get; }
         IButton SendButton { get; }
         void ShowSuccessMessage(string message, Action complete = null);
-        void Close(ICollection<StoryRequestDTO> requestedStories);
+        void Close(RequestStoryDTO dto, ICollection<ContactDTO> recipients);
     }
 }

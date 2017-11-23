@@ -1,5 +1,5 @@
 ﻿using System;
-
+using CoreGraphics;
 using Foundation;
 using TellMe.Core.Contracts.DTO;
 using TellMe.iOS.Core.UI;
@@ -47,6 +47,10 @@ namespace TellMe.iOS.Views.Cells
         {
             base.AwakeFromNib();
 
+            this.Layer.MasksToBounds = false;
+            this.Layer.ShadowOffset = new CGSize(-15, 20);
+            this.Layer.ShadowRadius = 5;
+            this.Layer.ShadowOpacity = 0.5f;
 
             this._defaultPicture = UIImage.FromBundle("UserPic");
 

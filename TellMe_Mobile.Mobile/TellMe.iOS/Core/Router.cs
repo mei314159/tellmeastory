@@ -25,11 +25,12 @@ namespace TellMe.iOS.Core
                 this._window.SwapController(UIStoryboard.FromName("Main", null).InstantiateInitialViewController()));
         }
 
-        public void NavigateRequestStory(IView view, ICollection<ContactDTO> recipients)
+        public void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients, StoryRequestCreatedEventHandler e)
         {
             var targetController = (RequestStoryController) UIStoryboard.FromName("Story", null)
                 .InstantiateViewController("RequestStoryController");
             targetController.Recipients = recipients;
+            targetController.RequestCreated += e;
             this.Present(targetController, view);
         }
 
@@ -37,9 +38,9 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (StorytellersController) UIStoryboard.FromName("Story", null)
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
                     .InstantiateViewController("StorytellersController");
-                targetController.Mode = ContactsMode.FriendsAndTribes;
+                targetController.Mode = ContactsMode.ChooseRecipient;
                 targetController.DismissOnFinish = dismissOnFinish;
                 targetController.RecipientsSelected += e;
                 this.Present(targetController, view);
@@ -51,16 +52,32 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (StorytellersController) UIStoryboard.FromName("Story", null)
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
                     .InstantiateViewController("StorytellersController");
-                targetController.Mode = ContactsMode.FriendsOnly;
+                targetController.Mode = ContactsMode.ChooseTribeMembers;
                 targetController.DisabledUserIds = disabledUserIds;
                 targetController.DismissOnFinish = dismissOnFinish;
                 targetController.RecipientsSelected += e;
                 this.Present(targetController, view);
             });
         }
-
+        
+        public void NavigateChooseEventMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
+            HashSet<string> disabledUserIds = null,
+            HashSet<int> disabledTribeIds = null)
+        {
+            this._window.InvokeOnMainThread(() =>
+            {
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
+                    .InstantiateViewController("StorytellersController");
+                targetController.Mode = ContactsMode.ChooseRecipient;
+                targetController.DisabledUserIds = disabledUserIds;
+                targetController.DisabledTribeIds = disabledTribeIds;
+                targetController.DismissOnFinish = dismissOnFinish;
+                targetController.RecipientsSelected += e;
+                this.Present(targetController, view);
+            });
+        }
         public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null,
             NotificationDTO notification = null, ContactDTO contact = null)
         {
@@ -235,12 +252,21 @@ namespace TellMe.iOS.Core
 
         public void NavigateCreateEvent(IView view, EventCreatedHandler complete)
         {
-            throw new System.NotImplementedException();
+            this._window.InvokeOnMainThread(() =>
+            {
+                var targetController = IoC.GetInstance<CreateEventController>();
+                this.Present(targetController, view);
+            });
         }
 
         public void NavigateEditEvent(IView view, EventDTO eventDTO)
         {
-            throw new System.NotImplementedException();
+            this._window.InvokeOnMainThread(() =>
+            {
+                var targetController = IoC.GetInstance<CreateEventController>();
+                targetController.Event = eventDTO;
+                this.Present(targetController, view);
+            });
         }
 
         public void NavigateEvents(IView view)

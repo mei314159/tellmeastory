@@ -124,7 +124,7 @@ namespace TellMe.Core.Types.BusinessLogic
             return _localAccountService.GetAuthInfo().Account.UserName;
         }
 
-        private void HandleStorytellersSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
+        private void HandleStorytellersSelectedEventHandler(IDismissable view, ICollection<ContactDTO> selectedContacts)
         {
             _recipients = selectedContacts;
             InitButtons();

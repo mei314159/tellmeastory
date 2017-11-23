@@ -67,6 +67,7 @@ namespace TellMe.DAL.Types.Services
                     where @event.CreateDateUtc < olderThanUtc && (@event.HostId == currentUserId || st != null)
                     orderby @event.CreateDateUtc descending
                     select @event)
+                .Distinct()
                 .Take(20);
 
 
@@ -85,18 +86,19 @@ namespace TellMe.DAL.Types.Services
             entity.CreateDateUtc = now;
             await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
 
+            var entityId = entity.Id;
             var entities = newEventDTO.Attendees.Select(x => new StoryRequest
             {
                 CreateDateUtc = now,
                 SenderId = currentUserId,
                 UserId = x.TribeId == null ? x.UserId : null,
                 TribeId = x.TribeId,
-                Title = newEventDTO.StoryRequestTitle
+                Title = newEventDTO.StoryRequestTitle,
+                EventId = entityId
             });
             
             _storyRequestRepository.AddRange(entities, true);
 
-            var entityId = entity.Id;
             entity = await _eventsRepository
                 .GetQueryable(true)
                 .Include(x => x.Host)

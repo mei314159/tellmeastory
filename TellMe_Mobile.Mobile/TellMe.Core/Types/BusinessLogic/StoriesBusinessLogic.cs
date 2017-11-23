@@ -14,18 +14,18 @@ namespace TellMe.Core.Types.BusinessLogic
 {
     public class StoriesBusinessLogic : IStoriesBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesService;
+        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteNotificationsDataService _remoteNotificationsService;
         private readonly ILocalStoriesDataService _localStoriesService;
         private readonly IRouter _router;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
         public StoriesBusinessLogic(
-            IRemoteStoriesDataService remoteStoriesService,
+            IRemoteStoriesDataService remoteStoriesDataService,
             IRemoteNotificationsDataService remoteNotificationsService,
             IRouter router, ILocalStoriesDataService localStoriesService)
         {
-            _remoteStoriesService = remoteStoriesService;
+            _remoteStoriesDataService = remoteStoriesDataService;
             _remoteNotificationsService = remoteNotificationsService;
             _router = router;
             _localStoriesService = localStoriesService;
@@ -44,7 +44,7 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
             }
-            var result = await _remoteStoriesService
+            var result = await _remoteStoriesDataService
                 .GetStoriesAsync(forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
@@ -86,9 +86,22 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateNotificationsCenter(View);
         }
 
-        private void RequestStoryRecipientSelectedEventHandler(ICollection<ContactDTO> selectedContacts)
+        private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView, ICollection<ContactDTO> selectedContacts)
         {
-            _router.NavigateRequestStory(this.View, selectedContacts);
+            _router.NavigatePrepareStoryRequest(this.View, selectedContacts, (x,y) => CreateStoryRequestAsync(chooseRecipientsView, x, y));
+        }
+        
+        private async void CreateStoryRequestAsync(IDismissable chooseRecipientsView, RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        {
+            var result = await this._remoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this.View.ShowSuccessMessage("Story successfully requested", chooseRecipientsView.Dismiss);
+            }
+            else
+            {
+                result.ShowResultError(this.View);
+            }  
         }
 
         public void ViewStory(StoryDTO story, bool goToComments = false)
@@ -135,8 +148,8 @@ namespace TellMe.Core.Types.BusinessLogic
             App.Instance.StoryLikeChanged(story);
 
             var result = liked
-                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
-                : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
+                ? await _remoteStoriesDataService.DislikeAsync(story.Id).ConfigureAwait(false)
+                : await _remoteStoriesDataService.LikeAsync(story.Id).ConfigureAwait(false);
 
             if (!result.IsSuccess)
             {

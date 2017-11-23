@@ -205,6 +205,7 @@
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
+    <InterfaceDefinition Include="Views\Cells\EventEditAttendeesListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StorytellersListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoriesListCell.xib" />
     <InterfaceDefinition Include="Story.storyboard" />
@@ -228,6 +229,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CreateEventController.cs" />
     <Compile Include="Controllers\SendStoryViewController.designer.cs">
       <DependentUpon>SendStoryViewController.cs</DependentUpon>
     </Compile>
@@ -237,6 +239,10 @@
     <Compile Include="Core\UI\TextInput.cs" />
     <Compile Include="Extensions\ViewExtensions.cs" />
     <Compile Include="Core\Providers\ContactsProvider.cs" />
+    <Compile Include="Views\Cells\EventEditAttendeesListCell.cs" />
+    <Compile Include="Views\Cells\EventEditAttendeesListCell.designer.cs">
+      <DependentUpon>EventEditAttendeesListCell.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\Cells\StorytellersListCell.cs" />
     <Compile Include="Views\Cells\StorytellersListCell.designer.cs">
       <DependentUpon>StorytellersListCell.cs</DependentUpon>
@@ -266,6 +272,9 @@
     <Compile Include="Controllers\StoriesListViewController.cs" />
     <Compile Include="Controllers\StoriesListViewController.designer.cs">
       <DependentUpon>StoriesListViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
+      <DependentUpon>TribeMembersListCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\CustomPopUpView.cs" />
     <Compile Include="Views\Overlay.cs" />
@@ -298,9 +307,9 @@
     <Compile Include="Controllers\SignUpController.designer.cs">
       <DependentUpon>SignUpController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\StorytellersController.cs" />
+    <Compile Include="Controllers\StorytellersViewController.cs" />
     <Compile Include="Controllers\StorytellersController.designer.cs">
-      <DependentUpon>StorytellersController.cs</DependentUpon>
+      <DependentUpon>StorytellersViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Controllers\UploadPictureController.cs" />
     <Compile Include="Controllers\UploadPictureController.designer.cs">
@@ -318,9 +327,6 @@
     <Compile Include="Controllers\CreateTribeController.cs" />
     <Compile Include="Controllers\TribeInfoViewController.cs" />
     <Compile Include="Views\Cells\TribeMembersListCell.cs" />
-    <Compile Include="Views\Cells\TribeMembersListCell.designer.cs">
-      <DependentUpon>TribeMembersListCell.cs</DependentUpon>
-    </Compile>
     <Compile Include="Views\VideoSlider\SAResizableBubble.cs" />
     <Compile Include="Views\VideoSlider\SASliderLeft.cs" />
     <Compile Include="Views\VideoSlider\SASliderRight.cs" />

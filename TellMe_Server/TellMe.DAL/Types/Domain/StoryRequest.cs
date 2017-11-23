@@ -10,6 +10,7 @@ namespace TellMe.DAL.Types.Domain
         public string SenderId { get; set; }
         public string UserId { get; set; }
         public int? TribeId { get; set; }
+        public int? EventId { get; set; }
         public virtual ApplicationUser Sender { get; set; }
         public virtual ApplicationUser Receiver { get; set; }
         public virtual Event Event { get; set; }

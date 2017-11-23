@@ -27,7 +27,8 @@ namespace TellMe.iOS.Controllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-            _businessLogic.View = this;
+
+            this._businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(EventCell.Nib, EventCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -39,7 +40,14 @@ namespace TellMe.iOS.Controllers
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
+            this.NavigationItem.RightBarButtonItem =
+                new UIBarButtonItem("Add", UIBarButtonItemStyle.Done, AddEventButtonTouched);
             LoadEventsAsync(false, true);
+        }
+
+        private void AddEventButtonTouched(object sender, EventArgs e)
+        {
+            this._businessLogic.CreateEvent();
         }
 
         public override void ViewWillAppear(bool animated)
