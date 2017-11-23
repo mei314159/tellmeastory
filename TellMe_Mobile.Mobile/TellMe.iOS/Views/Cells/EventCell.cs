@@ -47,10 +47,10 @@ namespace TellMe.iOS.Views.Cells
         {
             base.AwakeFromNib();
 
-            this.Layer.MasksToBounds = false;
-            this.Layer.ShadowOffset = new CGSize(-15, 20);
-            this.Layer.ShadowRadius = 5;
-            this.Layer.ShadowOpacity = 0.5f;
+            this.ContentWrapper.Layer.MasksToBounds = false;
+            this.ContentWrapper.Layer.ShadowOffset = new CGSize(0, 2);
+            this.ContentWrapper.Layer.ShadowRadius = 2;
+            this.ContentWrapper.Layer.ShadowOpacity = 0.5f;
 
             this._defaultPicture = UIImage.FromBundle("UserPic");
 

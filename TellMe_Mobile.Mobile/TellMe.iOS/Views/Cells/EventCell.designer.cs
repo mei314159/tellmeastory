@@ -23,6 +23,10 @@ namespace TellMe.iOS.Views.Cells
         UIKit.UICollectionView AttendeesCollection { get; set; }
 
         [Outlet]
+        [GeneratedCode("iOS Designer", "1.0")]
+        UIKit.UIView ContentWrapper { get; set; }
+
+        [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.NSLayoutConstraint ContentWrapperHeight { get; set; }
 
@@ -60,14 +64,21 @@ namespace TellMe.iOS.Views.Cells
 
         void ReleaseDesignerOutlets ()
         {
-            if (AcceptButton != null) {
-                AcceptButton.Dispose ();
+            if (AcceptButton != null)
+            {
+                AcceptButton.Dispose();
                 AcceptButton = null;
             }
 
             if (AttendeesCollection != null) {
                 AttendeesCollection.Dispose ();
                 AttendeesCollection = null;
+            }
+
+            if (ContentWrapper != null)
+            {
+                ContentWrapper.Dispose();
+                ContentWrapper = null;
             }
 
             if (ContentWrapperHeight != null) {

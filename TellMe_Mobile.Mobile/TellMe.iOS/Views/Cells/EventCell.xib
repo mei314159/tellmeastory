@@ -168,7 +168,8 @@
                 <outlet property="AttendeesCollection" destination="3760" id="name-outlet-3760"/>
                 <outlet property="AcceptButton" destination="2672" id="name-outlet-2672"/>
                 <outlet property="SkipButton" destination="3246" id="name-outlet-3246"/>
-                <outlet property="ContentWrapperHeight" destination="3717" id="name-outlet-3717"/>
+                <outlet property="ContentWrapper" destination="1759" id="name-outlet-1759"/>
+				<outlet property="ContentWrapperHeight" destination="3717" id="name-outlet-3717"/>
             </connections>
             <point key="canvasLocation" x="-37" y="-35"/>
             <color key="backgroundColor" colorSpace="calibratedRGB" red="0.90588235294117647" green="0.90588235294117647" blue="0.90588235294117647" alpha="1"/>
