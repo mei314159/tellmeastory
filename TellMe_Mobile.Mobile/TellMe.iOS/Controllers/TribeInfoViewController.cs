@@ -255,7 +255,7 @@ namespace TellMe.iOS.Controllers
                     _addMemberCell = new UITableViewCell();
                     _addMemberCell.TextLabel.Text = "Add Member";
                     _addMemberCell.TextLabel.TextAlignment = UITextAlignment.Center;
-                    _addMemberCell.TextLabel.TextColor = UIColor.Blue;
+                    _addMemberCell.TextLabel.TextColor = _addMemberCell.DefaultTintColor();
                 }
 
                 return _addMemberCell;

@@ -7,9 +7,11 @@ using Foundation;
 using TellMe.Core;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
+using TellMe.iOS.Views;
 using TellMe.iOS.Views.Badge;
 using TellMe.iOS.Views.Cells;
 using UIKit;
@@ -243,6 +245,20 @@ namespace TellMe.iOS.Controllers
                     cell?.UpdateLikeButton(story);
                 }
             });
+        }
+
+        public IOverlay DisableInput()
+        {
+            var overlay = new Overlay("Wait");
+            overlay.PopUp();
+
+            return overlay;
+        }
+
+        public void EnableInput(IOverlay overlay)
+        {
+            overlay?.Close(false);
+            overlay?.Dispose();
         }
     }
 }

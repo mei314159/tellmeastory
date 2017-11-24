@@ -67,7 +67,7 @@ namespace TellMe.iOS.Controllers
                 var contactDto = Recipients.First();
                 if (contactDto.Type == ContactType.User)
                 {
-                    handleName = contactDto.User.UserName;
+                    handleName = contactDto.User?.UserName;
                 }
             }
 
@@ -88,11 +88,11 @@ namespace TellMe.iOS.Controllers
 
         public void Close(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
         {
+            RequestCreated?.Invoke(dto, recipients);
             if (NavigationController != null)
                 this.NavigationController.PopViewController(true);
             else
                 this.DismissViewController(true, null);
-            RequestCreated?.Invoke(dto, recipients);
         }
     }
 }

@@ -10,5 +10,7 @@ namespace TellMe.Core.Contracts.UI.Views
 
         void DisplayStories(ICollection<StoryDTO> stories);
         void DisplayNotificationsCount(int count);
+        IOverlay DisableInput();
+        void EnableInput(IOverlay overlay);
     }
 }

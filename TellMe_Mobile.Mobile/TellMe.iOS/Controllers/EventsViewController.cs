@@ -40,8 +40,9 @@ namespace TellMe.iOS.Controllers
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
+            this.NavigationItem.Title = "Events";
             this.NavigationItem.RightBarButtonItem =
-                new UIBarButtonItem("Add", UIBarButtonItemStyle.Done, AddEventButtonTouched);
+                    new UIBarButtonItem(UIBarButtonSystemItem.Add, AddEventButtonTouched);
             LoadEventsAsync(false, true);
         }
 

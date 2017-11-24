@@ -25,6 +25,11 @@ namespace TellMe.iOS.Extensions
 
     public static class ViewExtensions
     {
+        public static UIColor DefaultTintColor(this UIView view)
+        {
+            return UIColor.FromRGBA(0f, 122 / 255f, 1f, 1f);
+        }
+
         /// <summary>
         /// Find the first responder in the <paramref name="view"/>'s subview hierarchy
         /// </summary>
@@ -136,13 +141,13 @@ namespace TellMe.iOS.Extensions
 
         public static UIViewController GetViewController(this UIView view)
         {
-            var responder = (UIResponder) view;
+            var responder = (UIResponder)view;
             while (responder != null && !(responder is UIViewController))
             {
                 responder = responder.NextResponder;
             }
 
-            return (UIViewController) responder;
+            return (UIViewController)responder;
         }
 
         public static void HideKeyboard(this UIViewController controller)

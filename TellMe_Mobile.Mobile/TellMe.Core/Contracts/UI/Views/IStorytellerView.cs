@@ -6,12 +6,14 @@ namespace TellMe.Core.Contracts.UI.Views
 {
     public interface IStorytellerView : IView
     {
+		StorytellerDTO Storyteller { get; set; }
+		string StorytellerId { get; }
         void ShowSuccessMessage(string message, Action complete = null);
 
         void DisplayStories(ICollection<StoryDTO> stories);
 
         void DisplayStoryteller(StorytellerDTO storyteller);
-        StorytellerDTO Storyteller { get; set; }
-        string StorytellerId { get; }
+        IOverlay DisableInput();
+        void EnableInput(IOverlay overlay);
     }
 }

@@ -119,7 +119,9 @@ namespace TellMe.Core.Types.BusinessLogic
 
         private async void CreateStoryRequestAsync(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
         {
+            var overlay = this.View.DisableInput();
             var result = await this._remoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
+            this.View.EnableInput(overlay);
             if (result.IsSuccess)
             {
                 this.View.ShowSuccessMessage("Story successfully requested");
