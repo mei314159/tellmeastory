@@ -111,7 +111,6 @@ namespace TellMe.Web
             app.UseHangfireServer();
             app.UseAuthentication();
             app.UseMvc();
-
             RecurringJob.AddOrUpdate<PushFeedbackService>(x => x.CheckExpiredTokens(), Cron.Daily);
         }
 

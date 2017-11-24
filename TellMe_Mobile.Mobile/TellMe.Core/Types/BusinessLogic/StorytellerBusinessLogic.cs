@@ -6,53 +6,45 @@ using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class StorytellerBusinessLogic : IStorytellerBusinessLogic
+    public class StorytellerBusinessLogic : StoriesTableBusinessLogic, IStorytellerBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteStorytellersDataService _remoteStorytellesDataService;
-        private readonly ILocalStoriesDataService _localStoriesDataService;
         private readonly ILocalStorytellersDataService _localStorytellesDataService;
-        private readonly ILocalAccountService _localLocalAccountService;
-        private readonly IRouter _router;
-        private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService,
-            IRemoteStorytellersDataService remoteStorytellesDataService,
-            IRouter router,
-            ILocalStoriesDataService localStoriesDataService,
-            ILocalStorytellersDataService localStorytellesDataService,
-            ILocalAccountService localLocalAccountService)
+        public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
+            ILocalStoriesDataService localStoriesService, IRemoteStorytellersDataService remoteStorytellesDataService,
+            ILocalStorytellersDataService localStorytellesDataService) : base(remoteStoriesDataService, router,
+            localStoriesService)
         {
-            _remoteStoriesDataService = remoteStoriesDataService;
             _remoteStorytellesDataService = remoteStorytellesDataService;
-            _router = router;
-            _localStoriesDataService = localStoriesDataService;
             _localStorytellesDataService = localStorytellesDataService;
-            _localLocalAccountService = localLocalAccountService;
         }
 
-        public IStorytellerView View { get; set; }
+        public new IStorytellerView View
+        {
+            get => (IStorytellerView) base.View;
+            set => base.View = value;
+        }
 
-        public async Task LoadStoriesAsync(bool forceRefresh = false)
+        public override async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
             if (forceRefresh)
             {
-                _stories.Clear();
+                Stories.Clear();
             }
 
-            var result = await _remoteStoriesDataService
-                .GetStoriesAsync(View.Storyteller.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
+            var result = await RemoteStoriesDataService
+                .GetStoriesAsync(View.Storyteller.Id, forceRefresh ? null : Stories.LastOrDefault()?.CreateDateUtc)
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localStoriesDataService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                _stories.AddRange(result.Data);
+                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
+                Stories.AddRange(result.Data);
             }
             else
             {
@@ -60,10 +52,10 @@ namespace TellMe.Core.Types.BusinessLogic
                 return;
             }
 
-            this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
+            this.View.DisplayStories(Stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
 
-        public async Task<bool> InitAsync()
+        public override async Task<bool> InitAsync()
         {
             if (View.Storyteller == null)
             {
@@ -95,7 +87,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void SendStory()
         {
-            _router.NavigateRecordStory(View, contact: new ContactDTO
+            Router.NavigateRecordStory(View, contact: new ContactDTO
             {
                 Type = ContactType.User,
                 UserId = View.Storyteller.Id,
@@ -114,13 +106,13 @@ namespace TellMe.Core.Types.BusinessLogic
                     User = View.Storyteller
                 }
             };
-            _router.NavigatePrepareStoryRequest(this.View, contacts, CreateStoryRequestAsync);
+            Router.NavigatePrepareStoryRequest(this.View, contacts, CreateStoryRequestAsync);
         }
 
         private async void CreateStoryRequestAsync(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
         {
             var overlay = this.View.DisableInput();
-            var result = await this._remoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
+            var result = await this.RemoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
             this.View.EnableInput(overlay);
             if (result.IsSuccess)
             {
@@ -129,51 +121,6 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 result.ShowResultError(this.View);
-            }  
-        }
-        
-        public void ViewStory(StoryDTO story)
-        {
-            _router.NavigateViewStory(this.View, story);
-        }
-
-        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
-        {
-            if (receiver.TribeId != null)
-            {
-                _router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
-            }
-            else
-            {
-                _router.NavigateStoryteller(View, receiver.UserId);
-            }
-        }
-
-        public async Task LikeButtonTouchedAsync(StoryDTO story)
-        {
-            var liked = story.Liked;
-            var likeCount = story.LikesCount;
-            story.Liked = !liked;
-            story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
-            App.Instance.StoryLikeChanged(story);
-
-            var result = liked
-                ? await _remoteStoriesDataService.DislikeAsync(story.Id).ConfigureAwait(false)
-                : await _remoteStoriesDataService.LikeAsync(story.Id).ConfigureAwait(false);
-
-            if (!result.IsSuccess)
-            {
-                story.Liked = liked;
-                story.LikesCount = likeCount;
-                App.Instance.StoryLikeChanged(story);
-            }
-        }
-
-        public void NavigateStoryteller(StoryDTO story)
-        {
-            if (story.SenderId != _localLocalAccountService.GetAuthInfo().UserId)
-            {
-                _router.NavigateStoryteller(View, story.SenderId);
             }
         }
     }

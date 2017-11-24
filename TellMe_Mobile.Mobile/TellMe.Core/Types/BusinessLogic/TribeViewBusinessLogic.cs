@@ -12,41 +12,37 @@ using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class TribeViewBusinessLogic : ITribeViewBusinessLogic
+    public class TribeViewBusinessLogic : StoriesTableBusinessLogic, ITribeViewBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesService;
         private readonly IRemoteTribesDataService _remoteTribesService;
-        private readonly ILocalStoriesDataService _localStoriesService;
         private readonly ILocalTribesDataService _localTribesService;
-        private readonly IRouter _router;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public TribeViewBusinessLogic(IRemoteStoriesDataService remoteStoriesService,
-            IRemoteTribesDataService remoteTribesService, IRouter router,
-            ILocalStoriesDataService localStoriesService, ILocalTribesDataService localTribesService)
+        public TribeViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router, ILocalStoriesDataService localStoriesService, IRemoteTribesDataService remoteTribesService, ILocalTribesDataService localTribesService) : base(remoteStoriesDataService, router, localStoriesService)
         {
-            _remoteStoriesService = remoteStoriesService;
             _remoteTribesService = remoteTribesService;
-            _router = router;
-            _localStoriesService = localStoriesService;
             _localTribesService = localTribesService;
         }
 
-        public ITribeView View { get; set; }
+        public new ITribeView View
+        {
+            get => (ITribeView) base.View;
+            set => base.View = value;
+        }
 
-        public async Task LoadStoriesAsync(bool forceRefresh = false)
+        public override async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
         {
             if (forceRefresh)
             {
                 _stories.Clear();
             }
 
-            var result = await _remoteStoriesService
+            var result = await RemoteStoriesDataService
                 .GetStoriesAsync(View.Tribe.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
+                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 _stories.AddRange(result.Data);
             }
             else
@@ -58,7 +54,7 @@ namespace TellMe.Core.Types.BusinessLogic
             this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
         }
 
-        public async Task<bool> InitAsync()
+        public override async Task<bool> InitAsync()
         {
             if (View.Tribe == null)
             {
@@ -88,7 +84,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void SendStory()
         {
-            _router.NavigateRecordStory(View, contact: new ContactDTO
+            Router.NavigateRecordStory(View, contact: new ContactDTO
             {
                 Type = ContactType.Tribe,
                 TribeId = View.Tribe.Id,
@@ -98,54 +94,17 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void ViewStory(StoryDTO story)
         {
-            _router.NavigateViewStory(this.View, story);
+            Router.NavigateViewStory(this.View, story);
         }
 
         public void TribeInfo()
         {
-            _router.NavigateTribeInfo(View, View.Tribe, HandleTribeLeftHandler);
+            Router.NavigateTribeInfo(View, View.Tribe, HandleTribeLeftHandler);
         }
 
         private void HandleTribeLeftHandler(TribeDTO tribe)
         {
             this.View.TribeLeft(tribe);
-        }
-
-        public void NavigateStoryteller(StoryDTO story)
-        {
-            _router.NavigateStoryteller(View, story.SenderId);
-        }
-
-        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
-        {
-            if (receiver.TribeId != null)
-            {
-                _router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
-            }
-            else
-            {
-                _router.NavigateStoryteller(View, receiver.UserId);
-            }
-        }
-
-        public async Task LikeButtonTouchedAsync(StoryDTO story)
-        {
-            var liked = story.Liked;
-            var likeCount = story.LikesCount;
-            story.Liked = !liked;
-            story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
-            App.Instance.StoryLikeChanged(story);
-
-            var result = liked
-                ? await _remoteStoriesService.DislikeAsync(story.Id).ConfigureAwait(false)
-                : await _remoteStoriesService.LikeAsync(story.Id).ConfigureAwait(false);
-
-            if (!result.IsSuccess)
-            {
-                story.Liked = liked;
-                story.LikesCount = likeCount;
-                App.Instance.StoryLikeChanged(story);
-            }
         }
     }
 }

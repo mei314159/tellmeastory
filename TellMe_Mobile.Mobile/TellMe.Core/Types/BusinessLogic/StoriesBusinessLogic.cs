@@ -1,100 +1,67 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
-using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class StoriesBusinessLogic : IStoriesBusinessLogic
+    public class StoriesBusinessLogic : StoriesTableBusinessLogic, IStoriesBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteNotificationsDataService _remoteNotificationsService;
-        private readonly ILocalStoriesDataService _localStoriesService;
-        private readonly IRouter _router;
-        private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public StoriesBusinessLogic(
-            IRemoteStoriesDataService remoteStoriesDataService,
-            IRemoteNotificationsDataService remoteNotificationsService,
-            IRouter router, ILocalStoriesDataService localStoriesService)
+        public StoriesBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
+            ILocalStoriesDataService localStoriesService, IRemoteNotificationsDataService remoteNotificationsService) :
+            base(remoteStoriesDataService, router, localStoriesService)
         {
-            _remoteStoriesDataService = remoteStoriesDataService;
             _remoteNotificationsService = remoteNotificationsService;
-            _router = router;
-            _localStoriesService = localStoriesService;
         }
 
-        public IStoriesListView View { get; set; }
-
-        public async Task LoadStoriesAsync(bool forceRefresh = false, bool clearCache = false)
-        {
-            if (forceRefresh)
-            {
-                _stories.Clear();
-            }
-
-            if (clearCache)
-            {
-                await _localStoriesService.DeleteAllAsync().ConfigureAwait(false);
-            }
-            var result = await _remoteStoriesDataService
-                .GetStoriesAsync(forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                await _localStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
-                _stories.AddRange(result.Data);
-            }
-            else
-            {
-                result.ShowResultError(this.View);
-                return;
-            }
-
-            this.View.DisplayStories(_stories.OrderByDescending(x => x.CreateDateUtc).ToList());
+        public new IStoriesListView View { get => (IStoriesListView) base.View;
+            set => base.View = value;
         }
-
 
         public void SendStory()
         {
-            _router.NavigateRecordStory(View);
+            Router.NavigateRecordStory(View);
         }
 
         public void RequestStory()
         {
-            _router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
+            Router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
         }
 
         public void AccountSettings()
         {
-            _router.NavigateAccountSettings(View);
+            Router.NavigateAccountSettings(View);
         }
 
         public void ShowStorytellers()
         {
-            _router.NavigateStorytellers(View);
+            Router.NavigateStorytellers(View);
         }
 
         public void NotificationsCenter()
         {
-            _router.NavigateNotificationsCenter(View);
+            Router.NavigateNotificationsCenter(View);
         }
 
-        private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView, ICollection<ContactDTO> selectedContacts)
+        private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView,
+            ICollection<ContactDTO> selectedContacts)
         {
-            _router.NavigatePrepareStoryRequest(this.View, selectedContacts, (x,y) => CreateStoryRequestAsync(chooseRecipientsView, x, y));
+            Router.NavigatePrepareStoryRequest(this.View, selectedContacts,
+                (x, y) => CreateStoryRequestAsync(chooseRecipientsView, x, y));
         }
-        
-        private async void CreateStoryRequestAsync(IDismissable chooseRecipientsView, RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+
+        private async void CreateStoryRequestAsync(IDismissable chooseRecipientsView, RequestStoryDTO dto,
+            ICollection<ContactDTO> recipients)
         {
             var overlay = this.View.DisableInput();
-            var result = await this._remoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
+            var result = await this.RemoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
             this.View.EnableInput(overlay);
             if (result.IsSuccess)
             {
@@ -103,28 +70,6 @@ namespace TellMe.Core.Types.BusinessLogic
             else
             {
                 result.ShowResultError(this.View);
-            }  
-        }
-
-        public void ViewStory(StoryDTO story, bool goToComments = false)
-        {
-            _router.NavigateViewStory(this.View, story, goToComments);
-        }
-
-        public void NavigateStoryteller(StoryDTO story)
-        {
-            _router.NavigateStoryteller(View, story.SenderId);
-        }
-
-        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
-        {
-            if (receiver.TribeId != null)
-            {
-                _router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
-            }
-            else
-            {
-                _router.NavigateStoryteller(View, receiver.UserId);
             }
         }
 
@@ -141,29 +86,9 @@ namespace TellMe.Core.Types.BusinessLogic
             }
         }
 
-        public async Task LikeButtonTouchedAsync(StoryDTO story)
-        {
-            var liked = story.Liked;
-            var likeCount = story.LikesCount;
-            story.Liked = !liked;
-            story.LikesCount = liked ? likeCount - 1 : likeCount + 1;
-            App.Instance.StoryLikeChanged(story);
-
-            var result = liked
-                ? await _remoteStoriesDataService.DislikeAsync(story.Id).ConfigureAwait(false)
-                : await _remoteStoriesDataService.LikeAsync(story.Id).ConfigureAwait(false);
-
-            if (!result.IsSuccess)
-            {
-                story.Liked = liked;
-                story.LikesCount = likeCount;
-                App.Instance.StoryLikeChanged(story);
-            }
-        }
-
         public void NavigateEvents()
         {
-            _router.NavigateEvents(this.View);
+            Router.NavigateEvents(this.View);
         }
     }
 }

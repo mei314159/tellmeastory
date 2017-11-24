@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
 using SimpleInjector;
 using SimpleInjector.Diagnostics;
@@ -13,7 +12,6 @@ using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Types.DataServices;
 using TellMe.iOS.Controllers;
-using TellMe.iOS.Core.UI;
 using UIKit;
 
 namespace TellMe.iOS.Core
@@ -81,7 +79,7 @@ namespace TellMe.iOS.Core
                       type.GetInterfaces().Any()
                 select new
                 {
-                    Service = type.GetInterfaces().First(x => x != targetType),
+                Service = type.GetInterfaces().First(x => x != targetType && x.Name == "I" + type.Name),
                     Implementation = type
                 };
 

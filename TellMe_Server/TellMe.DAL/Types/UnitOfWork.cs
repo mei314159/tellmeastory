@@ -17,11 +17,6 @@ namespace TellMe.DAL.Types
 			_dbContext = dbContext;
 		}
 
-		public async Task<int> CommitAsync()
-		{
-			return await _dbContext.SaveChangesAsync();
-		}
-
 		public virtual void BeginTransaction()
 		{
 			if (null == Transaction)

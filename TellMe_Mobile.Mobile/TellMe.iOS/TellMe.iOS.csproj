@@ -233,6 +233,7 @@
     <Compile Include="Controllers\SendStoryViewController.designer.cs">
       <DependentUpon>SendStoryViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\StoriesTableViewController.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Core\ApplicationDataStorage.cs" />
@@ -377,6 +378,10 @@
     <Compile Include="Views\Cells\EventAttendeesListCell.cs" />
     <Compile Include="Views\Cells\EventAttendeesListCell.designer.cs">
       <DependentUpon>EventAttendeesListCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventViewController.cs" />
+    <Compile Include="EventViewController.designer.cs">
+      <DependentUpon>EventViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Contracts.UI.Views
