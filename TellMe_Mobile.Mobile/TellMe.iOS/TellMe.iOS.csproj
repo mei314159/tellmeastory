@@ -230,6 +230,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CreateEventController.cs" />
+    <Compile Include="Controllers\EventViewController.cs" />
+    <Compile Include="Controllers\EventViewController.designer.cs">
+      <DependentUpon>EventViewController.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\SendStoryViewController.designer.cs">
       <DependentUpon>SendStoryViewController.cs</DependentUpon>
     </Compile>
@@ -378,10 +382,6 @@
     <Compile Include="Views\Cells\EventAttendeesListCell.cs" />
     <Compile Include="Views\Cells\EventAttendeesListCell.designer.cs">
       <DependentUpon>EventAttendeesListCell.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EventViewController.cs" />
-    <Compile Include="EventViewController.designer.cs">
-      <DependentUpon>EventViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -60,6 +60,15 @@ namespace TellMe.Core.Types.DataServices.Remote
             return result;
         }
 
+        public async Task<Result<List<StoryDTO>>> GetEventStoriesAsync(int eventId, DateTime? olderThanUtc = null)
+        {
+            var olderThan = olderThanUtc ?? DateTime.MaxValue;
+            var result = await this._apiProvider
+                .GetAsync<List<StoryDTO>>($"stories/event/{eventId}/older-than/{olderThan.Ticks}")
+                .ConfigureAwait(false);
+            return result;
+        }
+
         public async Task<Result<List<StoryReceiverDTO>>> GetStoryReceiversAsync(int storyId)
         {
             var result = await this._apiProvider.GetAsync<List<StoryReceiverDTO>>($"stories/{storyId}/receivers")

@@ -12,6 +12,7 @@ namespace TellMe.Core.Contracts.DataServices.Remote
         Task<Result<List<StoryDTO>>> GetStoriesAsync(DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, DateTime? olderThanUtc = null);
+        Task<Result<List<StoryDTO>>> GetEventStoriesAsync(int eventId, DateTime? olderThanUtc = null);
 
         Task<Result<UploadMediaDTO>> UploadMediaAsync(FileStream videoStream, string videoFileName,
             FileStream previewImageStream, string previewImageFileName);

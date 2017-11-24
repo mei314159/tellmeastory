@@ -12,23 +12,25 @@ using TellMe.Core.Types.Extensions;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class TribeViewBusinessLogic : StoriesTableBusinessLogic, ITribeViewBusinessLogic
+    public class EventViewBusinessLogic : StoriesTableBusinessLogic, IEventViewBusinessLogic
     {
-        private readonly IRemoteTribesDataService _remoteTribesService;
-        private readonly ILocalTribesDataService _localTribesService;
+        private readonly IRemoteEventsDataService _remoteEventsDataService;
+        private readonly ILocalEventsDataService _localEventsDataService;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
-        public TribeViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
-            ILocalStoriesDataService localStoriesService, IRemoteTribesDataService remoteTribesService,
-            ILocalTribesDataService localTribesService) : base(remoteStoriesDataService, router, localStoriesService)
+
+        public EventViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
+            ILocalStoriesDataService localStoriesService, IRemoteEventsDataService remoteEventsDataService,
+            ILocalEventsDataService localEventsDataService) : base(remoteStoriesDataService, router,
+            localStoriesService)
         {
-            _remoteTribesService = remoteTribesService;
-            _localTribesService = localTribesService;
+            _remoteEventsDataService = remoteEventsDataService;
+            _localEventsDataService = localEventsDataService;
         }
 
-        public new ITribeView View
+        public new IEventView View
         {
-            get => (ITribeView) base.View;
+            get => (IEventView) base.View;
             set => base.View = value;
         }
 
@@ -40,7 +42,7 @@ namespace TellMe.Core.Types.BusinessLogic
             }
 
             var result = await RemoteStoriesDataService
-                .GetStoriesAsync(View.Tribe.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
+                .GetEventStoriesAsync(View.Event.Id, forceRefresh ? null : _stories.LastOrDefault()?.CreateDateUtc)
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
@@ -58,15 +60,15 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public override async Task<bool> InitAsync()
         {
-            if (View.Tribe == null)
+            if (View.Event == null)
             {
-                var localStoryteller = await _localTribesService.GetAsync(View.TribeId).ConfigureAwait(false);
+                var localStoryteller = await _localEventsDataService.GetAsync(View.EventId).ConfigureAwait(false);
                 if (localStoryteller.Data == null || localStoryteller.Expired)
                 {
-                    var result = await _remoteTribesService.GetTribeAsync(View.TribeId).ConfigureAwait(false);
+                    var result = await _remoteEventsDataService.GetEventAsync(View.EventId).ConfigureAwait(false);
                     if (result.IsSuccess)
                     {
-                        View.Tribe = result.Data;
+                        View.Event = result.Data;
                     }
                     else
                     {
@@ -76,22 +78,22 @@ namespace TellMe.Core.Types.BusinessLogic
                 }
                 else
                 {
-                    View.Tribe = localStoryteller.Data;
+                    View.Event = localStoryteller.Data;
                 }
             }
 
-            View.DisplayTribe(View.Tribe);
+            View.DisplayEvent(View.Event);
             return true;
         }
 
         public void SendStory()
         {
-            Router.NavigateRecordStory(View, contact: new ContactDTO
+            /*Router.NavigateRecordStory(View, contact: new ContactDTO
             {
                 Type = ContactType.Tribe,
-                TribeId = View.Tribe.Id,
-                Tribe = View.Tribe
-            });
+                TribeId = View.Event.Id,
+                Tribe = View.Event
+            });*/
         }
 
         public void ViewStory(StoryDTO story)
@@ -99,14 +101,25 @@ namespace TellMe.Core.Types.BusinessLogic
             Router.NavigateViewStory(this.View, story);
         }
 
-        public void TribeInfo()
+        public async Task DeleteEvent()
         {
-            Router.NavigateTribeInfo(View, View.Tribe, HandleTribeLeftHandler);
+            var result = await _remoteEventsDataService
+                .DeleteEventAsync(View.Event.Id)
+                .ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                await _localEventsDataService.DeleteAsync(View.Event).ConfigureAwait(false);
+                this.View.ShowSuccessMessage("You've deleted this event", HandleEventDeleted);
+            }
+            else
+            {
+                result.ShowResultError(this.View);
+            }
         }
 
-        private void HandleTribeLeftHandler(TribeDTO tribe)
+        private void HandleEventDeleted()
         {
-            this.View.TribeLeft(tribe);
+            View.EventDeleted(View.Event);
         }
     }
 }

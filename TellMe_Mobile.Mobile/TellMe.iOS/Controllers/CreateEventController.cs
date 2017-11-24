@@ -28,7 +28,7 @@ namespace TellMe.iOS.Controllers
             _businessLogic.View = this;
         }
 
-        public event DeleteEventHandler EventDeleted;
+        public event EventDeletedHandler EventDeleted;
 
         public EventDTO Event { get; set; }
 
