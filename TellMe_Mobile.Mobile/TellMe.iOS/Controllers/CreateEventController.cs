@@ -34,7 +34,7 @@ namespace TellMe.iOS.Controllers
 
         public override void ViewDidLoad()
         {
-            bool createEvent = Event == null;
+            var createEvent = Event == null;
             if (createEvent)
             {
                 Event = new EventDTO
@@ -42,8 +42,8 @@ namespace TellMe.iOS.Controllers
                     Attendees = new List<EventAttendeeDTO>()
                 };
             }
-            this.NavigationItem.RightBarButtonItem =
-                new UIBarButtonItem("Save", UIBarButtonItemStyle.Done, EditButtonTouched);
+
+            ToggleRightButton(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             TableView.AllowsSelectionDuringEditing = true;
@@ -54,7 +54,7 @@ namespace TellMe.iOS.Controllers
                 {
                     new EntryElement("Title", "Event Title", Event?.Title),
                     new EntryElement("Description", "Event Description", Event?.Description),
-                    new DateElement("Date", createEvent ? DateTime.UtcNow :  Event.DateUtc)
+                    new DateElement("Date", createEvent ? DateTime.UtcNow : Event.DateUtc)
                 },
                 new Section("Members")
             };
@@ -84,11 +84,21 @@ namespace TellMe.iOS.Controllers
             return _dataSource;
         }
 
-        public async Task LoadAsync(bool forceRefresh)
+        private async Task LoadAsync(bool forceRefresh)
         {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
             await _businessLogic.LoadAsync(forceRefresh);
             InvokeOnMainThread(() => this.RefreshControl.EndRefreshing());
+        }
+
+        private void ToggleRightButton(bool showButton)
+        {
+            InvokeOnMainThread(() =>
+            {
+                this.NavigationItem.RightBarButtonItem = showButton
+                    ? new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                    : null;
+            });
         }
 
         private void DataSource_EditButtonTouched()
@@ -99,7 +109,7 @@ namespace TellMe.iOS.Controllers
         private void DataSource_OnDeleteRow(EventAttendeeDTO deletedItem, NSIndexPath indexPath)
         {
             Event.Attendees.Remove(deletedItem);
-            TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
+            TableView.DeleteRows(new[] {indexPath}, UITableViewRowAnimation.Automatic);
         }
 
         private void DataSource_OnMemberSelected(EventAttendeeDTO eventAttendee, NSIndexPath indexPath)
@@ -124,9 +134,9 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() =>
             {
                 var root = this.Root[0];
-                ((EntryElement)root[0]).Value = eventDTO.Title;
-                ((EntryElement)root[1]).Value = eventDTO.Description;
-                ((DateElement)root[2]).DateValue = eventDTO.CreateDateUtc;
+                ((EntryElement) root[0]).Value = eventDTO.Title;
+                ((EntryElement) root[1]).Value = eventDTO.Description;
+                ((DateElement) root[2]).DateValue = eventDTO.CreateDateUtc;
 
                 if (this.Root.Count == 2)
                 {
@@ -163,20 +173,47 @@ namespace TellMe.iOS.Controllers
             TableView.ReloadData();
         }
 
-        private void EditButtonTouched(object sender, EventArgs e)
+        private void ContinueButtonTouched(object sender, EventArgs e)
         {
             var root = this.Root[0];
             TableView.RefreshControl.Enabled = true;
-            Event.Title = ((EntryElement)root[0]).Value;
-            Event.Description = ((EntryElement)root[1]).Value;
-            Event.DateUtc = ((DateElement)root[2]).DateValue;
+            Event.Title = ((EntryElement) root[0]).Value;
+            Event.Description = ((EntryElement) root[1]).Value;
+            Event.DateUtc = ((DateElement) root[2]).DateValue;
             _businessLogic.NavigateCreateRequest();
         }
 
         public void Close(EventDTO eventDTO)
         {
             EventDeleted?.Invoke(eventDTO);
-            InvokeOnMainThread(() => { this.NavigationController.PopViewController(true); });
+            Dismiss();
+        }
+
+        public void Dismiss()
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            });
+        }
+
+        public IOverlay DisableInput()
+        {
+            ToggleRightButton(false);
+            var overlay = new Overlay("Wait");
+            overlay.PopUp();
+
+            return overlay;
+        }
+
+        public void EnableInput(IOverlay overlay)
+        {
+            ToggleRightButton(true);
+            overlay?.Close(false);
+            overlay?.Dispose();
         }
     }
 
@@ -198,7 +235,7 @@ namespace TellMe.iOS.Controllers
 
         public void SetData(EventDTO eventDTO)
         {
-            lock (((ICollection)_membersList).SyncRoot)
+            lock (((ICollection) _membersList).SyncRoot)
             {
                 _membersList.Clear();
                 if (eventDTO.Attendees != null)
@@ -231,7 +268,7 @@ namespace TellMe.iOS.Controllers
                 return _addMemberCell;
             }
 
-            var cell = (EventEditAttendeesListCell)tableView.DequeueReusableCell(EventEditAttendeesListCell.Key,
+            var cell = (EventEditAttendeesListCell) tableView.DequeueReusableCell(EventEditAttendeesListCell.Key,
                 indexPath);
             var index = tableView.Editing ? indexPath.Row - 1 : indexPath.Row;
             cell.Attendee = _membersList.ElementAt(index);
@@ -253,7 +290,7 @@ namespace TellMe.iOS.Controllers
             }
             else
             {
-                var cell = (EventEditAttendeesListCell)tableView.CellAt(indexPath);
+                var cell = (EventEditAttendeesListCell) tableView.CellAt(indexPath);
                 OnMemberSelected?.Invoke(cell.Attendee, indexPath);
             }
         }
@@ -282,7 +319,7 @@ namespace TellMe.iOS.Controllers
         public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
         {
             var deleteAction = UITableViewRowAction.Create(UITableViewRowActionStyle.Destructive, "Delete", DeleteRow);
-            return new[] { deleteAction };
+            return new[] {deleteAction};
         }
 
         private void DeleteRow(UITableViewRowAction action, NSIndexPath indexPath)

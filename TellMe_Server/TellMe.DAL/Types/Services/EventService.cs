@@ -65,7 +65,7 @@ namespace TellMe.DAL.Types.Services
                         on @event.Id equals attendee.EventId into gj
                     from st in gj.DefaultIfEmpty()
                     where @event.CreateDateUtc < olderThanUtc && (@event.HostId == currentUserId || st != null)
-                    orderby @event.CreateDateUtc descending
+                    orderby @event.DateUtc ascending
                     select @event)
                 .Distinct()
                 .Take(20);

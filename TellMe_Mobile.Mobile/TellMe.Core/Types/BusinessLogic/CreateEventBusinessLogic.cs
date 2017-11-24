@@ -89,37 +89,39 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void NavigateCreateRequest()
         {
-            _router.NavigatePrepareStoryRequest(this.View, View.Event.Attendees.Select(x => new ContactDTO
-            {
-                Name = x.AttendeeName,
-                TribeId = x.TribeId,
-                UserId = x.UserId,
-                Type = x.TribeId.HasValue ? ContactType.Tribe : ContactType.User
-            }).ToArray(), StoryRequestCreated);
-        }
-
-        private async void StoryRequestCreated(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
-        {
-            this.View.Event.StoryRequestTitle = dto.Title;
-            var validationResult = await _validator.ValidateAsync(View.Event).ConfigureAwait(false);
+            var validationResult = _validator.Validate(View.Event);
             if (validationResult.IsValid)
             {
-                var result = await _remoteEventsDataService
-                    .SaveEventAsync(View.Event)
-                    .ConfigureAwait(false);
-                if (result.IsSuccess)
+                _router.NavigatePrepareStoryRequest(this.View, View.Event.Attendees.Select(x => new ContactDTO
                 {
-                    await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                    this.View.ShowSuccessMessage("Tribe successfully updated");
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                }
+                    Name = x.AttendeeName,
+                    TribeId = x.TribeId,
+                    UserId = x.UserId,
+                    Type = x.TribeId.HasValue ? ContactType.Tribe : ContactType.User
+                }).ToArray(), StoryRequestCreated);
             }
             else
             {
                 validationResult.ShowValidationResult(this.View);
+            }
+        }
+
+        private async void StoryRequestCreated(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        {
+            var overlay = this.View.DisableInput();
+            this.View.Event.StoryRequestTitle = dto.Title;
+            var result = await _remoteEventsDataService
+                .SaveEventAsync(View.Event)
+                .ConfigureAwait(false);
+            this.View.EnableInput(overlay);
+            if (result.IsSuccess)
+            {
+                await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
+                this.View.ShowSuccessMessage("Event successfully saved", () => this.View.Dismiss());
+            }
+            else
+            {
+                result.ShowResultError(this.View);
             }
         }
 

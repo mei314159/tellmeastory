@@ -73,7 +73,7 @@ namespace TellMe.iOS.Views
                 {
                     Transform = CGAffineTransform.MakeScale(0.1f, 0.1f);
                     effectView.Alpha = 0;
-                }, delegate
+                }, () =>
                 {
                     this.RemoveFromSuperview();
                     effectView.RemoveFromSuperview();
@@ -82,6 +82,8 @@ namespace TellMe.iOS.Views
             }
             else
             {
+                this.RemoveFromSuperview();
+                effectView.RemoveFromSuperview();
                 PopWillClose?.Invoke();
             }
         }

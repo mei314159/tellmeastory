@@ -46,7 +46,7 @@ namespace TellMe.Core.Types.BusinessLogic
                 return;
             }
 
-            this.View.DisplayEvents(_events.OrderByDescending(x => x.CreateDateUtc).ToList());
+            this.View.DisplayEvents(_events.OrderBy(x => x.DateUtc).ToList());
         }
 
         public void CreateEvent()

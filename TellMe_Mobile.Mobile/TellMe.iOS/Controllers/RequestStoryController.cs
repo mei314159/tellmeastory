@@ -23,7 +23,7 @@ namespace TellMe.iOS.Controllers
         }
 
         public event StoryRequestCreatedEventHandler RequestCreated;
-        
+
         public ICollection<ContactDTO> Recipients { get; set; }
 
         ITextInput IRequestStoryView.StoryTitle => this.StoryTitle;
@@ -88,11 +88,11 @@ namespace TellMe.iOS.Controllers
 
         public void Close(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
         {
-            RequestCreated?.Invoke(dto, recipients);
             if (NavigationController != null)
                 this.NavigationController.PopViewController(true);
             else
                 this.DismissViewController(true, null);
+            RequestCreated?.Invoke(dto, recipients);
         }
     }
 }
