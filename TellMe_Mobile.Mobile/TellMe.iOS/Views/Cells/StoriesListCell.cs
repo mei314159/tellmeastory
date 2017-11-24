@@ -5,6 +5,7 @@ using UIKit;
 using TellMe.Core.Types.Extensions;
 using SDWebImage;
 using TellMe.iOS.Core.UI;
+using CoreGraphics;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -35,6 +36,11 @@ namespace TellMe.iOS.Views.Cells
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
+
+            this.ContentWrapper.Layer.MasksToBounds = false;
+            this.ContentWrapper.Layer.ShadowOffset = new CGSize(0, 2);
+            this.ContentWrapper.Layer.ShadowRadius = 2;
+            this.ContentWrapper.Layer.ShadowOpacity = 0.5f;
 
             this.defaultPicture = UIImage.FromBundle("UserPic");
 
