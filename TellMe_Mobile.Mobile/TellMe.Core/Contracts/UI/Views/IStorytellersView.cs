@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
 
 namespace TellMe.Core.Contracts.UI.Views
 {

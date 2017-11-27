@@ -59,12 +59,12 @@ namespace TellMe.DAL.Types.Repositories
             }
         }
 
-        public void AddRange(IEnumerable<TEntity> entity, bool commit = false)
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entity, bool commit = false)
         {
             Set.AddRange(entity);
             if (commit)
             {
-                UnitOfWork.PreCommitSave();
+                await UnitOfWork.PreCommitSaveAsync().ConfigureAwait(false);
             }
         }
 

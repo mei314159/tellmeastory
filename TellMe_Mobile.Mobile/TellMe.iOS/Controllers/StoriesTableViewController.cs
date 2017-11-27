@@ -63,21 +63,23 @@ namespace TellMe.iOS.Controllers
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (_storiesList.Count - indexPath.Row == 5 && _canLoadMore)
+            if (_storiesList.Count - indexPath.Row - StoryItemIndexOffset == 5 && _canLoadMore)
             {
                 LoadMoreAsync();
             }
         }
 
+        public virtual int StoryItemIndexOffset => 0;
+
         public override nint RowsInSection(UITableView tableView, nint section)
         {
-            return this._storiesList.Count;
+            return this._storiesList.Count + StoryItemIndexOffset;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (StoriesListCell) tableView.DequeueReusableCell(StoriesListCell.Key, indexPath);
-            cell.Story = this._storiesList[indexPath.Row];
+            cell.Story = this._storiesList[indexPath.Row - StoryItemIndexOffset];
             cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
             cell.PreviewTouched = Cell_PreviewTouched;
             cell.CommentsButtonTouched = Cell_CommentsButtonTouched;
@@ -134,7 +136,7 @@ namespace TellMe.iOS.Controllers
 
         private void Cell_ProfilePictureTouched(StoryDTO story)
         {
-            BusinessLogic.NavigateStoryteller(story);
+            BusinessLogic.NavigateStoryteller(story.SenderId);
         }
 
         private void Cell_CommentsButtonTouched(StoryDTO story)
@@ -144,7 +146,7 @@ namespace TellMe.iOS.Controllers
 
         private void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
         {
-            BusinessLogic.ViewReceiver(receiver, cell.RemoveTribe);
+            BusinessLogic.NavigateReceiver(receiver, cell.RemoveTribe);
         }
 
         private async Task LoadMoreAsync()

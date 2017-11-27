@@ -25,13 +25,6 @@ namespace TellMe.iOS.Controllers
         private NSObject _willShowNotificationObserver;
 
         private readonly List<CommentDTO> _commentsList = new List<CommentDTO>();
-        private UIVisualEffectView _effectView;
-
-        private UIVisualEffectView EffectView => _effectView ??
-                                                 (_effectView =
-                                                     new UIVisualEffectView(
-                                                         UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)));
-
         private IRemoteCommentsDataService _commentsService;
         private IRemoteStoriesDataService _remoteStoriesService;
         private ILocalAccountService _localAccountService;
@@ -55,9 +48,6 @@ namespace TellMe.iOS.Controllers
         public override void ViewDidLoad()
         {
             Initialize();
-            EffectView.Frame = View.Bounds;
-            View.AddSubview(EffectView);
-            View.SendSubviewToBack(EffectView);
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
 
             _commentsService = IoC.GetInstance<IRemoteCommentsDataService>();

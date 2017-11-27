@@ -92,6 +92,15 @@ namespace TellMe.Web.Controllers
 
             return Ok(result);
         }
+        
+        [HttpGet("event/{eventId}/older-than/{olderThanTicksUtc}")]
+        public async Task<IActionResult> GetEventStoriesAsync(int eventId, long olderThanTicksUtc)
+        {
+            var olderThanUtc = olderThanTicksUtc.GetUtcDateTime();
+            var result = await _storyService.GetAllAsync(this.UserId, eventId, olderThanUtc);
+
+            return Ok(result);
+        }
 
         [HttpPost("upload-media")]
         public async Task<IActionResult> UploadMediaAsync(FileInputDTO dto)

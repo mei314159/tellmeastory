@@ -18,7 +18,6 @@ namespace TellMe.DAL.Types.Services
     {
         private readonly IRepository<Story, int> _storyRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
-        private readonly IRepository<Notification, int> _notificationRepository;
 
         private readonly IRepository<StoryRequestStatus, int> _storyRequestStatusRepository;
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
@@ -26,27 +25,27 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<StoryLike> _storyLikeRepository;
         private readonly IRepository<ApplicationUser> _userRepository;
+        private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository,
             IRepository<StoryRequestStatus, int> storyRequestStatusRepository,
             IRepository<StoryRequest, int> storyRequestRepository,
             IRepository<StoryReceiver, int> storyReceiverRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
             IRepository<StoryLike> storyLikeRepository,
-            IRepository<ApplicationUser> userRepository)
+            IRepository<ApplicationUser> userRepository, IRepository<EventAttendee, int> eventAttendeeRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
-            _notificationRepository = notificationRepository;
             _storyRequestStatusRepository = storyRequestStatusRepository;
             _storyRequestRepository = storyRequestRepository;
             _storyReceiverRepository = storyReceiverRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _storyLikeRepository = storyLikeRepository;
             _userRepository = userRepository;
+            _eventAttendeeRepository = eventAttendeeRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -64,7 +63,6 @@ namespace TellMe.DAL.Types.Services
                 select
                     receiver;
 
-
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
@@ -76,6 +74,27 @@ namespace TellMe.DAL.Types.Services
                         on story.Id equals receiver.StoryId into gj
                     from st in gj.DefaultIfEmpty()
                     where story.CreateDateUtc < olderThanUtc && (story.SenderId == currentUserId || st != null)
+                    orderby story.CreateDateUtc descending
+                    select story)
+                .Take(20);
+
+
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryDTO>>(list, x => x.Items["UserId"] = currentUserId);
+
+            return result;
+        }
+
+        public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int eventId, DateTime olderThanUtc)
+        {
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Likes)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
+            stories = (from story in stories
+                    where story.EventId == eventId && story.CreateDateUtc < olderThanUtc
                     orderby story.CreateDateUtc descending
                     select story)
                 .Take(20);
@@ -217,7 +236,7 @@ namespace TellMe.DAL.Types.Services
                     Extra = new object(),
                     Text = $"{username} likes your story \"{story.Title}\""
                 };
-                _notificationRepository.Save(notification, true);
+                
                 await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
 
@@ -248,7 +267,7 @@ namespace TellMe.DAL.Types.Services
         {
             var entities = Mapper.Map<List<StoryRequest>>(requests);
             entities.ForEach(x => x.SenderId = requestSenderId);
-            _storyRequestRepository.AddRange(entities, true);
+            await _storyRequestRepository.AddRangeAsync(entities, true).ConfigureAwait(false);
 
             var tribeIds = requests.Select(x => x.TribeId).Where(x => x != null).ToList();
             var tribeMembers = await _tribeMemberRepository.GetQueryable(true).Where(x => tribeIds.Contains(x.TribeId))
@@ -300,7 +319,6 @@ namespace TellMe.DAL.Types.Services
                     });
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
             return requestDtos;
         }
@@ -323,6 +341,7 @@ namespace TellMe.DAL.Types.Services
             {
                 var request = await _storyRequestRepository.GetQueryable()
                     .FirstOrDefaultAsync(x => x.Id == dto.RequestId).ConfigureAwait(false);
+                entity.EventId = request.EventId;
                 entity.Receivers = new[]
                 {
                     new StoryReceiver
@@ -396,7 +415,6 @@ namespace TellMe.DAL.Types.Services
                 });
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
             return storyDTO;
         }

@@ -9,12 +9,29 @@ using System.CodeDom.Compiler;
 
 namespace TellMe.iOS
 {
-	[Register ("EventViewController")]
-	partial class EventViewController
+    [Register ("EventViewController")]
+    partial class EventViewController
 	{
-		
+        [Outlet]
+        UIKit.UINavigationItem NavItem { get; set; }
+
+
+        [Outlet]
+        UIKit.UIActivityIndicatorView Spinner { get; set; }
+
 		void ReleaseDesignerOutlets ()
-		{
+        {
+            if (NavItem != null)
+            {
+                NavItem.Dispose();
+                NavItem = null;
+            }
+
+            if (Spinner != null)
+            {
+                Spinner.Dispose();
+                Spinner = null;
+            }
 		}
 	}
 }

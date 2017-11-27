@@ -43,6 +43,21 @@ namespace TellMe.iOS.Views.Cells
             }
         }
 
+        public Action<EventDTO, EventCell> Touched { get; set; }
+
+        public static EventCell Create()
+        {
+            var arr = NSBundle.MainBundle.LoadNib("EventCell", null, null);
+            var v = ObjCRuntime.Runtime.GetNSObject<EventCell>(arr.ValueAt(0));
+            return v;
+        }
+        
+        public void RemoveTribe(TribeDTO tribe)
+        {
+            Event.Attendees.RemoveAll(x => x.TribeId == tribe.Id);
+            InvokeOnMainThread(() => { AttendeesCollection.ReloadData(); });
+        }
+
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
@@ -51,13 +66,29 @@ namespace TellMe.iOS.Views.Cells
             this.ContentWrapper.Layer.ShadowOffset = new CGSize(0, 2);
             this.ContentWrapper.Layer.ShadowRadius = 2;
             this.ContentWrapper.Layer.ShadowOpacity = 0.5f;
-
+            
             this._defaultPicture = UIImage.FromBundle("UserPic");
 
+            var tapGestureRecognizer = new UITapGestureRecognizer(this.CellTouched){
+                CancelsTouchesInView = false
+            };
+            this.AddGestureRecognizer(tapGestureRecognizer);
             this.ProfilePicture.UserInteractionEnabled = true;
             this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(this.ProfilePictureTouched));
             AttendeesCollection.DelaysContentTouches = false;
             AttendeesCollection.RegisterNibForCell(EventAttendeesListCell.Nib, EventAttendeesListCell.Key);
+        }
+
+        private void CellTouched(UITapGestureRecognizer r)
+        {
+            var location = r.LocationOfTouch(0, this);
+            if (!AttendeesCollection.Frame.Contains(location)
+                && !AcceptButton.Frame.Contains(location)
+                && !SkipButton.Frame.Contains(location)
+                && !ProfilePicture.Frame.Contains(location))
+            {
+                Touched?.Invoke(this.Event, this);
+            }
         }
 
         public nint GetItemsCount(UICollectionView collectionView, nint section)
@@ -67,7 +98,7 @@ namespace TellMe.iOS.Views.Cells
 
         public UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
         {
-            var cell = collectionView.DequeueReusableCell(EventAttendeesListCell.Key, indexPath) as EventAttendeesListCell;
+            var cell = (EventAttendeesListCell) collectionView.DequeueReusableCell(EventAttendeesListCell.Key, indexPath);
             cell.Attendee = Event.Attendees[(int)indexPath.Item];
             return cell;
         }
@@ -75,8 +106,7 @@ namespace TellMe.iOS.Views.Cells
         [Export("collectionView:didSelectItemAtIndexPath:")]
         public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
         {
-            var cell = collectionView.CellForItem(indexPath) as EventAttendeesListCell;
-            if (cell != null)
+            if (collectionView.CellForItem(indexPath) is EventAttendeesListCell cell)
             {
                 this.AttendeeSelected?.Invoke(cell.Attendee, this);
             }

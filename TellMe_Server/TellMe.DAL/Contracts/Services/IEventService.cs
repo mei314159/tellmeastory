@@ -7,6 +7,8 @@ namespace TellMe.DAL.Contracts.Services
 {
     public interface IEventService : IService
     {
+        Task<EventDTO> GetAsync(string currentUserId, int eventId);
+        
         Task<ICollection<EventDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc);
         
         Task<EventDTO> CreateAsync(string currentUserId, EventDTO newEventDTO);

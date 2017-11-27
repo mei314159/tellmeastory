@@ -143,8 +143,7 @@ namespace TellMe.iOS.Views.Cells
         [Export("collectionView:didSelectItemAtIndexPath:")]
         public void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
         {
-            var cell = collectionView.CellForItem(indexPath) as ReceiversListCell;
-            if (cell != null)
+            if (collectionView.CellForItem(indexPath) is ReceiversListCell cell)
             {
                 this.ReceiverSelected?.Invoke(cell.Receiver, this);
             }

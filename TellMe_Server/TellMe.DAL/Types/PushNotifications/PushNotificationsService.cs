@@ -19,17 +19,20 @@ namespace TellMe.DAL.Types.PushNotifications
     public class PushNotificationsService : IPushNotificationsService
     {
         private readonly IRepository<PushNotificationClient, int> _pushTokenRepository;
+        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly PushSettings _pushSettings;
 
         private readonly IHostingEnvironment _environment;
 
         public PushNotificationsService(IRepository<PushNotificationClient, int> pushTokenRepository,
+            IRepository<Notification, int> notificationRepository,
             IOptions<PushSettings> pushSettings,
             IHostingEnvironment environment)
         {
             _pushTokenRepository = pushTokenRepository;
             _pushSettings = pushSettings.Value;
             _environment = environment;
+            _notificationRepository = notificationRepository;
         }
 
         public async Task RegisterPushTokenAsync(string token, string oldToken, OsType osType, string userId,
@@ -71,6 +74,7 @@ namespace TellMe.DAL.Types.PushNotifications
 
         public async Task SendPushNotificationsAsync(ICollection<Notification> notifications)
         {
+            await _notificationRepository.AddRangeAsync(notifications, true).ConfigureAwait(false);
             var receiverIds = notifications.Select(x => x.RecipientId).ToArray();
             var pushNotificationClients = await _pushTokenRepository
                 .GetQueryable()

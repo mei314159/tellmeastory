@@ -7,6 +7,7 @@ using TellMe.Core.Contracts.DTO;
 using System.Collections.Generic;
 using System.Linq;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.iOS.Views;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;

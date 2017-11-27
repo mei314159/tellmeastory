@@ -6,6 +6,7 @@ using Foundation;
 using TellMe.Core;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Core;

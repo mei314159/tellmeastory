@@ -19,7 +19,6 @@ namespace TellMe.DAL.Types.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Comment, int> _commentRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
-        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IRepository<Story, int> _storyRepository;
         private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
 
@@ -27,7 +26,6 @@ namespace TellMe.DAL.Types.Services
 
         public CommentService(IRepository<Comment, int> commentRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository,
             IRepository<Story, int> storyRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
             IRepository<StoryReceiver, int> storyReceiverRepository,
@@ -35,7 +33,6 @@ namespace TellMe.DAL.Types.Services
         {
             _commentRepository = commentRepository;
             _pushNotificationsService = pushNotificationsService;
-            _notificationRepository = notificationRepository;
             _storyRepository = storyRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _storyReceiverRepository = storyReceiverRepository;
@@ -129,7 +126,6 @@ namespace TellMe.DAL.Types.Services
                 });
             }
 
-            _notificationRepository.AddRange(notifications, true);
             _unitOfWork.SaveChanges();
 
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);

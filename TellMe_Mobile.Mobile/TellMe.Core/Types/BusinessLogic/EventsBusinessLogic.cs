@@ -6,6 +6,8 @@ using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
+using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.Extensions;
 
@@ -51,7 +53,7 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void CreateEvent()
         {
-            _router.NavigateCreateEvent(View, HandleEventCreatedHandler);
+            _router.NavigateCreateEvent(View, OnEventCreated);
         }
 
         public void NavigateViewEvent(EventDTO eventDTO)
@@ -69,9 +71,15 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateStoryteller(View, storytellerId);
         }
 
-        void HandleEventCreatedHandler(EventDTO eventDTO)
+        public void NavigateTribe(int tribeId, TribeLeftHandler onRemoveTribe)
         {
+            _router.NavigateTribe(this.View, tribeId, onRemoveTribe);
+        }
 
+        void OnEventCreated(EventDTO eventDTO)
+        {
+            this._events.Insert(0, eventDTO);
+            this.View.DisplayEvents(_events.OrderBy(x => x.DateUtc).ToList());
         }
     }
 }

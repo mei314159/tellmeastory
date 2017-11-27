@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.Data.OData.Atom;
 using Microsoft.EntityFrameworkCore;
 using TellMe.DAL.Contracts;
 using TellMe.DAL.Contracts.DTO;
 using TellMe.DAL.Contracts.PushNotifications;
 using TellMe.DAL.Contracts.Repositories;
 using TellMe.DAL.Contracts.Services;
+using TellMe.DAL.Extensions;
 using TellMe.DAL.Types.Domain;
 using TellMe.DAL.Types.PushNotifications;
 
@@ -19,31 +22,61 @@ namespace TellMe.DAL.Types.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Event, int> _eventsRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
-        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeesRepository;
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
+        private readonly IRepository<Tribe, int> _tribeRepository;
 
         public EventService(IUnitOfWork unitOfWork, IRepository<Event, int> eventsRepository,
-            IPushNotificationsService pushNotificationsService, IRepository<Notification, int> notificationRepository,
+            IPushNotificationsService pushNotificationsService,
             IRepository<TribeMember, int> tribeMemberRepository,
             IRepository<EventAttendee, int> eventAttendeesRepository,
-            IRepository<StoryRequest, int> storyRequestRepository)
+            IRepository<StoryRequest, int> storyRequestRepository, IRepository<Tribe, int> tribeRepository)
         {
             _unitOfWork = unitOfWork;
             _eventsRepository = eventsRepository;
             _pushNotificationsService = pushNotificationsService;
-            _notificationRepository = notificationRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _eventAttendeesRepository = eventAttendeesRepository;
             _storyRequestRepository = storyRequestRepository;
+            _tribeRepository = tribeRepository;
+        }
+
+        public async Task<EventDTO> GetAsync(string currentUserId, int eventId)
+        {
+            var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
+            var attendees = from attendee in _eventAttendeesRepository.GetQueryable(true)
+                join tribeMember in tribeMembers
+                    on attendee.TribeId equals tribeMember.TribeId into gj
+                from tb in gj.DefaultIfEmpty()
+                where
+                    attendee.Status != EventAttendeeStatus.Rejected &&
+                    (attendee.UserId == currentUserId ||
+                     tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
+                select
+                    attendee;
+            IQueryable<Event> events = _eventsRepository
+                .GetQueryable(true)
+                .Include(x => x.Host)
+                .Include(x => x.Attendees).ThenInclude(x => x.User)
+                .Include(x => x.Attendees).ThenInclude(x => x.Tribe);
+
+            var entity = await (from @event in events
+                join attendee in attendees
+                    on @event.Id equals attendee.EventId into gj
+                from st in gj.DefaultIfEmpty()
+                where @event.Id == eventId && @event.HostId == currentUserId || st != null
+                select @event).FirstOrDefaultAsync().ConfigureAwait(false);
+
+            var result = Mapper.Map<EventDTO>(entity);
+
+            return result;
         }
 
         public async Task<ICollection<EventDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
             var attendees = _eventAttendeesRepository.GetQueryable(true);
-
             attendees = from attendee in attendees
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.TribeId into gj
@@ -54,18 +87,19 @@ namespace TellMe.DAL.Types.Services
                      tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
                 select
                     attendee;
-
             IQueryable<Event> events = _eventsRepository
                 .GetQueryable(true)
                 .Include(x => x.Host)
                 .Include(x => x.Attendees).ThenInclude(x => x.User)
                 .Include(x => x.Attendees).ThenInclude(x => x.Tribe);
+            var utcNow = DateTime.UtcNow.Date;
             events = (from @event in events
                     join attendee in attendees
                         on @event.Id equals attendee.EventId into gj
                     from st in gj.DefaultIfEmpty()
                     where @event.CreateDateUtc < olderThanUtc && (@event.HostId == currentUserId || st != null)
-                    orderby @event.DateUtc ascending
+                          && @event.DateUtc >= utcNow
+                    orderby @event.DateUtc
                     select @event)
                 .Distinct()
                 .Take(20);
@@ -81,23 +115,81 @@ namespace TellMe.DAL.Types.Services
         {
             _unitOfWork.BeginTransaction();
             var now = DateTime.UtcNow;
+            var eventDTO = await CreateEventAsync(currentUserId, newEventDTO, now).ConfigureAwait(false);
+            eventDTO.StoryRequestTitle = newEventDTO.StoryRequestTitle;
+            var storyRequests =
+                await CreateStoryRequests(newEventDTO.Attendees, eventDTO, now)
+                    .ConfigureAwait(false);
+            _unitOfWork.SaveChanges();
+            
+            var receivers = await GetNotificationReceivers(eventDTO.Id).ConfigureAwait(false);
+            var eventNotifications = receivers
+                .Select(receiver => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.Event,
+                    RecipientId = receiver.UserId,
+                    Extra = eventDTO,
+                    Text = receiver.TribeId == null
+                        ? $"{eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
+                        : $"[{receiver.TribeName}]: {eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
+                }).ToArray();
+
+            var requestNotifications = receivers.Join(storyRequests, x => x.UserId, x => x.UserId,
+                (receiver, requestDTO) => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.StoryRequest,
+                    RecipientId = requestDTO.UserId,
+                    Extra = requestDTO,
+                    Text = requestDTO.TribeId == null
+                        ? $"{eventDTO.HostUserName} would like you to tell a story for event \"{eventDTO.Title}\" about {eventDTO.StoryRequestTitle}"
+                        : $"[{receiver.TribeName}]: {eventDTO.HostUserName} would like you to tell a story for event \"{eventDTO.Title}\" about \"{eventDTO.StoryRequestTitle}\""
+                });
+
+            await _pushNotificationsService
+                .SendPushNotificationsAsync(eventNotifications.Concat(requestNotifications).ToList())
+                .ConfigureAwait(false);
+            return eventDTO;
+        }
+
+        private async Task<List<NotificationReceiver>> GetNotificationReceivers(int eventId)
+        {
+            var tribes = _tribeRepository.GetQueryable(true);
+            var attendees = _eventAttendeesRepository.GetQueryable(true)
+                .Where(x => x.EventId == eventId)
+                .Select(x => new {x.TribeId, x.UserId});
+            var tribeMembers = _tribeMemberRepository.GetQueryable(true);
+            var receivers =
+                (await (from attendee in attendees
+                    join tribeMember in tribeMembers
+                        on attendee.TribeId equals tribeMember.TribeId into atm
+                    from tm in atm.DefaultIfEmpty()
+                    join tribe in tribes on tm.TribeId equals tribe.Id into atmt
+                    from x in atmt.DefaultIfEmpty()
+                    select new NotificationReceiver
+                    {
+                        UserId = tm != null ? tm.UserId : attendee.UserId,
+                        TribeId = tm != null ? tm.TribeId : (int?) null,
+                        TribeName = x != null ? x.Name : null
+                    }).ToListAsync().ConfigureAwait(false)).GroupBy(x => x.UserId)
+                .Select(x => x.OrderBy(y => y.TribeId != null).First()).ToList();
+            return receivers;
+        }
+
+        private async Task<EventDTO> CreateEventAsync(string currentUserId, EventDTO newEventDTO, DateTime now)
+        {
             var entity = Mapper.Map<Event>(newEventDTO);
             entity.HostId = currentUserId;
             entity.CreateDateUtc = now;
-            await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
-
-            var entityId = entity.Id;
-            var entities = newEventDTO.Attendees.Select(x => new StoryRequest
+            entity.Attendees.Add(new EventAttendee
             {
-                CreateDateUtc = now,
-                SenderId = currentUserId,
-                UserId = x.TribeId == null ? x.UserId : null,
-                TribeId = x.TribeId,
-                Title = newEventDTO.StoryRequestTitle,
-                EventId = entityId
+                UserId = currentUserId,
+                CreateDateUtc = entity.Attendees.First().CreateDateUtc,
+                Status = EventAttendeeStatus.Host
             });
-            
-            _storyRequestRepository.AddRange(entities, true);
+            await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
+            var entityId = entity.Id;
 
             entity = await _eventsRepository
                 .GetQueryable(true)
@@ -107,50 +199,64 @@ namespace TellMe.DAL.Types.Services
                 .ConfigureAwait(false);
 
             var eventDTO = Mapper.Map<EventDTO>(entity);
-            var tribeIds = eventDTO.Attendees.Where(x => x.TribeId != null).Select(x => x.TribeId).ToList();
-            var tribeMembers = await _tribeMemberRepository.GetQueryable(true).Where(x => tribeIds.Contains(x.TribeId))
-                .Select(x => new
-                {
-                    x.TribeId,
-                    TribeName = x.Tribe.Name,
-                    x.UserId
-                })
+
+
+            return eventDTO;
+        }
+
+        private async Task<List<StoryRequestDTO>> CreateStoryRequests(IEnumerable<EventAttendeeDTO> attendees,
+            EventDTO newEventDTO, DateTime now)
+        {
+            var entityId = newEventDTO.Id;
+            var storyRequests = attendees.Select(x => new StoryRequest
+            {
+                CreateDateUtc = now,
+                SenderId = newEventDTO.HostId,
+                UserId = x.TribeId == null ? x.UserId : null,
+                TribeId = x.TribeId,
+                Title = newEventDTO.StoryRequestTitle,
+                EventId = entityId
+            }).ToList();
+
+            await _storyRequestRepository.AddRangeAsync(storyRequests, true).ConfigureAwait(false);
+
+            var entityIds = storyRequests.Select(x => x.Id).ToArray();
+            var requestDtos = await _storyRequestRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Receiver)
+                .Where(x => entityIds.Contains(x.Id))
+                .ProjectTo<StoryRequestDTO>()
                 .ToListAsync()
                 .ConfigureAwait(false);
+            return requestDtos;
+        }
 
-            var notifications = eventDTO.Attendees.SelectMany(receiver =>
+        private IEnumerable<NotificationReceiver> GetNotificationReceivers(INotificationReceiver attendee,
+            IEnumerable<TribeMember> tribeMembers)
+        {
+            if (attendee.TribeId == null)
             {
-                if (receiver.TribeId == null)
+                yield return new NotificationReceiver
                 {
-                    return new[]
+                    UserId = attendee.UserId
+                };
+            }
+            else
+            {
+                foreach (var tribeMember in tribeMembers)
+                {
+                    if (tribeMember.TribeId == attendee.TribeId)
                     {
-                        new Notification
+                        yield return new NotificationReceiver
                         {
-                            Date = now,
-                            Type = NotificationTypeEnum.Event,
-                            RecipientId = receiver.UserId,
-                            Extra = eventDTO,
-                            Text = $"{eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
-                        }
-                    };
+                            UserId = tribeMember.UserId,
+                            TribeId = tribeMember.TribeId,
+                            TribeName = tribeMember.Tribe.Name,
+                        };
+                    }
                 }
-
-                return tribeMembers.Where(x => x.TribeId == receiver.TribeId).Select(x => new Notification
-                {
-                    Date = now,
-                    Type = NotificationTypeEnum.Event,
-                    RecipientId = x.UserId,
-                    Extra = eventDTO,
-                    Text =
-                        $"[{x.TribeName}]: {eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
-                });
-            }).ToArray();
-
-            _notificationRepository.AddRange(notifications, true);
-            _unitOfWork.SaveChanges();
-
-            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
-            return eventDTO;
+            }
         }
 
         public Task<EventDTO> EditAsync(string currentUserId, EventDTO eventDTO)

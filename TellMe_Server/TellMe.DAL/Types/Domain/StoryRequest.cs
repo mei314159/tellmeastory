@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using TellMe.DAL.Contracts.DTO;
 
 namespace TellMe.DAL.Types.Domain
 {
-    public class StoryRequest : EntityBase<int>
+    public class StoryRequest : EntityBase<int>, INotificationReceiver
     {
         public string Title { get; set; }
         public DateTime CreateDateUtc { get; set; }

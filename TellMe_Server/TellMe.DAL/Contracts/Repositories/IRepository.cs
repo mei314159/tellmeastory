@@ -18,7 +18,7 @@ namespace TellMe.DAL.Contracts.Repositories
 
         Task SaveAsync(TEntity entity, bool commit = false);
 
-        void AddRange(IEnumerable<TEntity> entity, bool commit = false);
+        Task AddRangeAsync(IEnumerable<TEntity> entity, bool commit = false);
 
         void LoadProperty<TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property)
             where TProperty : class;

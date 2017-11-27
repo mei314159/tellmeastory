@@ -190,21 +190,12 @@ namespace TellMe.iOS
 
         private async void Instance_OnNotificationReceived(NotificationDTO notification)
         {
-            if (!(Window.RootViewController is UITabBarController tabBarController))
+            if (!(Window.RootViewController is UINavigationController navigationController))
                 return;
-            foreach (var c in tabBarController.ViewControllers)
-            {
-                var rootController = c as UINavigationController;
-                if (rootController == null)
-                {
-                    continue;
-                }
 
-                var view = rootController.ChildViewControllers.OfType<IView>().FirstOrDefault();
+            var view = navigationController.ChildViewControllers.OfType<IView>().FirstOrDefault();
                 await IoC.GetInstance<INotificationHandler>().ProcessNotificationAsync(notification, view)
                     .ConfigureAwait(false);
-                return;
-            }
         }
 
         private UIViewController GetInitialViewController()

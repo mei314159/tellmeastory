@@ -16,7 +16,6 @@ namespace TellMe.DAL.Types.Services
     public class TribeService : ITribeService
     {
         private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<Tribe, int> _tribeRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
@@ -24,13 +23,11 @@ namespace TellMe.DAL.Types.Services
         public TribeService(
             IRepository<ApplicationUser, string> userRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository,
             IRepository<Tribe, int> tribeRepository,
             IRepository<TribeMember, int> tribeMemberRepository)
         {
             _userRepository = userRepository;
             _pushNotificationsService = pushNotificationsService;
-            _notificationRepository = notificationRepository;
             _tribeRepository = tribeRepository;
             _tribeMemberRepository = tribeMemberRepository;
         }
@@ -92,7 +89,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} has left the tribe"
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
 
@@ -124,7 +120,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} rejected your invitation to the tribe"
             };
 
-            await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
             await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return TribeMemberStatus.Rejected;
@@ -157,7 +152,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} joined the tribe"
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
 
             return TribeMemberStatus.Joined;
@@ -233,7 +227,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"{result.CreatorName} invited you to join a tribe \"{result.Name}\""
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
 
@@ -250,7 +243,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"You were deleted from a tribe \"{result.Name}\""
             }).ToArray();
 
-            _notificationRepository.AddRange(notifications, true);
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
     }

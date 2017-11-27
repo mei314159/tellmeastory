@@ -25,6 +25,14 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
         
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEventAsync(int id)
+        {
+            var result = await _eventService.GetAsync(this.UserId, id);
+
+            return Ok(result);
+        }
+        
         [HttpPost("")]
         public async Task<IActionResult> CreateAsync([FromBody] EventDTO dto)
         {

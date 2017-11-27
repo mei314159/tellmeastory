@@ -18,7 +18,6 @@ namespace TellMe.DAL.Types.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<Notification, int> _notificationRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Friendship, int> _friendshipRepository;
@@ -33,7 +32,6 @@ namespace TellMe.DAL.Types.Services
             IRepository<RefreshToken, int> refreshTokenRepository,
             IRepository<Friendship, int> friendshipRepository,
             IPushNotificationsService pushNotificationsService,
-            IRepository<Notification, int> notificationRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
             IMailSender mailSender,
             IOptions<AppSettings> emailingSettings,
@@ -43,7 +41,6 @@ namespace TellMe.DAL.Types.Services
             _refreshTokenRepository = refreshTokenRepository;
             _friendshipRepository = friendshipRepository;
             _pushNotificationsService = pushNotificationsService;
-            _notificationRepository = notificationRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _mailSender = mailSender;
             _stringLocalizer = stringLocalizer;
@@ -162,7 +159,7 @@ namespace TellMe.DAL.Types.Services
         {
             var user = await _userRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == senderUserId)
                 .ConfigureAwait(false);
-            
+
             const string displayName = "TellMeAStoryApp";
             const string mailSubject = "Registration confirmation";
 
@@ -257,9 +254,10 @@ namespace TellMe.DAL.Types.Services
                 FullName = user.FullName,
                 PictureUrl = user.PictureUrl
             };
+            Notification notification;
             if (friendships.Count == 0)
             {
-                var notification = new Notification
+                notification = new Notification
                 {
                     Date = now,
                     Type = NotificationTypeEnum.FriendshipRequest,
@@ -267,13 +265,10 @@ namespace TellMe.DAL.Types.Services
                     Extra = friend,
                     Text = $"{friend.UserName} sent you a friendship request"
                 };
-
-                await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
-                await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
             else
             {
-                var notification = new Notification
+                notification = new Notification
                 {
                     Date = now,
                     Type = NotificationTypeEnum.FriendshipAccepted,
@@ -281,10 +276,9 @@ namespace TellMe.DAL.Types.Services
                     Extra = friend,
                     Text = $"{friend.UserName} accepted your friendship request"
                 };
-
-                await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
-                await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
+            
+            await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return myFriendship.Status;
         }
@@ -326,7 +320,6 @@ namespace TellMe.DAL.Types.Services
                 Text = $"{friend.UserName} rejected your friendship request"
             };
 
-            await _notificationRepository.SaveAsync(notification, true).ConfigureAwait(false);
             await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return FriendshipStatus.Rejected;

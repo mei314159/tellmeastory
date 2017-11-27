@@ -3,6 +3,7 @@ using System.Linq;
 using TellMe.iOS.Controllers;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 using UIKit;
@@ -247,7 +248,13 @@ namespace TellMe.iOS.Core
 
         public void NavigateViewEvent(IView view, EventDTO eventDTO)
         {
-            throw new System.NotImplementedException();
+            this._window.InvokeOnMainThread(() =>
+            {
+                var targetController = (EventViewController) UIStoryboard.FromName("Story", null)
+                    .InstantiateViewController("EventViewController");
+                targetController.Event = eventDTO;
+                this.Present(targetController, view);
+            });
         }
 
         public void NavigateCreateEvent(IView view, EventCreatedHandler complete)

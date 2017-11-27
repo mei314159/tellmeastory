@@ -1,55 +1,99 @@
 using System;
+using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
+using TellMe.iOS.Controllers;
 using TellMe.iOS.Core;
+using TellMe.iOS.Views.Cells;
+using UIKit;
 
-namespace TellMe.iOS.Controllers
+namespace TellMe.iOS
 {
-	public partial class EventViewController : StoriesTableViewController, IEventView
-	{
-		private new IEventViewBusinessLogic BusinessLogic
-		{
-			get => (IEventViewBusinessLogic) base.BusinessLogic;
-			set => base.BusinessLogic = value;
-		}
+    public partial class EventViewController : StoriesTableViewController, IEventView
+    {
+        private EventCell _eventCell;
 
-		public EventViewController(IntPtr handle) : base(handle)
-		{
-		}
+        private new IEventViewBusinessLogic BusinessLogic
+        {
+            get => (IEventViewBusinessLogic) base.BusinessLogic;
+            set => base.BusinessLogic = value;
+        }
 
-		public event EventDeletedHandler EventDeleted;
-		public EventDTO Event { get; set; }
-		public int EventId { get; set; }
+        public EventViewController(IntPtr handle) : base(handle)
+        {
+        }
 
-        
-		public override void ViewDidLoad()
-		{
-			if (this.BusinessLogic == null)
-				this.BusinessLogic = IoC.GetInstance<IEventViewBusinessLogic>();
+        public event EventDeletedHandler EventDeleted;
+        public EventDTO Event { get; set; }
+        public int EventId { get; set; }
 
-			base.ViewDidLoad();
-		}
+        public override int StoryItemIndexOffset {
+            get{
+                return _eventCell == null ? 0 : 1;
+            }
+        }
+        public override void ViewDidLoad()
+        {
+            if (this.BusinessLogic == null)
+                this.BusinessLogic = IoC.GetInstance<IEventViewBusinessLogic>();
 
-		public override void ViewWillAppear(bool animated)
-		{
-			this.NavigationController.SetToolbarHidden(true, false);
-		}
+            base.ViewDidLoad();
+        }
 
-		public void DisplayEvent(EventDTO eventDTO)
-		{
-			InvokeOnMainThread(() =>
-			{
-				//NavItem.Title = tribe.Name;
-				/*this.EventName.Text = eventDTO.Title;
-				this.EventDescription.Text = eventDTO.Description;*/
-			});
-		}
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetToolbarHidden(true, false);
+        }
 
-		void IEventView.EventDeleted(EventDTO eventDTO)
-		{
-			EventDeleted?.Invoke(eventDTO);
-		}
-	}
+        public void DisplayEvent(EventDTO eventDTO)
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (_eventCell == null)
+                {
+                    _eventCell = EventCell.Create();
+                    _eventCell.HostSelected = Cell_HostSelected;
+                    _eventCell.AttendeeSelected += Cell_AttendeeSelected;
+                    _eventCell.UserInteractionEnabled = true;
+                }
+
+                _eventCell.Event = eventDTO;
+            });
+        }
+
+        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
+        {
+            if (_eventCell != null && indexPath.Row == 0)
+            {
+                return _eventCell;
+            }
+
+            return base.GetCell(tableView, indexPath);
+        }
+
+        private void Cell_HostSelected(EventDTO eventDTO, EventCell cell)
+        {
+            BusinessLogic.NavigateStoryteller(eventDTO.HostId);
+        }
+
+        private void Cell_AttendeeSelected(EventAttendeeDTO eventAttendee, EventCell cell)
+        {
+            if (eventAttendee.TribeId == null)
+            {
+                BusinessLogic.NavigateStoryteller(eventAttendee.UserId);
+            }
+            else
+            {
+                BusinessLogic.NavigateTribe(eventAttendee.TribeId.Value, cell.RemoveTribe);
+            }
+        }
+
+        void IEventView.EventDeleted(EventDTO eventDTO)
+        {
+            EventDeleted?.Invoke(eventDTO);
+        }
+    }
 }

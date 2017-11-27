@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.BusinessLogic;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.iOS.Core;
 using TellMe.iOS.Views;
 

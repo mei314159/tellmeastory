@@ -108,6 +108,8 @@ namespace TellMe.Web
             {
                 //app.UseDeveloperExceptionPage();
             }
+            
+            app.UseTransactionAwareExceptionMiddleware();
             app.UseHangfireServer();
             app.UseAuthentication();
             app.UseMvc();
@@ -146,6 +148,15 @@ namespace TellMe.Web
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(o => { o.TokenValidationParameters = tokenValidationParameters; });
+        }
+    }
+
+// Extension method used to add the middleware to the HTTP request pipeline.
+    public static class HttpStatusCodeExceptionMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseHttpStatusCodeExceptionMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<HttpStatusCodeExceptionMiddleware>();
         }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using TellMe.Core.Contracts.DTO;
 
-namespace TellMe.Core.Contracts.UI
+namespace TellMe.Core.Contracts.Handlers
 {
-    public delegate void TribeLeftHandler(TribeDTO tribe);
     public delegate void EventDeletedHandler (EventDTO eventDTO);
-    
-    
 }

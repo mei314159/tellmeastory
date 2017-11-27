@@ -6,6 +6,7 @@ using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DataServices.Remote;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.Core.Types.Extensions;
@@ -62,20 +63,25 @@ namespace TellMe.Core.Types.BusinessLogic
             Router.NavigateViewStory(this.View, story, goToComments);
         }
 
-        public void NavigateStoryteller(StoryDTO story)
+        public void NavigateStoryteller(string userId)
         {
-            Router.NavigateStoryteller(View, story.SenderId);
+            Router.NavigateStoryteller(View, userId);
         }
 
-        public void ViewReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
+        public void NavigateTribe(int tribeId, TribeLeftHandler onRemoveTribe)
+        {
+            Router.NavigateTribe(View, tribeId, onRemoveTribe);
+        }
+
+        public void NavigateReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe)
         {
             if (receiver.TribeId != null)
             {
-                Router.NavigateTribe(View, receiver.TribeId.Value, onRemoveTribe);
+                this.NavigateTribe(receiver.TribeId.Value, onRemoveTribe);
             }
             else
             {
-                Router.NavigateStoryteller(View, receiver.UserId);
+                this.NavigateStoryteller(receiver.UserId);
             }
         }
 

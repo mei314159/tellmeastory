@@ -73,10 +73,11 @@ namespace TellMe.iOS.Controllers
             cell.Event = this._eventsList[indexPath.Row];
             cell.HostSelected = Cell_HostSelected;
             cell.AttendeeSelected += Cell_AttendeeSelected;
+            cell.Touched += Cell_Touched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
-        
+
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
             if (_eventsList.Count - indexPath.Row == 5 && _canLoadMore)
@@ -137,15 +138,27 @@ namespace TellMe.iOS.Controllers
 
             this._loadingMore = false;
         }
+
+        private void Cell_Touched(EventDTO eventDTO, EventCell cell)
+        {
+            _businessLogic.NavigateViewEvent(eventDTO);
+        }
         
         private void Cell_HostSelected(EventDTO eventDTO, EventCell cell)
         {
             _businessLogic.NavigateStoryteller(eventDTO.HostId);
         }
 
-        void Cell_AttendeeSelected(EventAttendeeDTO eventAttendee, EventCell cell)
+        private void Cell_AttendeeSelected(EventAttendeeDTO eventAttendee, EventCell cell)
         {
-            _businessLogic.NavigateStoryteller(eventAttendee.UserId);
+            if (eventAttendee.TribeId == null)
+            {
+                _businessLogic.NavigateStoryteller(eventAttendee.UserId);
+            }
+            else
+            {
+                _businessLogic.NavigateTribe(eventAttendee.TribeId.Value, cell.RemoveTribe);
+            }
         }
     }
 }
