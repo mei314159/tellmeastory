@@ -10,6 +10,7 @@ using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
+using TellMe.Core.Types.Extensions;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
@@ -17,12 +18,13 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public class CreateEventController : DialogViewController, ICreateEventView
+    public class EditEventController : DialogViewController, ICreateEventView
     {
-        private readonly ICreateEventBusinessLogic _businessLogic;
+        private readonly IEditEventBusinessLogic _businessLogic;
         private CreateEventSource _dataSource;
+        private bool _createEvent;
 
-        public CreateEventController(ICreateEventBusinessLogic businessLogic) : base(UITableViewStyle.Grouped, null,
+        public EditEventController(IEditEventBusinessLogic businessLogic) : base(UITableViewStyle.Grouped, null,
             true)
         {
             _businessLogic = businessLogic;
@@ -30,13 +32,14 @@ namespace TellMe.iOS.Controllers
         }
 
         public event EventDeletedHandler EventDeleted;
+        public event EventSavedHandler EventSaved;
 
         public EventDTO Event { get; set; }
 
         public override void ViewDidLoad()
         {
-            var createEvent = Event == null;
-            if (createEvent)
+            this._createEvent = Event == null;
+            if (_createEvent)
             {
                 Event = new EventDTO
                 {
@@ -49,18 +52,19 @@ namespace TellMe.iOS.Controllers
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             TableView.AllowsSelectionDuringEditing = true;
             TableView.SetEditing(true, true);
+            var dateTime = _createEvent && Event != null ? DateTime.UtcNow : Event.DateUtc.GetUtcDateTime();
             this.Root = new RootElement("Edit Event")
             {
                 new Section("Event Info")
                 {
                     new EntryElement("Title", "Event Title", Event?.Title),
                     new EntryElement("Description", "Event Description", Event?.Description),
-                    new DateElement("Date", createEvent ? DateTime.UtcNow : Event.DateUtc)
+                    new DateElement("Date", dateTime)
                 },
                 new Section("Members")
             };
 
-            if (!createEvent)
+            if (!_createEvent)
                 LoadAsync(false);
         }
 
@@ -97,7 +101,7 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() =>
             {
                 this.NavigationItem.RightBarButtonItem = showButton
-                    ? new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                    ? new UIBarButtonItem(_createEvent ? "Continue" : "Save", UIBarButtonItemStyle.Done, ContinueButtonTouched)
                     : null;
             });
         }
@@ -137,7 +141,7 @@ namespace TellMe.iOS.Controllers
                 var root = this.Root[0];
                 ((EntryElement) root[0]).Value = eventDTO.Title;
                 ((EntryElement) root[1]).Value = eventDTO.Description;
-                ((DateElement) root[2]).DateValue = eventDTO.CreateDateUtc;
+                ((DateElement) root[2]).DateValue = eventDTO.DateUtc.GetUtcDateTime();
 
                 if (this.Root.Count == 2)
                 {
@@ -181,16 +185,28 @@ namespace TellMe.iOS.Controllers
             Event.Title = ((EntryElement) root[0]).Value;
             Event.Description = ((EntryElement) root[1]).Value;
             Event.DateUtc = ((DateElement) root[2]).DateValue;
-            _businessLogic.NavigateCreateRequest();
+            
+            if (_createEvent)
+                _businessLogic.NavigateCreateRequest();
+            else
+            {
+                _businessLogic.SaveAsync();
+            }
         }
 
-        public void Close(EventDTO eventDTO)
+        public void Deleted(EventDTO eventDTO)
         {
             EventDeleted?.Invoke(eventDTO);
-            Dismiss();
+            ((IDismissable)this).Dismiss();
+        }
+        
+        public void Saved(EventDTO eventDTO)
+        {
+            EventSaved?.Invoke(eventDTO);
+            ((IDismissable)this).Dismiss();
         }
 
-        public void Dismiss()
+        void IDismissable.Dismiss()
         {
             InvokeOnMainThread(() =>
             {

@@ -6,5 +6,6 @@ namespace TellMe.Core.Contracts.UI.Views
     public interface IEventsView : IView
     {
         void DisplayEvents(ICollection<EventDTO> events);
+        void ReloadEvent(EventDTO eventDTO);
     }
 }

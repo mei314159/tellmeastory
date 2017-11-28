@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts;
@@ -20,7 +21,8 @@ namespace TellMe.Core.Types.BusinessLogic
         private readonly IRemoteEventsDataService _remoteEventsDataService;
         private readonly ILocalEventsDataService _localEventsDataService;
 
-        public EventsBusinessLogic(IRouter router, IRemoteEventsDataService remoteEventsDataService, ILocalEventsDataService localEventsDataService)
+        public EventsBusinessLogic(IRouter router, IRemoteEventsDataService remoteEventsDataService,
+            ILocalEventsDataService localEventsDataService)
         {
             _router = router;
             _remoteEventsDataService = remoteEventsDataService;
@@ -28,13 +30,14 @@ namespace TellMe.Core.Types.BusinessLogic
         }
 
         public IEventsView View { get; set; }
+
         public async Task LoadEventsAsync(bool forceRefresh = false, bool clearCache = false)
         {
             if (forceRefresh)
             {
                 _events.Clear();
             }
-            
+
             var result = await _remoteEventsDataService
                 .GetEventsAsync(forceRefresh ? null : _events.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
@@ -53,17 +56,17 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public void CreateEvent()
         {
-            _router.NavigateCreateEvent(View, OnEventCreated);
+            _router.NavigateCreateEvent(View, EventCreated, EventDeleted);
         }
 
         public void NavigateViewEvent(EventDTO eventDTO)
         {
-            _router.NavigateViewEvent(View, eventDTO);
+            _router.NavigateViewEvent(View, eventDTO, EventDeleted);
         }
 
         public void EditEvent(EventDTO eventDTO)
         {
-            _router.NavigateEditEvent(View, eventDTO);
+            _router.NavigateEditEvent(View, eventDTO, EventUpdated, EventDeleted);
         }
 
         public void NavigateStoryteller(string storytellerId)
@@ -76,9 +79,20 @@ namespace TellMe.Core.Types.BusinessLogic
             _router.NavigateTribe(this.View, tribeId, onRemoveTribe);
         }
 
-        void OnEventCreated(EventDTO eventDTO)
+        private void EventCreated(EventDTO eventDTO)
         {
             this._events.Insert(0, eventDTO);
+            this.View.DisplayEvents(_events.OrderBy(x => x.DateUtc).ToList());
+        }
+
+        private void EventUpdated(EventDTO eventDTO)
+        {
+            this.View.ReloadEvent(eventDTO);
+        }
+
+        private void EventDeleted(EventDTO eventDTO)
+        {
+            this._events.RemoveAll(x => x.Id == eventDTO.Id);
             this.View.DisplayEvents(_events.OrderBy(x => x.DateUtc).ToList());
         }
     }

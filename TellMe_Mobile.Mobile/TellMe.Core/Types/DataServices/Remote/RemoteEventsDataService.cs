@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using TellMe.Core.Contracts.DataServices;
 using TellMe.Core.Contracts.DataServices.Remote;
@@ -33,7 +34,8 @@ namespace TellMe.Core.Types.DataServices.Remote
 
         public async Task<Result<EventDTO>> SaveEventAsync(EventDTO eventDTO)
         {
-            var result = await this._apiProvider.PostAsync<EventDTO>("events", eventDTO).ConfigureAwait(false);
+            var httpMethod = eventDTO.Id == default(int) ? HttpMethod.Post : HttpMethod.Put;
+            var result = await this._apiProvider.SendDataAsync<EventDTO>("events", eventDTO, httpMethod).ConfigureAwait(false);
             return result;
         }
 

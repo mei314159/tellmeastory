@@ -53,7 +53,7 @@ namespace TellMe.iOS.Core
 
         private static void RegisterControllers()
         {
-            RegisterController<CreateEventController>();
+            RegisterController<EditEventController>();
             RegisterController<EventsViewController>();
             
             foreach (var controllerType in ControllerTypes)

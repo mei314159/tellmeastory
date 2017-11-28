@@ -5,9 +5,9 @@ using TellMe.Core.Contracts.DTO;
 
 namespace TellMe.Core.Validation
 {
-    public class CreateEventValidator : AbstractValidator<EventDTO>
+    public class EventValidator : AbstractValidator<EventDTO>
     {
-        public CreateEventValidator()
+        public EventValidator()
         {
             this.RuleFor(x => x.Title).NotEmpty()
                 .WithMessage("Please enter the title of event")

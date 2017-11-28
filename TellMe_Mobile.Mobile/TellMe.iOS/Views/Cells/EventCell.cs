@@ -70,7 +70,10 @@ namespace TellMe.iOS.Views.Cells
             this._defaultPicture = UIImage.FromBundle("UserPic");
 
             var tapGestureRecognizer = new UITapGestureRecognizer(this.CellTouched){
-                CancelsTouchesInView = false
+                CancelsTouchesInView = false,
+                NumberOfTapsRequired = 1,
+                NumberOfTouchesRequired = 1,
+                RequiresExclusiveTouchType = true
             };
             this.AddGestureRecognizer(tapGestureRecognizer);
             this.ProfilePicture.UserInteractionEnabled = true;

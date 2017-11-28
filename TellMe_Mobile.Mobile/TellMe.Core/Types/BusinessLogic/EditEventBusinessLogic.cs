@@ -12,15 +12,15 @@ using TellMe.Core.Validation;
 
 namespace TellMe.Core.Types.BusinessLogic
 {
-    public class CreateEventBusinessLogic : ICreateEventBusinessLogic
+    public class EditEventBusinessLogic : IEditEventBusinessLogic
     {
         private readonly IRemoteEventsDataService _remoteEventsDataService;
         private readonly ILocalEventsDataService _localEventsDataService;
-        private readonly CreateEventValidator _validator;
+        private readonly EventValidator _validator;
         private readonly IRouter _router;
 
-        public CreateEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router,
-            ILocalEventsDataService localEventsDataService, CreateEventValidator validator)
+        public EditEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router,
+            ILocalEventsDataService localEventsDataService, EventValidator validator)
         {
             _localEventsDataService = localEventsDataService;
             _validator = validator;
@@ -33,9 +33,9 @@ namespace TellMe.Core.Types.BusinessLogic
         public async Task LoadAsync(bool forceRefresh)
         {
             var eventDTO = View.Event;
-            var tribeResult = await _localEventsDataService.GetAsync(eventDTO.Id).ConfigureAwait(false);
-            if (forceRefresh || tribeResult.Expired || tribeResult.Data.Attendees == null ||
-                tribeResult.Data.Attendees.Count == 0)
+            var localEventResult = await _localEventsDataService.GetAsync(eventDTO.Id).ConfigureAwait(false);
+            if (forceRefresh || localEventResult.Expired || localEventResult.Data.Attendees == null ||
+                localEventResult.Data.Attendees.Count == 0)
             {
                 var result = await _remoteEventsDataService.GetEventAsync(eventDTO.Id).ConfigureAwait(false);
                 if (result.IsSuccess)
@@ -51,7 +51,7 @@ namespace TellMe.Core.Types.BusinessLogic
             }
             else
             {
-                eventDTO = tribeResult.Data;
+                eventDTO = localEventResult.Data;
             }
 
             this.View.Display(eventDTO);
@@ -98,7 +98,7 @@ namespace TellMe.Core.Types.BusinessLogic
                     TribeId = x.TribeId,
                     UserId = x.UserId,
                     Type = x.TribeId.HasValue ? ContactType.Tribe : ContactType.User
-                }).ToArray(), StoryRequestCreated);
+                }).ToArray(), SaveEvent);
             }
             else
             {
@@ -106,23 +106,36 @@ namespace TellMe.Core.Types.BusinessLogic
             }
         }
 
-        private async void StoryRequestCreated(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        public async Task SaveAsync()
         {
             var overlay = this.View.DisableInput();
-            this.View.Event.StoryRequestTitle = dto.Title;
-            var result = await _remoteEventsDataService
-                .SaveEventAsync(View.Event)
-                .ConfigureAwait(false);
-            this.View.EnableInput(overlay);
-            if (result.IsSuccess)
+            var validationResult = _validator.Validate(View.Event);
+            if (validationResult.IsValid)
             {
-                await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                this.View.ShowSuccessMessage("Event successfully saved", () => this.View.Dismiss());
+                var result = await _remoteEventsDataService
+                    .SaveEventAsync(View.Event)
+                    .ConfigureAwait(false);
+                this.View.EnableInput(overlay);
+                if (result.IsSuccess)
+                {
+                    await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
+                    this.View.ShowSuccessMessage("Event successfully saved", () => this.View.Saved(result.Data));
+                }
+                else
+                {
+                    result.ShowResultError(this.View);
+                }
             }
             else
             {
-                result.ShowResultError(this.View);
+                validationResult.ShowValidationResult(this.View);
             }
+        }
+
+        private async void SaveEvent(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        {
+            this.View.Event.StoryRequestTitle = dto.Title;
+            await SaveAsync().ConfigureAwait(false);
         }
 
         public void NavigateAttendee(EventAttendeeDTO eventAttendeeDTO)
@@ -148,7 +161,7 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 await _localEventsDataService.DeleteAsync(View.Event).ConfigureAwait(false);
                 this.View.ShowSuccessMessage($"You've deleted the event \"{View.Event.Title}\"",
-                    () => View.Close(View.Event));
+                    () => View.Deleted(View.Event));
             }
             else
             {

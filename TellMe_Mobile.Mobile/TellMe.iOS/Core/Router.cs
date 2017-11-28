@@ -7,7 +7,6 @@ using TellMe.Core.Contracts.Handlers;
 using TellMe.Core.Contracts.UI.Views;
 using TellMe.iOS.Extensions;
 using UIKit;
-using TellMe.Core.Contracts.UI;
 
 namespace TellMe.iOS.Core
 {
@@ -246,32 +245,37 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewEvent(IView view, EventDTO eventDTO)
+        public void NavigateViewEvent(IView view, EventDTO eventDTO, EventDeletedHandler eventDeleted)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (EventViewController) UIStoryboard.FromName("Story", null)
                     .InstantiateViewController("EventViewController");
                 targetController.Event = eventDTO;
+                targetController.EventDeleted += eventDeleted;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateCreateEvent(IView view, EventCreatedHandler complete)
+        public void NavigateCreateEvent(IView view, EventSavedHandler eventSaved, EventDeletedHandler eventDeleted)
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = IoC.GetInstance<CreateEventController>();
+                var targetController = IoC.GetInstance<EditEventController>();
+                targetController.EventSaved += eventSaved;
+                targetController.EventDeleted += eventDeleted;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateEditEvent(IView view, EventDTO eventDTO)
+        public void NavigateEditEvent(IView view, EventDTO eventDTO, EventSavedHandler eventSaved, EventDeletedHandler eventDeleted)
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = IoC.GetInstance<CreateEventController>();
+                var targetController = IoC.GetInstance<EditEventController>();
                 targetController.Event = eventDTO;
+                targetController.EventSaved += eventSaved;
+                targetController.EventDeleted += eventDeleted;
                 this.Present(targetController, view);
             });
         }

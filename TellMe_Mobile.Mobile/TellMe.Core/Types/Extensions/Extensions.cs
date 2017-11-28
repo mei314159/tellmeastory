@@ -4,6 +4,17 @@ namespace TellMe.Core.Types.Extensions
 {
     public static class Extensions
     {
+        public static DateTime GetUtcDateTime(this DateTime dateTime)
+        {
+            return new DateTime(
+                dateTime.Year,
+                dateTime.Month,
+                dateTime.Day,
+                dateTime.Hour,
+                dateTime.Minute,
+                dateTime.Second, DateTimeKind.Utc);
+        }
+
         public static string GetDateString(this DateTime publishDateUTC)
         {
             var utcNow = DateTime.UtcNow;

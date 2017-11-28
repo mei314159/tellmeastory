@@ -5,6 +5,6 @@
         Pending = 1,
         Accepted = 2,
         Rejected = 3,
-        Host = 3
+        Host = 4
     }
 }

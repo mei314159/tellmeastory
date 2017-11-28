@@ -65,7 +65,7 @@ namespace TellMe.DAL.Types.Services
                 join attendee in attendees
                     on @event.Id equals attendee.EventId into gj
                 from st in gj.DefaultIfEmpty()
-                where @event.Id == eventId && @event.HostId == currentUserId || st != null
+                where @event.Id == eventId && (@event.HostId == currentUserId || st != null)
                 select @event).FirstOrDefaultAsync().ConfigureAwait(false);
 
             var result = Mapper.Map<EventDTO>(entity);
@@ -153,6 +153,86 @@ namespace TellMe.DAL.Types.Services
             return eventDTO;
         }
 
+        public async Task<EventDTO> UpdateAsync(string currentUserId, EventDTO updateEventDTO)
+        {
+            _unitOfWork.BeginTransaction();
+            var now = DateTime.UtcNow;
+            var entity = await _eventsRepository
+                .GetQueryable()
+                .Include(x => x.Host)
+                .Include(x => x.Attendees)
+                .FirstOrDefaultAsync(x => x.Id == updateEventDTO.Id && x.HostId == currentUserId)
+                .ConfigureAwait(false);
+            if (entity.HostId != currentUserId)
+            {
+                throw new Exception("Event not found");
+            }
+
+            Mapper.Map(updateEventDTO, entity);
+            await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
+            _unitOfWork.SaveChanges();
+            
+            var entityId = entity.Id;
+            entity = await _eventsRepository
+                .GetQueryable(true)
+                .Include(x => x.Host)
+                .Include(x => x.Attendees)
+                .FirstOrDefaultAsync(x => x.Id == entityId)
+                .ConfigureAwait(false);
+
+            var eventDTO = Mapper.Map<EventDTO>(entity);
+            
+            var newAttendees = updateEventDTO.Attendees.Where(x => x.Id == default(int)).ToList();
+            var receivers = await GetNotificationReceivers(newAttendees).ConfigureAwait(false);
+            var storyRequests = await CreateStoryRequests(newAttendees, eventDTO, now).ConfigureAwait(false);
+            
+            var eventNotifications = receivers
+                .Select(receiver => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.Event,
+                    RecipientId = receiver.UserId,
+                    Extra = eventDTO,
+                    Text = receiver.TribeId == null
+                        ? $"{eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
+                        : $"[{receiver.TribeName}]: {eventDTO.HostUserName} invites you to attend an event \"{eventDTO.Title}\""
+                }).ToArray();
+
+            var requestNotifications = receivers.Join(storyRequests, x => x.UserId, x => x.UserId,
+                (receiver, requestDTO) => new Notification
+                {
+                    Date = now,
+                    Type = NotificationTypeEnum.StoryRequest,
+                    RecipientId = requestDTO.UserId,
+                    Extra = requestDTO,
+                    Text = requestDTO.TribeId == null
+                        ? $"{eventDTO.HostUserName} would like you to tell a story for event \"{eventDTO.Title}\" about {eventDTO.StoryRequestTitle}"
+                        : $"[{receiver.TribeName}]: {eventDTO.HostUserName} would like you to tell a story for event \"{eventDTO.Title}\" about \"{eventDTO.StoryRequestTitle}\""
+                });
+            await _pushNotificationsService
+                .SendPushNotificationsAsync(eventNotifications.Concat(requestNotifications).ToList())
+                .ConfigureAwait(false);
+            return eventDTO;
+        }
+
+        public async Task DeleteAsync(string currentUserId, int eventId)
+        {
+            _unitOfWork.BeginTransaction();
+
+            var entity = await _eventsRepository
+                .GetQueryable()
+                .FirstOrDefaultAsync(x => x.Id == eventId && x.HostId == currentUserId)
+                .ConfigureAwait(false);
+
+            if (entity == null)
+            {
+                throw new Exception("Comment was not found or you don't have permissions to delete it");
+            }
+
+            _eventsRepository.Remove(entity, true);
+            _unitOfWork.SaveChanges();
+        }
+
         private async Task<List<NotificationReceiver>> GetNotificationReceivers(int eventId)
         {
             var tribes = _tribeRepository.GetQueryable(true);
@@ -177,17 +257,33 @@ namespace TellMe.DAL.Types.Services
             return receivers;
         }
 
+        private async Task<List<NotificationReceiver>> GetNotificationReceivers(ICollection<EventAttendeeDTO> attendees)
+        {
+            var invitedTribes = attendees.Where(x => x.TribeId != null).Select(x => x.TribeId).ToArray();
+            var tribeMembers = await _tribeRepository.GetQueryable(true).Include(x => x.Members)
+                .Where(x => invitedTribes.Contains(x.Id))
+                .SelectMany(x => x.Members.Select(y => new NotificationReceiver
+                {
+                    UserId = y.UserId,
+                    TribeId = y.TribeId,
+                    TribeName = x.Name
+                })).ToListAsync().ConfigureAwait(false);
+
+            var invitedUsers = attendees.Where(x => x.TribeId == null).Select(x => new NotificationReceiver
+            {
+                UserId = x.UserId
+            }).ToArray();
+
+            var receivers = tribeMembers.Concat(invitedUsers)
+                .GroupBy(x => x.UserId)
+                .Select(x => x.OrderBy(y => y.TribeId != null).First()).ToList();
+            return receivers;
+        }
+
         private async Task<EventDTO> CreateEventAsync(string currentUserId, EventDTO newEventDTO, DateTime now)
         {
             var entity = Mapper.Map<Event>(newEventDTO);
             entity.HostId = currentUserId;
-            entity.CreateDateUtc = now;
-            entity.Attendees.Add(new EventAttendee
-            {
-                UserId = currentUserId,
-                CreateDateUtc = entity.Attendees.First().CreateDateUtc,
-                Status = EventAttendeeStatus.Host
-            });
             await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
             var entityId = entity.Id;
 
@@ -230,56 +326,6 @@ namespace TellMe.DAL.Types.Services
                 .ToListAsync()
                 .ConfigureAwait(false);
             return requestDtos;
-        }
-
-        private IEnumerable<NotificationReceiver> GetNotificationReceivers(INotificationReceiver attendee,
-            IEnumerable<TribeMember> tribeMembers)
-        {
-            if (attendee.TribeId == null)
-            {
-                yield return new NotificationReceiver
-                {
-                    UserId = attendee.UserId
-                };
-            }
-            else
-            {
-                foreach (var tribeMember in tribeMembers)
-                {
-                    if (tribeMember.TribeId == attendee.TribeId)
-                    {
-                        yield return new NotificationReceiver
-                        {
-                            UserId = tribeMember.UserId,
-                            TribeId = tribeMember.TribeId,
-                            TribeName = tribeMember.Tribe.Name,
-                        };
-                    }
-                }
-            }
-        }
-
-        public Task<EventDTO> EditAsync(string currentUserId, EventDTO eventDTO)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task DeleteAsync(string currentUserId, int eventId)
-        {
-            _unitOfWork.BeginTransaction();
-
-            var comment = await _eventsRepository
-                .GetQueryable()
-                .FirstOrDefaultAsync(x => x.Id == eventId && x.HostId == currentUserId)
-                .ConfigureAwait(false);
-
-            if (comment == null)
-            {
-                throw new Exception("Comment was not found or you don't have permissions to delete it");
-            }
-
-            _eventsRepository.Remove(comment, true);
-            _unitOfWork.SaveChanges();
         }
     }
 }

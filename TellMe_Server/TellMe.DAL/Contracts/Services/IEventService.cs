@@ -13,7 +13,7 @@ namespace TellMe.DAL.Contracts.Services
         
         Task<EventDTO> CreateAsync(string currentUserId, EventDTO newEventDTO);
         
-        Task<EventDTO> EditAsync(string currentUserId, EventDTO eventDTO);
+        Task<EventDTO> UpdateAsync(string currentUserId, EventDTO eventDTO);
         
         Task DeleteAsync(string currentUserId, int eventId);
     }

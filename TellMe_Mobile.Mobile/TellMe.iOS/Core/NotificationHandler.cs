@@ -21,6 +21,7 @@ namespace TellMe.iOS.Core
         public async Task<bool?> ProcessNotificationAsync(NotificationDTO notification, IView view)
         {
             bool? result;
+            Overlay overlay;
             switch (notification.Type)
             {
                 case NotificationTypeEnum.StoryRequest:
@@ -87,12 +88,19 @@ namespace TellMe.iOS.Core
                 case NotificationTypeEnum.Story:
                 {
                     var extra = ((JObject) notification.Extra).ToObject<StoryDTO>();
-                    var overlay = new Overlay("Wait");
+                    overlay = new Overlay("Wait");
                     overlay.PopUp();
-                    result = await _businessLogic.ViewStory(notification.Id, extra, view).ConfigureAwait(false);
+                    result = await _businessLogic.NavigateStory(notification.Id, extra, view).ConfigureAwait(false);
                     overlay.Close();
                     break;
                 }
+                case NotificationTypeEnum.Event:
+                    var @event = ((JObject) notification.Extra).ToObject<EventDTO>();
+                    overlay = new Overlay("Wait");
+                    overlay.PopUp();
+                    result = await _businessLogic.NavigateEvent(notification.Id, @event, view).ConfigureAwait(false);
+                    overlay.Close();
+                    break;
                 default:
                     if (notification.Handled)
                         return null;

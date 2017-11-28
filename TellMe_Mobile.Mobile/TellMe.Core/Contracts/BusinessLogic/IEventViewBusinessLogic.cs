@@ -10,5 +10,6 @@ namespace TellMe.Core.Contracts.BusinessLogic
         void SendStory();
         void ViewStory(StoryDTO story);
         Task DeleteEvent();
+        void EditEvent();
     }
 }

@@ -35,31 +35,24 @@ namespace TellMe.Core.Types.BusinessLogic
         public async Task LoadNotificationsAsync(bool forceRefresh = false)
         {
             //await _localNotificationsDataService.DeleteAllAsync();
-            var localEntities = await _localNotificationsDataService.GetAllAsync().ConfigureAwait(false);
-            if (localEntities.Expired || forceRefresh)
-            {
-                if (forceRefresh)
-                {
-                    _notifications.Clear();
-                }
+            //var localEntities = await _localNotificationsDataService.GetAllAsync().ConfigureAwait(false);
 
-                var result = await _remoteNotificationsDataService
-                    .GetNotificationsAsync(_notifications.LastOrDefault()?.Date).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await _localNotificationsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
-                    _notifications.AddRange(result.Data);
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return;
-                }
+            if (forceRefresh)
+            {
+                _notifications.Clear();
+            }
+
+            var result = await _remoteNotificationsDataService
+                .GetNotificationsAsync(_notifications.LastOrDefault()?.Date).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                await _localNotificationsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
+                _notifications.AddRange(result.Data);
             }
             else
             {
-                _notifications.Clear();
-                _notifications.AddRange(localEntities.Data);
+                result.ShowResultError(this.View);
+                return;
             }
 
             this.View.DisplayNotifications(_notifications);

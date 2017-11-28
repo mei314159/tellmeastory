@@ -11,6 +11,10 @@
         TribeAcceptInvite = 7,
         TribeRejectInvite = 8,
         DeleteFromTribe = 9,
-        LeftTribe = 10
+        LeftTribe = 10,
+        StoryComment = 11,
+        StoryLike = 12,
+        StoryCommentReply = 13,
+        Event = 14
     }
 }

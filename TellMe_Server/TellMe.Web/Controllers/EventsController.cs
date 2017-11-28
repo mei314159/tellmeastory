@@ -39,5 +39,12 @@ namespace TellMe.Web.Controllers
             var result = await _eventService.CreateAsync(this.UserId, dto);
             return Ok(result);
         }
+        
+        [HttpPut("")]
+        public async Task<IActionResult> UpdateAsync([FromBody] EventDTO dto)
+        {
+            var result = await _eventService.UpdateAsync(this.UserId, dto);
+            return Ok(result);
+        }
     }
 }

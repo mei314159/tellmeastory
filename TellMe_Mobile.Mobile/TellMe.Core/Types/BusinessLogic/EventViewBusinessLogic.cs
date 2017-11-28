@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SQLitePCL;
 using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DataServices.Local;
@@ -14,6 +16,7 @@ namespace TellMe.Core.Types.BusinessLogic
 {
     public class EventViewBusinessLogic : StoriesTableBusinessLogic, IEventViewBusinessLogic
     {
+        private readonly ILocalAccountService _localLocalAccountService;
         private readonly IRemoteEventsDataService _remoteEventsDataService;
         private readonly ILocalEventsDataService _localEventsDataService;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
@@ -21,11 +24,12 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public EventViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
             ILocalStoriesDataService localStoriesService, IRemoteEventsDataService remoteEventsDataService,
-            ILocalEventsDataService localEventsDataService) : base(remoteStoriesDataService, router,
+            ILocalEventsDataService localEventsDataService, ILocalAccountService localLocalAccountService) : base(remoteStoriesDataService, router,
             localStoriesService)
         {
             _remoteEventsDataService = remoteEventsDataService;
             _localEventsDataService = localEventsDataService;
+            _localLocalAccountService = localLocalAccountService;
         }
 
         public new IEventView View
@@ -38,6 +42,7 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             if (forceRefresh)
             {
+				LoadEventAsync(true);
                 _stories.Clear();
             }
 
@@ -62,27 +67,36 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             if (View.Event == null)
             {
-                var localStoryteller = await _localEventsDataService.GetAsync(View.EventId).ConfigureAwait(false);
-                if (localStoryteller.Data == null || localStoryteller.Expired)
+                var result = await LoadEventAsync().ConfigureAwait(false);
+                if (!result)
+                    return false;
+            }
+
+            DisplayEvent(View.Event);
+            return true;
+        }
+
+        private async Task<bool> LoadEventAsync(bool forceRefresh = false)
+        {
+            var localEvent = await _localEventsDataService.GetAsync(View.EventId).ConfigureAwait(false);
+            if (forceRefresh || localEvent.Data == null || localEvent.Expired)
+            {
+                var result = await _remoteEventsDataService.GetEventAsync(View.EventId).ConfigureAwait(false);
+                if (result.IsSuccess)
                 {
-                    var result = await _remoteEventsDataService.GetEventAsync(View.EventId).ConfigureAwait(false);
-                    if (result.IsSuccess)
-                    {
-                        View.Event = result.Data;
-                    }
-                    else
-                    {
-                        result.ShowResultError(this.View);
-                        return false;
-                    }
+                    View.Event = result.Data;
                 }
                 else
                 {
-                    View.Event = localStoryteller.Data;
+                    result.ShowResultError(this.View);
+                    return false;
                 }
             }
-
-            View.DisplayEvent(View.Event);
+            else
+            {
+                View.Event = localEvent.Data;
+            }
+            
             return true;
         }
 
@@ -115,6 +129,22 @@ namespace TellMe.Core.Types.BusinessLogic
             {
                 result.ShowResultError(this.View);
             }
+        }
+
+        public void EditEvent()
+        {
+            Router.NavigateEditEvent(View, View.Event, DisplayEvent, EventDeleted);
+        }
+
+        private void EventDeleted(EventDTO eventDTO)
+        {
+            this.View.EventDeleted(eventDTO);
+        }
+
+        private void DisplayEvent(EventDTO eventDTO)
+        {
+            var currentUserId = _localLocalAccountService.GetAuthInfo().Account.Id;
+            View.DisplayEvent(View.Event, View.Event.HostId == currentUserId);
         }
 
         private void HandleEventDeleted()

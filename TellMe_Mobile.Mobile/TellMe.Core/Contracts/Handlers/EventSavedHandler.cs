@@ -2,5 +2,5 @@
 
 namespace TellMe.Core.Contracts.Handlers
 {
-    public delegate void EventCreatedHandler (EventDTO eventDTO);
+    public delegate void EventSavedHandler (EventDTO eventDTO);
 }

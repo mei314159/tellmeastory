@@ -3,14 +3,12 @@ using Foundation;
 using TellMe.Core.Contracts.BusinessLogic;
 using TellMe.Core.Contracts.DTO;
 using TellMe.Core.Contracts.Handlers;
-using TellMe.Core.Contracts.UI;
 using TellMe.Core.Contracts.UI.Views;
-using TellMe.iOS.Controllers;
 using TellMe.iOS.Core;
 using TellMe.iOS.Views.Cells;
 using UIKit;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Controllers
 {
     public partial class EventViewController : StoriesTableViewController, IEventView
     {
@@ -27,14 +25,12 @@ namespace TellMe.iOS
         }
 
         public event EventDeletedHandler EventDeleted;
+        
         public EventDTO Event { get; set; }
         public int EventId { get; set; }
 
-        public override int StoryItemIndexOffset {
-            get{
-                return _eventCell == null ? 0 : 1;
-            }
-        }
+        public override int StoryItemIndexOffset => _eventCell == null ? 0 : 1;
+
         public override void ViewDidLoad()
         {
             if (this.BusinessLogic == null)
@@ -48,10 +44,14 @@ namespace TellMe.iOS
             this.NavigationController.SetToolbarHidden(true, false);
         }
 
-        public void DisplayEvent(EventDTO eventDTO)
+        public void DisplayEvent(EventDTO eventDTO, bool canEdit)
         {
             InvokeOnMainThread(() =>
             {
+
+                this.NavigationItem.RightBarButtonItem = canEdit
+                    ? new UIBarButtonItem(UIBarButtonSystemItem.Edit, (s, e) => this.BusinessLogic.EditEvent())
+                    : null;
                 if (_eventCell == null)
                 {
                     _eventCell = EventCell.Create();
@@ -74,6 +74,23 @@ namespace TellMe.iOS
             return base.GetCell(tableView, indexPath);
         }
 
+        void IEventView.EventDeleted(EventDTO eventDTO)
+        {
+            EventDeleted?.Invoke(eventDTO);
+            ((IDismissable)this).Dismiss();
+        }
+        
+        void IDismissable.Dismiss()
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            });
+        }
+
         private void Cell_HostSelected(EventDTO eventDTO, EventCell cell)
         {
             BusinessLogic.NavigateStoryteller(eventDTO.HostId);
@@ -89,11 +106,6 @@ namespace TellMe.iOS
             {
                 BusinessLogic.NavigateTribe(eventAttendee.TribeId.Value, cell.RemoveTribe);
             }
-        }
-
-        void IEventView.EventDeleted(EventDTO eventDTO)
-        {
-            EventDeleted?.Invoke(eventDTO);
         }
     }
 }

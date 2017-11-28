@@ -229,7 +229,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\CreateEventController.cs" />
+    <Compile Include="Controllers\EditEventController.cs" />
     <Compile Include="Controllers\EventViewController.cs" />
     <Compile Include="Controllers\EventViewController.designer.cs">
       <DependentUpon>EventViewController.cs</DependentUpon>

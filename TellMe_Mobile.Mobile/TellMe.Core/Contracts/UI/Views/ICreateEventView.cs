@@ -11,7 +11,8 @@ namespace TellMe.Core.Contracts.UI.Views
         void Display(EventDTO eventDTO);
         void DisplayMembers();
         void ShowSuccessMessage(string message, Action complete = null);
-        void Close(EventDTO deletedEventDTO);
+        void Deleted(EventDTO deletedEventDTO);
+        void Saved(EventDTO eventDTO);
         IOverlay DisableInput();
         void EnableInput(IOverlay overlay);
     }

@@ -4,7 +4,7 @@ using TellMe.Core.Contracts.UI.Views;
 
 namespace TellMe.Core.Contracts.BusinessLogic
 {
-    public interface ICreateEventBusinessLogic : IBusinessLogic
+    public interface IEditEventBusinessLogic : IBusinessLogic
     {
         ICreateEventView View { get; set; }
         void NavigateCreateRequest();
@@ -12,5 +12,6 @@ namespace TellMe.Core.Contracts.BusinessLogic
         void ChooseMembers();
         Task LoadAsync(bool forceRefresh);
         Task DeleteEventAsync();
+        Task SaveAsync();
     }
 }

@@ -42,7 +42,7 @@ namespace TellMe.iOS.Controllers
             this.NavigationController.View.BackgroundColor = UIColor.White;
             this.NavigationItem.Title = "Events";
             this.NavigationItem.RightBarButtonItem =
-                    new UIBarButtonItem(UIBarButtonSystemItem.Add, AddEventButtonTouched);
+                new UIBarButtonItem(UIBarButtonSystemItem.Add, AddEventButtonTouched);
             LoadEventsAsync(false, true);
         }
 
@@ -61,7 +61,7 @@ namespace TellMe.iOS.Controllers
             base.DidReceiveMemoryWarning();
             // Release any cached data, images, etc that aren't in use.
         }
-        
+
         public override nint RowsInSection(UITableView tableView, nint section)
         {
             return this._eventsList.Count;
@@ -70,11 +70,15 @@ namespace TellMe.iOS.Controllers
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (EventCell) tableView.DequeueReusableCell(EventCell.Key, indexPath);
+            if (cell.Event == null)
+            {
+                cell.HostSelected = Cell_HostSelected;
+                cell.AttendeeSelected = Cell_AttendeeSelected;
+                cell.Touched = Cell_Touched;
+                cell.UserInteractionEnabled = true;
+            }
+
             cell.Event = this._eventsList[indexPath.Row];
-            cell.HostSelected = Cell_HostSelected;
-            cell.AttendeeSelected += Cell_AttendeeSelected;
-            cell.Touched += Cell_Touched;
-            cell.UserInteractionEnabled = true;
             return cell;
         }
 
@@ -105,19 +109,26 @@ namespace TellMe.iOS.Controllers
 
         public void ShowSuccessMessage(string message, Action complete) =>
             ViewExtensions.ShowSuccessMessage(this, message, complete);
-        
+
+        public void ReloadEvent(EventDTO eventDTO)
+        {
+            var index = _eventsList.IndexOf(x => x.Id == eventDTO.Id);
+            InvokeOnMainThread(() =>
+                TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(index, 0)}, UITableViewRowAnimation.None));
+        }
+
         private async Task LoadEventsAsync(bool forceRefresh, bool clearCache = false)
         {
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
             await _businessLogic.LoadEventsAsync(forceRefresh, clearCache);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
         }
-        
+
         private void RefreshControl_ValueChanged(object sender, EventArgs e)
         {
             Task.Run(() => LoadEventsAsync(true));
         }
-        
+
         private async Task LoadMoreAsync()
         {
             if (this._loadingMore)
@@ -143,7 +154,7 @@ namespace TellMe.iOS.Controllers
         {
             _businessLogic.NavigateViewEvent(eventDTO);
         }
-        
+
         private void Cell_HostSelected(EventDTO eventDTO, EventCell cell)
         {
             _businessLogic.NavigateStoryteller(eventDTO.HostId);
@@ -162,4 +173,3 @@ namespace TellMe.iOS.Controllers
         }
     }
 }
-

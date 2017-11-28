@@ -66,11 +66,19 @@ namespace TellMe.Core.Types.BusinessLogic
             return result.IsSuccess;
         }
 
-        public async Task<bool> ViewStory(int notificationId, StoryDTO story, IView view)
+        public async Task<bool> NavigateStory(int notificationId, StoryDTO story, IView view)
         {
             var result = await _remoteNotificationsDataService.HandleNotificationAsync(notificationId)
                 .ConfigureAwait(false);
             _router.NavigateViewStory(view, story);
+            return result.IsSuccess;
+        }
+
+        public async Task<bool> NavigateEvent(int notificationId, EventDTO eventDTO, IView view)
+        {
+            var result = await _remoteNotificationsDataService.HandleNotificationAsync(notificationId)
+                .ConfigureAwait(false);
+            _router.NavigateViewEvent(view, eventDTO, dto => { });
             return result.IsSuccess;
         }
 

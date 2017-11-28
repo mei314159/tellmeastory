@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using TellMe.DAL.Contracts.DTO;
+using TellMe.DAL.Extensions;
 using TellMe.DAL.Types.Domain;
 
 namespace TellMe.Web.Automapper
@@ -44,17 +46,35 @@ namespace TellMe.Web.Automapper
 
                 cfg.CreateMap<Event, EventDTO>()
                     .ForMember(x => x.HostUserName, x => x.MapFrom(z => z.Host.UserName))
-                    .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl))
-                    .ForMember(x => x.Attendees,
-                        x => x.MapFrom(y => y.Attendees.Where(z => z.Status != EventAttendeeStatus.Rejected).ToList()));;
+                    .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl));
 
                 cfg.CreateMap<EventDTO, Event>()
                     .ForMember(x => x.Id, x => x.Ignore())
                     .ForMember(x => x.HostId, x => x.Ignore())
-                    .ForMember(x => x.CreateDateUtc, x => x.Ignore())
-                    .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => y.DateUtc.Date));
+                    .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => DateTime.UtcNow))
+                    .ForMember(x => x.DateUtc, x => x.MapFrom(y => y.DateUtc.Date))
+                    .ForMember(x => x.Attendees, x => x.Ignore())
+                    .BeforeMap((dto, entity) =>
+                    {
+                        if (entity.Attendees == null)
+                            entity.Attendees = new List<EventAttendee>();
+                    })
+                    .AfterMap((dto, entity, afterFunction) =>
+                    {
+                        entity.Attendees.MapFrom(dto.Attendees, x => x.Id, x => x.Id,
+                            (attendeeDTO, attendee) => afterFunction.Mapper.Map(attendeeDTO, attendee));
+                        if (entity.Attendees.All(x => x.Status != EventAttendeeStatus.Host))
+                            entity.Attendees.Add(new EventAttendee
+                            {
+                                UserId = entity.HostId,
+                                EventId = entity.Id,
+                                CreateDateUtc = DateTime.UtcNow,
+                                Status = EventAttendeeStatus.Host
+                            });
+                    });
 
                 cfg.CreateMap<EventAttendeeDTO, EventAttendee>()
+                    .ForMember(x => x.Id, x => x.Ignore())
                     .ForMember(x => x.UserId, x =>
                     {
                         x.PreCondition(y => y.TribeId == null);
