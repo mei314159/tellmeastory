@@ -10,6 +10,7 @@ using TellMe.Core.Contracts;
 using TellMe.Core.Contracts.DataServices;
 using TellMe.Core.Contracts.DataServices.Local;
 using TellMe.Core.Contracts.DTO;
+using TellMe.Core.Types.Tasks;
 
 namespace TellMe.Core.Types.DataServices
 {
@@ -17,7 +18,7 @@ namespace TellMe.Core.Types.DataServices
     {
         private readonly ILocalAccountService _localLocalAccountService;
         private readonly IRouter _router;
-
+        private static readonly TaskSynchronizationScope Lock = new TaskSynchronizationScope();
         public ApiProvider(ILocalAccountService localLocalAccountService, IRouter router)
         {
             _localLocalAccountService = localLocalAccountService;
@@ -45,8 +46,9 @@ namespace TellMe.Core.Types.DataServices
             {
                 try
                 {
+                    var accessToken = await this.GetAccessTokenAsync().ConfigureAwait(false);
                     webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
-                        _localLocalAccountService.GetAuthInfo().AccessToken);
+                        accessToken);
                     var response = await webClient.GetAsync(requestUri).ConfigureAwait(false);
                     var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -62,18 +64,7 @@ namespace TellMe.Core.Types.DataServices
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && refreshExpiredToken)
                     {
-                        var refreshTokenResult = await this.RefreshAuthTokenAsync();
-                        if (refreshTokenResult.IsSuccess)
-                        {
-                            return await this.GetAsync(uri, resultType, false).ConfigureAwait(false);
-                        }
-
-                        return new Result<object>
-                        {
-                            IsSuccess = false,
-                            IsNetworkIssue = false,
-                            ErrorMessage = refreshTokenResult.Error?.ErrorMessage ?? refreshTokenResult.ErrorMessage
-                        };
+                        return await this.GetAsync(uri, resultType, false).ConfigureAwait(false);
                     }
 
                     var errorResponse = JsonConvert.DeserializeObject<ErrorDTO>(responseString);
@@ -163,8 +154,9 @@ namespace TellMe.Core.Types.DataServices
                 {
                     if (!anonymously)
                     {
+                        var accessToken = await this.GetAccessTokenAsync().ConfigureAwait(false);
                         webClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
-                            _localLocalAccountService.GetAuthInfo().AccessToken);
+                            accessToken);
                     }
                     else
                     {
@@ -198,19 +190,8 @@ namespace TellMe.Core.Types.DataServices
 
                     if (response.StatusCode == HttpStatusCode.Unauthorized && !anonymously && refreshExpiredToken)
                     {
-                        var refreshTokenResult = await this.RefreshAuthTokenAsync().ConfigureAwait(false);
-                        if (refreshTokenResult.IsSuccess)
-                        {
-                            return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, false, false)
-                                .ConfigureAwait(false);
-                        }
-
-                        return new Result<TResult, TErrorResult>
-                        {
-                            IsSuccess = false,
-                            IsNetworkIssue = false,
-                            ErrorMessage = refreshTokenResult.Error?.ErrorMessage ?? refreshTokenResult.ErrorMessage
-                        };
+                        return await this.SendDataAsync<TResult, TErrorResult>(uri, method, content, false, false)
+                            .ConfigureAwait(false);
                     }
 
                     var error = JsonConvert.DeserializeObject<TErrorResult>(responseString);
@@ -242,39 +223,55 @@ namespace TellMe.Core.Types.DataServices
             }
         }
 
-        public async Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> RefreshAuthTokenAsync()
+        private async Task<string> GetAccessTokenAsync()
         {
             var authInfo = _localLocalAccountService.GetAuthInfo();
-            if (authInfo != null)
+            if (authInfo.Expired)
             {
-                var data = new Dictionary<string, string>
+                await Lock.RunAsync(async () =>
                 {
-                    {"grant_type", "refresh_token"},
-                    {"refresh_token", authInfo.RefreshToken},
-                    {"client_id", "ios_app"}
-                };
-                var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth",
-                        HttpMethod.Post, new FormUrlEncodedContent(data), true)
-                    .ConfigureAwait(false);
+                    authInfo = _localLocalAccountService.GetAuthInfo();
+                    if (authInfo.Expired)
+                    {
+                        authInfo = await RefreshAuthTokenAsync().ConfigureAwait(false);
+                    }
+                }).ConfigureAwait(false);
+            }
+            
+            return authInfo.AccessToken;
+        }
 
-                if (result.IsSuccess)
-                {
-                    _localLocalAccountService.SaveAuthInfo(result.Data);
-                }
-                else if (result.Error.Code == "905" || result.Error.Code == "906")
-                {
-                    _localLocalAccountService.SaveAuthInfo(null);
-                    _router.SwapToAuth();
-                }
-
-                return result;
+        private async Task<AuthenticationInfoDTO> RefreshAuthTokenAsync()
+        {
+            var authInfo = _localLocalAccountService.GetAuthInfo();
+            if (authInfo == null)
+            {
+                throw new Exception("You're not authenticated");
             }
 
-            return new Result<AuthenticationInfoDTO, AuthenticationErrorDto>
+            var data = new Dictionary<string, string>
             {
-                IsSuccess = false,
-                ErrorMessage = "You're not authenticated"
+                {"grant_type", "refresh_token"},
+                {"refresh_token", authInfo.RefreshToken},
+                {"client_id", "ios_app"}
             };
+            var result = await this.SendDataAsync<AuthenticationInfoDTO, AuthenticationErrorDto>("token/auth",
+                    HttpMethod.Post, new FormUrlEncodedContent(data), true)
+                .ConfigureAwait(false);
+
+            if (result.IsSuccess)
+            {
+                _localLocalAccountService.SaveAuthInfo(result.Data);
+                return result.Data;
+            }
+            
+            if (result.Error.Code == "905" || result.Error.Code == "906")
+            {
+                _localLocalAccountService.SaveAuthInfo(null);
+                _router.SwapToAuth();
+            }
+            
+            throw new Exception(result.ErrorMessage);
         }
     }
 }

@@ -108,8 +108,6 @@ namespace TellMe.Web
             {
                 //app.UseDeveloperExceptionPage();
             }
-            
-            app.UseTransactionAwareExceptionMiddleware();
             app.UseHangfireServer();
             app.UseAuthentication();
             app.UseMvc();

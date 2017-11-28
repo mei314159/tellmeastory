@@ -121,7 +121,7 @@ namespace TellMe.DAL.Types.Services
                 await CreateStoryRequests(newEventDTO.Attendees, eventDTO, now)
                     .ConfigureAwait(false);
             _unitOfWork.SaveChanges();
-            
+
             var receivers = await GetNotificationReceivers(eventDTO.Id).ConfigureAwait(false);
             var eventNotifications = receivers
                 .Select(receiver => new Notification

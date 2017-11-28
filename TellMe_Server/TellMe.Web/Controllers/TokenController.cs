@@ -154,25 +154,26 @@ namespace TellMe.Web.Controllers
         //get the jwt token   
         private string GetJwt(string refreshToken, ApplicationUser user)
         {
-            var now = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow;
 
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
+            new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToUniversalTime().ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64)
             };
 
             var symmetricKeyAsBase64 = _settings.Value.Secret;
             var keyByteArray = Encoding.ASCII.GetBytes(symmetricKeyAsBase64);
             var signingKey = new SymmetricSecurityKey(keyByteArray);
 
+            var expiresIn = utcNow.Add(TimeSpan.FromMinutes(2));
             var jwt = new JwtSecurityToken(
                 issuer: _settings.Value.Iss,
                 audience: _settings.Value.Aud,
                 claims: claims,
-                notBefore: now,
-                expires: now.Add(TimeSpan.FromMinutes(2)),
+                notBefore: utcNow,
+                expires: expiresIn,
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
@@ -180,6 +181,7 @@ namespace TellMe.Web.Controllers
             {
                 access_token = encodedJwt,
                 expires_in = (int)TimeSpan.FromMinutes(2).TotalSeconds,
+                expires_at = expiresIn,
                 refresh_token = refreshToken,
                 user_id = user.Id,
                 account = Mapper.Map<UserDTO>(user)

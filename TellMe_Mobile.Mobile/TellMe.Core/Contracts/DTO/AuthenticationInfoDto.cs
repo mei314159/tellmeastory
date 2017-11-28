@@ -16,16 +16,21 @@ namespace TellMe.Core.Contracts.DTO
 
         [JsonProperty(PropertyName = "expires_in")]
         public int ExpiresIn { get; set; }
-
+        
+        [JsonProperty(PropertyName = "expires_at")]
+        public DateTime ExpiresAt { get; set; }
+        
         [JsonProperty(PropertyName = "refresh_token")]
         public string RefreshToken { get; set; }
-
-        public DateTime AuthDate { get; set; }
 
         [JsonProperty(PropertyName = "account")]
         [TextBlob("AccountBlobbed")]
         public UserDTO Account { get; set; }
 
         public string AccountBlobbed { get; set; }
+
+        [JsonIgnore]
+        [SQLite.Ignore]
+        public bool Expired => DateTime.UtcNow > ExpiresAt;
     }
 }

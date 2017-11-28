@@ -21,7 +21,5 @@ namespace TellMe.Core.Contracts.DataServices
 
         Task<Result<TResult, TErrorResult>> SendDataAsync<TResult, TErrorResult>(string uri, HttpMethod method,
             HttpContent content, bool anonymously = false, bool refreshExpiredToken = true);
-
-        Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> RefreshAuthTokenAsync();
     }
 }

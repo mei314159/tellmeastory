@@ -92,7 +92,6 @@ namespace TellMe.Core.Types.BusinessLogic
                 return;
             }
 
-            result.Data.AuthDate = DateTime.UtcNow;
             _localAccountService.SaveAuthInfo(result.Data);
             _router.NavigateSetProfilePicture(View);
         }

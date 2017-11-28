@@ -48,7 +48,6 @@ namespace TellMe.Core.Types.BusinessLogic
                     .ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    result.Data.AuthDate = DateTime.UtcNow;
                     _localAccountService.SaveAuthInfo(result.Data);
                     _router.NavigateMain();
                     return;
