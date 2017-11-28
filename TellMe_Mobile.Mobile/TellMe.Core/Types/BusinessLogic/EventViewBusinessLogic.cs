@@ -42,7 +42,7 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             if (forceRefresh)
             {
-				LoadEventAsync(true);
+                LoadEventAsync(View.Event?.Id ?? View.EventId, true);
                 _stories.Clear();
             }
 
@@ -67,7 +67,7 @@ namespace TellMe.Core.Types.BusinessLogic
         {
             if (View.Event == null)
             {
-                var result = await LoadEventAsync().ConfigureAwait(false);
+                var result = await LoadEventAsync(View.EventId).ConfigureAwait(false);
                 if (!result)
                     return false;
             }
@@ -76,12 +76,12 @@ namespace TellMe.Core.Types.BusinessLogic
             return true;
         }
 
-        private async Task<bool> LoadEventAsync(bool forceRefresh = false)
+        private async Task<bool> LoadEventAsync(int eventId, bool forceRefresh = false)
         {
-            var localEvent = await _localEventsDataService.GetAsync(View.EventId).ConfigureAwait(false);
+            var localEvent = await _localEventsDataService.GetAsync(eventId).ConfigureAwait(false);
             if (forceRefresh || localEvent.Data == null || localEvent.Expired)
             {
-                var result = await _remoteEventsDataService.GetEventAsync(View.EventId).ConfigureAwait(false);
+                var result = await _remoteEventsDataService.GetEventAsync(eventId).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
                     View.Event = result.Data;

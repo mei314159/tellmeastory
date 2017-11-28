@@ -108,10 +108,10 @@ namespace TellMe.Core.Types.BusinessLogic
 
         public async Task SaveAsync()
         {
-            var overlay = this.View.DisableInput();
             var validationResult = _validator.Validate(View.Event);
             if (validationResult.IsValid)
             {
+                var overlay = this.View.DisableInput();
                 var result = await _remoteEventsDataService
                     .SaveEventAsync(View.Event)
                     .ConfigureAwait(false);
