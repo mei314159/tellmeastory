@@ -46,7 +46,6 @@ namespace TellMe.iOS.Controllers
                     Attendees = new List<EventAttendeeDTO>()
                 };
             }
-            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             ToggleRightButton(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -181,6 +180,7 @@ namespace TellMe.iOS.Controllers
 
         private void ContinueButtonTouched(object sender, EventArgs e)
         {
+            this.HideKeyboard();
             var root = this.Root[0];
             TableView.RefreshControl.Enabled = true;
             Event.Title = ((EntryElement) root[0]).Value;

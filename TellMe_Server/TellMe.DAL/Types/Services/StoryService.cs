@@ -72,7 +72,7 @@ namespace TellMe.DAL.Types.Services
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.Tribe.Id into atm
                 from tm in atm.DefaultIfEmpty()
-                where attendee.UserId == currentUserId || tm.UserId == currentUserId
+                where  (attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId) || tm.UserId == currentUserId
                 select attendee;
 
             IQueryable<Story> stories = _storyRepository
