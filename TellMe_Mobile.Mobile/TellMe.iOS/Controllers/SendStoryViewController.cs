@@ -60,6 +60,7 @@ namespace TellMe.iOS.Controllers
 
         async partial void SendButton_TouchUpInside(Button sender)
         {
+            this.HideKeyboard();
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.SendAsync();

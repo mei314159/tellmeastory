@@ -21,6 +21,8 @@ namespace TellMe.DAL.Contracts.DTO
 
         public string Description { get; set; }
         
+        public bool ShareStories { get; set; }
+        
         public string StoryRequestTitle { get; set; }
         
         public int StoryRequestId { get; set; }

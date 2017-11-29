@@ -26,6 +26,7 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<StoryLike> _storyLikeRepository;
         private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
+        private readonly IRepository<Event, int> _eventRepository;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -35,7 +36,9 @@ namespace TellMe.DAL.Types.Services
             IRepository<StoryReceiver, int> storyReceiverRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
             IRepository<StoryLike> storyLikeRepository,
-            IRepository<ApplicationUser> userRepository, IRepository<EventAttendee, int> eventAttendeeRepository)
+            IRepository<ApplicationUser> userRepository,
+            IRepository<EventAttendee, int> eventAttendeeRepository,
+            IRepository<Event, int> eventRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -46,6 +49,7 @@ namespace TellMe.DAL.Types.Services
             _storyLikeRepository = storyLikeRepository;
             _userRepository = userRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
+            _eventRepository = eventRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -53,30 +57,48 @@ namespace TellMe.DAL.Types.Services
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
             var receivers = _storyReceiverRepository.GetQueryable(true);
 
-            receivers = from receiver in receivers
+            receivers = receivers
+                .GroupJoin(tribeMembers, receiver => receiver.TribeId, tribeMember => tribeMember.Tribe.Id,
+                    (receiver, gj) => new {receiver, gj})
+                .SelectMany(t => t.gj.DefaultIfEmpty(), (t, tb) => new {t, tb})
+                .Where(t =>
+                    t.t.receiver.UserId == currentUserId ||
+                    (t.tb != null && (t.tb.Status == TribeMemberStatus.Joined ||
+                                      t.tb.Status == TribeMemberStatus.Creator)))
+                .Select(t => t.t.receiver);
+
+            var eventAttendees = _eventAttendeeRepository.GetQueryable(true);
+            eventAttendees = from attendee in eventAttendees
                 join tribeMember in tribeMembers
-                    on receiver.TribeId equals tribeMember.TribeId into gj
-                from tb in gj.DefaultIfEmpty()
-                where
-                    receiver.UserId == currentUserId ||
-                    (tb != null && (tb.Status == TribeMemberStatus.Joined || tb.Status == TribeMemberStatus.Creator))
-                select
-                    receiver;
+                    on attendee.TribeId equals tribeMember.Tribe.Id into atm
+                from tm in atm.DefaultIfEmpty()
+                where attendee.UserId == currentUserId || tm.UserId == currentUserId
+                select attendee;
 
             IQueryable<Story> stories = _storyRepository
-                .GetQueryable(true)
+                .GetQueryable(true);
+            stories = stories
+                .GroupJoin(receivers, story => story.Id, receiver => receiver.Story.Id,
+                    (story, receiversGroup) => new {story, receiversGroup})
+                .SelectMany(x => x.receiversGroup.DefaultIfEmpty(), (x, storyReceiver) => new {x.story, storyReceiver})
+                .GroupJoin(eventAttendees, x => x.story.EventId, x => x.Event.Id,
+                    (group, attendeesGroup) => new {group.story, group.storyReceiver, attendeesGroup})
+                .SelectMany(x => x.attendeesGroup.DefaultIfEmpty(),
+                    (x, attendee) => new {x.story, x.storyReceiver, attendee})
+                .Where(x =>
+                    x.story.CreateDateUtc < olderThanUtc &&
+                    (x.story.SenderId == currentUserId || x.storyReceiver != null) &&
+                    (x.story.Event == null || x.story.Event.HostId == currentUserId ||
+                     (x.story.Event.ShareStories && x.attendee != null)))
+                .Select(t => t.story)
+                .Distinct()
+                .OrderByDescending(t => t.CreateDateUtc)
+                .Take(20)
+                .Include(x => x.Event)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
-            stories = (from story in stories
-                    join receiver in receivers
-                        on story.Id equals receiver.StoryId into gj
-                    from st in gj.DefaultIfEmpty()
-                    where story.CreateDateUtc < olderThanUtc && (story.SenderId == currentUserId || st != null)
-                    orderby story.CreateDateUtc descending
-                    select story)
-                .Take(20);
 
 
             var list = await stories.ToListAsync().ConfigureAwait(false);
@@ -87,6 +109,13 @@ namespace TellMe.DAL.Types.Services
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int eventId, DateTime olderThanUtc)
         {
+            var sharedStories = await _eventRepository
+                .GetQueryable(true)
+                .AnyAsync(x => x.Id == eventId && (x.HostId == currentUserId || x.ShareStories))
+                .ConfigureAwait(false);
+            if (!sharedStories)
+                return new StoryDTO[] { };
+
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
@@ -114,25 +143,20 @@ namespace TellMe.DAL.Types.Services
             }
 
             var receivers = _storyReceiverRepository.GetQueryable(true)
-                .Include(x => x.Story)
-                .ThenInclude(x => x.Sender)
                 .Where(receiver =>
-                    (receiver.UserId == currentUserId && receiver.Story.SenderId == userId) ||
-                    (receiver.UserId == userId && receiver.Story.SenderId == currentUserId));
+                    receiver.UserId == currentUserId && receiver.Story.SenderId == userId ||
+                    receiver.UserId == userId && receiver.Story.SenderId == currentUserId);
 
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
-                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
-            stories = (from story in stories
-                    join receiver in receivers
-                        on story.Id equals receiver.StoryId into gj
-                    from st in gj.DefaultIfEmpty()
-                    where story.CreateDateUtc < olderThanUtc && st != null
-                    orderby story.CreateDateUtc descending
-                    select story)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe)
+                .Where(t => t.CreateDateUtc < olderThanUtc);
+            stories = stories
+                .Join(receivers, story => story.Id, receiver => receiver.Story.Id, (story, gj) => story)
+                .OrderByDescending(t => t.CreateDateUtc)
                 .Take(20);
             var list = await stories.ToListAsync().ConfigureAwait(false);
             var result = Mapper.Map<ICollection<StoryDTO>>(list, x => x.Items["UserId"] = currentUserId);
@@ -158,20 +182,27 @@ namespace TellMe.DAL.Types.Services
                 .GetQueryable(true
                 ).Where(x => x.TribeId == tribeId);
 
-            IQueryable<Story> stories = _storyRepository
-                .GetQueryable(true)
+            var eventAttendees = _eventAttendeeRepository.GetQueryable(true)
+                .Where(x => x.TribeId == tribeId);
+
+            IQueryable<Story> stories = _storyRepository.GetQueryable(true)
+                .Join(receivers, story => story.Id, receiver => receiver.Story.Id, (story, gj) => story)
+                .GroupJoin(eventAttendees, x => x.EventId, x => x.Event.Id,
+                    (story, attendeesGroup) => new {story, attendeesGroup})
+                .SelectMany(x => x.attendeesGroup.DefaultIfEmpty(),
+                    (x, attendee) => new {x.story, attendee})
+                .Where(x => x.story.CreateDateUtc < olderThanUtc &&
+                            (x.story.Event == null || x.story.Event.HostId == currentUserId ||
+                             (x.story.Event.ShareStories && x.attendee != null)))
+                .Select(x => x.story)
+                .Distinct()
+                .OrderByDescending(t => t.CreateDateUtc)
+                .Take(20)
+                .Include(x => x.Event)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
-            stories = (from story in stories
-                    join receiver in receivers
-                        on story.Id equals receiver.StoryId into gj
-                    from st in gj.DefaultIfEmpty()
-                    where story.CreateDateUtc < olderThanUtc && st != null
-                    orderby story.CreateDateUtc descending
-                    select story)
-                .Take(20);
 
 
             var list = await stories.ToListAsync().ConfigureAwait(false);
@@ -236,7 +267,7 @@ namespace TellMe.DAL.Types.Services
                     Extra = new object(),
                     Text = $"{username} likes your story \"{story.Title}\""
                 };
-                
+
                 await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
             }
 

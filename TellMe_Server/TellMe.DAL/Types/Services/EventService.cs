@@ -23,21 +23,21 @@ namespace TellMe.DAL.Types.Services
         private readonly IRepository<Event, int> _eventsRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
-        private readonly IRepository<EventAttendee, int> _eventAttendeesRepository;
+        private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
         private readonly IRepository<Tribe, int> _tribeRepository;
 
         public EventService(IUnitOfWork unitOfWork, IRepository<Event, int> eventsRepository,
             IPushNotificationsService pushNotificationsService,
             IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<EventAttendee, int> eventAttendeesRepository,
+            IRepository<EventAttendee, int> eventAttendeeRepository,
             IRepository<StoryRequest, int> storyRequestRepository, IRepository<Tribe, int> tribeRepository)
         {
             _unitOfWork = unitOfWork;
             _eventsRepository = eventsRepository;
             _pushNotificationsService = pushNotificationsService;
             _tribeMemberRepository = tribeMemberRepository;
-            _eventAttendeesRepository = eventAttendeesRepository;
+            _eventAttendeeRepository = eventAttendeeRepository;
             _storyRequestRepository = storyRequestRepository;
             _tribeRepository = tribeRepository;
         }
@@ -45,7 +45,7 @@ namespace TellMe.DAL.Types.Services
         public async Task<EventDTO> GetAsync(string currentUserId, int eventId)
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
-            var attendees = from attendee in _eventAttendeesRepository.GetQueryable(true)
+            var attendees = from attendee in _eventAttendeeRepository.GetQueryable(true)
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.TribeId into gj
                 from tb in gj.DefaultIfEmpty()
@@ -76,7 +76,7 @@ namespace TellMe.DAL.Types.Services
         public async Task<ICollection<EventDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
         {
             var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
-            var attendees = _eventAttendeesRepository.GetQueryable(true);
+            var attendees = _eventAttendeeRepository.GetQueryable(true);
             attendees = from attendee in attendees
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.TribeId into gj
@@ -236,7 +236,7 @@ namespace TellMe.DAL.Types.Services
         private async Task<List<NotificationReceiver>> GetNotificationReceivers(int eventId)
         {
             var tribes = _tribeRepository.GetQueryable(true);
-            var attendees = _eventAttendeesRepository.GetQueryable(true)
+            var attendees = _eventAttendeeRepository.GetQueryable(true)
                 .Where(x => x.EventId == eventId)
                 .Select(x => new {x.TribeId, x.UserId});
             var tribeMembers = _tribeMemberRepository.GetQueryable(true);

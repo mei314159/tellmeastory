@@ -46,7 +46,7 @@ namespace TellMe.iOS.Controllers
                     Attendees = new List<EventAttendeeDTO>()
                 };
             }
-
+            this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             ToggleRightButton(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -59,7 +59,8 @@ namespace TellMe.iOS.Controllers
                 {
                     new EntryElement("Title", "Event Title", Event?.Title),
                     new EntryElement("Description", "Event Description", Event?.Description),
-                    new DateElement("Date", dateTime)
+                    new DateElement("Date", dateTime),
+                    new BooleanElement("ShareStories", Event?.ShareStories ?? false)
                 },
                 new Section("Members")
             };
@@ -142,7 +143,7 @@ namespace TellMe.iOS.Controllers
                 ((EntryElement) root[0]).Value = eventDTO.Title;
                 ((EntryElement) root[1]).Value = eventDTO.Description;
                 ((DateElement) root[2]).DateValue = eventDTO.DateUtc.GetUtcDateTime();
-
+                ((BooleanElement)root[3]).Value = eventDTO.ShareStories;
                 if (this.Root.Count == 2)
                 {
                     var deleteEventButton = new UIButton(UIButtonType.System);
@@ -185,7 +186,7 @@ namespace TellMe.iOS.Controllers
             Event.Title = ((EntryElement) root[0]).Value;
             Event.Description = ((EntryElement) root[1]).Value;
             Event.DateUtc = ((DateElement) root[2]).DateValue;
-            
+            Event.ShareStories = ((BooleanElement)root[3]).Value;
             if (_createEvent)
                 _businessLogic.NavigateCreateRequest();
             else

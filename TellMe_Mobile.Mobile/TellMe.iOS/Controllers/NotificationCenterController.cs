@@ -35,8 +35,17 @@ namespace TellMe.iOS.Controllers
             this.TableView.RegisterNibForCellReuse(NotificationCenterStoryCell.Nib, NotificationCenterStoryCell.Key);
             this.TableView.RefreshControl = new UIRefreshControl();
             this.TableView.RefreshControl.ValueChanged += (s, e) => LoadNotificationsAsync(true);
-
             Task.Run(() => LoadNotificationsAsync(false));
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController.SetNavigationBarHidden(true, false);
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            this.NavigationController.SetNavigationBarHidden(false, true);
         }
 
         private async Task LoadNotificationsAsync(bool forceRefresh)

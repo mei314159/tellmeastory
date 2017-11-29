@@ -46,7 +46,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
-            Task.Run(() => LoadStoriesAsync(false, true));
+            //Task.Run(() => LoadStoriesAsync(false, true));
             
             var overlay = new Overlay("Loading");
             overlay.PopUp(false);
