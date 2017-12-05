@@ -95,7 +95,7 @@ namespace TellMe.DAL.Types.Services
             var utcNow = DateTime.UtcNow.Date;
             events = (from @event in events
                     join attendee in attendees
-                        on @event.Id equals attendee.EventId into gj
+                        on @event.Id equals attendee.Event.Id into gj
                     from st in gj.DefaultIfEmpty()
                     where @event.CreateDateUtc < olderThanUtc && (@event.HostId == currentUserId || st != null)
                           && @event.DateUtc >= utcNow

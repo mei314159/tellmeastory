@@ -46,7 +46,10 @@ namespace TellMe.Web.Automapper
 
                 cfg.CreateMap<Event, EventDTO>()
                     .ForMember(x => x.HostUserName, x => x.MapFrom(z => z.Host.UserName))
-                    .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl));
+                    .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl))
+                    .ForMember(x => x.Attendees,
+                        x => x.MapFrom(y => y.Attendees.Where(z =>
+                            z.Status == EventAttendeeStatus.Accepted || z.Status == EventAttendeeStatus.Pending).ToList()));
 
                 cfg.CreateMap<EventDTO, Event>()
                     .ForMember(x => x.Id, x => x.Ignore())
