@@ -407,8 +407,8 @@
     <Compile Include="Views\Cells\SlimStoryCell.designer.cs">
       <DependentUpon>SlimStoryCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="SearchStoriesViewController.cs" />
-    <Compile Include="SearchStoriesViewController.designer.cs">
+    <Compile Include="Controllers\SearchStoriesViewController.cs" />
+    <Compile Include="Controllers\SearchStoriesViewController.designer.cs">
       <DependentUpon>SearchStoriesViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>

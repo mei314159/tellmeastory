@@ -12,12 +12,14 @@ namespace TellMe.iOS.Views.Cells
 
         public static readonly NSString Key = new NSString("SlimStoryCell");
         public static readonly UINib Nib;
-        private static readonly UIImage DefaultPicture;
+        private static readonly UIImage DefaultUserPicture;
+        private static readonly UIImage DefaultPlaylistPicture;
 
         static SlimStoryCell()
         {
             Nib = UINib.FromName("SlimStoryCell", NSBundle.MainBundle);
-            DefaultPicture = UIImage.FromBundle("UserPic");
+            DefaultUserPicture = UIImage.FromBundle("UserPic");
+            DefaultPlaylistPicture = UIImage.FromBundle("Playlist");
         }
 
         protected SlimStoryCell(IntPtr handle) : base(handle)
@@ -38,9 +40,9 @@ namespace TellMe.iOS.Views.Cells
 
         private void Initialize()
         {
-            Preview.SetPictureUrl(Story.PreviewUrl, DefaultPicture);
+            Preview.SetPictureUrl(Story.PreviewUrl, DefaultPlaylistPicture);
             Title.Text = Story.Title;
-            SenderPicture.SetPictureUrl(Story.SenderPictureUrl, DefaultPicture);
+            SenderPicture.SetPictureUrl(Story.SenderPictureUrl, DefaultUserPicture);
         }
     }
 }
