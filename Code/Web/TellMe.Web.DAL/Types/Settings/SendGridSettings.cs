@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Types.Settings
+namespace TellMe.Web.DAL.Types.Settings
 {
     public class SendGridSettings
     {

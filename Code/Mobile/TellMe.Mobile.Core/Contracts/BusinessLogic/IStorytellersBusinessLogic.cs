@@ -16,4 +16,6 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         Task RejectTribeInvitationAsync(TribeDTO dto);
         void ViewTribe(TribeDTO tribe);
     }
+
+
 }

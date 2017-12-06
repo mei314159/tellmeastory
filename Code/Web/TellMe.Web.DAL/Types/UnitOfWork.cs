@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using TellMe.DAL.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using TellMe.Web.DAL.Contracts;
 
-namespace TellMe.DAL.Types
+namespace TellMe.Web.DAL.Types
 {
 	public class UnitOfWork : IUnitOfWork
 	{

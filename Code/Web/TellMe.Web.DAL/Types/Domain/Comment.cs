@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.ComponentModel.DataAnnotations;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class Comment : EntityBase<int>
     {

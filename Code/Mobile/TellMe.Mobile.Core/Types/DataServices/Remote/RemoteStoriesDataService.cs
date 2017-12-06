@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.DataServices;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Types.DataServices.Remote
 {
@@ -66,6 +67,23 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             var result = await this._apiProvider
                 .GetAsync<List<StoryDTO>>($"stories/event/{eventId}/older-than/{olderThan.Ticks}")
                 .ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<List<StoryListDTO>>> SearchAsync(string fragment, int skip)
+        {
+            var url = string.IsNullOrWhiteSpace(fragment)
+                ? $"stories/search/skip/{skip}"
+                : $"stories/search/skip/{skip}/{fragment}";
+            var result = await this._apiProvider.GetAsync<List<StoryListDTO>>(url).ConfigureAwait(false);
+            return result;
+        }
+        
+        
+
+        public async Task<Result<StoryDTO>> GetStoryAsync(int storyId)
+        {
+            var result = await this._apiProvider.GetAsync<StoryDTO>($"stories/{storyId}").ConfigureAwait(false);
             return result;
         }
 

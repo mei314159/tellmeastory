@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="4023">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
@@ -20,7 +20,7 @@
                         <viewControllerLayoutGuide type="bottom" id="4056"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="4034">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4027">
@@ -62,7 +62,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4057" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2306" y="-1047"/>
+            <point key="canvasLocation" x="-2506" y="-1047"/>
         </scene>
         <!--Record a Story-->
         <scene sceneID="14768">
@@ -170,7 +170,7 @@
                                 <rect key="frame" x="0.0" y="108" width="375" height="559"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <view key="tableFooterView" contentMode="scaleToFill" id="53862">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <rect key="frame" x="0.0" y="35" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <subviews>
                                         <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="54194">
@@ -315,7 +315,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="27067" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="32360" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="-3010" y="-321"/>
+            <point key="canvasLocation" x="-3285" y="-322"/>
         </scene>
         <!--Storyteller-->
         <scene sceneID="Bxc-Ma-bf4">
@@ -368,7 +368,7 @@
                                     <rect key="frame" x="0.0" y="20" width="137" height="100"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KOH-IL-qWe">
-                                            <rect key="frame" x="19.5" y="35" width="97" height="30"/>
+                                            <rect key="frame" x="20.5" y="35" width="97" height="30"/>
                                             <state key="normal" title="Request Story"/>
                                             <connections>
                                                 <action selector="RequestStoryTouched:" destination="0wy-WT-jyn" eventType="touchUpInside" id="BgW-xx-XqJ"/>
@@ -410,7 +410,7 @@
                             </constraints>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="8TC-xO-kWn">
-                            <rect key="frame" x="0.0" y="272" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="273" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="fgt-sz-bBa">
@@ -425,10 +425,10 @@
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="79c-nc-dcl">
-                                <rect key="frame" x="0.0" y="228" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="228" width="375" height="45"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="79c-nc-dcl" id="wbt-g8-9DN">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -454,7 +454,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rNh-g2-h88" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2206" y="-322"/>
+            <point key="canvasLocation" x="-2871" y="-322"/>
         </scene>
         <!--Send Story-->
         <scene sceneID="40184">
@@ -552,7 +552,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="40217" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="40193" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="-1580" y="-1046"/>
+            <point key="canvasLocation" x="-2048" y="-1054"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="51631">
@@ -625,7 +625,7 @@
                             </constraints>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="2GD-sF-vip">
-                            <rect key="frame" x="0.0" y="172" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="173" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="1DD-Ko-kA3">
@@ -640,10 +640,10 @@
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="wFf-Sn-fgP">
-                                <rect key="frame" x="0.0" y="128" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="128" width="375" height="45"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wFf-Sn-fgP" id="CX3-gv-VK5">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -673,7 +673,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LwG-pW-XSH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1479.2" y="-322.48875562218893"/>
+            <point key="canvasLocation" x="-2444.2" y="-317.4888"/>
         </scene>
         <!--Event-->
         <scene sceneID="54f-5g-qRI">
@@ -684,7 +684,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="Ctz-0B-ltz">
-                            <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="73" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="AgT-nW-Xna">
@@ -699,10 +699,10 @@
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="uBQ-N3-7vs">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="28" width="375" height="45"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="uBQ-N3-7vs" id="qQH-P2-V4b">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -725,10 +725,99 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v8g-ln-0yQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-796" y="-322"/>
+            <point key="canvasLocation" x="-2026" y="-318"/>
+        </scene>
+        <scene sceneID="59023">
+            <objects>
+                <viewController storyboardIdentifier="SearchStoriesViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="59024" customClass="SearchStoriesViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="59046"/>
+                        <viewControllerLayoutGuide type="bottom" id="59052"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="59040">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" placeholder="Search for stories" translatesAutoresizingMaskIntoConstraints="NO" id="59032">
+                                <rect key="frame" x="0.0" y="64" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="59041"/>
+                                </constraints>
+                                <textInputTraits key="textInputTraits" returnKeyType="search"/>
+                                <scopeButtonTitles>
+                                    <string>Storytellers</string>
+                                    <string>Tribes</string>
+                                </scopeButtonTitles>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="59034">
+                                <rect key="frame" x="0.0" y="108" width="375" height="559"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <view key="tableFooterView" contentMode="scaleToFill" id="59042">
+                                    <rect key="frame" x="0.0" y="35" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="59026">
+                                            <rect key="frame" x="178" y="12" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstItem="59026" firstAttribute="centerY" secondItem="59042" secondAttribute="centerY" id="59043"/>
+                                        <constraint firstItem="59026" firstAttribute="centerX" secondItem="59042" secondAttribute="centerX" id="59044"/>
+                                    </constraints>
+                                </view>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="59032" firstAttribute="top" secondItem="59046" secondAttribute="bottom" id="59045"/>
+                            <constraint firstItem="59032" firstAttribute="centerX" secondItem="59040" secondAttribute="centerX" id="59047"/>
+                            <constraint firstItem="59032" firstAttribute="width" secondItem="59040" secondAttribute="width" id="59048"/>
+                            <constraint firstItem="59034" firstAttribute="centerX" secondItem="59040" secondAttribute="centerX" id="59049"/>
+                            <constraint firstItem="59034" firstAttribute="width" secondItem="59040" secondAttribute="width" id="59050"/>
+                            <constraint firstItem="59034" firstAttribute="bottom" secondItem="59052" secondAttribute="top" id="59051"/>
+                            <constraint firstItem="59034" firstAttribute="top" secondItem="59046" secondAttribute="bottom" constant="44" id="59036"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Stories" id="59030"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="ActivityIndicator" destination="59026" id="59025"/>
+                        <outlet property="NavItem" destination="59030" id="59029"/>
+                        <outlet property="SearchBar" destination="59032" id="59031"/>
+                        <outlet property="TableView" destination="59034" id="59033"/>
+                        <outlet property="TableViewTop" destination="59036" id="59035"/>
+                        <outlet property="searchDisplayController" destination="59038" id="59037"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="59053" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="59038">
+                    <connections>
+                        <outlet property="delegate" destination="59024" id="59054"/>
+                        <outlet property="searchContentsController" destination="59024" id="59055"/>
+                        <outlet property="searchResultsDataSource" destination="59024" id="59056"/>
+                        <outlet property="searchResultsDelegate" destination="59024" id="59057"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="-1635" y="-320"/>
         </scene>
     </scenes>
     <resources>
         <image name="AddGroup" width="25" height="25"/>
+        <image name="Contacts" width="192" height="192"/>
+        <image name="Play" width="64" height="64"/>
+        <image name="UserPic" width="36" height="36"/>
+        <image name="Bell" width="25" height="25"/>
+        <image name="Storytellers" width="25" height="25"/>
+        <image name="Account" width="25" height="25"/>
+        <image name="Send" width="30" height="30"/>
+        <image name="Comment" width="30" height="30"/>
+        <image name="Replay" width="64" height="64"/>
+        <image name="Heart" width="30" height="30"/>
+        <image name="Heart-O" width="30" height="30"/>
+        <image name="Calendar" width="25" height="25"/>
+        <image name="Playlists" width="25" height="25"/>
+        <image name="Playlist" width="50" height="50"/>
     </resources>
 </document>

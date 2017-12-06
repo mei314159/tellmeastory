@@ -1,4 +1,4 @@
-namespace TellMe.DAL
+namespace TellMe.Web.DAL
 {
     public class Constants
     {

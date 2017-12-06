@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class PlaylistService : IPlaylistService
     {
@@ -64,6 +64,7 @@ namespace TellMe.DAL.Types.Services
                 : await _playlistRepository.GetQueryable().FirstAsync(x => x.Id == playlistDTO.Id)
                     .ConfigureAwait(false);
             Mapper.Map(playlistDTO, playlist);
+            await _playlistRepository.SaveAsync(playlist).ConfigureAwait(false);
             _unitOfWork.SaveChanges();
 
             var result = await _playlistRepository

@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public enum FriendshipStatus
     {

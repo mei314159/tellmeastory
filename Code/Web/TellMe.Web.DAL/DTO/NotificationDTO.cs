@@ -1,7 +1,7 @@
 using System;
-using TellMe.DAL.Types.PushNotifications;
+using TellMe.Web.DAL.Types.PushNotifications;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     public class NotificationDTO
     {

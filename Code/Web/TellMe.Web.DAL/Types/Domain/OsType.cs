@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum OsType

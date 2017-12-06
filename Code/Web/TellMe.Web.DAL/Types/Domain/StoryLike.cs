@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using TellMe.DAL.Contracts.Domain;
+using TellMe.Web.DAL.Contracts.Domain;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class StoryLike : IEntityBase
     {

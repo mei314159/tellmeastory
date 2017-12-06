@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.Contracts.DTO
 {
     public enum ContactsMode
     {

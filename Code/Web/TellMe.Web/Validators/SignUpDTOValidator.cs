@@ -1,6 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.Domain;
 using TellMe.Web.DTO;
 
 namespace TellMe.Web.Validators

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TellMe.DAL.Contracts.Services;
+using TellMe.Web.DAL.Contracts.Services;
 
 namespace TellMe.Web.Controllers
 {

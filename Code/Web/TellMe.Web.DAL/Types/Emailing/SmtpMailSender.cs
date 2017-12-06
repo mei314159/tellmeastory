@@ -5,12 +5,12 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Types.Settings;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Types.Settings;
 using MailMessage = System.Net.Mail.MailMessage;
 using MailPriority = System.Net.Mail.MailPriority;
 
-namespace TellMe.DAL.Types.Emailing
+namespace TellMe.Web.DAL.Types.Emailing
 {
     public class SmtpMailSender : IMailSender
     {

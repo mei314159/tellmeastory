@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SQLite;
-using SQLiteNetExtensions.Attributes;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Contracts.DTO
 {
@@ -17,9 +17,7 @@ namespace TellMe.Mobile.Core.Contracts.DTO
 
         public string UserId { get; set; }
 
-        [TextBlob("StoryIdsBlobbed")]
-        public ICollection<int> StoryIds { get; set; }
-
-        public string StoryIdsBlobbed { get; set; }
+        [SQLite.Ignore]
+        public List<StoryListDTO> Stories { get; set; }
     }
 }

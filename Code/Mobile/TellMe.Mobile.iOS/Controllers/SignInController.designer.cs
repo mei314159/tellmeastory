@@ -4,9 +4,9 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-
-using System.CodeDom.Compiler;
 using Foundation;
+using System;
+using System.CodeDom.Compiler;
 using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Controllers
@@ -16,7 +16,7 @@ namespace TellMe.iOS.Controllers
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TextInput Email { get; set; }
+        TellMe.iOS.Core.UI.TextInput Email { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -24,7 +24,7 @@ namespace TellMe.iOS.Controllers
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        TextInput Password { get; set; }
+        TellMe.iOS.Core.UI.TextInput Password { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]

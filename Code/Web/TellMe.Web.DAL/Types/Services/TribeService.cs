@@ -1,17 +1,17 @@
-using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Contracts.DTO;
 using System;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Types.Domain;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using TellMe.DAL.Types.PushNotifications;
 using System.Collections.Generic;
-using TellMe.DAL.Contracts.PushNotifications;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using TellMe.Web.DAL.Contracts.PushNotifications;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.PushNotifications;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class TribeService : ITribeService
     {

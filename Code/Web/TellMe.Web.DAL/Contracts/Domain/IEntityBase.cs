@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Contracts.Domain
+namespace TellMe.Web.DAL.Contracts.Domain
 {
     public interface IEntityBase
     {

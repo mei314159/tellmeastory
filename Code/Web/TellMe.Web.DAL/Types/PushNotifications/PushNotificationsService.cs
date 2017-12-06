@@ -9,12 +9,12 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PushSharp.Apple;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.PushNotifications;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.PushNotifications;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Types.PushNotifications
+namespace TellMe.Web.DAL.Types.PushNotifications
 {
     public class PushNotificationsService : IPushNotificationsService
     {

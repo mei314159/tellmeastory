@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace TellMe.DAL.Types.PushNotifications
+namespace TellMe.Web.DAL.Types.PushNotifications
 {
     public class IosNotification<T>
     {

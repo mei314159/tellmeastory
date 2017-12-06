@@ -8,7 +8,7 @@ using Foundation;
 using System;
 using System.CodeDom.Compiler;
 
-namespace TellMe.iOS
+namespace TellMe.iOS.Core.UI
 {
     [Register ("TextInput")]
     partial class TextInput

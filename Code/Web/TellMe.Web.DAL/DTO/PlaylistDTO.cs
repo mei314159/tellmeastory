@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     public class PlaylistDTO
     {
@@ -13,6 +13,6 @@ namespace TellMe.DAL.Contracts.DTO
 
         public string UserId { get; set; }
 
-        public ICollection<int> StoryIds { get; set; }
+        public ICollection<StoryDTO> Stories { get; set; }
     }
 }

@@ -4,18 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Microsoft.Data.OData.Atom;
 using Microsoft.EntityFrameworkCore;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Contracts.PushNotifications;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Extensions;
-using TellMe.DAL.Types.Domain;
-using TellMe.DAL.Types.PushNotifications;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.PushNotifications;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.PushNotifications;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class EventService : IEventService
     {

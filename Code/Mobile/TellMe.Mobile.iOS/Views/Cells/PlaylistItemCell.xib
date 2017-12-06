@@ -19,7 +19,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="286" height="69.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Playlist" translatesAutoresizingMaskIntoConstraints="NO" id="sfL-oK-STE">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Playlist" translatesAutoresizingMaskIntoConstraints="NO" id="sfL-oK-STE" customClass="Picture">
                         <rect key="frame" x="10" y="10" width="50" height="50"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="sfL-oK-STE" secondAttribute="height" multiplier="1:1" id="8B1-JX-vSs"/>

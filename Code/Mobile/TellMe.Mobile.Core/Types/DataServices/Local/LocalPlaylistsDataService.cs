@@ -19,7 +19,7 @@ namespace TellMe.Mobile.Core.Types.DataServices.Local
             using (var conn = new SQLiteConnection(_dbPath,
                 SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.Create))
             {
-                conn.CreateTable<EventDTO>();
+                conn.CreateTable<PlaylistDTO>();
                 conn.CreateTable<UpdateInfo>();
             }
         }

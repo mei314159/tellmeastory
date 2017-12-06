@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class Tribe : EntityBase<int>
     {

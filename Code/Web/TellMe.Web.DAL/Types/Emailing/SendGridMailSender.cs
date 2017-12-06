@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Types.Settings;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Types.Settings;
 
-namespace TellMe.DAL.Types.Emailing
+namespace TellMe.Web.DAL.Types.Emailing
 {
     public class SendGridMailSender : IMailSender
     {

@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Types.PushNotifications
+namespace TellMe.Web.DAL.Types.PushNotifications
 {
     public enum NotificationTypeEnum
     {

@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TellMe.DAL.Types.PushNotifications;
+using TellMe.Web.DAL.Types.PushNotifications;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class Notification : EntityBase<int>
     {

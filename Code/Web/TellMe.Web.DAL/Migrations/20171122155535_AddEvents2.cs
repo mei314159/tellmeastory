@@ -1,8 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TellMe.DAL.Migrations
+namespace TellMe.Web.DAL.Migrations
 {
     public partial class AddEvents2 : Migration
     {

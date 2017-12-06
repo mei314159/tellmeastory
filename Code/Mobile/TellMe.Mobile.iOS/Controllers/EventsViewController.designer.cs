@@ -23,6 +23,16 @@ namespace TellMe.iOS.Controllers
                 ActivityIndicator.Dispose ();
                 ActivityIndicator = null;
             }
+
+            if (TableView != null) {
+                TableView.Dispose ();
+                TableView = null;
+            }
+
+            if (View != null) {
+                View.Dispose ();
+                View = null;
+            }
         }
     }
 }

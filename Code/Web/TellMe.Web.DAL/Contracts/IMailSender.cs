@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TellMe.DAL.Contracts
+namespace TellMe.Web.DAL.Contracts
 {
     public interface IMailSender
     {

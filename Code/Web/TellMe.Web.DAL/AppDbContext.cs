@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL
+namespace TellMe.Web.DAL
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

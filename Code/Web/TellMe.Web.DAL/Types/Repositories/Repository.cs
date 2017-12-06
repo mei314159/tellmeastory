@@ -1,14 +1,14 @@
-﻿using System.Linq;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.Repositories;
-using Microsoft.EntityFrameworkCore;
-using TellMe.DAL.Contracts.Domain;
+﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.Domain;
+using TellMe.Web.DAL.Contracts.Repositories;
 
-namespace TellMe.DAL.Types.Repositories
+namespace TellMe.Web.DAL.Types.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntityBase
     {

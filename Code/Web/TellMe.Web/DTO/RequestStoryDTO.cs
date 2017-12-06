@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using TellMe.DAL.Contracts.DTO;
+using TellMe.Web.DAL.DTO;
 
 namespace TellMe.Web.DTO
 {

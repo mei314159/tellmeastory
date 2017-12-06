@@ -1,20 +1,21 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using TellMe.DAL.Contracts.DTO;
-using System;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using TellMe.DAL.Contracts;
-using TellMe.DAL.Contracts.PushNotifications;
-using TellMe.DAL.Types.PushNotifications;
-using TellMe.DAL.Types.Settings;
+using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.DTO;
+using TellMe.Web.DAL.Contracts.PushNotifications;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.PushNotifications;
+using TellMe.Web.DAL.Types.Settings;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class UserService : IUserService
     {

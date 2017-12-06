@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Contracts.Services;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
 using TellMe.Web.Extensions;
 
 namespace TellMe.Web.Controllers

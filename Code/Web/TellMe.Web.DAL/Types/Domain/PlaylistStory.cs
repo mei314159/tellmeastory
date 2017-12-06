@@ -1,6 +1,6 @@
-using TellMe.DAL.Contracts.Domain;
+using TellMe.Web.DAL.Contracts.Domain;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class PlaylistStory : IEntityBase
     {

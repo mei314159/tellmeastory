@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Extensions;
-using TellMe.DAL.Types.Domain;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Extensions;
+using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.Automapper
 {
@@ -43,6 +44,10 @@ namespace TellMe.Web.Automapper
                     })
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
+                
+                cfg.CreateMap<Story, StoryListDTO>()
+                    .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
+                    .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
 
                 cfg.CreateMap<Event, EventDTO>()
                     .ForMember(x => x.HostUserName, x => x.MapFrom(z => z.Host.UserName))
@@ -51,6 +56,26 @@ namespace TellMe.Web.Automapper
                         x => x.MapFrom(y => y.Attendees.Where(z =>
                             z.Status == EventAttendeeStatus.Accepted || z.Status == EventAttendeeStatus.Pending).ToList()));
 
+                cfg.CreateMap<PlaylistDTO, Playlist>()
+                    .ForMember(x => x.Id, x => x.Ignore())
+                    .ForMember(x => x.UserId, x => x.Ignore())
+                    .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => DateTime.UtcNow))
+                    .ForMember(x => x.Stories, x => x.Ignore())
+                    .BeforeMap((dto, entity) =>
+                    {
+                        if (entity.Stories == null)
+                            entity.Stories = new List<PlaylistStory>();
+                    })
+                    .AfterMap((dto, entity, afterFunction) =>
+                    {
+                        entity.Stories.MapFrom(dto.Stories, x => x.Id, x => x.StoryId,
+                            (storyDTO, playlistStory) =>
+                            {
+                                playlistStory.StoryId = storyDTO.Id;
+                                playlistStory.PlaylistId = entity.Id;
+                            });
+                    });
+                
                 cfg.CreateMap<EventDTO, Event>()
                     .ForMember(x => x.Id, x => x.Ignore())
                     .ForMember(x => x.HostId, x => x.Ignore())

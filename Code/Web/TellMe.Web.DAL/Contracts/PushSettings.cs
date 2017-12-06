@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Contracts
+namespace TellMe.Web.DAL.Contracts
 {
     public class PushSettings
     {

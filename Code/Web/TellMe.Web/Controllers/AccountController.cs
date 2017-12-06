@@ -1,14 +1,14 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
 using TellMe.Web.DTO;
 using Microsoft.AspNetCore.Hosting;
 using TellMe.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.Controllers
 {

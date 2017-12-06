@@ -16,7 +16,7 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Picture ProfilePicture { get; set; }
+        TellMe.iOS.Core.UI.Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -24,31 +24,31 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button ReplyButton { get; set; }
+        TellMe.iOS.Core.UI.Button ReplyButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button ShowRepliesButton { get; set; }
+        TellMe.iOS.Core.UI.Button ShowRepliesButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label Text { get; set; }
+        TellMe.iOS.Core.UI.Label Text { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label Time { get; set; }
+        TellMe.iOS.Core.UI.Label Time { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label UserName { get; set; }
+        TellMe.iOS.Core.UI.Label UserName { get; set; }
 
         [Action ("ReplyButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ReplyButton_TouchUpInside (Button sender);
+        partial void ReplyButton_TouchUpInside (TellMe.iOS.Core.UI.Button sender);
 
         [Action ("ShowRepliesButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ShowRepliesButton_TouchUpInside (Button sender);
+        partial void ShowRepliesButton_TouchUpInside (TellMe.iOS.Core.UI.Button sender);
 
         void ReleaseDesignerOutlets ()
         {

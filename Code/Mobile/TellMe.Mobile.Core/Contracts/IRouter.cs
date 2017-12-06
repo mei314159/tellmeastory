@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Contracts
 {
@@ -36,6 +38,7 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateNotificationsCenter(IView view);
         void NavigateCreateTribe(IView view, ICollection<StorytellerDTO> members, TribeCreatedHandler complete);
         void NavigateViewStory(IView view, StoryDTO story, bool goToComments = false);
+        void NavigateViewStory(IView view, int storyId, bool goToComments = false);
         void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, int tribeId, TribeLeftHandler e);
@@ -47,5 +50,6 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateCreatePlaylist(IView view, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void NavigateViewPlaylist(IView view, PlaylistDTO dto, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void SwapToAuth();
+        void NavigateSearchStories(IView view, ItemsSelectedHandler<StoryListDTO> storiesSelectedEventHandler, bool dismissOnFinish, HashSet<int> disabledStories);
     }
 }

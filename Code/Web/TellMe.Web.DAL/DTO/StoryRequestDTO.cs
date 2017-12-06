@@ -1,6 +1,6 @@
 using System;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     public class StoryRequestDTO
     {

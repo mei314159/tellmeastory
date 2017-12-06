@@ -16,57 +16,52 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button AcceptButton { get; set; }
+        TellMe.iOS.Core.UI.Button AcceptButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UICollectionView AttendeesCollection { get; set; }
 
         [Outlet]
-        [GeneratedCode("iOS Designer", "1.0")]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIView ContentWrapper { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.NSLayoutConstraint ContentWrapperHeight { get; set; }
+        TellMe.iOS.Core.UI.Label DateDay { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label DateDay { get; set; }
+        TellMe.iOS.Core.UI.Label DateMonth { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label DateMonth { get; set; }
+        TellMe.iOS.Core.UI.Label Description { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label Description { get; set; }
+        TellMe.iOS.Core.UI.Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Picture ProfilePicture { get; set; }
+        TellMe.iOS.Core.UI.Button SkipButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button SkipButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        Label Title { get; set; }
+        TellMe.iOS.Core.UI.Label Title { get; set; }
 
         [Action ("AcceptButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void AcceptButton_TouchUpInside (Button sender);
+        partial void AcceptButton_TouchUpInside (TellMe.iOS.Core.UI.Button sender);
 
         [Action ("SkipButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SkipButton_TouchUpInside (Button sender);
+        partial void SkipButton_TouchUpInside (TellMe.iOS.Core.UI.Button sender);
 
         void ReleaseDesignerOutlets ()
         {
-            if (AcceptButton != null)
-            {
-                AcceptButton.Dispose();
+            if (AcceptButton != null) {
+                AcceptButton.Dispose ();
                 AcceptButton = null;
             }
 
@@ -75,15 +70,9 @@ namespace TellMe.iOS.Views.Cells
                 AttendeesCollection = null;
             }
 
-            if (ContentWrapper != null)
-            {
-                ContentWrapper.Dispose();
+            if (ContentWrapper != null) {
+                ContentWrapper.Dispose ();
                 ContentWrapper = null;
-            }
-
-            if (ContentWrapperHeight != null) {
-                ContentWrapperHeight.Dispose ();
-                ContentWrapperHeight = null;
             }
 
             if (DateDay != null) {

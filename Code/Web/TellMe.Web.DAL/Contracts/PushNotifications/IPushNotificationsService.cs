@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Contracts.PushNotifications
+namespace TellMe.Web.DAL.Contracts.PushNotifications
 {
     public interface IPushNotificationsService
     {

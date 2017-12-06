@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class TokenAuthParams

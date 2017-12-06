@@ -51,6 +51,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
                         accessToken);
                     var response = await webClient.GetAsync(requestUri).ConfigureAwait(false);
                     var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    Debug.WriteLine(responseString);
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         var data = JsonConvert.DeserializeObject(responseString, resultType);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
 {
@@ -13,6 +14,8 @@ namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
         Task<Result<List<StoryDTO>>> GetStoriesAsync(string userId, DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetStoriesAsync(int tribeId, DateTime? olderThanUtc = null);
         Task<Result<List<StoryDTO>>> GetEventStoriesAsync(int eventId, DateTime? olderThanUtc = null);
+        Task<Result<List<StoryListDTO>>> SearchAsync(string fragment, int skip);
+        Task<Result<StoryDTO>> GetStoryAsync(int storyId);
 
         Task<Result<UploadMediaDTO>> UploadMediaAsync(FileStream videoStream, string videoFileName,
             FileStream previewImageStream, string previewImageFileName);

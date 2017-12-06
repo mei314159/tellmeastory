@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TellMe.DAL
+namespace TellMe.Web.DAL
 {
     public static class AsyncHelpers
     {

@@ -1,4 +1,4 @@
-﻿// WARNING
+// WARNING
 //
 // This file has been generated automatically by Visual Studio from the outlets and
 // actions declared in your storyboard file.
@@ -22,6 +22,16 @@ namespace TellMe.iOS.Controllers
             if (ActivityIndicator != null) {
                 ActivityIndicator.Dispose ();
                 ActivityIndicator = null;
+            }
+
+            if (TableView != null) {
+                TableView.Dispose ();
+                TableView = null;
+            }
+
+            if (View != null) {
+                View.Dispose ();
+                View = null;
             }
         }
     }

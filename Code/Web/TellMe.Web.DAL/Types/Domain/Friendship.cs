@@ -1,6 +1,6 @@
 using System;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class Friendship : EntityBase<int>
     {

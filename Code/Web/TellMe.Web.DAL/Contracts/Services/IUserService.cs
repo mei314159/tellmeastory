@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.DTO;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Contracts.DTO;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Contracts.Services
+namespace TellMe.Web.DAL.Contracts.Services
 {
     public interface IUserService : IService
     {

@@ -44,10 +44,11 @@ namespace TellMe.iOS.Controllers
         public StoryDTO Story { get; set; }
         public IView Parent { get; set; }
         public bool DisplayCommentsWhenAppear { get; set; }
+        public int StoryId { get; set; }
 
-        public override void ViewDidLoad()
+        public override async void ViewDidLoad()
         {
-            Initialize();
+            await Initialize();
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
 
             _commentsService = IoC.GetInstance<IRemoteCommentsDataService>();
@@ -75,6 +76,7 @@ namespace TellMe.iOS.Controllers
             {
                 CancelsTouchesInView = false
             });
+            
             this.LoadCommentsAsync();
         }
 
@@ -312,7 +314,7 @@ namespace TellMe.iOS.Controllers
                 return;
             }
 
-            var scrollToComments = _commentsList.Count > 0 || (DisplayCommentsWhenAppear && comments?.Length > 0);
+            var scrollToComments = _commentsList.Count > 0 || DisplayCommentsWhenAppear && comments.Length > 0;
             if (DisplayCommentsWhenAppear)
             {
                 DisplayCommentsWhenAppear = false;
@@ -358,8 +360,21 @@ namespace TellMe.iOS.Controllers
             return newText.Length <= 500; //max length
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
+            if (Story == null)
+            {
+                var result = await _remoteStoriesService.GetStoryAsync(this.StoryId).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    Story = result.Data;
+                }
+                else
+                {
+                    ShowErrorMessage("Can't load the story");
+                    this.DismissViewController(true, null);
+                }
+            }
             _storyView = StoryViewCell.Create(Story);
             _storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
             _storyView.OnReceiverSelected = StoryView_OnReceiverSelected;

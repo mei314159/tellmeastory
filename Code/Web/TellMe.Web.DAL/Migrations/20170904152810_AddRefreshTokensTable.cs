@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace TellMe.DAL.Migrations
+namespace TellMe.Web.DAL.Migrations
 {
     public partial class AddRefreshTokensTable : Migration
     {

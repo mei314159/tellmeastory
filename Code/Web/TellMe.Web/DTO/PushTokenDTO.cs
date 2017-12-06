@@ -1,4 +1,4 @@
-﻿using TellMe.DAL.Types.Domain;
+﻿using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.DTO
 {

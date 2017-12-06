@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     public class BulkDTO<T>
     {

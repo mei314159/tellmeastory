@@ -4,9 +4,9 @@
 // actions declared in your storyboard file.
 // Manual changes to this file will not be maintained.
 //
-
-using System.CodeDom.Compiler;
 using Foundation;
+using System;
+using System.CodeDom.Compiler;
 using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Views.Cells
@@ -16,15 +16,15 @@ namespace TellMe.iOS.Views.Cells
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button LikeButton { get; set; }
+        TellMe.iOS.Core.UI.Button LikeButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Picture Preview { get; set; }
+        TellMe.iOS.Core.UI.Picture Preview { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Picture ProfilePicture { get; set; }
+        TellMe.iOS.Core.UI.Picture ProfilePicture { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -32,7 +32,7 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button ReplayButton { get; set; }
+        TellMe.iOS.Core.UI.Button ReplayButton { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -40,15 +40,15 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Label Title { get; set; }
+        TellMe.iOS.Core.UI.Label Title { get; set; }
 
         [Action ("LikeButton_TouchUpInside:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void LikeButton_TouchUpInside (Button sender);
+        partial void LikeButton_TouchUpInside (TellMe.iOS.Core.UI.Button sender);
 
         [Action ("ReplayButton_Touched:")]
         [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ReplayButton_Touched (Button sender);
+        partial void ReplayButton_Touched (TellMe.iOS.Core.UI.Button sender);
 
         void ReleaseDesignerOutlets ()
         {

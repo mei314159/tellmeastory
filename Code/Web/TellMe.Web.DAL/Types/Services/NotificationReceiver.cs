@@ -1,4 +1,4 @@
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class NotificationReceiver
     {

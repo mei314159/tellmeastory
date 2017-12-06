@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Domain;
+using TellMe.Web.DAL.Contracts.Domain;
 
-namespace TellMe.DAL.Contracts.Repositories
+namespace TellMe.Web.DAL.Contracts.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class, IEntityBase
     {

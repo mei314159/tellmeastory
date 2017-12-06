@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using TellMe.DAL.Contracts.DTO;
+using TellMe.Web.DAL.DTO;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class StoryRequest : EntityBase<int>, INotificationReceiver
     {

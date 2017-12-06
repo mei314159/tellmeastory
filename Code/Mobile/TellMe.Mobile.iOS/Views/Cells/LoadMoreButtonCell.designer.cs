@@ -19,7 +19,7 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        Button Button { get; set; }
+        TellMe.iOS.Core.UI.Button Button { get; set; }
 
 
         [Action ("Button_TouchUpInside:")]

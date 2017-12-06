@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace TellMe.DAL.Contracts
+namespace TellMe.Web.DAL.Contracts
 {
 	public interface IUnitOfWork : IDisposable
 	{

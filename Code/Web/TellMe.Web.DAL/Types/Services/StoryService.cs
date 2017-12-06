@@ -1,18 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
-using Microsoft.EntityFrameworkCore;
-using TellMe.DAL.Contracts.DTO;
 using AutoMapper;
-using System;
 using AutoMapper.QueryableExtensions;
-using TellMe.DAL.Contracts.PushNotifications;
-using TellMe.DAL.Types.PushNotifications;
+using Microsoft.EntityFrameworkCore;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Web.DAL.Contracts.PushNotifications;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.PushNotifications;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class StoryService : IStoryService
     {
@@ -72,7 +74,8 @@ namespace TellMe.DAL.Types.Services
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.Tribe.Id into atm
                 from tm in atm.DefaultIfEmpty()
-                where  (attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId) || tm.UserId == currentUserId
+                where (attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId) ||
+                      tm.UserId == currentUserId
                 select attendee;
 
             IQueryable<Story> stories = _storyRepository
@@ -164,6 +167,29 @@ namespace TellMe.DAL.Types.Services
             return result;
         }
 
+        public async Task<ICollection<StoryListDTO>> SearchAsync(string currentUserId, string fragment, int skip)
+        {
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true)
+                .FromSql(new RawSqlString(@"SELECT story.*
+            FROM [dbo].[Story] AS story 
+            LEFT JOIN CONTAINSTABLE ([dbo].[Story], Title, @p0) AS sk
+            ON story.Id = sk.[KEY]
+            LEFT JOIN CONTAINSTABLE ([dbo].[Event], (Title, Description), @p0) AS ek
+            ON story.EventId = ek.[KEY]
+            LEFT JOIN CONTAINSTABLE ([dbo].[AspNetUsers], (FullName, UserName), @p0) AS uk
+            ON story.SenderId = uk.[KEY]
+            WHERE sk.RANK > 2 OR ek.RANK > 2 OR uk.RANK > 2
+            ORDER BY sk.RANK DESC, ek.RANK DESC, uk.RANK DESC
+            OFFSET @p1 ROWS
+            FETCH NEXT @p2 ROWS ONLY"), fragment, skip, 20)
+                .Include(x => x.Sender);
+
+            var result = await stories.ProjectTo<StoryListDTO>().ToListAsync()
+                .ConfigureAwait(false);
+            return result;
+        }
+
         public async Task<ICollection<StoryDTO>> GetAllAsync(int tribeId, string currentUserId, DateTime olderThanUtc)
         {
             var tribeMember = await _tribeMemberRepository
@@ -193,7 +219,7 @@ namespace TellMe.DAL.Types.Services
                     (x, attendee) => new {x.story, attendee})
                 .Where(x => x.story.CreateDateUtc < olderThanUtc &&
                             (x.story.Event == null || x.story.Event.HostId == currentUserId ||
-                             (x.story.Event.ShareStories && x.attendee != null)))
+                             x.story.Event.ShareStories && x.attendee != null))
                 .Select(x => x.story)
                 .Distinct()
                 .OrderByDescending(t => t.CreateDateUtc)

@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
 using TellMe.Web.DTO;
 using AutoMapper;
-using TellMe.DAL.Contracts.DTO;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.Controllers
 {

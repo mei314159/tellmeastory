@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Contracts.DTO;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
 using TellMe.Web.DTO;
 using TellMe.Web.Extensions;
 
@@ -31,22 +31,19 @@ namespace TellMe.Web.Controllers
         public async Task<IActionResult> RequestStoryAsync([FromBody] RequestStoryDTO dto)
         {
             var result = await _storyService.RequestStoryAsync(this.UserId, dto.Requests);
-
             return Ok(result);
         }
         
         [HttpPost("{storyId}/like")]
-        public async Task<IActionResult> LikeAsync(int storyId)
+        public async Task LikeAsync(int storyId)
         {
             await _storyService.LikeAsync(this.UserId, storyId);
-            return Ok();
         }
         
         [HttpPost("{storyId}/dislike")]
-        public async Task<IActionResult> DislikeAsync(int storyId)
+        public async Task DislikeAsync(int storyId)
         {
             await _storyService.DislikeAsync(this.UserId, storyId);
-            return Ok();
         }
 
         [HttpPost("")]
@@ -100,6 +97,13 @@ namespace TellMe.Web.Controllers
             var result = await _storyService.GetAllAsync(this.UserId, eventId, olderThanUtc);
 
             return Ok(result);
+        }
+        
+        [HttpGet("search/skip/{skip}/{fragment}")]
+        public async Task<IActionResult> SearchAsync(string fragment, int skip)
+        {
+            var users = await _storyService.SearchAsync(this.UserId, fragment, skip > 0 ? skip : 0);
+            return Ok(users);
         }
 
         [HttpPost("upload-media")]

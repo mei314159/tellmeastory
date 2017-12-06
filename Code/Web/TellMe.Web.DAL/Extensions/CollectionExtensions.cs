@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TellMe.DAL.Extensions
+namespace TellMe.Web.DAL.Extensions
 {
     public static class CollectionExtensions
     {

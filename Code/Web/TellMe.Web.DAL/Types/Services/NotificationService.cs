@@ -1,15 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TellMe.DAL.Contracts.Repositories;
-using TellMe.DAL.Contracts.Services;
-using TellMe.DAL.Types.Domain;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using TellMe.DAL.Contracts.DTO;
 using AutoMapper;
-using System;
+using Microsoft.EntityFrameworkCore;
+using TellMe.Web.DAL.Contracts.Repositories;
+using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Types.Services
+namespace TellMe.Web.DAL.Types.Services
 {
     public class NotificationService : INotificationService
     {

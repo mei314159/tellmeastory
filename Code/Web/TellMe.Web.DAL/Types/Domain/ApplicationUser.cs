@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
-using TellMe.DAL.Contracts.Domain;
+using TellMe.Web.DAL.Contracts.Domain;
 
-namespace TellMe.DAL.Types.Domain
+namespace TellMe.Web.DAL.Types.Domain
 {
     public class ApplicationUser : IdentityUser, IEntityBase<string>
     {

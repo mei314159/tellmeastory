@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using TellMe.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.Domain;
 
-namespace TellMe.DAL.Contracts.DTO
+namespace TellMe.Web.DAL.DTO
 {
     public class TribeDTO
     {

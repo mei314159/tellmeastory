@@ -1,4 +1,4 @@
-﻿namespace TellMe.DAL.Contracts.Services
+﻿namespace TellMe.Web.DAL.Contracts.Services
 {
 	public interface IService
 	{

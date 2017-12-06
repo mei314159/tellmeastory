@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using TellMe.DAL.Contracts;
+using TellMe.Web.DAL.Contracts;
 
 namespace TellMe.Web
 {
@@ -27,7 +27,7 @@ namespace TellMe.Web
                 await _next(context);
                 unitOfWork.Commit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 unitOfWork.Rollback();
                 if (context.Response.HasStarted)

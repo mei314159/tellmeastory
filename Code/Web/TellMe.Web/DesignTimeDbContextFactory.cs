@@ -2,7 +2,7 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using TellMe.DAL;
+using TellMe.Web.DAL;
 
 namespace TellMe.Web
 {
