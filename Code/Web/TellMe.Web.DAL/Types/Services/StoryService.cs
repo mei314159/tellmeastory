@@ -169,24 +169,113 @@ namespace TellMe.Web.DAL.Types.Services
 
         public async Task<ICollection<StoryListDTO>> SearchAsync(string currentUserId, string fragment, int skip)
         {
+            if (fragment == null)
+            {
+                return await this.SearchWithoutTextAsync(currentUserId, skip).ConfigureAwait(false);
+            }
+
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true)
-                .FromSql(new RawSqlString(@"SELECT story.*
-            FROM [dbo].[Story] AS story 
-            LEFT JOIN CONTAINSTABLE ([dbo].[Story], Title, @p0) AS sk
+                .FromSql(new RawSqlString(@"SELECT DISTINCT 
+	   story.[Id]
+      ,story.[SenderId]
+      ,story.[Title]
+      ,story.[CreateDateUtc]
+      ,story.[PreviewUrl]
+      ,story.[VideoUrl]
+      ,story.[RequestId]
+      ,story.[CommentsCount]
+      ,story.[LikesCount]
+      ,story.[EventId]
+	  ,sk.RANK as StoryRank
+	  ,ek.RANK as EventRank
+	  ,uk.RANK as UserRank
+            FROM [dbo].[Story] AS story
+			LEFT JOIN [Event] AS [story.Event] ON [story].[EventId] = [story.Event].[Id]
+			LEFT JOIN (
+				SELECT r.* FROM StoryReceiver AS r
+				LEFT JOIN (SELECT tm.* FROM TribeMember AS tm WHERE tm.UserId = @p0) AS [t] ON r.[TribeId] = [t].[TribeId]
+				WHERE (r.[UserId] = @p0) OR ([t].[Id] IS NOT NULL AND (([t].[Status] = 2) OR ([t].[Status] = 4)))
+			) AS receiver ON story.Id = receiver.[StoryId]
+			LEFT JOIN (
+				SELECT ea.*
+				FROM EventAttendee AS ea
+				LEFT JOIN (SELECT [x0].* FROM [TribeMember] AS [x0] WHERE [x0].[UserId] = @p0) AS [t1] ON ea.[TribeId] = [t1].[TribeId]
+				WHERE ((ea.[Status] <> 2) AND (ea.[UserId] = @p0)) OR ([t1].[UserId] = @p0)) AS eventAttendee 
+				ON [story].[EventId] = eventAttendee.[EventId]
+            LEFT JOIN CONTAINSTABLE ([dbo].[Story], Title, @p1) AS sk
             ON story.Id = sk.[KEY]
-            LEFT JOIN CONTAINSTABLE ([dbo].[Event], (Title, Description), @p0) AS ek
+            LEFT JOIN CONTAINSTABLE ([dbo].[Event], (Title, Description), @p1) AS ek
             ON story.EventId = ek.[KEY]
-            LEFT JOIN CONTAINSTABLE ([dbo].[AspNetUsers], (FullName, UserName), @p0) AS uk
+            LEFT JOIN CONTAINSTABLE ([dbo].[AspNetUsers], (FullName, UserName), @p1) AS uk
             ON story.SenderId = uk.[KEY]
-            WHERE sk.RANK > 2 OR ek.RANK > 2 OR uk.RANK > 2
-            ORDER BY sk.RANK DESC, ek.RANK DESC, uk.RANK DESC
-            OFFSET @p1 ROWS
-            FETCH NEXT @p2 ROWS ONLY"), fragment, skip, 20)
+            WHERE 
+			(
+			(story.SenderId = @p0) OR receiver.Id IS NOT NULL) AND 
+			((story.EventId IS NULL OR ([story.Event].[HostId] = @p0)) 
+			OR (([story.Event].ShareStories = 1) AND eventAttendee.Id IS NOT NULL))
+			AND (sk.RANK > 2 OR ek.RANK > 2 OR uk.RANK > 2)
+            ORDER BY StoryRank DESC, EventRank DESC, UserRank DESC
+            OFFSET @p2 ROWS
+            FETCH NEXT @p3 ROWS ONLY"), currentUserId, fragment, skip, 20)
                 .Include(x => x.Sender);
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryListDTO>>(list);
+            return result;
+        }
 
-            var result = await stories.ProjectTo<StoryListDTO>().ToListAsync()
-                .ConfigureAwait(false);
+        private async Task<ICollection<StoryListDTO>> SearchWithoutTextAsync(string currentUserId, int skip)
+        {
+            var tribeMembers = _tribeMemberRepository.GetQueryable(true).Where(x => x.UserId == currentUserId);
+            var receivers = _storyReceiverRepository.GetQueryable(true);
+
+            receivers = receivers
+                .GroupJoin(tribeMembers, receiver => receiver.TribeId, tribeMember => tribeMember.Tribe.Id,
+                    (receiver, gj) => new {receiver, gj})
+                .SelectMany(t => t.gj.DefaultIfEmpty(), (t, tb) => new {t, tb})
+                .Where(t =>
+                    t.t.receiver.UserId == currentUserId ||
+                    (t.tb != null && (t.tb.Status == TribeMemberStatus.Joined ||
+                                      t.tb.Status == TribeMemberStatus.Creator)))
+                .Select(t => t.t.receiver);
+
+            var eventAttendees = _eventAttendeeRepository.GetQueryable(true);
+            eventAttendees = from attendee in eventAttendees
+                join tribeMember in tribeMembers
+                    on attendee.TribeId equals tribeMember.Tribe.Id into atm
+                from tm in atm.DefaultIfEmpty()
+                where (attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId) ||
+                      tm.UserId == currentUserId
+                select attendee;
+
+            IQueryable<Story> stories = _storyRepository
+                .GetQueryable(true);
+            stories = stories
+                .GroupJoin(receivers, story => story.Id, receiver => receiver.Story.Id,
+                    (story, receiversGroup) => new {story, receiversGroup})
+                .SelectMany(x => x.receiversGroup.DefaultIfEmpty(), (x, storyReceiver) => new {x.story, storyReceiver})
+                .GroupJoin(eventAttendees, x => x.story.EventId, x => x.Event.Id,
+                    (group, attendeesGroup) => new {group.story, group.storyReceiver, attendeesGroup})
+                .SelectMany(x => x.attendeesGroup.DefaultIfEmpty(),
+                    (x, attendee) => new {x.story, x.storyReceiver, attendee})
+                .Where(x =>
+                    (x.story.SenderId == currentUserId || x.storyReceiver != null) &&
+                    (x.story.Event == null || x.story.Event.HostId == currentUserId ||
+                     (x.story.Event.ShareStories && x.attendee != null)))
+                .Select(t => t.story)
+                .Distinct()
+                .OrderByDescending(t => t.CreateDateUtc)
+                .Skip(skip)
+                .Take(20)
+                .Include(x => x.Event)
+                .Include(x => x.Sender)
+                .Include(x => x.Likes)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
+
+
+            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var result = Mapper.Map<ICollection<StoryListDTO>>(list);
             return result;
         }
 

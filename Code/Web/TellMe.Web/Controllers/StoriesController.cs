@@ -105,6 +105,13 @@ namespace TellMe.Web.Controllers
             var users = await _storyService.SearchAsync(this.UserId, fragment, skip > 0 ? skip : 0);
             return Ok(users);
         }
+        
+        [HttpGet("search/skip/{skip}")]
+        public async Task<IActionResult> SearchAsync(int skip)
+        {
+            var result = await SearchAsync(null, skip);
+            return result;
+        }
 
         [HttpPost("upload-media")]
         public async Task<IActionResult> UploadMediaAsync(FileInputDTO dto)

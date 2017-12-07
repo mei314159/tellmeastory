@@ -13,9 +13,10 @@ using TellMe.Web.DAL.Types.PushNotifications;
 namespace TellMe.Web.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171207123333_AddFullTextSearch")]
+    partial class AddFullTextSearch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
