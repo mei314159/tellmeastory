@@ -36,9 +36,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.RefreshControl = new UIRefreshControl();
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
-            this.TableView.DelaysContentTouches = false;
             this.TableView.TableFooterView.Hidden = true;
-            this.TableView.AllowsSelection = false;
             this.NavigationController.View.BackgroundColor = UIColor.White;
             this.NavigationItem.Title = "Playlists";
             this.NavigationItem.RightBarButtonItem =
@@ -56,15 +54,16 @@ namespace TellMe.iOS.Controllers
             this.NavigationController.SetToolbarHidden(true, true);
         }
 
-        public override void DidReceiveMemoryWarning()
-        {
-            base.DidReceiveMemoryWarning();
-            // Release any cached data, images, etc that aren't in use.
-        }
-
         public override nint RowsInSection(UITableView tableView, nint section)
         {
             return this._itemsList.Count;
+        }
+
+        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
+        {
+            var cell = (PlaylistItemCell)tableView.CellAt(indexPath);
+            _businessLogic.NavigateViewPlaylist(cell.Playlist);
+            tableView.DeselectRow(indexPath, false);
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)

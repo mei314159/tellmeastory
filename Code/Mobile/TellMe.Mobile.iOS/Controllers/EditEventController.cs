@@ -187,12 +187,7 @@ namespace TellMe.iOS.Controllers
             Event.Description = ((EntryElement) root[1]).Value;
             Event.DateUtc = ((DateElement) root[2]).DateValue;
             Event.ShareStories = ((BooleanElement)root[3]).Value;
-            if (_createEvent)
-                _businessLogic.NavigateCreateRequest();
-            else
-            {
-                _businessLogic.SaveAsync();
-            }
+            _businessLogic.SaveAsync();
         }
 
         public void Deleted(EventDTO eventDTO)

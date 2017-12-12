@@ -44,7 +44,7 @@ namespace TellMe.Web.Automapper
                     })
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
-                
+
                 cfg.CreateMap<Story, StoryListDTO>()
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
@@ -54,7 +54,11 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl))
                     .ForMember(x => x.Attendees,
                         x => x.MapFrom(y => y.Attendees.Where(z =>
-                            z.Status == EventAttendeeStatus.Accepted || z.Status == EventAttendeeStatus.Pending).ToList()));
+                                z.Status == EventAttendeeStatus.Accepted || z.Status == EventAttendeeStatus.Pending)
+                            .ToList()));
+
+                cfg.CreateMap<Playlist, PlaylistDTO>()
+                    .ForMember(x => x.Stories, x => x.MapFrom(y => y.Stories.Select(a => a.Story)));
 
                 cfg.CreateMap<PlaylistDTO, Playlist>()
                     .ForMember(x => x.Id, x => x.Ignore())
@@ -75,7 +79,7 @@ namespace TellMe.Web.Automapper
                                 playlistStory.PlaylistId = entity.Id;
                             });
                     });
-                
+
                 cfg.CreateMap<EventDTO, Event>()
                     .ForMember(x => x.Id, x => x.Ignore())
                     .ForMember(x => x.HostId, x => x.Ignore())

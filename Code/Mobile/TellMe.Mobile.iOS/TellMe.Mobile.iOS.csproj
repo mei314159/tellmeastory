@@ -179,6 +179,12 @@
     <ImageAsset Include="Assets.xcassets\Playlist.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Playlist.imageset\playlist%402x.png" />
     <ImageAsset Include="Assets.xcassets\Playlist.imageset\playlist%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Next.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Next.imageset\next%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Next.imageset\next%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Prev.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Prev.imageset\prev%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Prev.imageset\prev%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -208,6 +214,8 @@
     <Folder Include="Assets.xcassets\Calendar.imageset\" />
     <Folder Include="Assets.xcassets\Playlists.imageset\" />
     <Folder Include="Assets.xcassets\Playlist.imageset\" />
+    <Folder Include="Assets.xcassets\Next.imageset\" />
+    <Folder Include="Assets.xcassets\Prev.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Controllers\PlaylistsViewController.xib" />
@@ -233,6 +241,7 @@
     <InterfaceDefinition Include="Views\Cells\EventAttendeesListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\PlaylistItemCell.xib" />
     <InterfaceDefinition Include="Views\Cells\SlimStoryCell.xib" />
+    <InterfaceDefinition Include="Controllers\PlaylistViewController.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -410,6 +419,10 @@
     <Compile Include="Controllers\SearchStoriesViewController.cs" />
     <Compile Include="Controllers\SearchStoriesViewController.designer.cs">
       <DependentUpon>SearchStoriesViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\PlaylistViewController.cs" />
+    <Compile Include="Controllers\PlaylistViewController.designer.cs">
+      <DependentUpon>PlaylistViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

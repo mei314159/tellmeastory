@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Web.DAL.DTO
 {
@@ -13,6 +14,6 @@ namespace TellMe.Web.DAL.DTO
 
         public string UserId { get; set; }
 
-        public ICollection<StoryDTO> Stories { get; set; }
+        public ICollection<StoryListDTO> Stories { get; set; }
     }
 }

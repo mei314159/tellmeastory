@@ -56,6 +56,7 @@ namespace TellMe.iOS.Core
             RegisterController<EditEventController>();
             RegisterController<EventsViewController>();
             RegisterController<PlaylistsViewController>();
+            RegisterController<PlaylistViewController>();
             
             foreach (var controllerType in ControllerTypes)
             {

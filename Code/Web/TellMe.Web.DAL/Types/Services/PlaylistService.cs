@@ -42,6 +42,8 @@ namespace TellMe.Web.DAL.Types.Services
             var result = await _playlistRepository
                 .GetQueryable(true)
                 .Include(x => x.User)
+                .Include(x => x.Stories)
+                .ThenInclude(x => x.Story).ThenInclude(x => x.Sender)
                 .Where(x => x.UserId == currentUserId && x.CreateDateUtc < olderThanUtc)
                 .OrderBy(x => x.CreateDateUtc)
                 .Take(20)
