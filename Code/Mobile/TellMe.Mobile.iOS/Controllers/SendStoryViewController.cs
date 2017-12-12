@@ -31,6 +31,7 @@ namespace TellMe.iOS.Controllers
 
         public NotificationDTO RequestNotification { get; set; }
         public ContactDTO Contact { get; set; }
+        public EventDTO Event { get; set; }
 
         public override void ViewDidLoad()
         {

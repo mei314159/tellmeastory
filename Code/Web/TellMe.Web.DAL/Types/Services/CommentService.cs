@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
 using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;

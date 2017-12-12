@@ -54,19 +54,14 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void CreateEvent()
         {
-            _router.NavigateCreateEvent(View, EventCreated, EventDeleted);
+            _router.NavigateCreateEvent(View, EventStateChanged);
         }
 
         public void NavigateViewEvent(EventDTO eventDTO)
         {
-            _router.NavigateViewEvent(View, eventDTO, EventDeleted);
+            _router.NavigateViewEvent(View, eventDTO, EventStateChanged);
         }
-
-        public void EditEvent(EventDTO eventDTO)
-        {
-            _router.NavigateEditEvent(View, eventDTO, EventUpdated, EventDeleted);
-        }
-
+        
         public void NavigateStoryteller(string storytellerId)
         {
             _router.NavigateStoryteller(View, storytellerId);
@@ -77,20 +72,26 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             _router.NavigateTribe(this.View, tribeId, onRemoveTribe);
         }
 
-        private void EventCreated(EventDTO eventDTO)
+        public void NavigateSendStory(EventDTO eventDTO)
         {
-            this._events.Insert(0, eventDTO);
-            this.View.DisplayItems(_events.OrderBy(x => x.DateUtc).ToList());
+            _router.NavigateRecordStory(this.View, eventDTO: eventDTO);
         }
 
-        private void EventUpdated(EventDTO eventDTO)
+        private void EventStateChanged(EventDTO item, ItemState state)
         {
-            this.View.ReloadItem(eventDTO);
-        }
-
-        private void EventDeleted(EventDTO eventDTO)
-        {
-            this._events.RemoveAll(x => x.Id == eventDTO.Id);
+            switch (state)
+            {
+                case ItemState.Created:
+                    this._events.Insert(0, item);
+                    break;
+                case ItemState.Updated:
+                    this.View.ReloadItem(item);
+                    return;
+                case ItemState.Deleted:
+                    this._events.RemoveAll(x => x.Id == item.Id);
+                    break;
+            }
+            
             this.View.DisplayItems(_events.OrderBy(x => x.DateUtc).ToList());
         }
     }

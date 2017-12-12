@@ -11,8 +11,8 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         Task LoadEventsAsync(bool forceRefresh = false, bool clearCache = false);
         void CreateEvent();
         void NavigateViewEvent(EventDTO eventDTO);
-        void EditEvent(EventDTO eventDTO);
         void NavigateStoryteller(string storytellerId);
         void NavigateTribe(int tribeId, TribeLeftHandler onRemoveTribe);
+        void NavigateSendStory(EventDTO eventDTO);
     }
 }

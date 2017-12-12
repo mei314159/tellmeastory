@@ -1,4 +1,6 @@
-﻿namespace TellMe.Mobile.Core.Contracts.DTO
+﻿using TellMe.Shared.Contracts.Enums;
+
+namespace TellMe.Mobile.Core.Contracts.DTO
 {
     public class ContactDTO
     {

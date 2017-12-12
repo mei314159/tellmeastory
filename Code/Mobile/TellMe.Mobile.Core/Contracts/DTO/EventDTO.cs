@@ -26,8 +26,6 @@ namespace TellMe.Mobile.Core.Contracts.DTO
 
         public bool ShareStories { get; set; }
         
-        public string StoryRequestTitle { get; set; }
-
         public List<EventAttendeeDTO> Attendees { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Shared.Contracts.DTO;
+using StorytellerDTO = TellMe.Mobile.Core.Contracts.DTO.StorytellerDTO;
 
 namespace TellMe.Mobile.Core.Contracts
 {
@@ -12,23 +13,19 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateMain();
 
         void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null, NotificationDTO notification = null,
-            ContactDTO contact = null);
+            ContactDTO contact = null, EventDTO eventDTO = null);
 
         void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null,
-            NotificationDTO notification = null, ContactDTO contact = null);
+            NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null);
 
         void NavigateStoryDetails(IView view, string videoPath, string previewImagePath,
-            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null);
+            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null);
 
-        void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients, StoryRequestCreatedEventHandler e);
+        void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients, ItemUpdateHandler<List<StoryRequestDTO>> e, EventDTO eventDTO = null);
         void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
 
         void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
             HashSet<string> disabledUserIds = null);
-
-        void NavigateChooseEventMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
-            HashSet<string> disabledUserIds = null,
-            HashSet<int> disabledTribeIds = null);
 
         void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);
@@ -42,9 +39,9 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateTribeInfo(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, TribeDTO tribe, TribeLeftHandler e);
         void NavigateTribe(IView view, int tribeId, TribeLeftHandler e);
-        void NavigateViewEvent(IView view, EventDTO eventDTO, EventDeletedHandler eventDeleted);
-        void NavigateCreateEvent(IView view, EventSavedHandler eventSaved, EventDeletedHandler eventDeleted);
-        void NavigateEditEvent(IView view, EventDTO eventDTO, EventSavedHandler eventSaved, EventDeletedHandler eventDeleted);
+        void NavigateViewEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged);
+        void NavigateCreateEvent(IView view, ItemUpdateHandler<EventDTO> eventStateChanged);
+        void NavigateEditEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged);
         void NavigateEvents(IView view);
         void NavigatePlaylists(IView view);
         void NavigateCreatePlaylist(IView view, ItemUpdateHandler<PlaylistDTO> eventHandler);

@@ -8,6 +8,7 @@ using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
+using TellMe.Shared.Contracts.Enums;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
@@ -106,22 +107,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     User = View.Storyteller
                 }
             };
-            Router.NavigatePrepareStoryRequest(this.View, contacts, CreateStoryRequestAsync);
-        }
-
-        private async void CreateStoryRequestAsync(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
-        {
-            var overlay = this.View.DisableInput();
-            var result = await this.RemoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
-            this.View.EnableInput(overlay);
-            if (result.IsSuccess)
-            {
-                this.View.ShowSuccessMessage("Story successfully requested");
-            }
-            else
-            {
-                result.ShowResultError(this.View);
-            }
+            Router.NavigatePrepareStoryRequest(this.View, contacts, (item, state) => { });
         }
     }
 }

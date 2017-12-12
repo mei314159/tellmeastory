@@ -32,6 +32,7 @@ namespace TellMe.iOS.Controllers
         public StoryRequestDTO StoryRequest { get; set; }
         public NotificationDTO RequestNotification { get; set; }
         public ContactDTO Contact { get; set; }
+        public EventDTO Event { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -64,7 +65,7 @@ namespace TellMe.iOS.Controllers
         {
             _goNext = true;
             _router.NavigateStoryDetails(this, VideoPath, _previewImagePath, StoryRequest, RequestNotification,
-                Contact);
+                Contact, Event);
         }
 
         public override void ViewWillDisappear(bool animated)

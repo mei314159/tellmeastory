@@ -41,6 +41,7 @@ namespace TellMe.iOS.Controllers
         public StoryRequestDTO StoryRequest { get; set; }
         public NotificationDTO RequestNotification { get; set; }
         public ContactDTO Contact { get; set; }
+        public EventDTO Event { get; set; }
 
         public override void ViewDidLoad()
         {
@@ -121,7 +122,6 @@ namespace TellMe.iOS.Controllers
 
         public void SwitchCamera()
         {
-            var type = _device.DeviceType;
             _session.StopRunning();
             var currentPosition = _device.Position;
             this._session.RemoveInput(_input);

@@ -27,11 +27,12 @@ namespace TellMe.iOS.Core
         }
 
         public void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients,
-            StoryRequestCreatedEventHandler e)
+            ItemUpdateHandler<List<StoryRequestDTO>> e, EventDTO eventDTO = null)
         {
             var targetController = (RequestStoryController)UIStoryboard.FromName("Story", null)
                 .InstantiateViewController("RequestStoryController");
             targetController.Recipients = recipients;
+            targetController.Event = eventDTO;
             targetController.RequestCreated += e;
             this.Present(targetController, view);
         }
@@ -82,7 +83,7 @@ namespace TellMe.iOS.Core
         }
 
         public void NavigateRecordStory(IView view, StoryRequestDTO storyRequest = null,
-            NotificationDTO notification = null, ContactDTO contact = null)
+            NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
@@ -92,12 +93,13 @@ namespace TellMe.iOS.Core
                 recordController.StoryRequest = storyRequest;
                 recordController.RequestNotification = notification;
                 recordController.Contact = contact;
+                recordController.Event = eventDTO;
                 this.Present(targetController, view, false);
             });
         }
 
         public void NavigatePreviewStory(IView view, string videoPath, StoryRequestDTO storyRequest = null,
-            NotificationDTO notification = null, ContactDTO contact = null)
+            NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
@@ -107,12 +109,13 @@ namespace TellMe.iOS.Core
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
                 targetController.Contact = contact;
+                targetController.Event = eventDTO;
                 this.Present(targetController, view);
             });
         }
 
         public void NavigateStoryDetails(IView view, string videoPath, string previewImagePath,
-            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null)
+            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
@@ -123,6 +126,7 @@ namespace TellMe.iOS.Core
                 targetController.StoryRequest = storyRequest;
                 targetController.RequestNotification = notification;
                 targetController.Contact = contact;
+                targetController.Event = eventDTO;
                 this.Present(targetController, view);
             });
         }
@@ -263,38 +267,35 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateViewEvent(IView view, EventDTO eventDTO, EventDeletedHandler eventDeleted)
+        public void NavigateViewEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (EventViewController)UIStoryboard.FromName("Story", null)
                     .InstantiateViewController("EventViewController");
                 targetController.Event = eventDTO;
-                targetController.EventDeleted += eventDeleted;
+                targetController.EventStateChanged += eventStateChanged;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateCreateEvent(IView view, EventSavedHandler eventSaved, EventDeletedHandler eventDeleted)
+        public void NavigateCreateEvent(IView view, ItemUpdateHandler<EventDTO> eventStateChanged)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = IoC.GetInstance<EditEventController>();
-                targetController.EventSaved += eventSaved;
-                targetController.EventDeleted += eventDeleted;
+                targetController.EventStateChanged += eventStateChanged;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateEditEvent(IView view, EventDTO eventDTO, EventSavedHandler eventSaved,
-            EventDeletedHandler eventDeleted)
+        public void NavigateEditEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = IoC.GetInstance<EditEventController>();
                 targetController.Event = eventDTO;
-                targetController.EventSaved += eventSaved;
-                targetController.EventDeleted += eventDeleted;
+                targetController.EventStateChanged += eventStateChanged;
                 this.Present(targetController, view);
             });
         }

@@ -20,17 +20,10 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             _apiProvider = apiProvider;
         }
 
-        public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO requestStoryDTO,
-            ICollection<ContactDTO> contacts)
+        public async Task<Result<List<StoryRequestDTO>>> RequestStoryAsync(RequestStoryDTO dto)
         {
-            var requests = contacts.Select(x => new StoryRequestDTO
-            {
-                Title = requestStoryDTO.Title,
-                UserId = x.Type == ContactType.User ? x.User.Id : null,
-                TribeId = x.Type == ContactType.Tribe ? x.Tribe.Id : (int?) null
-            }).ToList();
             var result = await this._apiProvider
-                .PostAsync<List<StoryRequestDTO>>("stories/request", new {Requests = requests})
+                .PostAsync<List<StoryRequestDTO>>("stories/request", dto)
                 .ConfigureAwait(false);
 
             return result;
@@ -78,8 +71,7 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             var result = await this._apiProvider.GetAsync<List<StoryListDTO>>(url).ConfigureAwait(false);
             return result;
         }
-        
-        
+
 
         public async Task<Result<StoryDTO>> GetStoryAsync(int storyId)
         {

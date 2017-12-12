@@ -9,6 +9,7 @@ using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
+using TellMe.Shared.Contracts.Enums;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
@@ -89,7 +90,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 dto.VideoUrl = uploadResult.Data.VideoUrl;
                 dto.PreviewUrl = uploadResult.Data.PreviewImageUrl;
                 dto.NotificationId = View.RequestNotification?.Id;
-
+                dto.EventId = View.Event?.Id;
                 var result = await _remoteStoriesDataService.SendStoryAsync(dto).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {

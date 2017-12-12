@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TellMe.Shared.Contracts.DTO;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.DTO;
@@ -30,7 +31,7 @@ namespace TellMe.Web.Controllers
         [HttpPost("request")]
         public async Task<IActionResult> RequestStoryAsync([FromBody] RequestStoryDTO dto)
         {
-            var result = await _storyService.RequestStoryAsync(this.UserId, dto.Requests);
+            var result = await _storyService.RequestStoryAsync(this.UserId, dto);
             return Ok(result);
         }
         

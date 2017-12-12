@@ -10,6 +10,8 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
 using TellMe.Mobile.Core.Validation;
+using TellMe.Shared.Contracts.Enums;
+using FriendshipStatus = TellMe.Mobile.Core.Contracts.DTO.FriendshipStatus;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {

@@ -1,7 +1,6 @@
-﻿namespace TellMe.Mobile.Core.Contracts.DTO
+﻿using System.Collections.Generic;
+
+namespace TellMe.Mobile.Core.Contracts.DTO
 {
-    public class RequestStoryDTO
-    {
-        public string Title { get; set; }
-    }
+    
 }

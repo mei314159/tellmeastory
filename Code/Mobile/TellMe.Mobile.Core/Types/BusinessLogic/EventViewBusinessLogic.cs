@@ -6,6 +6,7 @@ using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
+using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
 
@@ -69,7 +70,8 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     return false;
             }
 
-            DisplayEvent(View.Event);
+            var currentUserId = _localLocalAccountService.GetAuthInfo().Account.Id;
+            View.DisplayEvent(View.Event, View.Event.HostId == currentUserId);
             return true;
         }
 
@@ -130,20 +132,17 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void EditEvent()
         {
-            Router.NavigateEditEvent(View, View.Event, DisplayEvent, EventDeleted);
+            Router.NavigateEditEvent(View, View.Event, EventStateChanged);
         }
 
-        private void EventDeleted(EventDTO eventDTO)
+        private void EventStateChanged(EventDTO item, ItemState state)
         {
-            this.View.EventDeleted(eventDTO);
+            if (state == ItemState.Deleted)
+            {
+                this.View.EventDeleted(item);
+            }
         }
-
-        private void DisplayEvent(EventDTO eventDTO)
-        {
-            var currentUserId = _localLocalAccountService.GetAuthInfo().Account.Id;
-            View.DisplayEvent(View.Event, View.Event.HostId == currentUserId);
-        }
-
+        
         private void HandleEventDeleted()
         {
             View.EventDeleted(View.Event);

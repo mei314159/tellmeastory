@@ -1,8 +1,8 @@
-using TellMe.Web.DAL.Types.Domain;
+using TellMe.Shared.Contracts.Enums;
 
-namespace TellMe.Web.DAL.DTO
+namespace TellMe.Shared.Contracts.DTO
 {
-    public class TribeMemberDTO
+    public class SharedTribeMemberDTO
     {
         public int Id { get; set; }
 

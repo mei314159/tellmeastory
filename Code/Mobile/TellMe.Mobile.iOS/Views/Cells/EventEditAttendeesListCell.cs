@@ -44,7 +44,7 @@ namespace TellMe.iOS.Views.Cells
             this.Username.Text = Attendee.AttendeeName;
             this.FullName.Text = Attendee.AttendeeFullName;
             this.ProfilePicture.SetPictureUrl(Attendee.AttendeePictureUrl, _defaultPicture);
-            this.StatusLabel.Text = Attendee.Status.ToString();
+            this.StatusLabel.Text = Enum.GetName(typeof(EventAttendeeStatus), Attendee.Status);
         }
     }
 }

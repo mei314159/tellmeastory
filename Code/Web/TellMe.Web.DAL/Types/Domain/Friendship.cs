@@ -1,4 +1,6 @@
 using System;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 
 namespace TellMe.Web.DAL.Types.Domain
 {

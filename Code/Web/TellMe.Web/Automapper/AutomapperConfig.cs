@@ -15,15 +15,6 @@ namespace TellMe.Web.Automapper
         {
             Mapper.Initialize(cfg =>
             {
-                cfg.CreateMap<StoryRequestDTO, StoryRequest>()
-                    .ForMember(x => x.UserId, x =>
-                    {
-                        x.PreCondition(y => y.TribeId == null);
-                        x.MapFrom(z => z.UserId);
-                    })
-                    .ForMember(x => x.TribeId, x => x.MapFrom(z => z.TribeId))
-                    .ForMember(x => x.CreateDateUtc, x => x.ResolveUsing(y => DateTime.UtcNow));
-
                 cfg.CreateMap<StoryRequest, StoryRequestDTO>()
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl,
@@ -57,6 +48,13 @@ namespace TellMe.Web.Automapper
                                 z.Status == EventAttendeeStatus.Accepted || z.Status == EventAttendeeStatus.Pending)
                             .ToList()));
 
+                cfg.CreateMap<EventDTO, Event>()
+                    .ForMember(x => x.Id, x => x.Ignore())
+                    .ForMember(x => x.HostId, x => x.Ignore())
+                    .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => DateTime.UtcNow))
+                    .ForMember(x => x.DateUtc, x => x.MapFrom(y => y.DateUtc.Date))
+                    .ForMember(x => x.Attendees, x => x.Ignore());
+
                 cfg.CreateMap<Playlist, PlaylistDTO>()
                     .ForMember(x => x.Stories, x => x.MapFrom(y => y.Stories.Select(a => a.Story)));
 
@@ -77,31 +75,6 @@ namespace TellMe.Web.Automapper
                             {
                                 playlistStory.StoryId = storyDTO.Id;
                                 playlistStory.PlaylistId = entity.Id;
-                            });
-                    });
-
-                cfg.CreateMap<EventDTO, Event>()
-                    .ForMember(x => x.Id, x => x.Ignore())
-                    .ForMember(x => x.HostId, x => x.Ignore())
-                    .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => DateTime.UtcNow))
-                    .ForMember(x => x.DateUtc, x => x.MapFrom(y => y.DateUtc.Date))
-                    .ForMember(x => x.Attendees, x => x.Ignore())
-                    .BeforeMap((dto, entity) =>
-                    {
-                        if (entity.Attendees == null)
-                            entity.Attendees = new List<EventAttendee>();
-                    })
-                    .AfterMap((dto, entity, afterFunction) =>
-                    {
-                        entity.Attendees.MapFrom(dto.Attendees, x => x.Id, x => x.Id,
-                            (attendeeDTO, attendee) => afterFunction.Mapper.Map(attendeeDTO, attendee));
-                        if (entity.Attendees.All(x => x.Status != EventAttendeeStatus.Host))
-                            entity.Attendees.Add(new EventAttendee
-                            {
-                                UserId = entity.HostId,
-                                EventId = entity.Id,
-                                CreateDateUtc = DateTime.UtcNow,
-                                Status = EventAttendeeStatus.Host
                             });
                     });
 
@@ -140,7 +113,7 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.ReplyToCommentId, x => x.MapFrom(z => z.ReplyToCommentId))
                     .ForAllOtherMembers(x => x.Ignore());
 
-                cfg.CreateMap<Tribe, TribeDTO>()
+                cfg.CreateMap<Tribe, SharedTribeDTO>()
                     .ForMember(x => x.CreatorName, x =>
                     {
                         x.PreCondition(y => y.Creator != null);
@@ -163,11 +136,11 @@ namespace TellMe.Web.Automapper
                         });
                     });
 
-                cfg.CreateMap<TribeMember, TribeMemberDTO>()
+                cfg.CreateMap<TribeMember, SharedTribeMemberDTO>()
                     .ForMember(x => x.UserName, x => x.MapFrom(y => y.User.UserName))
                     .ForMember(x => x.FullName, x => x.MapFrom(y => y.User.FullName))
                     .ForMember(x => x.UserPictureUrl, x => x.MapFrom(y => y.User.PictureUrl));
-                cfg.CreateMap<ApplicationUser, TribeDTO>()
+                cfg.CreateMap<ApplicationUser, SharedTribeDTO>()
                     .ForMember(x => x.CreatorName, x => x.MapFrom(y => y.UserName))
                     .ForMember(x => x.CreatorPictureUrl, x => x.MapFrom(y => y.PictureUrl))
                     .ForMember(x => x.CreatorId, x => x.MapFrom(y => y.Id))

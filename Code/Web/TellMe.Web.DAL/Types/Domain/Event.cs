@@ -20,5 +20,7 @@ namespace TellMe.Web.DAL.Types.Domain
         public virtual ApplicationUser Host { get; set; }
 
         public virtual ICollection<StoryRequest> StoryRequests { get; set; }
+
+        public virtual ICollection<EventAttendee> Attendees { get; set; }
     }
 }
