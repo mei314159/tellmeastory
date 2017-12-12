@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TellMe.Mobile.iOS", "Mobile\TellMe.Mobile.iOS\TellMe.Mobile.iOS.csproj", "{5423CE61-26EC-41B9-B498-2141F2633CBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TellMe.Mobile.Core", "Mobile\TellMe.Mobile.Core\TellMe.Mobile.Core.csproj", "{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mobile", "Mobile", "{465ADC38-93F8-40C6-8CB8-59BD2D22D24B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{03D24D3D-18E5-4C5D-B6DB-7D6A4A32FF38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TellMe.Web.DAL", "Web\TellMe.Web.DAL\TellMe.Web.DAL.csproj", "{EC72E418-578A-4849-925A-F737717A1D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TellMe.Web", "Web\TellMe.Web\TellMe.Web.csproj", "{62643863-B352-4B12-BA59-8AAC5DE8CD32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TellMe.Shared.Contracts", "TellMe.Shared.Contracts\TellMe.Shared.Contracts.csproj", "{2CBC5541-BF75-4E80-B142-014E5CC228D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Release|iPhone.ActiveCfg = Release|iPhone
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Release|iPhone.Build.0 = Release|iPhone
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{5423CE61-26EC-41B9-B498-2141F2633CBF}.Debug|iPhone.Build.0 = Debug|iPhone
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Release|iPhone.Build.0 = Release|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{EC72E418-578A-4849-925A-F737717A1D60}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{EC72E418-578A-4849-925A-F737717A1D60}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{62643863-B352-4B12-BA59-8AAC5DE8CD32}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{62643863-B352-4B12-BA59-8AAC5DE8CD32}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Release|iPhone.ActiveCfg = Release|iPhone
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Release|iPhone.Build.0 = Release|iPhone
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{2CBC5541-BF75-4E80-B142-014E5CC228D2}.Debug|iPhone.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0B485FFF-E498-4A1A-84D1-D29FD20B34C9} = {465ADC38-93F8-40C6-8CB8-59BD2D22D24B}
+		{5423CE61-26EC-41B9-B498-2141F2633CBF} = {465ADC38-93F8-40C6-8CB8-59BD2D22D24B}
+		{EC72E418-578A-4849-925A-F737717A1D60} = {03D24D3D-18E5-4C5D-B6DB-7D6A4A32FF38}
+		{62643863-B352-4B12-BA59-8AAC5DE8CD32} = {03D24D3D-18E5-4C5D-B6DB-7D6A4A32FF38}
+	EndGlobalSection
+EndGlobal
