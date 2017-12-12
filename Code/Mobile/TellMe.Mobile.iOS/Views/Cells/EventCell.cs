@@ -27,9 +27,7 @@ namespace TellMe.iOS.Views.Cells
         
         public Action<EventDTO, EventCell> HostSelected;
 
-        public Action<EventDTO, EventCell> AcceptButtonTouched { get; set; }
-
-        public Action<EventDTO, EventCell> SkipButtonTouched { get; set; }
+        public Action<EventDTO, EventCell> SendStoryButtonTouched { get; set; }
 
         public Action<EventAttendeeDTO, EventCell> AttendeeSelected { get; set; }
 
@@ -86,8 +84,7 @@ namespace TellMe.iOS.Views.Cells
         {
             var location = r.LocationOfTouch(0, this);
             if (!AttendeesCollection.Frame.Contains(location)
-                && !AcceptButton.Frame.Contains(location)
-                && !SkipButton.Frame.Contains(location)
+                && !SendStoryButton.Frame.Contains(location)
                 && !ProfilePicture.Frame.Contains(location))
             {
                 Touched?.Invoke(this.Event, this);
@@ -132,14 +129,9 @@ namespace TellMe.iOS.Views.Cells
             this.HostSelected?.Invoke(Event, this);
         }
 
-        partial void AcceptButton_TouchUpInside(Button sender)
+        partial void SendStoryButton_TouchUpInside(Button sender)
         {
-            this.AcceptButtonTouched?.Invoke(this.Event, this);
-        }
-
-        partial void SkipButton_TouchUpInside(Button sender)
-        {
-            this.SkipButtonTouched?.Invoke(this.Event, this);
+            this.SendStoryButtonTouched?.Invoke(this.Event, this);
         }
     }
 }

@@ -11,6 +11,7 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Components;
 using TellMe.Mobile.Core.Contracts.UI.Views;
+using TellMe.Shared.Contracts.Enums;
 using UIKit;
 
 namespace TellMe.iOS.Controllers
@@ -23,9 +24,10 @@ namespace TellMe.iOS.Controllers
         {
         }
 
-        public event StoryRequestCreatedEventHandler RequestCreated;
+        public event ItemUpdateHandler<List<StoryRequestDTO>> RequestCreated;
 
         public ICollection<ContactDTO> Recipients { get; set; }
+        public EventDTO Event { get; set; }
 
         ITextInput IRequestStoryView.StoryTitle => this.StoryTitle;
 
@@ -49,7 +51,7 @@ namespace TellMe.iOS.Controllers
         async partial void SendButton_TouchUpInside(Button sender)
         {
             var overlay = new Overlay("Wait");
-            overlay.PopUp(true);
+            overlay.PopUp();
             await _businessLogic.CreateStoryRequest();
             overlay.Close();
         }
@@ -81,15 +83,16 @@ namespace TellMe.iOS.Controllers
             text.Append(new NSAttributedString(","));
             text.Append(new NSAttributedString(_businessLogic.GetUsername(),
                 UIFont.BoldSystemFontOfSize(RequestTextPreview.Font.PointSize)));
-            text.Append(new NSAttributedString($" would like you to tell a story about: "));
+            text.Append(new NSAttributedString(" would like you to tell a story" +
+                                               (Event != null ? $" for event\"{Event.Title}\"" : string.Empty) + " about: "));
             text.Append(new NSAttributedString(StoryTitle.Text,
                 UIFont.ItalicSystemFontOfSize(RequestTextPreview.Font.PointSize)));
             RequestTextPreview.AttributedText = text;
         }
 
-        public void Close(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
+        public void Close(List<StoryRequestDTO> requests)
         {
-            RequestCreated?.Invoke(dto, recipients);
+            RequestCreated?.Invoke(requests, ItemState.Created);
             if (NavigationController != null)
                 this.NavigationController.PopViewController(true);
             else

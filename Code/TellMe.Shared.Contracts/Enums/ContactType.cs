@@ -1,4 +1,4 @@
-namespace TellMe.Web.DAL.Types.Domain
+﻿namespace TellMe.Shared.Contracts.Enums
 {
     public enum ContactType
     {

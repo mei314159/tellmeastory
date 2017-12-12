@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
@@ -14,16 +14,19 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class EditEventBusinessLogic : IEditEventBusinessLogic
     {
+        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteEventsDataService _remoteEventsDataService;
         private readonly ILocalEventsDataService _localEventsDataService;
         private readonly EventValidator _validator;
         private readonly IRouter _router;
 
         public EditEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router,
-            ILocalEventsDataService localEventsDataService, EventValidator validator)
+            ILocalEventsDataService localEventsDataService, EventValidator validator,
+            IRemoteStoriesDataService remoteStoriesDataService)
         {
             _localEventsDataService = localEventsDataService;
             _validator = validator;
+            _remoteStoriesDataService = remoteStoriesDataService;
             _router = router;
             _remoteEventsDataService = remoteEventsDataService;
         }
@@ -57,57 +60,14 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             this.View.Display(eventDTO);
         }
 
-        public void ChooseMembers()
-        {
-            var disabledUserIds =
-                new HashSet<string>(View.Event.Attendees.Where(x => x.UserId != null).Select(x => x.UserId));
-            var disabledTribeIds =
-                new HashSet<int>(View.Event.Attendees.Where(x => x.TribeId != null).Select(x => x.TribeId.Value));
-            _router.NavigateChooseEventMembers(View, AttendeesSelectedEventHandler, true, disabledUserIds,
-                disabledTribeIds);
-        }
-
-        private void AttendeesSelectedEventHandler(IDismissable selectAttendeesView,
-            ICollection<ContactDTO> selectedContacts)
-        {
-            foreach (var contact in selectedContacts)
-            {
-                View.Event.Attendees.Add(new EventAttendeeDTO
-                {
-                    UserId = contact.TribeId == null ? contact.User.Id : null,
-                    AttendeeName = contact.TribeId == null ? contact.User.UserName : contact.Tribe.Name,
-                    AttendeePictureUrl = contact.TribeId == null ? contact.User.PictureUrl : null,
-                    AttendeeFullName = contact.TribeId == null ? contact.User.FullName : null,
-                    TribeId = contact.TribeId,
-                    EventId = View.Event.Id,
-                    Status = EventAttendeeStatus.Pending
-                });
-            }
-
-            View.DisplayMembers();
-        }
-
         public void NavigateCreateRequest()
         {
-            var validationResult = _validator.Validate(View.Event);
-            if (validationResult.IsValid)
-            {
-                _router.NavigatePrepareStoryRequest(this.View, View.Event.Attendees.Select(x => new ContactDTO
-                {
-                    Name = x.AttendeeName,
-                    TribeId = x.TribeId,
-                    UserId = x.UserId,
-                    Type = x.TribeId.HasValue ? ContactType.Tribe : ContactType.User
-                }).ToArray(), SaveEvent);
-            }
-            else
-            {
-                validationResult.ShowValidationResult(this.View);
-            }
+            _router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
         }
 
         public async Task SaveAsync()
         {
+            var createMode = View.CreateMode;
             var validationResult = _validator.Validate(View.Event);
             if (validationResult.IsValid)
             {
@@ -119,7 +79,13 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 if (result.IsSuccess)
                 {
                     await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                    this.View.ShowSuccessMessage("Event successfully saved", () => this.View.Saved(result.Data));
+                    this.View.Event = result.Data;
+                    if (createMode)
+                        this.View.PromptCreateRequest(result.Data);
+                    else
+                    {
+                        this.View.ShowSuccessMessage("Event successfully saved");   
+                    }
                 }
                 else
                 {
@@ -132,24 +98,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             }
         }
 
-        private async void SaveEvent(RequestStoryDTO dto, ICollection<ContactDTO> recipients)
-        {
-            this.View.Event.StoryRequestTitle = dto.Title;
-            await SaveAsync().ConfigureAwait(false);
-        }
-
         public void NavigateAttendee(EventAttendeeDTO eventAttendeeDTO)
         {
             if (eventAttendeeDTO.TribeId == null)
                 _router.NavigateStoryteller(View, eventAttendeeDTO.UserId);
             else
                 _router.NavigateTribe(View, eventAttendeeDTO.TribeId.Value, TribeLeftHandler);
-        }
-
-        private void TribeLeftHandler(TribeDTO tribe)
-        {
-            View.Event.Attendees.RemoveAll(x => x.TribeId == tribe.Id);
-            this.View.DisplayMembers();
         }
 
         public async Task DeleteEventAsync()
@@ -167,6 +121,18 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             {
                 result.ShowResultError(this.View);
             }
+        }
+
+        private void TribeLeftHandler(TribeDTO tribe)
+        {
+            View.Event.Attendees.RemoveAll(x => x.TribeId == tribe.Id);
+            this.View.DisplayMembers();
+        }
+
+        private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView,
+            ICollection<ContactDTO> selectedContacts)
+        {
+            _router.NavigatePrepareStoryRequest(this.View, selectedContacts, (item, state) => chooseRecipientsView.Dismiss(), View.Event);
         }
     }
 }

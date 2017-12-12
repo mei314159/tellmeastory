@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
@@ -6,6 +7,7 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
 using TellMe.Mobile.Core.Validation;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
@@ -15,12 +17,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private readonly RequestStoryValidator _validator;
         private readonly ILocalAccountService _localAccountService;
 
-        public RequestStoryBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService,
-            RequestStoryValidator validator, ILocalAccountService localAccountService)
+        public RequestStoryBusinessLogic(RequestStoryValidator validator, ILocalAccountService localAccountService,
+            IRemoteStoriesDataService remoteStoriesDataService)
         {
-            this._remoteStoriesDataService = remoteStoriesDataService;
             _validator = validator;
             _localAccountService = localAccountService;
+            _remoteStoriesDataService = remoteStoriesDataService;
         }
 
         public IRequestStoryView View { get; set; }
@@ -32,20 +34,36 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
             var dto = new RequestStoryDTO
             {
-                Title = title
+                Title = title,
+                EventId = View.Event?.Id,
+                Recipients = View.Recipients.Select(x => new SharedContactDTO
+                {
+                    TribeId = x.TribeId,
+                    UserId = x.UserId,
+                    Type = x.Type
+                }).ToList()
             };
 
             var validationResult = await _validator.ValidateAsync(dto).ConfigureAwait(false);
             if (validationResult.IsValid)
             {
-                View.Close(dto, View.Recipients);
+                var result = await this._remoteStoriesDataService.RequestStoryAsync(dto)
+                    .ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    this.View.ShowSuccessMessage("Story successfully requested", () => View.Close(result.Data));
+                }
+                else
+                {
+                    result.ShowResultError(this.View);
+                }
             }
             else
             {
                 validationResult.ShowValidationResult(this.View);
             }
 
-            View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);    
+            View.InvokeOnMainThread(() => this.View.SendButton.Enabled = true);
         }
 
         public string GetUsername()

@@ -12,7 +12,12 @@ using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 using UIKit;
+using ContactDTO = TellMe.Mobile.Core.Contracts.DTO.ContactDTO;
+using FriendshipStatus = TellMe.Mobile.Core.Contracts.DTO.FriendshipStatus;
+using TribeMemberStatus = TellMe.Mobile.Core.Contracts.DTO.TribeMemberStatus;
 
 namespace TellMe.iOS.Controllers
 {

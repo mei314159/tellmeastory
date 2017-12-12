@@ -24,7 +24,7 @@ namespace TellMe.iOS.Controllers
         {
         }
 
-        public event EventDeletedHandler EventDeleted;
+        public event ItemUpdateHandler<EventDTO> EventStateChanged;
         
         public EventDTO Event { get; set; }
         public int EventId { get; set; }
@@ -76,7 +76,7 @@ namespace TellMe.iOS.Controllers
 
         void IEventView.EventDeleted(EventDTO eventDTO)
         {
-            EventDeleted?.Invoke(eventDTO);
+            EventStateChanged?.Invoke(eventDTO, ItemState.Deleted);
             ((IDismissable)this).Dismiss();
         }
         

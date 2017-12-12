@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
 using TellMe.Web.DAL.Contracts.DTO;
 using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
-using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Types.Domain;
 using TellMe.Web.DAL.Types.PushNotifications;
 using TellMe.Web.DAL.Types.Settings;
@@ -54,7 +55,7 @@ namespace TellMe.Web.DAL.Types.Services
             return result;
         }
 
-        public async Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment,
+        public async Task<IReadOnlyCollection<SharedContactDTO>> SearchContactsAsync(string currentUserId, string fragment,
             ContactsMode mode, int skip)
         {
             string uppercaseFragment = null;
@@ -81,12 +82,12 @@ namespace TellMe.Web.DAL.Types.Services
             (from user in userQuery
                 join friend in friends on user.Id equals friend.FriendId into gj
                 from x in gj.DefaultIfEmpty()
-                select new ContactDTO
+                select new SharedContactDTO
                 {
                     Type = ContactType.User,
                     Name = user.UserName,
                     UserId = user.Id,
-                    User = new StorytellerDTO
+                    User = new SharedStorytellerDTO
                     {
                         Id = user.Id,
                         UserName = user.UserName,
@@ -101,7 +102,7 @@ namespace TellMe.Web.DAL.Types.Services
                 users = users.Where(x => x.User.FriendshipStatus == FriendshipStatus.Accepted);
             }
 
-            IQueryable<ContactDTO> contacts;
+            IQueryable<SharedContactDTO> contacts;
             if (mode == ContactsMode.FriendsOnly)
             {
                 contacts = users;
@@ -116,12 +117,12 @@ namespace TellMe.Web.DAL.Types.Services
                 {
                     tribeQuery = tribeQuery.Where(x => x.Tribe.Name.ToUpper().StartsWith(uppercaseFragment));
                 }
-                var tribes = tribeQuery.Select(x => new ContactDTO
+                var tribes = tribeQuery.Select(x => new SharedContactDTO
                 {
                     Type = ContactType.Tribe,
                     Name = x.Tribe.Name,
                     TribeId = x.TribeId,
-                    Tribe = new TribeDTO
+                    Tribe = new SharedTribeDTO
                     {
                         Id = x.TribeId,
                         Name = x.Tribe.Name,
@@ -247,7 +248,7 @@ namespace TellMe.Web.DAL.Types.Services
 
             var user = await _userRepository.GetQueryable().AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
-            var friend = new StorytellerDTO
+            var friend = new SharedStorytellerDTO
             {
                 Id = myFriendship.UserId,
                 FriendshipStatus = myFriendship.Status,
@@ -303,7 +304,7 @@ namespace TellMe.Web.DAL.Types.Services
 
             _friendshipRepository.PreCommitSave();
 
-            var friend = new StorytellerDTO
+            var friend = new SharedStorytellerDTO
             {
                 Id = myFriendship.UserId,
                 UserName = myFriendship.User.UserName,
@@ -326,7 +327,7 @@ namespace TellMe.Web.DAL.Types.Services
             return FriendshipStatus.Rejected;
         }
 
-        public async Task<StorytellerDTO> GetStorytellerAsync(string currentUserId, string userId)
+        public async Task<SharedStorytellerDTO> GetStorytellerAsync(string currentUserId, string userId)
         {
             var user = await _userRepository
                 .GetQueryable(true)
@@ -336,7 +337,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .GetQueryable(true)
                 .FirstOrDefaultAsync(x => x.UserId == currentUserId).ConfigureAwait(false);
 
-            var result = new StorytellerDTO
+            var result = new SharedStorytellerDTO
             {
                 Id = user.Id,
                 UserName = user.UserName,

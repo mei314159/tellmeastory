@@ -11,6 +11,8 @@ namespace TellMe.Mobile.Core.Contracts.DTO
         public List<StoryReceiverDTO> Receivers { get; set; }
 
         public int? NotificationId { get; set; }
+        
+        public int? EventId { get; set; }
 
         public string VideoUrl { get; set; }
 

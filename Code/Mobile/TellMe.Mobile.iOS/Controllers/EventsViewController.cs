@@ -74,6 +74,7 @@ namespace TellMe.iOS.Controllers
             {
                 cell.HostSelected = Cell_HostSelected;
                 cell.AttendeeSelected = Cell_AttendeeSelected;
+                cell.SendStoryButtonTouched = Cell_SendStory;
                 cell.Touched = Cell_Touched;
                 cell.UserInteractionEnabled = true;
             }
@@ -158,6 +159,11 @@ namespace TellMe.iOS.Controllers
         private void Cell_HostSelected(EventDTO eventDTO, EventCell cell)
         {
             _businessLogic.NavigateStoryteller(eventDTO.HostId);
+        }
+
+        private void Cell_SendStory(EventDTO eventDTO, EventCell cell)
+        {
+            _businessLogic.NavigateSendStory(eventDTO);
         }
 
         private void Cell_AttendeeSelected(EventAttendeeDTO eventAttendee, EventCell cell)

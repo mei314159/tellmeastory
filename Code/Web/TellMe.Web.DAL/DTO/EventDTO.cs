@@ -23,10 +23,6 @@ namespace TellMe.Web.DAL.DTO
         
         public bool ShareStories { get; set; }
         
-        public string StoryRequestTitle { get; set; }
-        
-        public int StoryRequestId { get; set; }
-
         public List<EventAttendeeDTO> Attendees { get; set; }
     }
 }

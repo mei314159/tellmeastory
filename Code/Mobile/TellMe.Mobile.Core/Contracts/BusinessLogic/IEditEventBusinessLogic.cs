@@ -9,7 +9,6 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         ICreateEventView View { get; set; }
         void NavigateCreateRequest();
         void NavigateAttendee(EventAttendeeDTO eventAttendeeDTO);
-        void ChooseMembers();
         Task LoadAsync(bool forceRefresh);
         Task DeleteEventAsync();
         Task SaveAsync();

@@ -9,7 +9,7 @@ namespace TellMe.Web.DAL.Contracts.Services
 {
     public interface IStoryService : IService
     {
-        Task<ICollection<StoryRequestDTO>> RequestStoryAsync(string requestSenderId, IEnumerable<StoryRequestDTO> requests);
+        Task<ICollection<StoryRequestDTO>> RequestStoryAsync(string requestSenderId, RequestStoryDTO request);
         Task<StoryDTO> SendStoryAsync(string senderId, SendStoryDTO dto);
         Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc);
         Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, int eventId, DateTime olderThanUtc);

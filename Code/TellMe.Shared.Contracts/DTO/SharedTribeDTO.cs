@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using TellMe.Web.DAL.Types.Domain;
+using TellMe.Shared.Contracts.Enums;
 
-namespace TellMe.Web.DAL.DTO
+namespace TellMe.Shared.Contracts.DTO
 {
-    public class TribeDTO
+    public class SharedTribeDTO
     {
         public int Id { get; set; }
 
@@ -20,6 +20,6 @@ namespace TellMe.Web.DAL.DTO
         
         public TribeMemberStatus MembershipStatus { get; set; }
 
-        public List<TribeMemberDTO> Members { get; set; }
+        public List<SharedTribeMemberDTO> Members { get; set; }
     }
 }

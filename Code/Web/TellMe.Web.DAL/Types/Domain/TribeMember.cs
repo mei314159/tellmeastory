@@ -1,3 +1,5 @@
+using TellMe.Shared.Contracts.Enums;
+
 namespace TellMe.Web.DAL.Types.Domain
 {
     public class TribeMember : EntityBase<int>

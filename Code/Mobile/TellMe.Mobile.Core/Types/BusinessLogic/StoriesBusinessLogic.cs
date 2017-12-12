@@ -21,7 +21,9 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             _remoteNotificationsService = remoteNotificationsService;
         }
 
-        public new IStoriesListView View { get => (IStoriesListView) base.View;
+        public new IStoriesListView View
+        {
+            get => (IStoriesListView) base.View;
             set => base.View = value;
         }
 
@@ -53,24 +55,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView,
             ICollection<ContactDTO> selectedContacts)
         {
-            Router.NavigatePrepareStoryRequest(this.View, selectedContacts,
-                (x, y) => CreateStoryRequestAsync(chooseRecipientsView, x, y));
-        }
-
-        private async void CreateStoryRequestAsync(IDismissable chooseRecipientsView, RequestStoryDTO dto,
-            ICollection<ContactDTO> recipients)
-        {
-            var overlay = this.View.DisableInput();
-            var result = await this.RemoteStoriesDataService.RequestStoryAsync(dto, recipients).ConfigureAwait(false);
-            this.View.EnableInput(overlay);
-            if (result.IsSuccess)
-            {
-                this.View.ShowSuccessMessage("Story successfully requested", chooseRecipientsView.Dismiss);
-            }
-            else
-            {
-                result.ShowResultError(this.View);
-            }
+            Router.NavigatePrepareStoryRequest(this.View, selectedContacts, (item, state) => chooseRecipientsView.Dismiss());
         }
 
         public async Task LoadActiveNotificationsCountAsync()

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TellMe.Shared.Contracts.DTO;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
 
@@ -30,7 +31,7 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> CreateAsync([FromBody] TribeDTO dto)
+        public async Task<IActionResult> CreateAsync([FromBody] SharedTribeDTO dto)
         {
             var result = await _tribeService.CreateAsync(this.UserId, dto);
 
@@ -38,7 +39,7 @@ namespace TellMe.Web.Controllers
         }
 
         [HttpPut("")]
-        public async Task<IActionResult> UpdateAsync([FromBody] TribeDTO dto)
+        public async Task<IActionResult> UpdateAsync([FromBody] SharedTribeDTO dto)
         {
             var isTribeCreator = await _tribeService.IsTribeCreatorAsync(this.UserId, dto.Id);
             if (!isTribeCreator)

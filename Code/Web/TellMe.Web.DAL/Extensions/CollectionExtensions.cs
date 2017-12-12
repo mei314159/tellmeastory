@@ -19,46 +19,6 @@ namespace TellMe.Web.DAL.Extensions
             }
         }
 
-        public static void MapFrom<TDto, TEntity>(this ICollection<TEntity> destination, ICollection<TDto> source,
-            Func<ICollection<TDto>, TEntity, bool> deletedPredicate,
-            Func<ICollection<TEntity>, TDto, bool> newEntityPredicate,
-            Action<TDto, TEntity> map) where TEntity : new()
-        {
-            var deletedResources = destination.Where(entity => deletedPredicate(source, entity)).ToList();
-            var newResources = source.Where(resourceId => newEntityPredicate(destination, resourceId))
-                .Select(resourceId =>
-                {
-                    var entity = new TEntity();
-                    map(resourceId, entity);
-                    return entity;
-                }).ToList();
-
-            foreach (var item in deletedResources)
-            {
-                destination.Remove(item);
-            }
-
-            foreach (var item in newResources)
-            {
-                destination.Add(item);
-            }
-        }
-
-        public static void MapFrom<TDto, TEntity>(this ICollection<TEntity> destination, ICollection<TDto> source,
-            Func<ICollection<TDto>, TEntity, bool> deletedPredicate,
-            Func<ICollection<TEntity>, TDto, bool> newEntityPredicate,
-            Func<TEntity, TDto, bool> equalityComparer,
-            Action<TDto, TEntity> map) where TEntity : new()
-        {
-            foreach (var entity in destination)
-            {
-                var dto = source.FirstOrDefault(x => equalityComparer(entity, x));
-                map(dto, entity);
-            }
-
-            destination.MapFrom(source, deletedPredicate, newEntityPredicate, map);
-        }
-
         public static void MapFrom<TDto, TEntity, TId>(this ICollection<TEntity> destination, ICollection<TDto> source,
             Func<TDto, TId> dtoIdFunc,
             Func<TEntity, TId> entityIdFunc,

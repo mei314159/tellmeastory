@@ -78,7 +78,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             var result = await _remoteNotificationsDataService.HandleNotificationAsync(notificationId)
                 .ConfigureAwait(false);
-            _router.NavigateViewEvent(view, eventDTO, dto => { });
+            _router.NavigateViewEvent(view, eventDTO, (item, state) => {});
             return result.IsSuccess;
         }
 

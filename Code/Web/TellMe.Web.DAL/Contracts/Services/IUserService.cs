@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts.DTO;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Types.Domain;
@@ -14,7 +16,7 @@ namespace TellMe.Web.DAL.Contracts.Services
         
         Task<ApplicationUser> GetAsync(string id);
 
-        Task<StorytellerDTO> GetStorytellerAsync(string currentUserId, string userId);
+        Task<SharedStorytellerDTO> GetStorytellerAsync(string currentUserId, string userId);
 
         Task<bool> AddTokenAsync(RefreshToken token);
 
@@ -22,7 +24,7 @@ namespace TellMe.Web.DAL.Contracts.Services
 
         Task<RefreshToken> GetTokenAsync(string token, string clientId);
 
-        Task<IReadOnlyCollection<ContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int skip);
+        Task<IReadOnlyCollection<SharedContactDTO>> SearchContactsAsync(string currentUserId, string fragment, ContactsMode mode, int skip);
 
         Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
         Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);

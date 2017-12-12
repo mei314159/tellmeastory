@@ -49,6 +49,16 @@ namespace TellMe.iOS.Controllers
             TableView.RegisterNibForCellReuse(SlimStoryCell.Nib, SlimStoryCell.Key);
             this.NavigationItem.Title = Playlist.Name;
 
+            this.Preview.Layer.MasksToBounds = false;
+            this.Preview.Layer.ShadowOffset = new CGSize(0, 2);
+            this.Preview.Layer.ShadowRadius = 2;
+            this.Preview.Layer.ShadowOpacity = 0.5f;
+
+            this.ButtonsWrapper.Layer.MasksToBounds = false;
+            this.ButtonsWrapper.Layer.ShadowOffset = new CGSize(0, 2);
+            this.ButtonsWrapper.Layer.ShadowRadius = 2;
+            this.ButtonsWrapper.Layer.ShadowOpacity = 0.5f;
+
             this.TogglePlayer(false);
         }
 
@@ -59,25 +69,24 @@ namespace TellMe.iOS.Controllers
 
 
             this.NavigationItem.RightBarButtonItem = show
-                ? new UIBarButtonItem(UIImage.FromBundle("Playlists"), UIBarButtonItemStyle.Done, PlayButton_Touched)
+                ? new UIBarButtonItem(UIImage.FromBundle("Playlists"), UIBarButtonItemStyle.Done,
+                    (x, y) => StopPlaying())
                 : new UIBarButtonItem(UIBarButtonSystemItem.Play, PlayButton_Touched);
+            this.NavigationItem.RightBarButtonItem.TintColor = UIColor.White;
 
-            var y = show ? 64 : this.View.Frame.Height;
-            if (show)
-                this.PlayerWrapper.Hidden = false;
+
+            var height = show ? 64 : this.View.Frame.Height;
             UIView.Animate(0.2,
-                () => { this.PlayerWrapper.Frame = new CGRect(new CGPoint(0, y), PlayerWrapper.Frame.Size); }, () =>
+                () =>
                 {
-                    if (!show)
-                        this.PlayerWrapper.Hidden = true;
-
-                    _playerVisible = show;
-                });
+                    this.PlayerWrapperTop.Constant = height;
+                    this.View.LayoutIfNeeded();
+                }, () => { _playerVisible = show; });
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = (SlimStoryCell)tableView.DequeueReusableCell(SlimStoryCell.Key);
+            var cell = (SlimStoryCell) tableView.DequeueReusableCell(SlimStoryCell.Key);
             cell.Story = Playlist.Stories[indexPath.Row];
             cell.ShowsReorderControl = true;
             return cell;
@@ -110,7 +119,7 @@ namespace TellMe.iOS.Controllers
         [Export("tableView:didSelectRowAtIndexPath:")]
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = (SlimStoryCell)tableView.CellAt(indexPath);
+            var cell = (SlimStoryCell) tableView.CellAt(indexPath);
             _currentItemIndex = Playlist.Stories.IndexOf(cell.Story);
             PlayStory(cell.Story);
         }
@@ -127,7 +136,7 @@ namespace TellMe.iOS.Controllers
         {
             if (context == AvCustomEditPlayerViewControllerStatusObservationContext.Handle)
             {
-                var playerItem = (AVPlayerItem)ofObject;
+                var playerItem = (AVPlayerItem) ofObject;
                 if (playerItem.Status == AVPlayerItemStatus.ReadyToPlay)
                 {
                     Spinner.StopAnimating();
@@ -222,7 +231,7 @@ namespace TellMe.iOS.Controllers
             NSUrl nSUrl = new NSUrl(story.VideoUrl);
             //var tempFileUrl = NSFileManager.DefaultManager.GetUrls(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User)[0].Append(Path.GetFileName(item.Url.ToString()), false);
             //tempFileUrl = NSUrl.CreateFileUrl(new[] { tempFileUrl.Path });
-           
+
             var item = AVUrlAsset.Create(nSUrl);
             return item;
         }

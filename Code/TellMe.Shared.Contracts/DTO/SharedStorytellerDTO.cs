@@ -1,13 +1,13 @@
-using TellMe.Web.DAL.Types.Domain;
+using TellMe.Shared.Contracts.Enums;
 
-namespace TellMe.Web.DAL.DTO
+namespace TellMe.Shared.Contracts.DTO
 {
-    public class StorytellerDTO
+    public class SharedStorytellerDTO
     {
         public virtual string Id { get; set; }
         public virtual string UserName { get; set; }
         public string FullName { get; set; }
         public string PictureUrl { get; set; }
-        public FriendshipStatus FriendshipStatus { get; set; }
+        public virtual FriendshipStatus FriendshipStatus { get; set; }
     }
 }

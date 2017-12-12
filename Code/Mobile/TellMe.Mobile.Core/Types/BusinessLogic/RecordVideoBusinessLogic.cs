@@ -28,7 +28,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public void PreviewStory()
         {
             _router.NavigatePreviewStory(View, this._videoPath, View.StoryRequest, View.RequestNotification,
-                View.Contact);
+                View.Contact, View.Event);
         }
 
         public void ToggleRecording()
