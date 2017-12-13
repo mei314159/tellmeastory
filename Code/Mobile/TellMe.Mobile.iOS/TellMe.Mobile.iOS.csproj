@@ -185,6 +185,9 @@
     <ImageAsset Include="Assets.xcassets\Prev.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Prev.imageset\prev%403x.png" />
     <ImageAsset Include="Assets.xcassets\Prev.imageset\prev%402x.png" />
+    <ImageAsset Include="Assets.xcassets\More.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\More.imageset\more%402x.png" />
+    <ImageAsset Include="Assets.xcassets\More.imageset\more%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -216,6 +219,7 @@
     <Folder Include="Assets.xcassets\Playlist.imageset\" />
     <Folder Include="Assets.xcassets\Next.imageset\" />
     <Folder Include="Assets.xcassets\Prev.imageset\" />
+    <Folder Include="Assets.xcassets\More.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Controllers\PlaylistsViewController.xib" />

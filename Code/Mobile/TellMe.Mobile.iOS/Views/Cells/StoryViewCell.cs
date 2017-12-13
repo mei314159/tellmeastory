@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using AVFoundation;
+using CoreFoundation;
 using CoreMedia;
 using Foundation;
 using SDWebImage;
@@ -12,7 +13,7 @@ using UIKit;
 
 namespace TellMe.iOS.Views.Cells
 {
-    public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
+    public partial class StoryViewCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate, IAVAssetResourceLoaderDelegate
     {
         private AVUrlAsset _playerAsset;
         private AVPlayerItem _playerItem;
@@ -85,8 +86,10 @@ namespace TellMe.iOS.Views.Cells
                 AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
                 var cachedVideoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
                 _playerAsset = new AVUrlAsset(File.Exists(cachedVideoPath)
-                    ? new NSUrl(cachedVideoPath, false)
+                    ? NSUrl.CreateFileUrl(new[] { cachedVideoPath })
                     : NSUrl.FromString(Story.VideoUrl));
+                _playerAsset.ResourceLoader.SetDelegate(this, DispatchQueue.MainQueue);
+                
                 _playerItem = new AVPlayerItem(_playerAsset);
                 _player = new AVPlayer(_playerItem);
                 _playerLayer = AVPlayerLayer.FromPlayer(_player);
@@ -138,12 +141,8 @@ namespace TellMe.iOS.Views.Cells
                 {
                     return;
                 }
-                var startTime = new CMTime(0, 1);
-                var timeRange = new CMTimeRange();
-                timeRange.Start = startTime;
-                timeRange.Duration = _playerItem.Duration;
-                exporter.TimeRange = timeRange;
-                exporter.OutputUrl = new NSUrl(videoPath, false);
+
+                exporter.OutputUrl = NSUrl.CreateFileUrl(new[] {videoPath});
                 exporter.OutputFileType = AVFileType.QuickTimeMovie;
                 exporter.ExportAsynchronously(() =>
                 {
@@ -275,6 +274,12 @@ namespace TellMe.iOS.Views.Cells
             }
 
             base.Dispose(disposing);
+        }
+
+        public bool ShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader,
+            AVAssetResourceLoadingRequest loadingRequest)
+        {
+            return true;
         }
     }
 }

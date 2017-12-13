@@ -85,6 +85,7 @@ namespace TellMe.iOS.Controllers
             cell.CommentsButtonTouched = Cell_CommentsButtonTouched;
             cell.LikeButtonTouched = Cell_LikeButtonTouched;
             cell.ReceiverSelected = Cell_ReceiverTouched;
+            cell.MoreButtonTouched = Cell_MoreButtonTouched;
             cell.UserInteractionEnabled = true;
             return cell;
         }
@@ -147,6 +148,22 @@ namespace TellMe.iOS.Controllers
         private void Cell_ReceiverTouched(StoryReceiverDTO receiver, StoriesListCell cell)
         {
             BusinessLogic.NavigateReceiver(receiver, cell.RemoveTribe);
+        }
+
+        private void Cell_MoreButtonTouched(StoryDTO story)
+        {
+            var actionSheet = new UIActionSheet ("Options");
+            actionSheet.AddButton ("Add to Playlist");
+            actionSheet.AddButton ("Cancel");
+            actionSheet.CancelButtonIndex = 1;
+            actionSheet.Clicked += (sender, args) =>
+            {
+                if (args.ButtonIndex == 0)
+                {
+                    BusinessLogic.AddToPlaylist(story);
+                }
+            };
+            actionSheet.ShowInView (View);
         }
 
         private async Task LoadMoreAsync()

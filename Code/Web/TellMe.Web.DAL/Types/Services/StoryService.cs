@@ -31,6 +31,7 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
         private readonly IRepository<Event, int> _eventRepository;
+        private readonly IRepository<Playlist, int> _playlistRepository;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -42,7 +43,7 @@ namespace TellMe.Web.DAL.Types.Services
             IRepository<StoryLike> storyLikeRepository,
             IRepository<ApplicationUser> userRepository,
             IRepository<EventAttendee, int> eventAttendeeRepository,
-            IRepository<Event, int> eventRepository)
+            IRepository<Event, int> eventRepository, IRepository<Playlist, int> playlistRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -54,6 +55,7 @@ namespace TellMe.Web.DAL.Types.Services
             _userRepository = userRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
             _eventRepository = eventRepository;
+            _playlistRepository = playlistRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -390,21 +392,20 @@ namespace TellMe.Web.DAL.Types.Services
 
                 foreach (var recipient in request.Recipients)
                 {
-                    if (!eventEntity.Attendees.Any(x => 
-                        (recipient.Type == ContactType.Tribe && x.TribeId == recipient.TribeId) 
+                    if (!eventEntity.Attendees.Any(x =>
+                        (recipient.Type == ContactType.Tribe && x.TribeId == recipient.TribeId)
                         || (recipient.Type == ContactType.User && x.UserId == recipient.UserId)))
                     {
                         eventEntity.Attendees.Add(new EventAttendee
                         {
-                            UserId =  recipient.Type == ContactType.User ? recipient.UserId : null,
-                            TribeId =  recipient.Type == ContactType.Tribe ? recipient.TribeId : null,
-                            Status =  EventAttendeeStatus.Pending,
+                            UserId = recipient.Type == ContactType.User ? recipient.UserId : null,
+                            TribeId = recipient.Type == ContactType.Tribe ? recipient.TribeId : null,
+                            Status = EventAttendeeStatus.Pending,
                             EventId = eventEntity.Id
-                                
                         });
                     }
                 }
-                
+
                 await _eventRepository.SaveAsync(eventEntity, true).ConfigureAwait(false);
             }
 
@@ -486,7 +487,8 @@ namespace TellMe.Web.DAL.Types.Services
                     UserId = x.TribeId == null ? x.UserId : null,
                     TribeId = x.TribeId
                 }).ToArray();
-            }else if (dto.EventId.HasValue)
+            }
+            else if (dto.EventId.HasValue)
             {
                 entity.EventId = dto.EventId;
             }
@@ -610,6 +612,24 @@ namespace TellMe.Web.DAL.Types.Services
             }
 
             return true;
+        }
+
+        public async Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId)
+        {
+            var playlist = await this._playlistRepository.GetQueryable()
+                .Include(x => x.Stories)
+                .FirstOrDefaultAsync(x => x.Id == playlistId && x.UserId == currentUserId)
+                .ConfigureAwait(false);
+            if (playlist.Stories.All(x => x.StoryId != storyId))
+            {
+                playlist.Stories.Add(new PlaylistStory
+                {
+                    StoryId = storyId,
+                    Order = playlist.Stories.Count
+                });
+
+                await _playlistRepository.SaveAsync(playlist, true).ConfigureAwait(false);
+            }
         }
 
         private async Task<StoryStatus> SetRequestStatus(string currentUserId, int requestId, StoryStatus status)

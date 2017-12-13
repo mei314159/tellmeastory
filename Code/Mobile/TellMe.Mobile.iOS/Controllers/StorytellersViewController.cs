@@ -149,7 +149,6 @@ namespace TellMe.iOS.Controllers
                 NavItem.RightBarButtonItem.Enabled = false;
             }
 
-            var cell = tableView.CellAt(indexPath);
             tableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
         }
 
@@ -239,18 +238,18 @@ namespace TellMe.iOS.Controllers
         {
             if (indexPath.Section == 0)
             {
-                var cell = tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath) as StorytellersListCell;
+                var cell = (StorytellersListCell) tableView.DequeueReusableCell(StorytellersListCell.Key, indexPath);
                 cell.Storyteller = this._storytellersList[indexPath.Row].User;
-                cell.TintColor = UIColor.Blue;
+                cell.TintColor = cell.DefaultTintColor();
 
                 return cell;
             }
 
             if (indexPath.Section == 1)
             {
-                var cell = tableView.DequeueReusableCell(TribesListCell.Key, indexPath) as TribesListCell;
+                var cell = (TribesListCell) tableView.DequeueReusableCell(TribesListCell.Key, indexPath);
                 cell.Tribe = this._tribesList[indexPath.Row].Tribe;
-                cell.TintColor = UIColor.Blue;
+                cell.TintColor = cell.DefaultTintColor();
                 return cell;
             }
 

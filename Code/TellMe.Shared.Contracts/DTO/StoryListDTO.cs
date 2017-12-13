@@ -12,5 +12,6 @@ namespace TellMe.Shared.Contracts.DTO
         public string SenderName { get; set; }
         public string SenderPictureUrl { get; set; }
         public DateTime CreateDateUtc { get; set; }
+        public int Order { get; set; }
     }
 }
