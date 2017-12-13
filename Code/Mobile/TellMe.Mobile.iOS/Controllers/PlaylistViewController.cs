@@ -1,25 +1,21 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using AVFoundation;
+using CoreFoundation;
 using CoreGraphics;
-using CoreMedia;
 using Foundation;
-using ObjCRuntime;
 using SDWebImage;
 using TellMe.iOS.Views.Cells;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Shared.Contracts.DTO;
 using UIKit;
+using Constants = TellMe.Mobile.Core.Constants;
 
 namespace TellMe.iOS.Controllers
 {
     public partial class PlaylistViewController : UIViewController, IUITableViewDelegate, IUITableViewDataSource,
-        IAVAssetDownloadDelegate
+        IAVAssetResourceLoaderDelegate
     {
         private AVPlayer _player;
         private AVPlayerLayer _playerLayer;
@@ -214,7 +210,6 @@ namespace TellMe.iOS.Controllers
 
             var asset = this.GetAsset(story);
             _player.ReplaceCurrentItemWithPlayerItem(new AVPlayerItem(asset));
-
             _stopPlayingNotification =
                 AVPlayerItem.Notifications.ObserveDidPlayToEndTime(_player.CurrentItem, DidReachEnd);
             _player.CurrentItem.AddObserver(this, "status",
@@ -228,11 +223,20 @@ namespace TellMe.iOS.Controllers
 
         private AVUrlAsset GetAsset(StoryListDTO story)
         {
-            NSUrl nSUrl = new NSUrl(story.VideoUrl);
-            //var tempFileUrl = NSFileManager.DefaultManager.GetUrls(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomain.User)[0].Append(Path.GetFileName(item.Url.ToString()), false);
-            //tempFileUrl = NSUrl.CreateFileUrl(new[] { tempFileUrl.Path });
+            NSUrl videoUrl;
+            
+            var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(story.VideoUrl));
+            if (File.Exists(videoPath))
+            {
+                videoUrl = NSUrl.CreateFileUrl(new[] { videoPath });
+            }
+            else
+            {
+                videoUrl = new NSUrl(story.VideoUrl);
+            }
 
-            var item = AVUrlAsset.Create(nSUrl);
+            var item = AVUrlAsset.Create(videoUrl);
+            item.ResourceLoader.SetDelegate(this, DispatchQueue.MainQueue);
             return item;
         }
 
@@ -248,7 +252,7 @@ namespace TellMe.iOS.Controllers
                 _player.Pause();
                 _playerLayer.RemoveFromSuperLayer();
                 _player.CurrentItem.RemoveObserver(this, "status",
-                    AvCustomEditPlayerViewControllerStatusObservationContext.Handle);
+                    AvCustomEditPlayerViewControllerStatusObservationContext.Handle); 
                 _playing = false;
                 _player.Dispose();
                 _playerLayer.Dispose();
@@ -259,6 +263,27 @@ namespace TellMe.iOS.Controllers
 
         private void DidReachEnd(object sender, NSNotificationEventArgs e)
         {
+            var asset = (AVUrlAsset)_player.CurrentItem.Asset;
+            if (!asset.Url.IsFileUrl && asset.Exportable)
+            {
+                var exporter = new AVAssetExportSession(asset, AVAssetExportSessionPreset.Preset640x480);
+                var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(asset.Url.ToString()));
+                if (File.Exists(videoPath))
+                {
+                    return;
+                }
+                
+                exporter.OutputUrl = NSUrl.CreateFileUrl(new[] { videoPath });
+                exporter.OutputFileType = AVFileType.QuickTimeMovie;
+                exporter.ExportAsynchronously(() =>
+                {
+                    Console.WriteLine(exporter.Status);
+                    Console.WriteLine(exporter.Error);
+
+                    Console.WriteLine(exporter.Description);
+                    Console.WriteLine(exporter.DebugDescription);
+                });
+            }
             Next();
         }
 
@@ -270,6 +295,12 @@ namespace TellMe.iOS.Controllers
             }
 
             base.Dispose(disposing);
+        }
+
+        public bool ShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader,
+            AVAssetResourceLoadingRequest loadingRequest)
+        {
+            return true;
         }
     }
 }

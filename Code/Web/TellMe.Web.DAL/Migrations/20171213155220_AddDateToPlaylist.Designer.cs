@@ -14,9 +14,10 @@ using TellMe.Web.DAL.Types.PushNotifications;
 namespace TellMe.Web.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171213155220_AddDateToPlaylist")]
+    partial class AddDateToPlaylist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,7 +339,7 @@ namespace TellMe.Web.DAL.Migrations
 
                     b.Property<int>("StoryId");
 
-                    b.Property<int>("Order");
+                    b.Property<DateTime>("DateUtc");
 
                     b.HasKey("PlaylistId", "StoryId");
 

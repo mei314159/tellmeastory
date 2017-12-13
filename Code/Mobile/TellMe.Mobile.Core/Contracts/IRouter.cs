@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -43,7 +44,7 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateCreateEvent(IView view, ItemUpdateHandler<EventDTO> eventStateChanged);
         void NavigateEditEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged);
         void NavigateEvents(IView view);
-        void NavigatePlaylists(IView view);
+        void NavigatePlaylists(IView view, PlaylistViewMode mode = PlaylistViewMode.Normal, Func<IDismissable, PlaylistDTO, Task> onSelected = null);
         void NavigateCreatePlaylist(IView view, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void NavigateViewPlaylist(IView view, PlaylistDTO dto, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void SwapToAuth();

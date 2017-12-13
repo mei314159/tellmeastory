@@ -56,7 +56,8 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.Attendees, x => x.Ignore());
 
                 cfg.CreateMap<Playlist, PlaylistDTO>()
-                    .ForMember(x => x.Stories, x => x.MapFrom(y => y.Stories.Select(a => a.Story)));
+                    .ForMember(x => x.Stories,
+                        x => x.MapFrom(y => y.Stories.OrderBy(d => d.Order).Select(a => a.Story)));
 
                 cfg.CreateMap<PlaylistDTO, Playlist>()
                     .ForMember(x => x.Id, x => x.Ignore())

@@ -24,5 +24,6 @@ namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
         Task<Result<StoryStatus>> RejectStoryRequestAsync(int storyId, int notificationid);
         Task<Result> LikeAsync(int storyId);
         Task<Result> DislikeAsync(int storyId);
+        Task<Result> AddToPlaylistAsync(int storyId, int playlistId);
     }
 }

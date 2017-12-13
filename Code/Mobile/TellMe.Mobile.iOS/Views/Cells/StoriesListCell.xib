@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -89,9 +89,22 @@
                                     <action selector="LikeButton_TouchUpInside:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="8135"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dii-Qf-ejU">
+                                <rect key="frame" x="321" y="18" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="dii-Qf-ejU" secondAttribute="height" multiplier="1:1" id="gBm-aU-ebH"/>
+                                    <constraint firstAttribute="height" constant="24" id="vLn-e9-6gf"/>
+                                </constraints>
+                                <state key="normal" image="More"/>
+                                <connections>
+                                    <action selector="MoreButton_Touched:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="cHG-1T-Zhp"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="dii-Qf-ejU" firstAttribute="centerY" secondItem="2396" secondAttribute="centerY" id="0h1-DG-ppF"/>
+                            <constraint firstAttribute="trailing" secondItem="dii-Qf-ejU" secondAttribute="trailing" constant="10" id="434-uh-pHh"/>
                             <constraint firstItem="2399" firstAttribute="height" relation="lessThanOrEqual" secondItem="2396" secondAttribute="height" id="OeT-v7-cwa"/>
                             <constraint firstItem="2400" firstAttribute="leading" secondItem="7175" secondAttribute="trailing" constant="5" id="Ojf-GM-5rH"/>
                             <constraint firstItem="2400" firstAttribute="centerY" secondItem="4826" secondAttribute="centerY" id="QL5-MU-fzy"/>
@@ -103,8 +116,8 @@
                             <constraint firstItem="7175" firstAttribute="leading" secondItem="4826" secondAttribute="trailing" constant="8" id="pyT-B9-Tak"/>
                             <constraint firstItem="2394" firstAttribute="width" secondItem="9m0-fb-khi" secondAttribute="width" id="r2O-c5-acU"/>
                             <constraint firstAttribute="trailing" secondItem="2400" secondAttribute="trailing" constant="5" id="sMv-zy-YnF"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="2399" secondAttribute="trailing" constant="10" id="sVU-NC-wxc"/>
                             <constraint firstItem="4826" firstAttribute="top" secondItem="2394" secondAttribute="bottom" constant="10" id="uLZ-Zp-R8X"/>
+                            <constraint firstItem="dii-Qf-ejU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2399" secondAttribute="trailing" constant="10" id="wlh-11-oqp"/>
                             <constraint firstItem="2394" firstAttribute="top" secondItem="2396" secondAttribute="bottom" constant="10" id="x2m-FM-pKv"/>
                             <constraint firstItem="2399" firstAttribute="centerY" secondItem="2396" secondAttribute="centerY" id="x5w-tE-yUX"/>
                             <constraint firstItem="2399" firstAttribute="leading" secondItem="2396" secondAttribute="trailing" constant="10" id="yEx-vM-cJH"/>
@@ -136,5 +149,6 @@
     <resources>
         <image name="Comment" width="30" height="30"/>
         <image name="Heart" width="30" height="30"/>
+        <image name="More" width="30" height="30"/>
     </resources>
 </document>

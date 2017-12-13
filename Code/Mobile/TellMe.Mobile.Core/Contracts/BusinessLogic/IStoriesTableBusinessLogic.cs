@@ -13,6 +13,7 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         void NavigateStoryteller(string userId);
         void NavigateTribe(int tribeId, TribeLeftHandler onRemoveTribe);
         void NavigateReceiver(StoryReceiverDTO receiver, TribeLeftHandler onRemoveTribe);
+        void AddToPlaylist(StoryDTO story);
         Task LikeButtonTouchedAsync(StoryDTO story);
         Task<bool> InitAsync();
     }

@@ -143,5 +143,12 @@ namespace TellMe.Web.Controllers
             await _notificationService.HandleNotificationAsync(this.UserId, notificationId);
             return Ok(storyStatus);
         }
+        
+        [HttpPost("{storyId}/add-to-playlist/{playlistId}")]
+        public async Task<IActionResult> AddToPlaylistAsync(int storyId, int playlistId)
+        {
+            await _storyService.AddToPlaylistAsync(this.UserId, storyId, playlistId);            
+            return Ok();
+        }
     }
 }

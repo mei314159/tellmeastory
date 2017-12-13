@@ -21,6 +21,8 @@ namespace TellMe.iOS.Views.Cells
         public Action<StoryDTO> PreviewTouched { get; set; }
         public Action<StoryDTO> CommentsButtonTouched { get; set; }
         public Action<StoryDTO> LikeButtonTouched { get; set; }
+        public Action<StoryDTO> MoreButtonTouched { get; set; }
+
         public Action<StoryReceiverDTO, StoriesListCell> ReceiverSelected { get; set; }
 
         static StoriesListCell()
@@ -55,7 +57,7 @@ namespace TellMe.iOS.Views.Cells
 
         public StoryDTO Story
         {
-            get { return story; }
+            get => story;
             set
             {
                 story = value;
@@ -84,6 +86,11 @@ namespace TellMe.iOS.Views.Cells
         partial void CommentsButton_TouchUpInside(Button sender)
         {
             this.CommentsButtonTouched?.Invoke(Story);
+        }
+
+        partial void MoreButton_Touched(UIButton sender)
+        {
+            this.MoreButtonTouched?.Invoke(Story);
         }
 
         private void Initialize()

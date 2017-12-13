@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
@@ -81,6 +82,25 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             else
             {
                 this.NavigateStoryteller(receiver.UserId);
+            }
+        }
+
+        public void AddToPlaylist(StoryDTO story)
+        {
+            Router.NavigatePlaylists(this.View, PlaylistViewMode.SelectOne,
+                async (dismissable, playlist) => await AddToPlaylistAsync(story, dismissable, playlist).ConfigureAwait(false));
+        }
+
+        private async Task AddToPlaylistAsync(StoryDTO story, IDismissable dismissable, PlaylistDTO playlist)
+        {
+            var result = await RemoteStoriesDataService.AddToPlaylistAsync(story.Id, playlist.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this.View.ShowSuccessMessage("Story successfully added to the playlist", dismissable.Dismiss);
+            }
+            else
+            {
+                result.ShowResultError(this.View);
             }
         }
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using TellMe.iOS.Extensions;
+using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
@@ -18,17 +20,22 @@ namespace TellMe.iOS.Controllers
         private readonly List<PlaylistDTO> _itemsList = new List<PlaylistDTO>();
         private volatile bool _canLoadMore;
         private volatile bool _loadingMore;
+        private UIBarButtonItem _doneButton;
 
         public PlaylistsViewController(IPlaylistsBusinessLogic businessLogic) : base("PlaylistsViewController", null)
         {
             _businessLogic = businessLogic;
         }
 
+        public PlaylistViewMode Mode { get; set; }
+        public Func<IDismissable, PlaylistDTO, Task> OnSelected;
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             this._businessLogic.View = this;
+            this._doneButton = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, DoneButtonTouched);
             this.TableView.RegisterNibForCellReuse(PlaylistItemCell.Nib, PlaylistItemCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
@@ -41,7 +48,32 @@ namespace TellMe.iOS.Controllers
             this.NavigationItem.Title = "Playlists";
             this.NavigationItem.RightBarButtonItem =
                 new UIBarButtonItem(UIBarButtonSystemItem.Add, AddPlaylistButtonTouched);
+
+            if (Mode == PlaylistViewMode.SelectOne)
+            {
+                this.TableView.AllowsSelection = false;
+                this.TableView.AllowsMultipleSelection = false;
+                this.TableView.SetEditing(true, false);
+                this.NavigationItem.SetRightBarButtonItems(new[]
+                {
+                    _doneButton,
+                    this.NavigationItem.RightBarButtonItem
+                }, false);
+            }
+
             LoadItemsAsync(false, true);
+        }
+
+        private async void DoneButtonTouched(object sender, EventArgs e)
+        {
+            if (OnSelected != null)
+            {
+                var cell = (PlaylistItemCell) TableView.CellAt(TableView.IndexPathForSelectedRow);
+                var overlay = new Overlay("Wait");
+                overlay.PopUp();
+                await OnSelected(this, cell.Playlist).ConfigureAwait(false);
+                overlay.Close();
+            }
         }
 
         private void AddPlaylistButtonTouched(object sender, EventArgs e)
@@ -59,17 +91,46 @@ namespace TellMe.iOS.Controllers
             return this._itemsList.Count;
         }
 
+        public override void RowDeselected(UITableView tableView, NSIndexPath indexPath)
+        {
+            if (Mode == PlaylistViewMode.SelectOne && tableView.IndexPathsForSelectedRows == null)
+            {
+                _doneButton.Enabled = false;
+            }
+            
+            tableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
+        }
+
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = (PlaylistItemCell)tableView.CellAt(indexPath);
-            _businessLogic.NavigateViewPlaylist(cell.Playlist);
-            tableView.DeselectRow(indexPath, false);
+            
+            if (Mode == PlaylistViewMode.Normal)
+            {
+                var cell = (PlaylistItemCell) tableView.CellAt(indexPath);
+                _businessLogic.NavigateViewPlaylist(cell.Playlist);
+                tableView.DeselectRow(indexPath, false);
+            }
+            else
+            {
+                _doneButton.Enabled = true;
+                var deselect = tableView.IndexPathsForSelectedRows.Where(x => x != indexPath).ToList();
+                foreach (var path in deselect)
+                {
+                    tableView.DeselectRow(path, false);
+                }
+            }
+        }
+
+        public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
+        {
+            return (UITableViewCellEditingStyle) 3;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (PlaylistItemCell) tableView.DequeueReusableCell(PlaylistItemCell.Key, indexPath);
             cell.Playlist = this._itemsList[indexPath.Row];
+            cell.TintColor = cell.DefaultTintColor();
             return cell;
         }
 
@@ -106,6 +167,17 @@ namespace TellMe.iOS.Controllers
             var index = _itemsList.IndexOf(x => x.Id == dto.Id);
             InvokeOnMainThread(() =>
                 TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(index, 0)}, UITableViewRowAnimation.None));
+        }
+        
+        void IDismissable.Dismiss()
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            });
         }
 
         private async Task LoadItemsAsync(bool forceRefresh, bool clearCache = false)

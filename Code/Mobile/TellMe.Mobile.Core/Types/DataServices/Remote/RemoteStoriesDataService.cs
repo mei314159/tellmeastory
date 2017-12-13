@@ -127,5 +127,12 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
                 .ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> AddToPlaylistAsync(int storyId, int playlistId)
+        {
+            var result = await this._apiProvider.PostAsync<object>($"stories/{storyId}/add-to-playlist/{playlistId}", null)
+                .ConfigureAwait(false);
+            return result;
+        }
     }
 }
