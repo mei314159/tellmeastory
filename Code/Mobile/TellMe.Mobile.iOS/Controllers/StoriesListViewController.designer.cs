@@ -18,10 +18,6 @@ namespace TellMe.iOS.Controllers
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem AccountSettingsButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView ActivityIndicator { get; set; }
 
         [Outlet]
@@ -30,7 +26,11 @@ namespace TellMe.iOS.Controllers
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem Storytellers { get; set; }
+        UIKit.UIBarButtonItem RecordButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIBarButtonItem RequestButton { get; set; }
 
 
         [Action ("AccountSettingsButton_Activated:")]
@@ -52,21 +52,19 @@ namespace TellMe.iOS.Controllers
         [Action ("Storytellers_Activated:")]
         partial void Storytellers_Activated (UIKit.UIBarButtonItem sender);
 
+        [Action ("RecordButton_Touched:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void RecordButton_Touched (UIKit.UIBarButtonItem sender);
+
+        [Action ("RequestButton_Touched:")]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        partial void RequestButton_Touched (UIKit.UIBarButtonItem sender);
+
         void ReleaseDesignerOutlets ()
         {
-            if (AccountSettingsButton != null) {
-                AccountSettingsButton.Dispose ();
-                AccountSettingsButton = null;
-            }
-
             if (ActivityIndicator != null) {
                 ActivityIndicator.Dispose ();
                 ActivityIndicator = null;
-            }
-
-            if (Events != null) {
-                Events.Dispose ();
-                Events = null;
             }
 
             if (Notifications != null) {
@@ -74,9 +72,14 @@ namespace TellMe.iOS.Controllers
                 Notifications = null;
             }
 
-            if (Storytellers != null) {
-                Storytellers.Dispose ();
-                Storytellers = null;
+            if (RecordButton != null) {
+                RecordButton.Dispose ();
+                RecordButton = null;
+            }
+
+            if (RequestButton != null) {
+                RequestButton.Dispose ();
+                RequestButton = null;
             }
         }
     }

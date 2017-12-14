@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="9189">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="n09-4r-nJy">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -71,7 +71,7 @@
                             <constraint firstAttribute="centerY" secondItem="zEq-FU-wV5" secondAttribute="centerY" id="qzY-Ky-pLD"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Profile" image="Second" id="cPa-gy-q4n"/>
+                    <tabBarItem key="tabBarItem" title="Profile" image="Account" id="cPa-gy-q4n"/>
                     <connections>
                         <outlet property="ChangePictureButton" destination="21014" id="name-outlet-21014"/>
                         <outlet property="SignOutButton" destination="275" id="name-outlet-275"/>
@@ -79,14 +79,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1065" y="-1793"/>
+            <point key="canvasLocation" x="73" y="-997"/>
         </scene>
         <!--Stories-->
         <scene sceneID="3076">
             <objects>
                 <tableViewController storyboardIdentifier="StoriesListViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="3077" customClass="StoriesListViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="-1" sectionFooterHeight="44" id="3078">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="559"/>
+                        <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="31708">
@@ -120,32 +120,21 @@
                     </tableView>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Stories" id="3128">
-                        <leftBarButtonItems>
-                            <barButtonItem image="Calendar" id="2vH-wT-pQh">
-                                <connections>
-                                    <action selector="Events_Activated:" destination="3077" id="UtY-sm-Fh4"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem image="Playlists" id="vey-jb-EJY">
-                                <connections>
-                                    <action selector="Playlists_Activated:" destination="3077" id="cBs-dI-Gbr"/>
-                                </connections>
-                            </barButtonItem>
-                        </leftBarButtonItems>
+                        <barButtonItem key="leftBarButtonItem" image="Bell" id="22104">
+                            <connections>
+                                <action selector="Notifications_Activated:" destination="3077" id="24558"/>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
-                            <barButtonItem image="Account" id="19949">
+                            <barButtonItem title="Item" image="Record" id="42859">
                                 <connections>
-                                    <action selector="AccountSettingsButton_Activated:" destination="3077" id="19950"/>
+                                    <action selector="RecordButton_Touched:" destination="3077" id="42971"/>
                                 </connections>
+                                <color key="tintColor" colorSpace="calibratedRGB" red="0.99215686274509807" green="0" blue="0.13333333333333333" alpha="1"/>
                             </barButtonItem>
-                            <barButtonItem image="Bell" id="22104">
+                            <barButtonItem image="Request" id="43082">
                                 <connections>
-                                    <action selector="Notifications_Activated:" destination="3077" id="24558"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem image="Storytellers" id="24667">
-                                <connections>
-                                    <action selector="Storytellers_Activated:" destination="3077" id="29625"/>
+                                    <action selector="RequestButton_Touched:" destination="3077" id="43083"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
@@ -163,27 +152,27 @@
                         </attributedString>
                     </refreshControl>
                     <connections>
-                        <outlet property="AccountSettingsButton" destination="19949" id="name-outlet-19949"/>
                         <outlet property="ActivityIndicator" destination="32071" id="name-outlet-32071"/>
-                        <outlet property="Events" destination="2vH-wT-pQh" id="d7j-5Z-R9W"/>
                         <outlet property="Notifications" destination="22104" id="name-outlet-22104"/>
-                        <outlet property="Storytellers" destination="24667" id="name-outlet-24667"/>
+                        <outlet property="RecordButton" destination="42859" id="name-outlet-42859"/>
+                        <outlet property="RequestButton" destination="43082" id="name-outlet-43082"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3083" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1890" y="-1793"/>
+            <point key="canvasLocation" x="-3407" y="-205"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Stories-->
         <scene sceneID="9188">
             <objects>
-                <navigationController toolbarHidden="NO" id="9189" sceneMemberID="viewController">
+                <navigationController title="Stories" id="9189" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Stories" image="Burger" id="CCE-Aw-fOG"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="9191">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="9195">
-                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="0.0" height="0.0"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     </toolbar>
                     <connections>
@@ -192,7 +181,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9192" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2702" y="-1793"/>
+            <point key="canvasLocation" x="-3407" y="-997"/>
         </scene>
         <!--Notification Center Controller-->
         <scene sceneID="30611">
@@ -255,7 +244,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="30614" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-273" y="-1793"/>
+            <point key="canvasLocation" x="-607" y="-1880"/>
         </scene>
         <!--Story View Controller-->
         <scene sceneID="IxG-7z-u67">
@@ -384,16 +373,288 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9df-x4-ssd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2695.1999999999998" y="-1122.1889055472266"/>
+            <point key="canvasLocation" x="73" y="-1729"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="fAL-GT-ShQ">
+            <objects>
+                <tabBarController id="n09-4r-nJy" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Mhv-QP-ber">
+                        <rect key="frame" x="0.0" y="618" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="9189" kind="relationship" relationship="viewControllers" id="kwG-qo-Bqr"/>
+                        <segue destination="36428" kind="relationship" relationship="viewControllers" id="36478"/>
+                        <segue destination="38856" kind="relationship" relationship="viewControllers" id="38891"/>
+                        <segue destination="40784" kind="relationship" relationship="viewControllers" id="41352"/>
+                        <segue destination="8rJ-Kc-sve" kind="relationship" relationship="viewControllers" id="r5h-Qh-n4t"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vPn-4M-bw8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1668" y="-1818"/>
+        </scene>
+        <!--Playlists-->
+        <scene sceneID="36418">
+            <objects>
+                <tableViewController title="Playlists" id="36419" customClass="PlaylistsViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="36421">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.90588235294117647" green="0.90588235294117647" blue="0.90588235294117647" alpha="1" colorSpace="calibratedRGB"/>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="36555">
+                            <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="36559">
+                                    <rect key="frame" x="177" y="12" width="20" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" secondItem="36559" secondAttribute="height" multiplier="1:1" id="36641"/>
+                                        <constraint firstAttribute="height" constant="20" id="36801"/>
+                                    </constraints>
+                                </activityIndicatorView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="36559" firstAttribute="centerY" secondItem="36555" secondAttribute="centerY" id="36560"/>
+                                <constraint firstItem="36559" firstAttribute="centerX" secondItem="36555" secondAttribute="centerX" id="36562"/>
+                            </constraints>
+                        </view>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="36424">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="36424" id="36425">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="36419" id="36422"/>
+                            <outlet property="delegate" destination="36419" id="36423"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Playlists" id="36420"/>
+                    <connections>
+                        <outlet property="ActivityIndicator" destination="36559" id="name-outlet-36559"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="36426" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2535" y="-206"/>
+        </scene>
+        <!--Playlists-->
+        <scene sceneID="36427">
+            <objects>
+                <navigationController id="36428" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Playlists" image="Playlists" id="36477"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="36430">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="36419" kind="relationship" relationship="rootViewController" id="36429"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="36431" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2535" y="-997"/>
+        </scene>
+        <!--Events-->
+        <scene sceneID="38846">
+            <objects>
+                <tableViewController storyboardIdentifier="EventsViewController" title="Events" useStoryboardIdentifierAsRestorationIdentifier="YES" id="38847" customClass="EventsViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="38849">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.90588235294117647" green="0.90588235294117647" blue="0.90588235294117647" alpha="1" colorSpace="calibratedRGB"/>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="39306">
+                            <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="39312">
+                                    <rect key="frame" x="178" y="12" width="20" height="20"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="39340"/>
+                                        <constraint firstAttribute="width" secondItem="39312" secondAttribute="height" multiplier="1:1" id="39346"/>
+                                    </constraints>
+                                </activityIndicatorView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="39312" firstAttribute="centerY" secondItem="39306" secondAttribute="centerY" id="39328"/>
+                                <constraint firstItem="39312" firstAttribute="centerX" secondItem="39306" secondAttribute="centerX" id="39334"/>
+                            </constraints>
+                        </view>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="38852">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="38852" id="38853">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="38847" id="38850"/>
+                            <outlet property="delegate" destination="38847" id="38851"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Events" id="38848"/>
+                    <connections>
+                        <outlet property="ActivityIndicator" destination="39312" id="name-outlet-39312"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="38854" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1668" y="-205"/>
+        </scene>
+        <!--Events-->
+        <scene sceneID="38855">
+            <objects>
+                <navigationController id="38856" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Events" image="Calendar" id="38890"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="38858">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="38847" kind="relationship" relationship="rootViewController" id="38857"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="38859" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1668" y="-997"/>
+        </scene>
+        <!--Storytellers-->
+        <scene sceneID="40588">
+            <objects>
+                <viewController storyboardIdentifier="StorytellersController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="40589" customClass="StorytellersController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="40611"/>
+                        <viewControllerLayoutGuide type="bottom" id="40617"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="40605">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" misplaced="YES" placeholder="Search for storytellers" translatesAutoresizingMaskIntoConstraints="NO" id="40597">
+                                <rect key="frame" x="0.0" y="64" width="414" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="40606"/>
+                                </constraints>
+                                <textInputTraits key="textInputTraits" returnKeyType="search"/>
+                                <scopeButtonTitles>
+                                    <string>Storytellers</string>
+                                    <string>Tribes</string>
+                                </scopeButtonTitles>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="40599">
+                                <rect key="frame" x="0.0" y="108" width="414" height="628"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <view key="tableFooterView" contentMode="scaleToFill" id="40607">
+                                    <rect key="frame" x="0.0" y="35" width="414" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="40591">
+                                            <rect key="frame" x="177.5" y="12" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstItem="40591" firstAttribute="centerY" secondItem="40607" secondAttribute="centerY" id="40608"/>
+                                        <constraint firstItem="40591" firstAttribute="centerX" secondItem="40607" secondAttribute="centerX" id="40609"/>
+                                    </constraints>
+                                </view>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="40599" firstAttribute="top" secondItem="40611" secondAttribute="bottom" constant="44" id="40601"/>
+                            <constraint firstItem="40597" firstAttribute="top" secondItem="40611" secondAttribute="bottom" id="40610"/>
+                            <constraint firstItem="40597" firstAttribute="centerX" secondItem="40605" secondAttribute="centerX" id="40612"/>
+                            <constraint firstItem="40597" firstAttribute="width" secondItem="40605" secondAttribute="width" id="40613"/>
+                            <constraint firstItem="40599" firstAttribute="centerX" secondItem="40605" secondAttribute="centerX" id="40614"/>
+                            <constraint firstItem="40599" firstAttribute="width" secondItem="40605" secondAttribute="width" id="40615"/>
+                            <constraint firstItem="40599" firstAttribute="bottom" secondItem="40617" secondAttribute="top" id="40616"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Storytellers" id="40595">
+                        <barButtonItem key="rightBarButtonItem" image="AddGroup" id="40593">
+                            <connections>
+                                <action selector="AddTribeButton_Activated:" destination="40589" id="40604"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="ActivityIndicator" destination="40591" id="40590"/>
+                        <outlet property="AddTribeButton" destination="40593" id="40592"/>
+                        <outlet property="NavItem" destination="40595" id="40594"/>
+                        <outlet property="SearchBar" destination="40597" id="40596"/>
+                        <outlet property="TableView" destination="40599" id="40598"/>
+                        <outlet property="TableViewTop" destination="40601" id="40600"/>
+                        <outlet property="searchDisplayController" destination="40603" id="40602"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="40618" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="40603">
+                    <connections>
+                        <outlet property="delegate" destination="40589" id="40619"/>
+                        <outlet property="searchContentsController" destination="40589" id="40620"/>
+                        <outlet property="searchResultsDataSource" destination="40589" id="40621"/>
+                        <outlet property="searchResultsDelegate" destination="40589" id="40622"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="-812" y="-204"/>
+        </scene>
+        <!--Storytellers-->
+        <scene sceneID="40783">
+            <objects>
+                <navigationController id="40784" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Storytellers" image="Storytellers" id="41351"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="40786">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="40589" kind="relationship" relationship="rootViewController" id="41125"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="40787" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-812" y="-997"/>
         </scene>
     </scenes>
     <resources>
         <image name="Account" width="25" height="25"/>
+        <image name="AddGroup" width="25" height="25"/>
         <image name="Bell" width="25" height="25"/>
+        <image name="Burger" width="25" height="25"/>
         <image name="Calendar" width="25" height="25"/>
         <image name="Playlists" width="25" height="25"/>
-        <image name="Second" width="16" height="16"/>
+        <image name="Record" width="25" height="25"/>
+        <image name="Request" width="25" height="25"/>
         <image name="Send" width="30" height="30"/>
         <image name="Storytellers" width="25" height="25"/>
+        <image name="Contacts" width="192" height="192"/>
+        <image name="Play" width="64" height="64"/>
+        <image name="UserPic" width="36" height="36"/>
+        <image name="Comment" width="30" height="30"/>
+        <image name="Replay" width="64" height="64"/>
+        <image name="Heart" width="30" height="30"/>
+        <image name="Heart-O" width="30" height="30"/>
+        <image name="Playlist" width="50" height="50"/>
+        <image name="Next" width="50" height="50"/>
+        <image name="Prev" width="50" height="50"/>
+        <image name="More" width="30" height="30"/>
     </resources>
 </document>

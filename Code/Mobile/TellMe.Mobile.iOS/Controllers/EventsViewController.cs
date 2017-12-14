@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Foundation;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views.Cells;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
@@ -14,20 +15,19 @@ namespace TellMe.iOS.Controllers
 {
     public partial class EventsViewController : UITableViewController, IEventsView
     {
-        private readonly IEventsBusinessLogic _businessLogic;
+        private IEventsBusinessLogic _businessLogic;
         private readonly List<EventDTO> _eventsList = new List<EventDTO>();
         private volatile bool _canLoadMore;
         private volatile bool _loadingMore;
 
-        public EventsViewController(IEventsBusinessLogic businessLogic) : base("EventsViewController", null)
+        public EventsViewController(IntPtr handle) : base(handle)
         {
-            _businessLogic = businessLogic;
         }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
+            this._businessLogic = IoC.GetInstance<IEventsBusinessLogic>();
             this._businessLogic.View = this;
             this.TableView.RegisterNibForCellReuse(EventCell.Nib, EventCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
@@ -49,11 +49,6 @@ namespace TellMe.iOS.Controllers
         private void AddEventButtonTouched(object sender, EventArgs e)
         {
             this._businessLogic.CreateEvent();
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, true);
         }
 
         public override void DidReceiveMemoryWarning()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
@@ -16,15 +17,14 @@ namespace TellMe.iOS.Controllers
 {
     public partial class PlaylistsViewController : UITableViewController, IPlaylistsView
     {
-        private readonly IPlaylistsBusinessLogic _businessLogic;
+        private IPlaylistsBusinessLogic _businessLogic;
         private readonly List<PlaylistDTO> _itemsList = new List<PlaylistDTO>();
         private volatile bool _canLoadMore;
         private volatile bool _loadingMore;
         private UIBarButtonItem _doneButton;
 
-        public PlaylistsViewController(IPlaylistsBusinessLogic businessLogic) : base("PlaylistsViewController", null)
+        public PlaylistsViewController(IntPtr handle) : base(handle)
         {
-            _businessLogic = businessLogic;
         }
 
         public PlaylistViewMode Mode { get; set; }
@@ -33,7 +33,7 @@ namespace TellMe.iOS.Controllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
+            _businessLogic = IoC.GetInstance<IPlaylistsBusinessLogic>();
             this._businessLogic.View = this;
             this._doneButton = new UIBarButtonItem("Done", UIBarButtonItemStyle.Done, DoneButtonTouched);
             this.TableView.RegisterNibForCellReuse(PlaylistItemCell.Nib, PlaylistItemCell.Key);
@@ -79,11 +79,6 @@ namespace TellMe.iOS.Controllers
         private void AddPlaylistButtonTouched(object sender, EventArgs e)
         {
             this._businessLogic.CreatePlaylist();
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, true);
         }
 
         public override nint RowsInSection(UITableView tableView, nint section)

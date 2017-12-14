@@ -68,11 +68,6 @@ namespace TellMe.iOS
             LoadAsync(false);
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, true);
-        }
-
         public void DisplayStories(ICollection<StoryListDTO> items)
         {
             var initialCount = _storiesList.Count;

@@ -43,7 +43,7 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.ChooseRecipient;
                 targetController.DismissOnFinish = dismissOnFinish;
@@ -57,7 +57,7 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.ChooseTribeMembers;
                 targetController.DisabledUserIds = disabledUserIds;
@@ -73,7 +73,7 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (StorytellersViewController) UIStoryboard.FromName("Story", null)
+                var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("StorytellersController");
                 targetController.Mode = ContactsMode.ChooseRecipient;
                 targetController.DisabledUserIds = disabledUserIds;
@@ -307,7 +307,8 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = IoC.GetInstance<EventsViewController>();
+                var targetController = (EventsViewController)UIStoryboard.FromName("Main", null)
+                    .InstantiateViewController("EventsViewController");
                 this.Present(targetController, view);
             });
         }
@@ -317,9 +318,10 @@ namespace TellMe.iOS.Core
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = IoC.GetInstance<PlaylistsViewController>();
+                var targetController = (PlaylistsViewController)UIStoryboard.FromName("Main", null)
+                    .InstantiateViewController("PlaylistsViewController");
                 targetController.Mode = mode;
-                if(onSelected != null)
+                if (onSelected != null)
                     targetController.OnSelected += onSelected;
                 this.Present(targetController, view);
             });

@@ -36,15 +36,6 @@ namespace TellMe.iOS.Controllers
         public override void ViewWillAppear(bool animated)
         {
             BusinessLogic.LoadActiveNotificationsCountAsync();
-            this.SetToolbarItems(new[]
-            {
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-                new UIBarButtonItem("Request a Story", UIBarButtonItemStyle.Plain, RequestStoryButtonTouched),
-                new UIBarButtonItem(UIBarButtonSystemItem.FixedSpace),
-                new UIBarButtonItem("Send a Story", UIBarButtonItemStyle.Plain, SendStoryButtonTouched),
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace)
-            }, true);
-            this.NavigationController.SetToolbarHidden(false, true);
         }
 
         public override void ViewDidAppear(bool animated)
@@ -58,39 +49,19 @@ namespace TellMe.iOS.Controllers
             Task.Run(() => LoadStoriesAsync(true, false));
         }
 
-        private void SendStoryButtonTouched(object sender, EventArgs e)
+        partial void RecordButton_Touched(UIBarButtonItem sender)
         {
             BusinessLogic.SendStory();
         }
 
-        private void RequestStoryButtonTouched(object sender, EventArgs e)
+        partial void RequestButton_Touched(UIBarButtonItem sender)
         {
             BusinessLogic.RequestStory();
-        }
-
-        partial void AccountSettingsButton_Activated(UIBarButtonItem sender)
-        {
-            BusinessLogic.AccountSettings();
         }
 
         partial void Notifications_Activated(UIBarButtonItem sender)
         {
             BusinessLogic.NotificationsCenter();
-        }
-
-        partial void Storytellers_Activated(UIBarButtonItem sender)
-        {
-            BusinessLogic.ShowStorytellers();
-        }
-
-        partial void Events_Activated(UIBarButtonItem sender)
-        {
-            BusinessLogic.NavigateEvents();
-        }
-
-        partial void Playlists_Activated(UIBarButtonItem sender)
-        {
-            BusinessLogic.NavigatePlaylists();
         }
 
         public void DisplayNotificationsCount(int count)
