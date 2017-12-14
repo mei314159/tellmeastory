@@ -37,16 +37,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             Router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
         }
 
-        public void AccountSettings()
-        {
-            Router.NavigateAccountSettings(View);
-        }
-
-        public void ShowStorytellers()
-        {
-            Router.NavigateStorytellers(View);
-        }
-
         public void NotificationsCenter()
         {
             Router.NavigateNotificationsCenter(View);
@@ -69,16 +59,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             {
                 result.ShowResultError(this.View);
             }
-        }
-
-        public void NavigateEvents()
-        {
-            Router.NavigateEvents(this.View);
-        }
-
-        public void NavigatePlaylists()
-        {
-            Router.NavigatePlaylists(this.View);
         }
     }
 }

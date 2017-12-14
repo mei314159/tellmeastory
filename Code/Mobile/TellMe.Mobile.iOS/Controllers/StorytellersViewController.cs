@@ -70,11 +70,6 @@ namespace TellMe.iOS.Controllers
             LoadAsync(false);
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, true);
-        }
-
         [Action("UnwindToStorytellers:")]
         public void UnwindToStorytellers(UIStoryboardSegue segue)
         {

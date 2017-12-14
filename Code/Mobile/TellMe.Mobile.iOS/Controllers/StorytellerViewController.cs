@@ -32,11 +32,6 @@ namespace TellMe.iOS.Controllers
             base.ViewDidLoad();
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, false);
-        }
-
         public void DisplayStoryteller(StorytellerDTO storyteller)
         {
             InvokeOnMainThread(() =>

@@ -188,6 +188,15 @@
     <ImageAsset Include="Assets.xcassets\More.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\More.imageset\more%402x.png" />
     <ImageAsset Include="Assets.xcassets\More.imageset\more%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Burger.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Burger.imageset\burger%402X.png" />
+    <ImageAsset Include="Assets.xcassets\Burger.imageset\burger%403X.png" />
+    <ImageAsset Include="Assets.xcassets\Record.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Record.imageset\record%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Record.imageset\record%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Request.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Request.imageset\request%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Request.imageset\request%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -220,9 +229,11 @@
     <Folder Include="Assets.xcassets\Next.imageset\" />
     <Folder Include="Assets.xcassets\Prev.imageset\" />
     <Folder Include="Assets.xcassets\More.imageset\" />
+    <Folder Include="Assets.xcassets\Burger.imageset\" />
+    <Folder Include="Assets.xcassets\Record.imageset\" />
+    <Folder Include="Assets.xcassets\Request.imageset\" />
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="Controllers\PlaylistsViewController.xib" />
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Auth.storyboard" />
@@ -240,7 +251,6 @@
     <InterfaceDefinition Include="Views\Cells\LoadMoreButtonCell.xib" />
     <InterfaceDefinition Include="Views\Cells\StoryViewCell.xib" />
     <InterfaceDefinition Include="Views\CommentView.xib" />
-    <InterfaceDefinition Include="Controllers\EventsViewController.xib" />
     <InterfaceDefinition Include="Views\Cells\EventCell.xib" />
     <InterfaceDefinition Include="Views\Cells\EventAttendeesListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\PlaylistItemCell.xib" />

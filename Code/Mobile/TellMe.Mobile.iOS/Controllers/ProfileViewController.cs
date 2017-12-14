@@ -23,11 +23,6 @@ namespace TellMe.iOS.Controllers
             _localAccountService = IoC.GetInstance<ILocalAccountService>();
         }
 
-        public override void ViewWillAppear(bool animated)
-        {
-            this.NavigationController.SetToolbarHidden(true, true);
-        }
-
         partial void SignOutButton_TouchUpInside(UIButton sender)
         {
             _localAccountService.SaveAuthInfo(null);
