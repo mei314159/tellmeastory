@@ -27,6 +27,9 @@ namespace TellMe.iOS.Controllers
         private static readonly NSString AvCustomEditPlayerViewControllerStatusObservationContext =
             new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
 
+        private UIColor _navbarWrapperColor;
+        private bool _controlsVisible = true;
+
         public PlaylistViewController() : base("PlaylistViewController", null)
         {
         }
@@ -49,13 +52,21 @@ namespace TellMe.iOS.Controllers
             this.Preview.Layer.ShadowOffset = new CGSize(0, 2);
             this.Preview.Layer.ShadowRadius = 2;
             this.Preview.Layer.ShadowOpacity = 0.5f;
-
+            SetGestureRecognizers();
             this.ButtonsWrapper.Layer.MasksToBounds = false;
             this.ButtonsWrapper.Layer.ShadowOffset = new CGSize(0, 2);
             this.ButtonsWrapper.Layer.ShadowRadius = 2;
             this.ButtonsWrapper.Layer.ShadowOpacity = 0.5f;
-
+            this._navbarWrapperColor = this.NavigationBarWrapper.BackgroundColor;           
+            this.ButtonsWrapper.BackgroundColor = _navbarWrapperColor.ColorWithAlpha(0.4f);
+            this.NavigationBar.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
+            this.NavigationBar.ShadowImage = new UIImage();
             this.TogglePlayer(false);
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            StopPlaying();
         }
 
         private void TogglePlayer(bool show)
@@ -63,6 +74,10 @@ namespace TellMe.iOS.Controllers
             if (_playerVisible == show)
                 return;
 
+            if (show)
+            {
+                ToggleControls(true);
+            }
 
             this.NavigationItem.RightBarButtonItem = show
                 ? new UIBarButtonItem(UIImage.FromBundle("Playlists"), UIBarButtonItemStyle.Done,
@@ -70,12 +85,13 @@ namespace TellMe.iOS.Controllers
                 : new UIBarButtonItem(UIBarButtonSystemItem.Play, PlayButton_Touched);
             this.NavigationItem.RightBarButtonItem.TintColor = UIColor.White;
 
-
-            var height = show ? 64 : this.View.Frame.Height;
+            var top = show ? 0 : this.View.Frame.Height;
+            var color = show ? _navbarWrapperColor.ColorWithAlpha(0.4f) : _navbarWrapperColor;
             UIView.Animate(0.2,
                 () =>
                 {
-                    this.PlayerWrapperTop.Constant = height;
+                    NavigationBarWrapper.BackgroundColor = color;
+                    this.PlayerWrapperTop.Constant = top;
                     this.View.LayoutIfNeeded();
                 }, () => { _playerVisible = show; });
         }
@@ -153,20 +169,35 @@ namespace TellMe.iOS.Controllers
             }
         }
 
+        public bool ShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader,
+            AVAssetResourceLoadingRequest loadingRequest)
+        {
+            return true;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                StopPlaying();
+            }
+
+            base.Dispose(disposing);
+        }
+
         partial void CloseButton_Activated(UIBarButtonItem sender)
         {
             this.DismissViewController(true, null);
         }
 
-        private void PlayButton_Touched(object sender, EventArgs eventArgs)
-        {
-            var currentItem = Playlist.Stories[_currentItemIndex];
-            PlayStory(currentItem);
-        }
-
         partial void NextButton_TouchUpInside(UIButton sender)
         {
             Next();
+        }
+
+        partial void PreviousButton_TouchUpInside(UIButton sender)
+        {
+            Previous();
         }
 
         private void Next()
@@ -183,7 +214,7 @@ namespace TellMe.iOS.Controllers
             }
         }
 
-        partial void PreviousButton_TouchUpInside(UIButton sender)
+        private void Previous()
         {
             if (_currentItemIndex > 0)
             {
@@ -204,7 +235,7 @@ namespace TellMe.iOS.Controllers
                 _player = new AVPlayer();
                 _playerLayer = AVPlayerLayer.FromPlayer(_player);
                 _playerLayer.Frame = this.Preview.Bounds;
-                _playerLayer.VideoGravity = AVLayerVideoGravity.ResizeAspect;
+                _playerLayer.VideoGravity = AVLayerVideoGravity.ResizeAspectFill;
                 this.Preview.Layer.AddSublayer(_playerLayer);
             }
 
@@ -224,11 +255,11 @@ namespace TellMe.iOS.Controllers
         private AVUrlAsset GetAsset(StoryListDTO story)
         {
             NSUrl videoUrl;
-            
+
             var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(story.VideoUrl));
             if (File.Exists(videoPath))
             {
-                videoUrl = NSUrl.CreateFileUrl(new[] { videoPath });
+                videoUrl = NSUrl.CreateFileUrl(new[] {videoPath});
             }
             else
             {
@@ -252,7 +283,7 @@ namespace TellMe.iOS.Controllers
                 _player.Pause();
                 _playerLayer.RemoveFromSuperLayer();
                 _player.CurrentItem.RemoveObserver(this, "status",
-                    AvCustomEditPlayerViewControllerStatusObservationContext.Handle); 
+                    AvCustomEditPlayerViewControllerStatusObservationContext.Handle);
                 _playing = false;
                 _player.Dispose();
                 _playerLayer.Dispose();
@@ -263,7 +294,7 @@ namespace TellMe.iOS.Controllers
 
         private void DidReachEnd(object sender, NSNotificationEventArgs e)
         {
-            var asset = (AVUrlAsset)_player.CurrentItem.Asset;
+            var asset = (AVUrlAsset) _player.CurrentItem.Asset;
             if (!asset.Url.IsFileUrl && asset.Exportable)
             {
                 var exporter = new AVAssetExportSession(asset, AVAssetExportSessionPreset.Preset640x480);
@@ -272,8 +303,8 @@ namespace TellMe.iOS.Controllers
                 {
                     return;
                 }
-                
-                exporter.OutputUrl = NSUrl.CreateFileUrl(new[] { videoPath });
+
+                exporter.OutputUrl = NSUrl.CreateFileUrl(new[] {videoPath});
                 exporter.OutputFileType = AVFileType.QuickTimeMovie;
                 exporter.ExportAsynchronously(() =>
                 {
@@ -287,20 +318,76 @@ namespace TellMe.iOS.Controllers
             Next();
         }
 
-        protected override void Dispose(bool disposing)
+        private void SetGestureRecognizers()
         {
-            if (disposing)
+            this.Preview.AddGestureRecognizer(new UITapGestureRecognizer(this.PreviewTouched)
             {
-                StopPlaying();
-            }
-
-            base.Dispose(disposing);
+                ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
+            });
+            this.Preview.AddGestureRecognizer(new UISwipeGestureRecognizer(this.PreviewSwiped)
+            {
+                Direction = UISwipeGestureRecognizerDirection.Left,
+                ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
+            });
+            this.Preview.AddGestureRecognizer(new UISwipeGestureRecognizer(this.PreviewSwiped)
+            {
+                Direction = UISwipeGestureRecognizerDirection.Right,
+                ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
+            });
+            this.Preview.AddGestureRecognizer(new UISwipeGestureRecognizer(this.PreviewSwiped)
+            {
+                Direction = UISwipeGestureRecognizerDirection.Up,
+                ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
+            });
+            this.Preview.AddGestureRecognizer(new UISwipeGestureRecognizer(this.PreviewSwiped)
+            {
+                Direction = UISwipeGestureRecognizerDirection.Down,
+                ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
+            });
         }
 
-        public bool ShouldWaitForLoadingOfRequestedResource(AVAssetResourceLoader resourceLoader,
-            AVAssetResourceLoadingRequest loadingRequest)
+        private void PlayButton_Touched(object sender, EventArgs eventArgs)
         {
-            return true;
+            var currentItem = Playlist.Stories[_currentItemIndex];
+            PlayStory(currentItem);
+        }
+
+        private void PreviewTouched(UITapGestureRecognizer r)
+        {
+            ToggleControls();
+        }
+
+        private void PreviewSwiped(UISwipeGestureRecognizer r)
+        {
+            switch (r.Direction)
+            {
+                case UISwipeGestureRecognizerDirection.Right:
+                    this.Previous();
+                    break;
+                case UISwipeGestureRecognizerDirection.Left:
+                    this.Next();
+                    break;
+                case UISwipeGestureRecognizerDirection.Up:
+                    ToggleControls(true);
+                    break;
+                case UISwipeGestureRecognizerDirection.Down:
+                    StopPlaying();
+                    break;
+            }
+        }
+
+        private void ToggleControls(bool? visible = null)
+        {
+            var newValue = visible ?? !_controlsVisible;
+
+            var alpha = newValue ? 1 : 0;
+            var navbarTop = newValue ? 0 : -64;
+            UIView.Animate(0.2, () =>
+            {
+                this.ButtonsWrapper.Alpha = alpha;
+                this.NavBarWrapperTop.Constant = navbarTop;
+                this.View.LayoutIfNeeded();
+            }, () => { _controlsVisible = newValue; });
         }
     }
 }

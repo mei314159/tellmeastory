@@ -20,7 +20,13 @@ namespace TellMe.iOS.Controllers
 		UIKit.UIBarButtonItem CloseButton { get; set; }
 
 		[Outlet]
+		UIKit.NSLayoutConstraint NavBarWrapperTop { get; set; }
+
+		[Outlet]
 		UIKit.UINavigationBar NavigationBar { get; set; }
+
+		[Outlet]
+		UIKit.UIView NavigationBarWrapper { get; set; }
 
 		[Outlet]
 		UIKit.UINavigationItem NavigationItem { get; set; }
@@ -62,9 +68,19 @@ namespace TellMe.iOS.Controllers
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (ButtonsWrapper != null) {
+				ButtonsWrapper.Dispose ();
+				ButtonsWrapper = null;
+			}
+
 			if (CloseButton != null) {
 				CloseButton.Dispose ();
 				CloseButton = null;
+			}
+
+			if (NavBarWrapperTop != null) {
+				NavBarWrapperTop.Dispose ();
+				NavBarWrapperTop = null;
 			}
 
 			if (NavigationBar != null) {
@@ -87,9 +103,9 @@ namespace TellMe.iOS.Controllers
 				PlayerWrapper = null;
 			}
 
-			if (ButtonsWrapper != null) {
-				ButtonsWrapper.Dispose ();
-				ButtonsWrapper = null;
+			if (NavigationBarWrapper != null) {
+				NavigationBarWrapper.Dispose ();
+				NavigationBarWrapper = null;
 			}
 
 			if (PlayerWrapperTop != null) {
