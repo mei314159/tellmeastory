@@ -450,6 +450,7 @@
     <Compile Include="Controllers\PlaylistViewController.designer.cs">
       <DependentUpon>PlaylistViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\UI\ViewWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\TellMe.Shared.Contracts\TellMe.Shared.Contracts.csproj">

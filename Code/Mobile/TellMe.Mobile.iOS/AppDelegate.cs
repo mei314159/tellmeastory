@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using SDWebImage;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.DTO;
+using TellMe.iOS.Core.UI;
+using TellMe.iOS.Extensions;
 using TellMe.Mobile.Core;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
@@ -18,6 +20,11 @@ using UserNotifications;
 
 namespace TellMe.iOS
 {
+    public static class ShortcutIdentifier
+    {
+        public const string RecordStory = "com.mehspot.tellmeastory.recordstory";
+    }
+
     // The UIApplicationDelegate for the application. This class is responsible for launching the
     // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
     [Register("AppDelegate")]
@@ -26,9 +33,32 @@ namespace TellMe.iOS
     {
         // class-level declarations
 
+        private IAccountBusinessLogic AccountBusinessLogic { get; set; }
+
+        public UIApplicationShortcutItem LaunchedShortcutItem { get; set; }
+
         public override UIWindow Window { get; set; }
 
-        private IAccountBusinessLogic AccountBusinessLogic { get; set; }
+        public bool HandleShortcutItem(UIApplicationShortcutItem shortcutItem)
+        {
+            var handled = false;
+
+            // Anything to process?
+            if (shortcutItem == null) 
+                return false;
+
+            var tabbarController = (UITabBarController)this.Window.RootViewController;
+
+            // Take action based on the shortcut type
+            if (shortcutItem.Type == ShortcutIdentifier.RecordStory)
+            {
+                IoC.GetInstance<IRouter>().NavigateRecordStory(tabbarController.AsIView());
+                handled = true;
+            }
+
+            // Return results
+            return handled;
+        }
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
@@ -55,7 +85,16 @@ namespace TellMe.iOS
 
             UNUserNotificationCenter.Current.Delegate = this;
 
-            return true;
+            var shouldPerformAdditionalDelegateHandling = true;
+
+            // Get possible shortcut item
+            if (launchOptions != null)
+            {
+                LaunchedShortcutItem = launchOptions[UIApplication.LaunchOptionsShortcutItemKey] as UIApplicationShortcutItem;
+                shouldPerformAdditionalDelegateHandling = (LaunchedShortcutItem == null);
+            }
+
+            return shouldPerformAdditionalDelegateHandling;
         }
 
         private void InitializeSDWebImage()
@@ -97,10 +136,22 @@ namespace TellMe.iOS
 
         public override void OnActivated(UIApplication application)
         {
-            if (this.AccountBusinessLogic.IsAuthenticated)
-            {
-                //await SyncContactsBusinessLogic.SynchronizeContacts();
-            }
+            //if (this.AccountBusinessLogic.IsAuthenticated)
+            //{
+            //    await SyncContactsBusinessLogic.SynchronizeContacts();
+            //}
+
+            // Handle any shortcut item being selected
+            HandleShortcutItem(LaunchedShortcutItem);
+
+            // Clear shortcut after it's been handled
+            LaunchedShortcutItem = null;
+        }
+
+        public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler)
+        {
+            // Perform action
+            completionHandler(HandleShortcutItem(shortcutItem));
         }
 
         public override void WillTerminate(UIApplication application)

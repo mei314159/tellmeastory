@@ -7,7 +7,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.38</string>
+	<string>1.0.40</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
@@ -44,5 +44,16 @@
 	<string>Tell Me a Story need an access to your media library to allow you to choose a userpic</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Tell Me a Story need an access to your photo library to allow you to choose a userpic</string>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeCaptureVideo</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Record a Story</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.mehspot.tellmeastory.recordstory</string>
+		</dict>
+	</array>
 </dict>
 </plist>
