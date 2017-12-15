@@ -64,10 +64,6 @@ namespace TellMe.iOS.Controllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIView View { get; set; }
-
         [Action ("CloseButton_Activated:")]
         partial void CloseButton_Activated (UIKit.UIBarButtonItem sender);
 

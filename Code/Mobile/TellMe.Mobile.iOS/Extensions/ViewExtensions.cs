@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreGraphics;
 using ObjCRuntime;
+using TellMe.iOS.Core.UI;
+using TellMe.Mobile.Core.Contracts.UI.Views;
 using UIKit;
 
 namespace TellMe.iOS.Extensions
@@ -25,6 +27,11 @@ namespace TellMe.iOS.Extensions
 
     public static class ViewExtensions
     {
+        public static IView AsIView(this UIViewController controller)
+        {
+            return new ViewWrapper(controller);
+        } 
+        
         public static UIColor DefaultTintColor(this UIView view)
         {
             return UIColor.FromRGBA(0f, 122 / 255f, 1f, 1f);

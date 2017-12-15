@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.iOS.Controllers;
+using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.DTO;
@@ -374,8 +375,11 @@ namespace TellMe.iOS.Core
 
         private void Present(UIViewController targetController, IView view, bool push = true)
         {
-            var controller = (UIViewController) view;
-
+            if (!(view is UIViewController controller))
+            {
+                controller = ((ViewWrapper) view).Controller;
+            }            
+            
             if (controller.NavigationController != null && push)
             {
                 controller.NavigationController.PushViewController(targetController, true);
