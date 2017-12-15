@@ -29,6 +29,16 @@ namespace TellMe.iOS.Controllers
 
         public PlaylistViewMode Mode { get; set; }
         public Func<IDismissable, PlaylistDTO, Task> OnSelected;
+        private UIImageView noItemsBackground;
+
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+            noItemsBackground = new UIImageView(UIImage.FromBundle("NoPlaylists"))
+            {
+                ContentMode = UIViewContentMode.Center
+            };
+        }
 
         public override void ViewDidLoad()
         {
@@ -44,6 +54,8 @@ namespace TellMe.iOS.Controllers
             this.TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
             this.TableView.TableFooterView = new UIView();
             this.TableView.TableFooterView.Hidden = true;
+            SetTableBackground();
+
             this.NavigationController.View.BackgroundColor = UIColor.White;
             this.NavigationItem.Title = "Playlists";
             this.NavigationItem.RightBarButtonItem =
@@ -68,7 +80,7 @@ namespace TellMe.iOS.Controllers
         {
             if (OnSelected != null)
             {
-                var cell = (PlaylistItemCell) TableView.CellAt(TableView.IndexPathForSelectedRow);
+                var cell = (PlaylistItemCell)TableView.CellAt(TableView.IndexPathForSelectedRow);
                 var overlay = new Overlay("Wait");
                 overlay.PopUp();
                 await OnSelected(this, cell.Playlist).ConfigureAwait(false);
@@ -92,16 +104,16 @@ namespace TellMe.iOS.Controllers
             {
                 _doneButton.Enabled = false;
             }
-            
-            tableView.ReloadRows(new[] {indexPath}, UITableViewRowAnimation.None);
+
+            tableView.ReloadRows(new[] { indexPath }, UITableViewRowAnimation.None);
         }
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            
+
             if (Mode == PlaylistViewMode.Normal)
             {
-                var cell = (PlaylistItemCell) tableView.CellAt(indexPath);
+                var cell = (PlaylistItemCell)tableView.CellAt(indexPath);
                 _businessLogic.NavigateViewPlaylist(cell.Playlist);
                 tableView.DeselectRow(indexPath, false);
             }
@@ -118,12 +130,12 @@ namespace TellMe.iOS.Controllers
 
         public override UITableViewCellEditingStyle EditingStyleForRow(UITableView tableView, NSIndexPath indexPath)
         {
-            return (UITableViewCellEditingStyle) 3;
+            return (UITableViewCellEditingStyle)3;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = (PlaylistItemCell) tableView.DequeueReusableCell(PlaylistItemCell.Key, indexPath);
+            var cell = (PlaylistItemCell)tableView.DequeueReusableCell(PlaylistItemCell.Key, indexPath);
             cell.Playlist = this._itemsList[indexPath.Row];
             cell.TintColor = cell.DefaultTintColor();
             return cell;
@@ -139,7 +151,7 @@ namespace TellMe.iOS.Controllers
 
         public void DisplayItems(ICollection<PlaylistDTO> items)
         {
-            lock (((ICollection) _itemsList).SyncRoot)
+            lock (((ICollection)_itemsList).SyncRoot)
             {
                 var initialCount = _itemsList.Count;
                 _itemsList.Clear();
@@ -148,7 +160,11 @@ namespace TellMe.iOS.Controllers
                 this._canLoadMore = items.Count > initialCount;
             }
 
-            InvokeOnMainThread(() => TableView.ReloadData());
+            InvokeOnMainThread(() =>
+            {
+                SetTableBackground();
+                TableView.ReloadData();
+            });
         }
 
         public void ShowErrorMessage(string title, string message = null) =>
@@ -161,9 +177,9 @@ namespace TellMe.iOS.Controllers
         {
             var index = _itemsList.IndexOf(x => x.Id == dto.Id);
             InvokeOnMainThread(() =>
-                TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(index, 0)}, UITableViewRowAnimation.None));
+                TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(index, 0) }, UITableViewRowAnimation.None));
         }
-        
+
         void IDismissable.Dismiss()
         {
             InvokeOnMainThread(() =>
@@ -206,6 +222,11 @@ namespace TellMe.iOS.Controllers
             });
 
             this._loadingMore = false;
+        }
+
+        private void SetTableBackground()
+        {
+            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : noItemsBackground;
         }
     }
 }

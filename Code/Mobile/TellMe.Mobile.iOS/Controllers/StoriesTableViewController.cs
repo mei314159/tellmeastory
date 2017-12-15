@@ -17,26 +17,36 @@ namespace TellMe.iOS.Controllers
 {
     public class StoriesTableViewController : UITableViewController, IStoriesTableView
     {
-        private readonly List<StoryDTO> _storiesList = new List<StoryDTO>();
+        private readonly List<StoryDTO> _itemsList = new List<StoryDTO>();
         private volatile bool _loadingMore;
         private volatile bool _canLoadMore;
-        
+        private UIImageView noItemsBackground;
+
         protected IStoriesTableBusinessLogic BusinessLogic { get; set; }
 
         public StoriesTableViewController(IntPtr handle) : base(handle)
         {
         }
-        
+
         public virtual UIActivityIndicatorView ActivityIndicator { get; set; }
+
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+            noItemsBackground = new UIImageView(UIImage.FromBundle("NoStories"))
+            {
+                ContentMode = UIViewContentMode.Center
+            };
+        }
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            var image = UIImage.FromBundle("NoStories");
             BusinessLogic.View = this;
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
             this.RefreshControl = new UIRefreshControl();
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
-            this.TableView.BackgroundColor = UIColor.FromRGB(238, 238, 238);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             this.TableView.RowHeight = UITableView.AutomaticDimension;
             this.TableView.EstimatedRowHeight = 64;
@@ -45,6 +55,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.DelaysContentTouches = false;
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
+            SetTableBackground();
             this.NavigationController.View.BackgroundColor = UIColor.White;
             //Task.Run(() => LoadStoriesAsync(false, true));
             
@@ -63,7 +74,7 @@ namespace TellMe.iOS.Controllers
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (_storiesList.Count - indexPath.Row - StoryItemIndexOffset == 5 && _canLoadMore)
+            if (_itemsList.Count - indexPath.Row - StoryItemIndexOffset == 5 && _canLoadMore)
             {
                 LoadMoreAsync();
             }
@@ -73,13 +84,13 @@ namespace TellMe.iOS.Controllers
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
-            return this._storiesList.Count + StoryItemIndexOffset;
+            return this._itemsList.Count + StoryItemIndexOffset;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (StoriesListCell) tableView.DequeueReusableCell(StoriesListCell.Key, indexPath);
-            cell.Story = this._storiesList[indexPath.Row - StoryItemIndexOffset];
+            cell.Story = this._itemsList[indexPath.Row - StoryItemIndexOffset];
             cell.ProfilePictureTouched = Cell_ProfilePictureTouched;
             cell.PreviewTouched = Cell_PreviewTouched;
             cell.CommentsButtonTouched = Cell_CommentsButtonTouched;
@@ -113,16 +124,20 @@ namespace TellMe.iOS.Controllers
 
         public void DisplayStories(ICollection<StoryDTO> stories)
         {
-            lock (((ICollection) _storiesList).SyncRoot)
+            lock (((ICollection) _itemsList).SyncRoot)
             {
-                var initialCount = _storiesList.Count;
-                _storiesList.Clear();
-                _storiesList.AddRange(stories);
+                var initialCount = _itemsList.Count;
+                _itemsList.Clear();
+                _itemsList.AddRange(stories);
 
                 this._canLoadMore = stories.Count > initialCount;
             }
 
-            InvokeOnMainThread(() => this.TableView.ReloadData());
+            InvokeOnMainThread(() =>
+            {
+                SetTableBackground();
+                TableView.ReloadData();
+            });
         }
 
         private async void Cell_LikeButtonTouched(StoryDTO story)
@@ -203,7 +218,7 @@ namespace TellMe.iOS.Controllers
         {
             InvokeOnMainThread(() =>
             {
-                var index = _storiesList.IndexOf(x => x.Id == story.Id);
+                var index = _itemsList.IndexOf(x => x.Id == story.Id);
                 if (index <= -1) return;
 
                 var cell = (StoriesListCell) this.TableView.CellAt(NSIndexPath.FromRowSection(index, 0));
@@ -220,6 +235,11 @@ namespace TellMe.iOS.Controllers
             }
             
             base.Dispose(disposing);
+        }
+
+        private void SetTableBackground()
+        {
+            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : noItemsBackground;
         }
     }
 }

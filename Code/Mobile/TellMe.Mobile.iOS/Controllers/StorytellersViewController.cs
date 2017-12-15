@@ -29,6 +29,7 @@ namespace TellMe.iOS.Controllers
         private readonly List<ContactDTO> _tribesList = new List<ContactDTO>();
         private volatile bool _loadingMore;
         private volatile bool _canLoadMore;
+        private UIImageView noItemsBackground;
 
         public ContactsMode Mode { get; set; }
         public event StorytellerSelectedEventHandler RecipientsSelected;
@@ -39,6 +40,15 @@ namespace TellMe.iOS.Controllers
 
         public StorytellersViewController(IntPtr handle) : base(handle)
         {
+        }
+
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+            noItemsBackground = new UIImageView(UIImage.FromBundle("NoStorytellers"))
+            {
+                ContentMode = UIViewContentMode.Center
+            };
         }
 
         public override void ViewDidLoad()
@@ -56,6 +66,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.TableFooterView = new UIView();
             this.TableView.Delegate = this;
             this.TableView.DataSource = this;
+            SetTableBackground();
             this.SearchBar.OnEditingStarted += SearchBar_OnEditingStarted;
             this.SearchBar.OnEditingStopped += SearchBar_OnEditingStopped;
             this.SearchBar.CancelButtonClicked += SearchBar_CancelButtonClicked;
@@ -75,35 +86,6 @@ namespace TellMe.iOS.Controllers
         {
         }
 
-        private void HideSearchCancelButton()
-        {
-            SearchBar.EndEditing(true);
-        }
-
-        private void SearchBar_OnEditingStarted(object sender, EventArgs e)
-        {
-            SearchBar.SetShowsCancelButton(true, true);
-        }
-
-        private void SearchBar_OnEditingStopped(object sender, EventArgs e)
-        {
-            SearchBar.SetShowsCancelButton(false, true);
-            SearchBar.ResignFirstResponder();
-        }
-
-        private void SearchBar_CancelButtonClicked(object sender, EventArgs e)
-        {
-            SearchBar.Text = null;
-            SearchBar.EndEditing(true);
-            LoadAsync(true);
-        }
-
-        private async void SearchBar_SearchButtonClicked(object sender, EventArgs e)
-        {
-            SearchBar.EndEditing(true);
-            await LoadAsync(true);
-        }
-
         public void DisplayContacts(ICollection<ContactDTO> contacts)
         {
             var initialCount = _tribesList.Count + _storytellersList.Count;
@@ -121,7 +103,11 @@ namespace TellMe.iOS.Controllers
 
             this._canLoadMore = contacts.Count > initialCount;
 
-            InvokeOnMainThread(() => TableView.ReloadData());
+            InvokeOnMainThread(() =>
+            {
+                SetTableBackground();
+                TableView.ReloadData();
+            });
         }
 
 
@@ -278,47 +264,22 @@ namespace TellMe.iOS.Controllers
         [Export("numberOfSectionsInTableView:")]
         public nint NumberOfSections(UITableView tableView)
         {
-            return Mode == ContactsMode.ChooseTribeMembers ? 1 : 2;
+            var storytellersExists = _storytellersList.Count > 0;
+            var tribesExists = _tribesList.Count > 0;
+            
+            nint sectionsCount = 0;
+            if (storytellersExists)
+                sectionsCount++;
+            
+            if (Mode != ContactsMode.ChooseTribeMembers && tribesExists)
+                sectionsCount++;
+            
+            return sectionsCount;
         }
 
         partial void AddTribeButton_Activated(UIBarButtonItem sender)
         {
             _businessLogic.AddTribe();
-        }
-
-        private void SetMode(ContactsMode mode)
-        {
-            this.Mode = mode;
-            switch (this.Mode)
-            {
-                case ContactsMode.DisplayStorytellers:
-                    TableView.SetEditing(false, true);
-                    NavItem.Title = "Storytellers";
-                    TableViewTop.Constant = 44;
-                    break;
-                case ContactsMode.ChooseRecipient:
-                    NavItem.Title = "Choose recipient";
-                    TableView.SetEditing(true, true);
-                    SearchBar.Hidden = true;
-                    TableViewTop.Constant = 0;
-                    NavItem.SetRightBarButtonItem(
-                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
-                        {
-                            Enabled = false
-                        }, false);
-                    break;
-                case ContactsMode.ChooseTribeMembers:
-                    NavItem.Title = "Choose Tribe Membes";
-                    TableView.SetEditing(true, true);
-                    SearchBar.Hidden = true;
-                    TableViewTop.Constant = 0;
-                    NavItem.SetRightBarButtonItem(
-                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
-                        {
-                            Enabled = false
-                        }, false);
-                    break;
-            }
         }
 
         public void ShowSendRequestPrompt()
@@ -334,12 +295,49 @@ namespace TellMe.iOS.Controllers
             });
         }
 
+        [Export("tableView:willDisplayCell:forRowAtIndexPath:")]
+        public void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
+        {
+            if (_canLoadMore && (_tribesList.Count + _storytellersList.Count - indexPath.Row == 5))
+            {
+                LoadMoreAsync();
+            }
+        }
+
+        public void DeleteRow(ContactDTO contact)
+        {
+            int section, index;
+            if (contact.Type == ContactType.Tribe)
+            {
+                section = 1;
+                index = _tribesList.IndexOf(contact);
+            }
+            else
+            {
+                section = 0;
+                index = _storytellersList.IndexOf(contact);
+            }
+
+            TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index, section)}, UITableViewRowAnimation.Automatic);
+        }
+
+        public void Dismiss()
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (NavigationController != null)
+                    this.NavigationController.PopViewController(true);
+                else
+                    this.DismissViewController(true, null);
+            });
+        }
+
         private async void SendFriendshipRequest(ContactDTO contact)
         {
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.SendFriendshipRequestAsync(contact.User);
-            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) },
                 UITableViewRowAnimation.None);
             overlay.Close(true);
         }
@@ -349,7 +347,7 @@ namespace TellMe.iOS.Controllers
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.AcceptTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) },
                 UITableViewRowAnimation.None);
             overlay.Close(true);
         }
@@ -359,9 +357,38 @@ namespace TellMe.iOS.Controllers
             var overlay = new Overlay("Wait");
             overlay.PopUp(true);
             await _businessLogic.RejectTribeInvitationAsync(contact.Tribe);
-            TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0)},
+            TableView.ReloadRows(new[] { NSIndexPath.FromRowSection(_storytellersList.IndexOf(contact), 0) },
                 UITableViewRowAnimation.None);
             overlay.Close(true);
+        }
+
+        private void HideSearchCancelButton()
+        {
+            SearchBar.EndEditing(true);
+        }
+
+        private void SearchBar_OnEditingStarted(object sender, EventArgs e)
+        {
+            SearchBar.SetShowsCancelButton(true, true);
+        }
+
+        private void SearchBar_OnEditingStopped(object sender, EventArgs e)
+        {
+            SearchBar.SetShowsCancelButton(false, true);
+            SearchBar.ResignFirstResponder();
+        }
+
+        private void SearchBar_CancelButtonClicked(object sender, EventArgs e)
+        {
+            SearchBar.Text = null;
+            SearchBar.EndEditing(true);
+            LoadAsync(true);
+        }
+
+        private async void SearchBar_SearchButtonClicked(object sender, EventArgs e)
+        {
+            SearchBar.EndEditing(true);
+            await LoadAsync(true);
         }
 
         private async Task LoadAsync(bool forceRefresh)
@@ -370,15 +397,6 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() => this.TableView.RefreshControl.BeginRefreshing());
             await _businessLogic.LoadAsync(forceRefresh, searchText);
             InvokeOnMainThread(() => this.TableView.RefreshControl.EndRefreshing());
-        }
-
-        [Export("tableView:willDisplayCell:forRowAtIndexPath:")]
-        public void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
-        {
-            if (_canLoadMore && (_tribesList.Count + _storytellersList.Count - indexPath.Row == 5))
-            {
-                LoadMoreAsync();
-            }
         }
 
         private async Task LoadMoreAsync()
@@ -427,32 +445,44 @@ namespace TellMe.iOS.Controllers
             }
         }
 
-        public void DeleteRow(ContactDTO contact)
+        private void SetMode(ContactsMode mode)
         {
-            int section, index;
-            if (contact.Type == ContactType.Tribe)
+            this.Mode = mode;
+            switch (this.Mode)
             {
-                section = 1;
-                index = _tribesList.IndexOf(contact);
+                case ContactsMode.DisplayStorytellers:
+                    TableView.SetEditing(false, true);
+                    NavItem.Title = "Storytellers";
+                    TableViewTop.Constant = 44;
+                    break;
+                case ContactsMode.ChooseRecipient:
+                    NavItem.Title = "Choose recipient";
+                    TableView.SetEditing(true, true);
+                    SearchBar.Hidden = true;
+                    TableViewTop.Constant = 0;
+                    NavItem.SetRightBarButtonItem(
+                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                        {
+                            Enabled = false
+                        }, false);
+                    break;
+                case ContactsMode.ChooseTribeMembers:
+                    NavItem.Title = "Choose Tribe Membes";
+                    TableView.SetEditing(true, true);
+                    SearchBar.Hidden = true;
+                    TableViewTop.Constant = 0;
+                    NavItem.SetRightBarButtonItem(
+                        new UIBarButtonItem("Continue", UIBarButtonItemStyle.Done, ContinueButtonTouched)
+                        {
+                            Enabled = false
+                        }, false);
+                    break;
             }
-            else
-            {
-                section = 0;
-                index = _storytellersList.IndexOf(contact);
-            }
-
-            TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index, section)}, UITableViewRowAnimation.Automatic);
         }
 
-        public void Dismiss()
+        private void SetTableBackground()
         {
-            InvokeOnMainThread(() =>
-            {
-                if (NavigationController != null)
-                    this.NavigationController.PopViewController(true);
-                else
-                    this.DismissViewController(true, null);
-            });
+            this.TableView.BackgroundView = this._storytellersList.Count > 0 && this._tribesList.Count > 0 ? null : noItemsBackground;
         }
     }
 }

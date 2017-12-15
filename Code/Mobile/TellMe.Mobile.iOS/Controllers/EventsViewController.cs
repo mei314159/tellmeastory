@@ -16,12 +16,22 @@ namespace TellMe.iOS.Controllers
     public partial class EventsViewController : UITableViewController, IEventsView
     {
         private IEventsBusinessLogic _businessLogic;
-        private readonly List<EventDTO> _eventsList = new List<EventDTO>();
+        private readonly List<EventDTO> _itemsList = new List<EventDTO>();
         private volatile bool _canLoadMore;
         private volatile bool _loadingMore;
+        private UIImageView noItemsBackground;
 
         public EventsViewController(IntPtr handle) : base(handle)
         {
+        }
+
+        public override void AwakeFromNib()
+        {
+            base.AwakeFromNib();
+            noItemsBackground = new UIImageView(UIImage.FromBundle("NoEvents"))
+            {
+                ContentMode = UIViewContentMode.Center
+            };
         }
 
         public override void ViewDidLoad()
@@ -39,6 +49,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.DelaysContentTouches = false;
             this.TableView.TableFooterView.Hidden = true;
             this.TableView.AllowsSelection = false;
+            SetTableBackground();
             this.NavigationController.View.BackgroundColor = UIColor.White;
             this.NavigationItem.Title = "Events";
             this.NavigationItem.RightBarButtonItem =
@@ -59,7 +70,7 @@ namespace TellMe.iOS.Controllers
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
-            return this._eventsList.Count;
+            return this._itemsList.Count;
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -74,13 +85,13 @@ namespace TellMe.iOS.Controllers
                 cell.UserInteractionEnabled = true;
             }
 
-            cell.Event = this._eventsList[indexPath.Row];
+            cell.Event = this._itemsList[indexPath.Row];
             return cell;
         }
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (_eventsList.Count - indexPath.Row == 5 && _canLoadMore)
+            if (_itemsList.Count - indexPath.Row == 5 && _canLoadMore)
             {
                 LoadMoreAsync();
             }
@@ -88,16 +99,20 @@ namespace TellMe.iOS.Controllers
 
         public void DisplayItems(ICollection<EventDTO> items)
         {
-            lock (((ICollection) _eventsList).SyncRoot)
+            lock (((ICollection) _itemsList).SyncRoot)
             {
-                var initialCount = _eventsList.Count;
-                _eventsList.Clear();
-                _eventsList.AddRange(items);
+                var initialCount = _itemsList.Count;
+                _itemsList.Clear();
+                _itemsList.AddRange(items);
 
                 this._canLoadMore = items.Count > initialCount;
             }
 
-            InvokeOnMainThread(() => TableView.ReloadData());
+            InvokeOnMainThread(() =>
+            {
+                SetTableBackground();
+                TableView.ReloadData();
+            });
         }
 
         public void ShowErrorMessage(string title, string message = null) =>
@@ -108,7 +123,7 @@ namespace TellMe.iOS.Controllers
 
         public void ReloadItem(EventDTO dto)
         {
-            var index = _eventsList.IndexOf(x => x.Id == dto.Id);
+            var index = _itemsList.IndexOf(x => x.Id == dto.Id);
             InvokeOnMainThread(() =>
                 TableView.ReloadRows(new[] {NSIndexPath.FromRowSection(index, 0)}, UITableViewRowAnimation.None));
         }
@@ -171,6 +186,11 @@ namespace TellMe.iOS.Controllers
             {
                 _businessLogic.NavigateTribe(eventAttendee.TribeId.Value, cell.RemoveTribe);
             }
+        }
+
+        private void SetTableBackground()
+        {
+            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : noItemsBackground;
         }
     }
 }
