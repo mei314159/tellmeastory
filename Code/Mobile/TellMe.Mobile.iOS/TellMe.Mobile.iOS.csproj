@@ -197,6 +197,14 @@
     <ImageAsset Include="Assets.xcassets\Request.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Request.imageset\request%402x.png" />
     <ImageAsset Include="Assets.xcassets\Request.imageset\request%403x.png" />
+    <ImageAsset Include="Assets.xcassets\NoEvents.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\NoEvents.imageset\NoEvents%402x.png" />
+    <ImageAsset Include="Assets.xcassets\NoStorytellers.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\NoStorytellers.imageset\NoStorytellers%402x.png" />
+    <ImageAsset Include="Assets.xcassets\NoPlaylists.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\NoPlaylists.imageset\NoPlaylists%402x.png" />
+    <ImageAsset Include="Assets.xcassets\NoStories.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\NoStories.imageset\NoStories%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -232,6 +240,10 @@
     <Folder Include="Assets.xcassets\Burger.imageset\" />
     <Folder Include="Assets.xcassets\Record.imageset\" />
     <Folder Include="Assets.xcassets\Request.imageset\" />
+    <Folder Include="Assets.xcassets\NoEvents.imageset\" />
+    <Folder Include="Assets.xcassets\NoStorytellers.imageset\" />
+    <Folder Include="Assets.xcassets\NoPlaylists.imageset\" />
+    <Folder Include="Assets.xcassets\NoStories.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

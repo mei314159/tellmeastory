@@ -88,7 +88,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="-1" sectionFooterHeight="44" id="3078">
                         <rect key="frame" x="0.0" y="64" width="375" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" colorSpace="calibratedRGB" red="0.88235294117647056" green="0.88235294117647056" blue="0.88235294117647056" alpha="1"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="31708">
                             <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -403,7 +403,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="36421">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.90588235294117647" green="0.90588235294117647" blue="0.90588235294117647" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" colorSpace="calibratedRGB" red="0.88235294117647056" green="0.88235294117647056" blue="0.88235294117647056" alpha="1"/>
                         <view key="tableFooterView" contentMode="scaleToFill" id="36555">
                             <rect key="frame" x="0.0" y="72" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -557,7 +557,7 @@
                             </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="40599">
                                 <rect key="frame" x="0.0" y="108" width="414" height="628"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" colorSpace="calibratedRGB" red="0.88235294117647056" green="0.88235294117647056" blue="0.88235294117647056" alpha="1"/>
                                 <view key="tableFooterView" contentMode="scaleToFill" id="40607">
                                     <rect key="frame" x="0.0" y="35" width="414" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -656,5 +656,9 @@
         <image name="Next" width="50" height="50"/>
         <image name="Prev" width="50" height="50"/>
         <image name="More" width="30" height="30"/>
+        <image name="NoEvents" width="350" height="129.5"/>
+        <image name="NoStorytellers" width="350" height="129.5"/>
+        <image name="NoPlaylists" width="350" height="129.5"/>
+        <image name="NoStories" width="350" height="129.5"/>
     </resources>
 </document>
