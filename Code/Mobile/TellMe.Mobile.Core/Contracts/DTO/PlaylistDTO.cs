@@ -15,9 +15,7 @@ namespace TellMe.Mobile.Core.Contracts.DTO
 
         public DateTime CreateDateUtc { get; set; }
 
-        public string UserId { get; set; }
-
-        [SQLite.Ignore]
+        [Ignore]
         public List<StoryListDTO> Stories { get; set; }
     }
 }

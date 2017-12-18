@@ -20,17 +20,19 @@ namespace TellMe.Mobile.Core.Contracts
             NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null);
 
         void NavigateStoryDetails(IView view, string videoPath, string previewImagePath,
-            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null, EventDTO eventDTO = null);
+            StoryRequestDTO storyRequest = null, NotificationDTO notification = null, ContactDTO contact = null,
+            EventDTO eventDTO = null);
 
-        void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients, ItemUpdateHandler<List<StoryRequestDTO>> e, EventDTO eventDTO = null);
-        void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish);
+        void NavigatePrepareStoryRequest(IView view, ICollection<ContactDTO> recipients,
+            ItemUpdateHandler<List<StoryRequestDTO>> e, EventDTO eventDTO = null);
 
-        void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
+        void NavigateChooseStorytellersAndTribes(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
+            string title);
+
+        void NavigateChooseStorytellers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish, string title,
             HashSet<string> disabledUserIds = null);
 
-        void NavigateAccountSettings(IView view);
         void NavigateSetProfilePicture(IView view);
-        void NavigateStorytellers(IView view);
         void NavigateStoryteller(IView view, StorytellerDTO storyteller);
         void NavigateStoryteller(IView view, string userId);
         void NavigateNotificationsCenter(IView view);
@@ -43,11 +45,15 @@ namespace TellMe.Mobile.Core.Contracts
         void NavigateViewEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged);
         void NavigateCreateEvent(IView view, ItemUpdateHandler<EventDTO> eventStateChanged);
         void NavigateEditEvent(IView view, EventDTO eventDTO, ItemUpdateHandler<EventDTO> eventStateChanged);
-        void NavigateEvents(IView view);
-        void NavigatePlaylists(IView view, PlaylistViewMode mode = PlaylistViewMode.Normal, Func<IDismissable, PlaylistDTO, Task> onSelected = null);
+
+        void NavigatePlaylists(IView view, PlaylistViewMode mode = PlaylistViewMode.Normal,
+            Func<IDismissable, PlaylistDTO, Task> onSelected = null);
+
         void NavigateCreatePlaylist(IView view, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void NavigateViewPlaylist(IView view, PlaylistDTO dto, ItemUpdateHandler<PlaylistDTO> eventHandler);
         void SwapToAuth();
-        void NavigateSearchStories(IView view, ItemsSelectedHandler<StoryListDTO> storiesSelectedEventHandler, bool dismissOnFinish, HashSet<int> disabledStories);
+
+        void NavigateSearchStories(IView view, ItemsSelectedHandler<StoryListDTO> storiesSelectedEventHandler,
+            bool dismissOnFinish, HashSet<int> disabledStories);
     }
 }

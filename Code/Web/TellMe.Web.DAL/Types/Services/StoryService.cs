@@ -11,7 +11,6 @@ using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
-using TellMe.Web.DAL.Extensions;
 using TellMe.Web.DAL.Types.Domain;
 using TellMe.Web.DAL.Types.PushNotifications;
 using ContactType = TellMe.Shared.Contracts.Enums.ContactType;
@@ -32,6 +31,7 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
         private readonly IRepository<Event, int> _eventRepository;
         private readonly IRepository<Playlist, int> _playlistRepository;
+        private readonly IRepository<PlaylistUser> _playlistUsersRepository;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -43,7 +43,8 @@ namespace TellMe.Web.DAL.Types.Services
             IRepository<StoryLike> storyLikeRepository,
             IRepository<ApplicationUser> userRepository,
             IRepository<EventAttendee, int> eventAttendeeRepository,
-            IRepository<Event, int> eventRepository, IRepository<Playlist, int> playlistRepository)
+            IRepository<Event, int> eventRepository, IRepository<Playlist, int> playlistRepository,
+            IRepository<PlaylistUser> playlistUsersRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -56,6 +57,7 @@ namespace TellMe.Web.DAL.Types.Services
             _eventAttendeeRepository = eventAttendeeRepository;
             _eventRepository = eventRepository;
             _playlistRepository = playlistRepository;
+            _playlistUsersRepository = playlistUsersRepository;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -616,10 +618,14 @@ namespace TellMe.Web.DAL.Types.Services
 
         public async Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId)
         {
-            var playlist = await this._playlistRepository.GetQueryable()
-                .Include(x => x.Stories)
-                .FirstOrDefaultAsync(x => x.Id == playlistId && x.UserId == currentUserId)
+            var playlist = await _playlistUsersRepository
+                .GetQueryable()
+                .Include(x => x.Playlist)
+                .Where(x => x.PlaylistId == playlistId && x.UserId == currentUserId)
+                .Select(x => x.Playlist)
+                .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
+            
             if (playlist.Stories.All(x => x.StoryId != storyId))
             {
                 playlist.Stories.Add(new PlaylistStory

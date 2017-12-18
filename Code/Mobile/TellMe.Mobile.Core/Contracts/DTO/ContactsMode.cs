@@ -3,7 +3,7 @@
     public enum ContactsMode
     {
         DisplayStorytellers,
-        ChooseRecipient,
-        ChooseTribeMembers
+        StorytellersAndTribes,
+        StorytellersOnly
     }
 }

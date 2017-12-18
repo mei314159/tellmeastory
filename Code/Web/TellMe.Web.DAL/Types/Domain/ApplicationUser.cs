@@ -24,6 +24,6 @@ namespace TellMe.Web.DAL.Types.Domain
         
         public virtual ICollection<Event> HostedEvents { get; set; }
         
-        public virtual ICollection<Playlist> Playlists { get; set; }
+        public virtual ICollection<PlaylistUser> Playlists { get; set; }
     }
 }

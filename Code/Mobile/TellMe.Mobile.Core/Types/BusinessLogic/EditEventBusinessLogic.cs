@@ -62,7 +62,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void NavigateCreateRequest()
         {
-            _router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
+            _router.NavigateChooseStorytellersAndTribes(View, RequestStoryRecipientSelectedEventHandler, false, "Choose recipient");
         }
 
         public async Task SaveAsync()

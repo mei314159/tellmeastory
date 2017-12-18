@@ -29,7 +29,7 @@ namespace TellMe.iOS.Controllers
         private readonly List<ContactDTO> _tribesList = new List<ContactDTO>();
         private volatile bool _loadingMore;
         private volatile bool _canLoadMore;
-        private UIImageView noItemsBackground;
+        private UIImageView _noItemsBackground;
 
         public ContactsMode Mode { get; set; }
         public event StorytellerSelectedEventHandler RecipientsSelected;
@@ -37,6 +37,7 @@ namespace TellMe.iOS.Controllers
 
         public HashSet<string> DisabledUserIds { get; set; }
         public HashSet<int> DisabledTribeIds { get; set; }
+        public string ViewTitle { get; set; }
 
         public StorytellersViewController(IntPtr handle) : base(handle)
         {
@@ -45,7 +46,7 @@ namespace TellMe.iOS.Controllers
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
-            noItemsBackground = new UIImageView(UIImage.FromBundle("NoStorytellers"))
+            _noItemsBackground = new UIImageView(UIImage.FromBundle("NoStorytellers"))
             {
                 ContentMode = UIViewContentMode.Center
             };
@@ -136,7 +137,7 @@ namespace TellMe.iOS.Controllers
         [Export("tableView:didSelectRowAtIndexPath:")]
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
-            if (Mode == ContactsMode.ChooseRecipient || Mode == ContactsMode.ChooseTribeMembers)
+            if (Mode == ContactsMode.StorytellersAndTribes || Mode == ContactsMode.StorytellersOnly)
             {
                 NavItem.RightBarButtonItem.Enabled = tableView.IndexPathsForSelectedRows?.Length > 0;
                 return;
@@ -271,7 +272,7 @@ namespace TellMe.iOS.Controllers
             if (storytellersExists)
                 sectionsCount++;
             
-            if (Mode != ContactsMode.ChooseTribeMembers && tribesExists)
+            if (Mode != ContactsMode.StorytellersOnly && tribesExists)
                 sectionsCount++;
             
             return sectionsCount;
@@ -455,8 +456,8 @@ namespace TellMe.iOS.Controllers
                     NavItem.Title = "Storytellers";
                     TableViewTop.Constant = 44;
                     break;
-                case ContactsMode.ChooseRecipient:
-                    NavItem.Title = "Choose recipient";
+                case ContactsMode.StorytellersAndTribes:
+                    NavItem.Title = this.ViewTitle;
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
                     TableViewTop.Constant = 0;
@@ -466,8 +467,8 @@ namespace TellMe.iOS.Controllers
                             Enabled = false
                         }, false);
                     break;
-                case ContactsMode.ChooseTribeMembers:
-                    NavItem.Title = "Choose Tribe Membes";
+                case ContactsMode.StorytellersOnly:
+                    NavItem.Title = this.ViewTitle;
                     TableView.SetEditing(true, true);
                     SearchBar.Hidden = true;
                     TableViewTop.Constant = 0;
@@ -482,7 +483,7 @@ namespace TellMe.iOS.Controllers
 
         private void SetTableBackground()
         {
-            this.TableView.BackgroundView = this._storytellersList.Count > 0 && this._tribesList.Count > 0 ? null : noItemsBackground;
+            this.TableView.BackgroundView = this._storytellersList.Count > 0 && this._tribesList.Count > 0 ? null : _noItemsBackground;
         }
     }
 }

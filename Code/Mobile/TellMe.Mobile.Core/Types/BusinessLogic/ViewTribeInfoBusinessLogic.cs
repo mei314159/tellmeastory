@@ -64,7 +64,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public void ChooseMembers()
         {
             var selectedItems = new HashSet<string>(View.Tribe.Members.Select(x => x.UserId));
-            _router.NavigateChooseTribeMembers(View, HandleStorytellerSelectedEventHandler, true, selectedItems);
+            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, true, "Choose Tribe Membes", selectedItems);
         }
 
         private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView, ICollection<ContactDTO> selectedContacts)

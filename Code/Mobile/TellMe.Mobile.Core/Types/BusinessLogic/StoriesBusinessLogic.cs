@@ -34,7 +34,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void RequestStory()
         {
-            Router.NavigateChooseRecipients(View, RequestStoryRecipientSelectedEventHandler, false);
+            Router.NavigateChooseStorytellersAndTribes(View, RequestStoryRecipientSelectedEventHandler, false, "Choose recipient");
         }
 
         public void NotificationsCenter()

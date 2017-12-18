@@ -24,14 +24,17 @@ namespace TellMe.Web.DAL
             builder.Entity<Story>().HasOne(x => x.Request).WithMany(x => x.Stories).HasForeignKey(x => x.RequestId);
             builder.Entity<Story>().HasOne(x => x.Sender).WithMany(x => x.SentStories).HasForeignKey(x => x.SenderId);
 
-            builder.Entity<Playlist>().HasOne(x => x.User).WithMany(x => x.Playlists).HasForeignKey(x => x.UserId)
-                .IsRequired();
-
             builder.Entity<PlaylistStory>().HasOne(x => x.Playlist).WithMany(x => x.Stories)
                 .HasForeignKey(x => x.PlaylistId);
             builder.Entity<PlaylistStory>().HasOne(x => x.Story).WithMany(x => x.Playlists)
                 .HasForeignKey(x => x.StoryId);
             builder.Entity<PlaylistStory>().HasKey(x => new {x.PlaylistId, x.StoryId});
+            
+            builder.Entity<PlaylistUser>().HasOne(x => x.Playlist).WithMany(x => x.Users)
+                .HasForeignKey(x => x.PlaylistId);
+            builder.Entity<PlaylistUser>().HasOne(x => x.User).WithMany(x => x.Playlists)
+                .HasForeignKey(x => x.UserId);
+            builder.Entity<PlaylistUser>().HasKey(x => new {x.PlaylistId, x.UserId});
 
             builder.Entity<StoryLike>().HasOne(x => x.User).WithMany(x => x.LikedStories).HasForeignKey(x => x.UserId)
                 .IsRequired();

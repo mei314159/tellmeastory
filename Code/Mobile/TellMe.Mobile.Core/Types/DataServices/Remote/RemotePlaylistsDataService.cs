@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.DataServices;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.Mobile.Core.Types.DataServices.Remote
 {
@@ -36,6 +37,12 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
         {
             var httpMethod = dto.Id == default(int) ? HttpMethod.Post : HttpMethod.Put;
             var result = await this._apiProvider.SendDataAsync<PlaylistDTO>("playlists", dto, httpMethod).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result> ShareAsync(SharePlaylistDTO dto)
+        {
+            var result = await this._apiProvider.PostAsync<object>($"playlists/{dto.PlaylistId}/share", dto).ConfigureAwait(false);
             return result;
         }
 
