@@ -1,20 +1,29 @@
 using System;
 using System.IO;
+using System.Threading;
 using AVFoundation;
 using CoreFoundation;
 using CoreGraphics;
 using Foundation;
 using SDWebImage;
+using TellMe.iOS.Core;
+using TellMe.iOS.Extensions;
+using TellMe.iOS.Views;
 using TellMe.iOS.Views.Cells;
+using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
+using TellMe.Mobile.Core.Contracts.UI;
+using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Shared.Contracts.DTO;
 using UIKit;
 using Constants = TellMe.Mobile.Core.Constants;
+using Timer = System.Timers.Timer;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class PlaylistViewController : UIViewController, IUITableViewDelegate, IUITableViewDataSource,
+    public partial class PlaylistViewController : UIViewController, IPlaylistView, IUITableViewDelegate,
+        IUITableViewDataSource,
         IAVAssetResourceLoaderDelegate
     {
         private AVPlayer _player;
@@ -29,6 +38,12 @@ namespace TellMe.iOS.Controllers
 
         private UIColor _navbarWrapperColor;
         private bool _controlsVisible = true;
+        private UIBarButtonItem _saveButton;
+        private UIBarButtonItem _editButton;
+        private UIBarButtonItem _shareButton;
+        private UIBarButtonItem _closeButton;
+        private Timer _timer;
+        private IPlaylistViewBusinessLogic _businessLogic;
 
         public PlaylistViewController() : base("PlaylistViewController", null)
         {
@@ -40,27 +55,30 @@ namespace TellMe.iOS.Controllers
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+            this._businessLogic = IoC.GetInstance<IPlaylistViewBusinessLogic>();
+            this._businessLogic.View = this;
             TableView.Delegate = this;
             TableView.DataSource = this;
-            TableView.Editing = true;
             TableView.DragInteractionEnabled = true;
             TableView.AllowsSelectionDuringEditing = true;
             TableView.RegisterNibForCellReuse(SlimStoryCell.Nib, SlimStoryCell.Key);
-            this.NavigationItem.Title = Playlist.Name;
-
-            this.Preview.Layer.MasksToBounds = false;
-            this.Preview.Layer.ShadowOffset = new CGSize(0, 2);
-            this.Preview.Layer.ShadowRadius = 2;
-            this.Preview.Layer.ShadowOpacity = 0.5f;
             SetGestureRecognizers();
-            this.ButtonsWrapper.Layer.MasksToBounds = false;
-            this.ButtonsWrapper.Layer.ShadowOffset = new CGSize(0, 2);
-            this.ButtonsWrapper.Layer.ShadowRadius = 2;
-            this.ButtonsWrapper.Layer.ShadowOpacity = 0.5f;
-            this._navbarWrapperColor = this.NavigationBarWrapper.BackgroundColor;           
-            this.ButtonsWrapper.BackgroundColor = _navbarWrapperColor.ColorWithAlpha(0.4f);
-            this.NavigationBar.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
-            this.NavigationBar.ShadowImage = new UIImage();
+            this._navbarWrapperColor = UIColor.FromRGB(33, 194, 250).ColorWithAlpha(0.4f);
+            this.ButtonsWrapper.BackgroundColor = _navbarWrapperColor;
+            this.NavigationController.NavigationBar.BarTintColor = _navbarWrapperColor;
+            this.NavigationController.NavigationBar.TintColor = UIColor.White;
+            this.NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes
+            {
+                ForegroundColor = UIColor.White
+            };
+            this._timer = new Timer(3000);
+            this._timer.Elapsed += (sender, args) =>
+            {
+                if (_playing)
+                    InvokeOnMainThread(() =>
+                        ToggleControls(false));
+            };
+            this.SetButtons();
             this.TogglePlayer(false);
         }
 
@@ -78,22 +96,22 @@ namespace TellMe.iOS.Controllers
             {
                 ToggleControls(true);
             }
-
-            this.NavigationItem.RightBarButtonItem = show
-                ? new UIBarButtonItem(UIImage.FromBundle("Playlists"), UIBarButtonItemStyle.Done,
-                    (x, y) => StopPlaying())
-                : new UIBarButtonItem(UIBarButtonSystemItem.Play, PlayButton_Touched);
-            this.NavigationItem.RightBarButtonItem.TintColor = UIColor.White;
-
+            else
+            {
+                this.NavigationController.SetNavigationBarHidden(false, true);
+            }
             var top = show ? 0 : this.View.Frame.Height;
-            var color = show ? _navbarWrapperColor.ColorWithAlpha(0.4f) : _navbarWrapperColor;
             UIView.Animate(0.2,
                 () =>
                 {
-                    NavigationBarWrapper.BackgroundColor = color;
                     this.PlayerWrapperTop.Constant = top;
                     this.View.LayoutIfNeeded();
-                }, () => { _playerVisible = show; });
+                }, () =>
+                {
+                    {
+                        _playerVisible = show;
+                    }
+                });
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -175,19 +193,48 @@ namespace TellMe.iOS.Controllers
             return true;
         }
 
+        public void ShowErrorMessage(string title, string message = null) =>
+            ViewExtensions.ShowErrorMessage(this, title, message);
+
+        public void ShowSuccessMessage(string message, Action complete = null) =>
+            ViewExtensions.ShowSuccessMessage(this, message, complete);
+
+        public void PlaylistSaved()
+        {
+            TableView.SetEditing(false, true);
+            SetButtons();
+        }
+
+        public IOverlay DisableInput()
+        {
+            var overlay = new Overlay("Wait");
+            overlay.PopUp();
+
+            return overlay;
+        }
+
+        public void EnableInput(IOverlay overlay)
+        {
+            overlay?.Close(false);
+            overlay?.Dispose();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 StopPlaying();
+                this._saveButton.Dispose();
+                this._editButton.Dispose();
+                this._shareButton.Dispose();
+                _navbarWrapperColor.Dispose();
+                this._saveButton = null;
+                this._editButton = null;
+                this._shareButton = null;
+                _navbarWrapperColor = null;
             }
 
             base.Dispose(disposing);
-        }
-
-        partial void CloseButton_Activated(UIBarButtonItem sender)
-        {
-            this.DismissViewController(true, null);
         }
 
         partial void NextButton_TouchUpInside(UIButton sender)
@@ -226,7 +273,9 @@ namespace TellMe.iOS.Controllers
 
         private void PlayStory(StoryListDTO story)
         {
+            _playing = true;
             this.TogglePlayer(true);
+            SetButtons();
             Preview.SetImage(new NSUrl(story.PreviewUrl));
 
             if (_player == null)
@@ -248,7 +297,6 @@ namespace TellMe.iOS.Controllers
                 AvCustomEditPlayerViewControllerStatusObservationContext.Handle);
             Spinner.Hidden = false;
             Spinner.StartAnimating();
-            _playing = true;
         }
 
 
@@ -275,6 +323,8 @@ namespace TellMe.iOS.Controllers
         {
             if (this._playing)
             {
+                _playing = false;
+                SetButtons();
                 TogglePlayer(false);
                 Spinner.StopAnimating();
                 Spinner.Hidden = true;
@@ -284,7 +334,6 @@ namespace TellMe.iOS.Controllers
                 _playerLayer.RemoveFromSuperLayer();
                 _player.CurrentItem.RemoveObserver(this, "status",
                     AvCustomEditPlayerViewControllerStatusObservationContext.Handle);
-                _playing = false;
                 _player.Dispose();
                 _playerLayer.Dispose();
                 _player = null;
@@ -346,10 +395,71 @@ namespace TellMe.iOS.Controllers
             });
         }
 
-        private void PlayButton_Touched(object sender, EventArgs eventArgs)
+        private void SetButtons()
         {
-            var currentItem = Playlist.Stories[_currentItemIndex];
-            PlayStory(currentItem);
+            if (_closeButton == null)
+                _closeButton = new UIBarButtonItem(UIBarButtonSystemItem.Stop, CloseButton_Touched);
+            if (_saveButton == null)
+                _saveButton = new UIBarButtonItem(UIBarButtonSystemItem.Save, SaveButton_Touched);
+            if (_editButton == null)
+                _editButton = new UIBarButtonItem(UIBarButtonSystemItem.Edit, EditButton_Touched);
+            if (_shareButton == null)
+                _shareButton = new UIBarButtonItem(UIBarButtonSystemItem.Action, ShareButton_Touched);
+
+            if (_playing)
+            {
+                this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = null;
+                this.NavigationController.NavigationBar.TopItem.Title = null;
+                this.NavigationController.NavigationBar.ShadowImage = new UIImage();
+                this.NavigationController.NavigationBar.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
+                return;
+            }
+            this.NavigationController.NavigationBar.SetBackgroundImage(null, UIBarMetrics.Default);
+            this.NavigationController.NavigationBar.TopItem.LeftBarButtonItem = _closeButton;
+            this.NavigationController.NavigationBar.TopItem.Title = Playlist.Name;
+
+            if (TableView.Editing)
+            {
+                this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
+                {
+                    _saveButton, _shareButton
+                };
+            }
+            else
+            {
+                this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
+                {
+                    _editButton, _shareButton
+                };
+            }
+        }
+
+        private void EditButton_Touched(object sender, EventArgs eventArgs)
+        {
+            TableView.SetEditing(true, true);
+            SetButtons();
+        }
+
+        private async void SaveButton_Touched(object sender, EventArgs eventArgs)
+        {
+            await _businessLogic.SaveAsync().ConfigureAwait(false);
+        }
+
+        private void ShareButton_Touched(object sender, EventArgs e)
+        {
+            _businessLogic.Share();
+        }
+
+        private void CloseButton_Touched(object sender, EventArgs eventArgs)
+        {
+            if (_playing)
+            {
+                StopPlaying();
+            }
+            else
+            {
+                this.DismissViewController(true, null);
+            }
         }
 
         private void PreviewTouched(UITapGestureRecognizer r)
@@ -381,13 +491,24 @@ namespace TellMe.iOS.Controllers
             var newValue = visible ?? !_controlsVisible;
 
             var alpha = newValue ? 1 : 0;
-            var navbarTop = newValue ? 0 : -64;
+
+            this.NavigationController.SetNavigationBarHidden(_playing && !newValue, true);
             UIView.Animate(0.2, () =>
             {
                 this.ButtonsWrapper.Alpha = alpha;
-                this.NavBarWrapperTop.Constant = navbarTop;
                 this.View.LayoutIfNeeded();
-            }, () => { _controlsVisible = newValue; });
+            }, () =>
+            {
+                _controlsVisible = newValue;
+                if (newValue)
+                {
+                    _timer.Start();
+                }
+                else
+                {
+                    _timer.Stop();
+                }
+            });
         }
     }
 }

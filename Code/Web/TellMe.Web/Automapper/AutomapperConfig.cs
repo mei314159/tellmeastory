@@ -61,13 +61,15 @@ namespace TellMe.Web.Automapper
 
                 cfg.CreateMap<PlaylistDTO, Playlist>()
                     .ForMember(x => x.Id, x => x.Ignore())
-                    .ForMember(x => x.UserId, x => x.Ignore())
+                    .ForMember(x => x.Users, x => x.Ignore())
                     .ForMember(x => x.CreateDateUtc, x => x.MapFrom(y => DateTime.UtcNow))
                     .ForMember(x => x.Stories, x => x.Ignore())
                     .BeforeMap((dto, entity) =>
                     {
                         if (entity.Stories == null)
                             entity.Stories = new List<PlaylistStory>();
+                        if (entity.Users == null)
+                            entity.Users = new List<PlaylistUser>();
                     })
                     .AfterMap((dto, entity, afterFunction) =>
                     {
@@ -76,6 +78,7 @@ namespace TellMe.Web.Automapper
                             {
                                 playlistStory.StoryId = storyDTO.Id;
                                 playlistStory.PlaylistId = entity.Id;
+                                playlistStory.Order = storyDTO.Order;
                             });
                     });
 

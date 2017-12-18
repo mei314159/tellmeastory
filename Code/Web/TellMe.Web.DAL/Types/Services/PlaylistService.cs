@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
+using TellMe.Web.DAL.Extensions;
 using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.DAL.Types.Services
@@ -17,19 +20,22 @@ namespace TellMe.Web.DAL.Types.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Playlist> _playlistRepository;
+        private readonly IRepository<PlaylistUser> _playlistUsersRepository;
 
-        public PlaylistService(IUnitOfWork unitOfWork, IRepository<Playlist> playlistRepository)
+        public PlaylistService(IUnitOfWork unitOfWork, IRepository<Playlist> playlistRepository,
+            IRepository<PlaylistUser> playlistUsersRepository)
         {
             _unitOfWork = unitOfWork;
             _playlistRepository = playlistRepository;
+            _playlistUsersRepository = playlistUsersRepository;
         }
 
         public async Task<PlaylistDTO> GetAsync(string currentUserId, int playlistId)
         {
-            var result = await _playlistRepository
-                .GetQueryable(true)
-                .Include(x => x.User)
-                .Where(x => x.Id == playlistId && x.UserId == currentUserId)
+            var result = await _playlistUsersRepository.GetQueryable(true)
+                .Include(x => x.Playlist)
+                .Where(x => x.PlaylistId == playlistId && x.UserId == currentUserId)
+                .Select(x => x.Playlist)
                 .ProjectTo<PlaylistDTO>()
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -39,15 +45,13 @@ namespace TellMe.Web.DAL.Types.Services
 
         public async Task<ICollection<PlaylistDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
         {
-            var result = await _playlistRepository
-                .GetQueryable(true)
-                .Include(x => x.User)
-                .Include(x => x.Stories)
-                .ThenInclude(x => x.Story).ThenInclude(x => x.Sender)
-                .Where(x => x.UserId == currentUserId && x.CreateDateUtc < olderThanUtc)
+            var result = await _playlistUsersRepository.GetQueryable(true)
+                .Include(x => x.Playlist)
+                .Where(x => x.UserId == currentUserId && x.Playlist.CreateDateUtc < olderThanUtc)
+                .Select(x => x.Playlist)
+                .ProjectTo<PlaylistDTO>()
                 .OrderBy(x => x.CreateDateUtc)
                 .Take(20)
-                .ProjectTo<PlaylistDTO>()
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -61,7 +65,14 @@ namespace TellMe.Web.DAL.Types.Services
                 ? new Playlist
                 {
                     CreateDateUtc = DateTime.UtcNow,
-                    UserId = currentUserId
+                    Users = new List<PlaylistUser>
+                    {
+                        new PlaylistUser
+                        {
+                            UserId = currentUserId,
+                            Type = PlaylistUserType.Author
+                        }
+                    }
                 }
                 : await _playlistRepository.GetQueryable().FirstAsync(x => x.Id == playlistDTO.Id)
                     .ConfigureAwait(false);
@@ -71,24 +82,39 @@ namespace TellMe.Web.DAL.Types.Services
 
             var result = await _playlistRepository
                 .GetQueryable(true)
-                .Include(x => x.User)
                 .Where(x => x.Id == playlist.Id)
                 .ProjectTo<PlaylistDTO>()
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-
             return result;
+        }
+
+        public async Task ShareAsync(string currentUserId, int playlistId, SharePlaylistDTO dto)
+        {
+            var entity = await _playlistRepository
+                .GetQueryable()
+                .Include(x => x.Users)
+                .Where(x => x.Id == playlistId && x.Users.Any(y => y.UserId == currentUserId && y.Type == PlaylistUserType.Author))
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+
+            entity.Users.MapFrom(dto.UserIds, contactDTO => contactDTO, x => x.UserId,
+                (userId, user) => { user.UserId = userId; });
+
+            await _playlistRepository.SaveAsync(entity).ConfigureAwait(false);
         }
 
         public async Task DeleteAsync(string currentUserId, int playlistId)
         {
             _unitOfWork.BeginTransaction();
 
-            var entity = await _playlistRepository
+            var entity = await _playlistUsersRepository
                 .GetQueryable()
-                .FirstOrDefaultAsync(x => x.Id == playlistId && x.UserId == currentUserId)
+                .Include(x => x.Playlist)
+                .Where(x => x.PlaylistId == playlistId && x.UserId == currentUserId)
+                .Select(x => x.Playlist)
+                .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-
             if (entity == null)
             {
                 throw new Exception("Playlist was not found or you don't have permissions to delete it");

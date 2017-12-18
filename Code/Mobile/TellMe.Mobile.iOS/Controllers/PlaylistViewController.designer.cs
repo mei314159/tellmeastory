@@ -16,26 +16,8 @@ namespace TellMe.iOS.Controllers
         [Outlet]
         UIKit.UIView ButtonsWrapper { get; set; }
 
-
-        [Outlet]
-        UIKit.NSLayoutConstraint NavBarWrapperTop { get; set; }
-
-
-        [Outlet]
-        UIKit.UINavigationBar NavigationBar { get; set; }
-
-
-        [Outlet]
-        UIKit.UIView NavigationBarWrapper { get; set; }
-
-
-        [Outlet]
-        UIKit.UINavigationItem NavigationItem { get; set; }
-
-
         [Outlet]
         UIKit.NSLayoutConstraint PlayerWrapperTop { get; set; }
-
 
         [Outlet]
         UIKit.UITableView TableView { get; set; }
@@ -64,10 +46,6 @@ namespace TellMe.iOS.Controllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
-        [Action ("CloseButton_Activated:")]
-        partial void CloseButton_Activated (UIKit.UIBarButtonItem sender);
-
-
         [Action ("NextButton_TouchUpInside:")]
         partial void NextButton_TouchUpInside (UIKit.UIButton sender);
 
@@ -86,27 +64,7 @@ namespace TellMe.iOS.Controllers
                 CloseButton.Dispose ();
                 CloseButton = null;
             }
-
-            if (NavBarWrapperTop != null) {
-                NavBarWrapperTop.Dispose ();
-                NavBarWrapperTop = null;
-            }
-
-            if (NavigationBar != null) {
-                NavigationBar.Dispose ();
-                NavigationBar = null;
-            }
-
-            if (NavigationBarWrapper != null) {
-                NavigationBarWrapper.Dispose ();
-                NavigationBarWrapper = null;
-            }
-
-            if (NavigationItem != null) {
-                NavigationItem.Dispose ();
-                NavigationItem = null;
-            }
-
+            
             if (NextButton != null) {
                 NextButton.Dispose ();
                 NextButton = null;

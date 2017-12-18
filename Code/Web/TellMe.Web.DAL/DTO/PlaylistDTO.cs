@@ -12,8 +12,6 @@ namespace TellMe.Web.DAL.DTO
 
         public DateTime CreateDateUtc { get; set; }
 
-        public string UserId { get; set; }
-
         public ICollection<StoryListDTO> Stories { get; set; }
     }
 }

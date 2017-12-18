@@ -60,7 +60,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     _contacts.Clear();
                     _contacts.AddRange(storytellers.Data
                         .Where(x =>
-                            (View.Mode == ContactsMode.ChooseTribeMembers &&
+                            (View.Mode == ContactsMode.StorytellersOnly &&
                              x.FriendshipStatus == FriendshipStatus.Accepted) ||
                             x.FriendshipStatus != FriendshipStatus.None
                         ).Select(x => new ContactDTO
@@ -168,7 +168,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void AddTribe()
         {
-            _router.NavigateChooseTribeMembers(View, HandleStorytellerSelectedEventHandler, false);
+            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, false, "Choose Tribe Membes");
         }
 
         private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView, ICollection<ContactDTO> selectedContacts)

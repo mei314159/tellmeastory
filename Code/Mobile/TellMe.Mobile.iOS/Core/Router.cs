@@ -40,45 +40,31 @@ namespace TellMe.iOS.Core
             this.Present(targetController, view);
         }
 
-        public void NavigateChooseRecipients(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish)
+        public void NavigateChooseStorytellersAndTribes(IView view, StorytellerSelectedEventHandler e,
+            bool dismissOnFinish, string title = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("StorytellersController");
-                targetController.Mode = ContactsMode.ChooseRecipient;
+                targetController.Mode = ContactsMode.StorytellersAndTribes;
+                targetController.ViewTitle = title;
                 targetController.DismissOnFinish = dismissOnFinish;
                 targetController.RecipientsSelected += e;
                 this.Present(targetController, view);
             });
         }
 
-        public void NavigateChooseTribeMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
-            HashSet<string> disabledUserIds = null)
+        public void NavigateChooseStorytellers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
+            string title = null, HashSet<string> disabledUserIds = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("StorytellersController");
-                targetController.Mode = ContactsMode.ChooseTribeMembers;
+                targetController.Mode = ContactsMode.StorytellersOnly;
+                targetController.ViewTitle = title;
                 targetController.DisabledUserIds = disabledUserIds;
-                targetController.DismissOnFinish = dismissOnFinish;
-                targetController.RecipientsSelected += e;
-                this.Present(targetController, view);
-            });
-        }
-
-        public void NavigateChooseEventMembers(IView view, StorytellerSelectedEventHandler e, bool dismissOnFinish,
-            HashSet<string> disabledUserIds = null,
-            HashSet<int> disabledTribeIds = null)
-        {
-            this._window.InvokeOnMainThread(() =>
-            {
-                var targetController = (StorytellersViewController) UIStoryboard.FromName("Main", null)
-                    .InstantiateViewController("StorytellersController");
-                targetController.Mode = ContactsMode.ChooseRecipient;
-                targetController.DisabledUserIds = disabledUserIds;
-                targetController.DisabledTribeIds = disabledTribeIds;
                 targetController.DismissOnFinish = dismissOnFinish;
                 targetController.RecipientsSelected += e;
                 this.Present(targetController, view);
@@ -135,32 +121,12 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateAccountSettings(IView view)
-        {
-            this._window.InvokeOnMainThread(() =>
-            {
-                var targetController = UIStoryboard.FromName("Main", null)
-                    .InstantiateViewController("ProfileViewController");
-                this.Present(targetController, view);
-            });
-        }
-
         public void NavigateSetProfilePicture(IView view)
         {
             this._window.InvokeOnMainThread(() =>
             {
                 var targetController = UIStoryboard.FromName("Auth", null)
                     .InstantiateViewController("UploadPictureController");
-                this.Present(targetController, view);
-            });
-        }
-
-        public void NavigateStorytellers(IView view)
-        {
-            this._window.InvokeOnMainThread(() =>
-            {
-                var targetController = UIStoryboard.FromName("Story", null)
-                    .InstantiateViewController("StorytellersController");
                 this.Present(targetController, view);
             });
         }
@@ -304,22 +270,12 @@ namespace TellMe.iOS.Core
             });
         }
 
-        public void NavigateEvents(IView view)
-        {
-            this._window.InvokeOnMainThread(() =>
-            {
-                var targetController = (EventsViewController)UIStoryboard.FromName("Main", null)
-                    .InstantiateViewController("EventsViewController");
-                this.Present(targetController, view);
-            });
-        }
-
         public void NavigatePlaylists(IView view, PlaylistViewMode mode = PlaylistViewMode.Normal,
             Func<IDismissable, PlaylistDTO, Task> onSelected = null)
         {
             this._window.InvokeOnMainThread(() =>
             {
-                var targetController = (PlaylistsViewController)UIStoryboard.FromName("Main", null)
+                var targetController = (PlaylistsViewController) UIStoryboard.FromName("Main", null)
                     .InstantiateViewController("PlaylistsViewController");
                 targetController.Mode = mode;
                 if (onSelected != null)
@@ -345,7 +301,8 @@ namespace TellMe.iOS.Core
                 var targetController = IoC.GetInstance<PlaylistViewController>();
                 targetController.Playlist = dto;
                 targetController.ItemUpdated += eventHandler;
-                this.Present(targetController, view, false);
+                var navController = new UINavigationController(targetController);
+                this.Present(navController, view, false);
             });
         }
 
@@ -378,8 +335,8 @@ namespace TellMe.iOS.Core
             if (!(view is UIViewController controller))
             {
                 controller = ((ViewWrapper) view).Controller;
-            }            
-            
+            }
+
             if (controller.NavigationController != null && push)
             {
                 controller.NavigationController.PushViewController(targetController, true);

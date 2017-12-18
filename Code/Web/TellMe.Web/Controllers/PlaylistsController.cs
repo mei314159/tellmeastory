@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TellMe.Shared.Contracts.DTO;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.Extensions;
@@ -31,6 +32,13 @@ namespace TellMe.Web.Controllers
             var result = await _playlistService.GetAsync(this.UserId, id);
 
             return Ok(result);
+        }
+        
+        [HttpPost("{playlistId}/share")]
+        public async Task<IActionResult> ShareAsync(int playlistId, [FromBody] SharePlaylistDTO dto)
+        {
+            await _playlistService.ShareAsync(this.UserId, playlistId, dto);
+            return Ok();
         }
         
         [HttpPost("")]

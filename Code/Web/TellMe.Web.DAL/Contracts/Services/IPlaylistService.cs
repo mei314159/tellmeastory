@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TellMe.Shared.Contracts.DTO;
 using TellMe.Web.DAL.DTO;
 
 namespace TellMe.Web.DAL.Contracts.Services
@@ -12,6 +13,8 @@ namespace TellMe.Web.DAL.Contracts.Services
         Task<ICollection<PlaylistDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc);
         
         Task<PlaylistDTO> SaveAsync(string currentUserId, PlaylistDTO playlistDTO);
+        
+        Task ShareAsync(string currentUserId, int playlistId, SharePlaylistDTO dto);
                
         Task DeleteAsync(string currentUserId, int playlistId);
     }

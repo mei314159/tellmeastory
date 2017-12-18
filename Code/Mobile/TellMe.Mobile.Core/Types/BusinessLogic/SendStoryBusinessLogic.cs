@@ -117,7 +117,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void ChooseRecipients()
         {
-            _router.NavigateChooseRecipients(View, HandleStorytellersSelectedEventHandler, true);
+            _router.NavigateChooseStorytellersAndTribes(View, HandleStorytellersSelectedEventHandler, true, "Choose recipient");
         }
 
         public string GetUsername()
