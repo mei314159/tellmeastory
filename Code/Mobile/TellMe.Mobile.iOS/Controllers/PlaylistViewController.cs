@@ -485,6 +485,8 @@ namespace TellMe.iOS.Controllers
             var newValue = visible ?? !_controlsVisible;
 
             var alpha = newValue ? 1 : 0;
+            
+            this.NavigationController.SetNavigationBarHidden(!newValue, true);
             UIView.Animate(0.2, () =>
             {
                 this.ButtonsWrapper.Alpha = alpha;
@@ -492,7 +494,6 @@ namespace TellMe.iOS.Controllers
             }, () =>
             {
                 _controlsVisible = newValue;
-                this.NavigationController.SetNavigationBarHidden(!newValue, false);
                 if (_controlsVisible)
                 {
                     _timer.Start();
