@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using AVFoundation;
 using CoreFoundation;
 using CoreGraphics;
@@ -17,6 +18,7 @@ using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Shared.Contracts.DTO;
 using UIKit;
 using Constants = TellMe.Mobile.Core.Constants;
+using Timer = System.Timers.Timer;
 
 namespace TellMe.iOS.Controllers
 {
@@ -40,6 +42,7 @@ namespace TellMe.iOS.Controllers
         private UIBarButtonItem _editButton;
         private UIBarButtonItem _shareButton;
         private UIBarButtonItem _closeButton;
+        private Timer _timer;
         private IPlaylistViewBusinessLogic _businessLogic;
 
         public PlaylistViewController() : base("PlaylistViewController", null)
@@ -63,10 +66,22 @@ namespace TellMe.iOS.Controllers
             this._navbarWrapperColor = UIColor.FromRGB(33, 194, 250).ColorWithAlpha(0.4f);
             this.ButtonsWrapper.BackgroundColor = _navbarWrapperColor;
             this.NavigationController.NavigationBar.BarTintColor = _navbarWrapperColor;
+            this.NavigationController.NavigationBar.TintColor = UIColor.White;
+            this.NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes
+            {
+                ForegroundColor = UIColor.White
+            };
+            this._timer = new Timer(1000);
+            this._timer.Elapsed += (sender, args) =>
+            {
+                if (_playing)
+                    InvokeOnMainThread(() =>
+                        ToggleControls(false));
+            };
             this.SetButtons();
             this.TogglePlayer(false);
         }
-        
+
         public override void ViewWillDisappear(bool animated)
         {
             StopPlaying();
@@ -77,10 +92,7 @@ namespace TellMe.iOS.Controllers
             if (_playerVisible == show)
                 return;
 
-            if (show)
-            {
-                ToggleControls(true);
-            }
+            ToggleControls(true);
 
             var top = show ? 0 : this.View.Frame.Height;
             UIView.Animate(0.2,
@@ -88,7 +100,12 @@ namespace TellMe.iOS.Controllers
                 {
                     this.PlayerWrapperTop.Constant = top;
                     this.View.LayoutIfNeeded();
-                }, () => { _playerVisible = show; });
+                }, () =>
+                {
+                    {
+                        _playerVisible = show;
+                    }
+                });
         }
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -371,7 +388,7 @@ namespace TellMe.iOS.Controllers
                 ShouldRecognizeSimultaneously = (recognizer, gestureRecognizer) => true
             });
         }
-        
+
         private void SetButtons()
         {
             if (_closeButton == null)
@@ -382,7 +399,7 @@ namespace TellMe.iOS.Controllers
                 _editButton = new UIBarButtonItem(UIBarButtonSystemItem.Edit, EditButton_Touched);
             if (_shareButton == null)
                 _shareButton = new UIBarButtonItem(UIBarButtonSystemItem.Action, ShareButton_Touched);
-            
+
             if (_playing)
             {
                 this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = null;
@@ -392,14 +409,8 @@ namespace TellMe.iOS.Controllers
                 return;
             }
             this.NavigationController.NavigationBar.SetBackgroundImage(null, UIBarMetrics.Default);
-            this.NavigationController.NavigationBar.TintColor = UIColor.White;
             this.NavigationController.NavigationBar.TopItem.LeftBarButtonItem = _closeButton;
             this.NavigationController.NavigationBar.TopItem.Title = Playlist.Name;
-            
-            this.NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes
-            {
-                ForegroundColor = UIColor.White
-            };
 
             if (TableView.Editing)
             {
@@ -474,12 +485,23 @@ namespace TellMe.iOS.Controllers
             var newValue = visible ?? !_controlsVisible;
 
             var alpha = newValue ? 1 : 0;
-            this.NavigationController.SetNavigationBarHidden(!newValue, true);
             UIView.Animate(0.2, () =>
             {
                 this.ButtonsWrapper.Alpha = alpha;
                 this.View.LayoutIfNeeded();
-            }, () => { _controlsVisible = newValue; });
+            }, () =>
+            {
+                _controlsVisible = newValue;
+                this.NavigationController.SetNavigationBarHidden(!newValue, false);
+                if (_controlsVisible)
+                {
+                    _timer.Start();
+                }
+                else
+                {
+                    _timer.Stop();
+                }
+            });
         }
     }
 }
