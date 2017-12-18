@@ -71,7 +71,7 @@ namespace TellMe.iOS.Controllers
             {
                 ForegroundColor = UIColor.White
             };
-            this._timer = new Timer(1000);
+            this._timer = new Timer(3000);
             this._timer.Elapsed += (sender, args) =>
             {
                 if (_playing)
@@ -92,8 +92,14 @@ namespace TellMe.iOS.Controllers
             if (_playerVisible == show)
                 return;
 
-            ToggleControls(true);
-
+            if (show)
+            {
+                ToggleControls(true);
+            }
+            else
+            {
+                this.NavigationController.SetNavigationBarHidden(false, true);
+            }
             var top = show ? 0 : this.View.Frame.Height;
             UIView.Animate(0.2,
                 () =>
@@ -485,8 +491,8 @@ namespace TellMe.iOS.Controllers
             var newValue = visible ?? !_controlsVisible;
 
             var alpha = newValue ? 1 : 0;
-            
-            this.NavigationController.SetNavigationBarHidden(!newValue, true);
+
+            this.NavigationController.SetNavigationBarHidden(_playing && !newValue, true);
             UIView.Animate(0.2, () =>
             {
                 this.ButtonsWrapper.Alpha = alpha;
@@ -494,7 +500,7 @@ namespace TellMe.iOS.Controllers
             }, () =>
             {
                 _controlsVisible = newValue;
-                if (_controlsVisible)
+                if (newValue)
                 {
                     _timer.Start();
                 }
