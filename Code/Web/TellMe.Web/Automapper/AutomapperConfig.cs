@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Extensions;
 using TellMe.Web.DAL.Types.Domain;
@@ -56,6 +57,8 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.Attendees, x => x.Ignore());
 
                 cfg.CreateMap<Playlist, PlaylistDTO>()
+                    .ForMember(x => x.AuthorId,
+                        x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).UserId))
                     .ForMember(x => x.Stories,
                         x => x.MapFrom(y => y.Stories.OrderBy(d => d.Order).Select(a => a.Story)));
 

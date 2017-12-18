@@ -9,6 +9,8 @@ namespace TellMe.Web.DAL.DTO
         public int Id { get; set; }
 
         public string Name { get; set; }
+        
+        public string AuthorId { get; set; }
 
         public DateTime CreateDateUtc { get; set; }
 

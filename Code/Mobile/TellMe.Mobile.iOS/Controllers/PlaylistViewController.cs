@@ -418,19 +418,26 @@ namespace TellMe.iOS.Controllers
             this.NavigationController.NavigationBar.TopItem.LeftBarButtonItem = _closeButton;
             this.NavigationController.NavigationBar.TopItem.Title = Playlist.Name;
 
-            if (TableView.Editing)
+            if (_businessLogic.CanSaveOrder)
             {
-                this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
+                if (TableView.Editing)
                 {
-                    _saveButton, _shareButton
-                };
+                    this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
+                    {
+                        _saveButton, _shareButton
+                    };
+                }
+                else
+                {
+                    this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
+                    {
+                        _editButton, _shareButton
+                    };
+                }
             }
             else
             {
-                this.NavigationController.NavigationBar.TopItem.RightBarButtonItems = new[]
-                {
-                    _editButton, _shareButton
-                };
+                this.NavigationController.NavigationBar.TopItem.RightBarButtonItem = _shareButton;
             }
         }
 

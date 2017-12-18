@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
+using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -15,16 +16,20 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class PlaylistViewBusinessLogic : IPlaylistViewBusinessLogic
     {
         private readonly IRouter _router;
+        private readonly ILocalAccountService _localAccountService;
         private readonly IRemotePlaylistsDataService _remotePlaylistsDataService;
 
-        public PlaylistViewBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService)
+        public PlaylistViewBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService, ILocalAccountService localAccountService)
         {
             _router = router;
             _remotePlaylistsDataService = remotePlaylistsDataService;
+            _localAccountService = localAccountService;
         }
 
         public IPlaylistView View { get; set; }
 
+
+        public bool CanSaveOrder => View.Playlist.AuthorId == _localAccountService.GetAuthInfo().UserId;
 
         public void Share()
         {
