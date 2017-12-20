@@ -9,5 +9,7 @@ namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
         Task<Result<AuthenticationInfoDTO, AuthenticationErrorDto>> SignInAsync(string email, string password);
         Task<Result> SignUpAsync(SignUpDTO dto);
         Task<Result<ProfilePictureDTO>> SetProfilePictureAsync(Stream profilePictureStream);
+
+        Task<Result<UserDTO>> SaveAsync(UserDTO dto, Stream profilePictureStream = null);
     }
 }

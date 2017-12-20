@@ -24,10 +24,6 @@ namespace TellMe.iOS.Controllers
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIBarButtonItem CloseButton { get; set; }
-
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton NextButton { get; set; }
 
         [Outlet]
@@ -46,6 +42,10 @@ namespace TellMe.iOS.Controllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIView View { get; set; }
+
         [Action ("NextButton_TouchUpInside:")]
         partial void NextButton_TouchUpInside (UIKit.UIButton sender);
 
@@ -60,11 +60,6 @@ namespace TellMe.iOS.Controllers
                 ButtonsWrapper = null;
             }
 
-            if (CloseButton != null) {
-                CloseButton.Dispose ();
-                CloseButton = null;
-            }
-            
             if (NextButton != null) {
                 NextButton.Dispose ();
                 NextButton = null;

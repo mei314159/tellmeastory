@@ -14,6 +14,7 @@ using Hangfire;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Localization;
 using TellMe.Web.Automapper;
 using TellMe.Web.DAL;
@@ -96,7 +97,10 @@ namespace TellMe.Web
                 options.MultipartBodyLengthLimit = 1048576 * 500; //500 Megabytes
             });
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().AddFluentValidation(
+            services.AddMvc(o =>
+            {
+                o.InputFormatters.Insert(0, new AccountDTOFormatter());
+            }).AddFluentValidation(
                 fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
         }
 

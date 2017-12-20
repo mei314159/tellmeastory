@@ -1,32 +1,38 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="HelveticaNeue.ttc">
+            <string>HelveticaNeue</string>
+        </array>
+    </customFonts>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="1" customClass="CommentView">
             <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <size key="freeformSize" width="375" height="70"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1359" translatesAutoresizingMaskIntoConstraints="NO" customClass="Button">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1359" customClass="Button">
                     <rect key="frame" x="76" y="48" width="33" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="15" id="1362"/>
+                        <constraint firstAttribute="width" constant="33" id="1363"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <state key="normal" title="Reply">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
-                    <constraints>
-                        <constraint id="1362" firstItem="1359" firstAttribute="height" constant="15"/>
-                        <constraint id="1363" firstItem="1359" firstAttribute="width" constant="33"/>
-                    </constraints>
                     <connections>
-                        <action selector="ReplyButton_TouchUpInside:" destination="1361" id="1360" eventType="touchUpInside"/>
-                        <action selector="ReplyButton_TouchUpInside:" destination="1" id="2829" eventType="touchUpInside"/>
+                        <action selector="ReplyButton_TouchUpInside:" destination="1" eventType="touchUpInside" id="2829"/>
                     </connections>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1364" customClass="Label">
@@ -87,39 +93,30 @@
                     </userDefinedRuntimeAttributes>
                 </imageView>
             </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint id="1416" firstItem="1378" firstAttribute="top" secondItem="1" secondAttribute="top" constant="5"/>
-                <constraint id="1452" firstItem="1378" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="5"/>
-                <constraint id="1488" firstItem="1366" firstAttribute="top" secondItem="1378" secondAttribute="top"/>
-                <constraint id="1524" firstItem="1366" firstAttribute="leading" secondItem="1378" secondAttribute="trailing" constant="5"/>
-                <constraint id="1630" firstItem="1359" firstAttribute="centerY" secondItem="1364" secondAttribute="centerY"/>
-                <constraint id="1666" firstItem="1359" firstAttribute="leading" secondItem="1364" secondAttribute="trailing" constant="9"/>
-                <constraint id="1702" firstItem="1364" firstAttribute="top" secondItem="1366" secondAttribute="bottom"/>
-                <constraint id="1738" firstItem="1364" firstAttribute="leading" secondItem="1366" secondAttribute="leading"/>
-                <constraint id="2356" firstItem="1" firstAttribute="trailing" secondItem="1366" secondAttribute="trailing" constant="5" relation="greaterThanOrEqual"/>
-                <constraint id="2578" firstItem="1" firstAttribute="bottom" secondItem="1364" secondAttribute="bottom" constant="5" relation="greaterThanOrEqual"/>
+                <constraint firstItem="1378" firstAttribute="top" secondItem="1" secondAttribute="top" constant="5" id="1416"/>
+                <constraint firstItem="1378" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="5" id="1452"/>
+                <constraint firstItem="1366" firstAttribute="top" secondItem="1378" secondAttribute="top" id="1488"/>
+                <constraint firstItem="1366" firstAttribute="leading" secondItem="1378" secondAttribute="trailing" constant="5" id="1524"/>
+                <constraint firstItem="1359" firstAttribute="centerY" secondItem="1364" secondAttribute="centerY" id="1630"/>
+                <constraint firstItem="1359" firstAttribute="leading" secondItem="1364" secondAttribute="trailing" constant="9" id="1666"/>
+                <constraint firstItem="1364" firstAttribute="top" secondItem="1366" secondAttribute="bottom" id="1702"/>
+                <constraint firstItem="1364" firstAttribute="leading" secondItem="1366" secondAttribute="leading" id="1738"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="1366" secondAttribute="trailing" constant="5" id="2356"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="1364" secondAttribute="bottom" constant="5" id="2578"/>
             </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
-                <outlet property="ReplyButton" destination="1359" id="name-outlet-1359"/>
                 <outlet property="ProfilePicture" destination="1378" id="name-outlet-1378"/>
+                <outlet property="ReplyButton" destination="1359" id="name-outlet-1359"/>
+                <outlet property="Text" destination="1369" id="name-outlet-1369"/>
                 <outlet property="Time" destination="1364" id="name-outlet-1364"/>
                 <outlet property="UserName" destination="1367" id="name-outlet-1367"/>
-                <outlet property="Text" destination="1369" id="name-outlet-1369"/>
             </connections>
         </view>
     </objects>
     <resources>
-        <image name="Contacts" width="192" height="192"/>
-        <image name="Play" width="64" height="64"/>
         <image name="UserPic" width="36" height="36"/>
-        <image name="Bell" width="25" height="25"/>
-        <image name="Storytellers" width="25" height="25"/>
-        <image name="Account" width="25" height="25"/>
-        <image name="AddGroup" width="25" height="25"/>
-        <image name="Send" width="30" height="30"/>
-        <image name="Comment" width="30" height="30"/>
-        <image name="Replay" width="64" height="64"/>
-        <image name="Heart" width="30" height="30"/>
-        <image name="Heart-O" width="30" height="30"/>
     </resources>
 </document>
