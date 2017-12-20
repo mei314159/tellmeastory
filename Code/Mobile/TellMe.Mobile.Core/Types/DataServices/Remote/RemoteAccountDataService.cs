@@ -58,7 +58,6 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
 
         public async Task<Result<UserDTO>> SaveAsync(UserDTO dto, Stream profilePictureStream = null)
         {
-            profilePictureStream.Position = 0;
             var serializedData = JsonConvert.SerializeObject(dto);
             var data = new MultipartFormDataContent
             {
@@ -66,6 +65,7 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             };
             if (profilePictureStream != null)
             {
+                profilePictureStream.Position = 0;
                 data.Add(new StreamContent(profilePictureStream), "File", Guid.NewGuid() + ".jpg");
             }
 
