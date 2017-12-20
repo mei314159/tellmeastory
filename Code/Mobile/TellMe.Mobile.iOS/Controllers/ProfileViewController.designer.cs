@@ -14,31 +14,17 @@ namespace TellMe.iOS.Controllers
     partial class ProfileViewController
     {
         [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIButton ChangePictureButton { get; set; }
+        UIKit.UIBarButtonItem EditButton { get; set; }
 
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIButton SignOutButton { get; set; }
 
-        [Action ("ChangePictureButton_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void ChangePictureButton_TouchUpInside (UIKit.UIButton sender);
-
-        [Action ("SignOutButton_TouchUpInside:")]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        partial void SignOutButton_TouchUpInside (UIKit.UIButton sender);
+        [Action ("EditButton_Touched:")]
+        partial void EditButton_Touched (UIKit.UIBarButtonItem sender);
 
         void ReleaseDesignerOutlets ()
         {
-            if (ChangePictureButton != null) {
-                ChangePictureButton.Dispose ();
-                ChangePictureButton = null;
-            }
-
-            if (SignOutButton != null) {
-                SignOutButton.Dispose ();
-                SignOutButton = null;
+            if (EditButton != null) {
+                EditButton.Dispose ();
+                EditButton = null;
             }
         }
     }

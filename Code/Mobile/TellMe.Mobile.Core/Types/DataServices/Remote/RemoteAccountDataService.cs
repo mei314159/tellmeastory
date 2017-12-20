@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using TellMe.Mobile.Core.Contracts.DataServices;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
@@ -52,6 +53,23 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
 
             var result = await this._apiProvider
                 .SendDataAsync<ProfilePictureDTO>("account/picture", HttpMethod.Post, data).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result<UserDTO>> SaveAsync(UserDTO dto, Stream profilePictureStream = null)
+        {
+            profilePictureStream.Position = 0;
+            var serializedData = JsonConvert.SerializeObject(dto);
+            var data = new MultipartFormDataContent
+            {
+                {new StringContent(serializedData, System.Text.Encoding.UTF8, "application/json"), "User"}
+            };
+            if (profilePictureStream != null)
+            {
+                data.Add(new StreamContent(profilePictureStream), "File", Guid.NewGuid() + ".jpg");
+            }
+
+            var result = await this._apiProvider.SendDataAsync<UserDTO>("account", HttpMethod.Post, data).ConfigureAwait(false);
             return result;
         }
     }

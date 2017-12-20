@@ -1,8 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
+using TellMe.Mobile.Core.Contracts.UI.Views;
+using TellMe.Mobile.Core.Types.Extensions;
+using TellMe.Mobile.Core.Validation;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
@@ -15,15 +20,23 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         private readonly IApplicationDataStorage _appDataStorage;
         private readonly ILocalAccountService _localAccountService;
+        private readonly IRemoteAccountDataService _remoteAccountDataService;
         private readonly IRemotePushDataService _remotePushDataService;
+        private readonly IRouter _router;
+        private readonly UserValidator _validator;
 
         public AccountBusinessLogic(IApplicationDataStorage appDataStorage, ILocalAccountService localAccountService,
-            IRemotePushDataService remotePushDataService)
+            IRemotePushDataService remotePushDataService, IRouter router, IRemoteAccountDataService remoteAccountDataService, UserValidator validator)
         {
             this._appDataStorage = appDataStorage;
             this._localAccountService = localAccountService;
             this._remotePushDataService = remotePushDataService;
+            _router = router;
+            _remoteAccountDataService = remoteAccountDataService;
+            _validator = validator;
         }
+
+        public IAccountView View { get; set; }
 
         public bool IsAuthenticated => _localAccountService.GetAuthInfo() != null;
 
@@ -59,6 +72,59 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     .ConfigureAwait(false);
                 _appDataStorage.SetBool(PushTokenSentToBackendKey, result.IsSuccess);
             }
+        }
+
+        public void SignOut()
+        {
+            _localAccountService.SaveAuthInfo(null);
+            _router.SwapToAuth();
+        }
+
+        public void NavigateChangePicture()
+        {
+            _router.NavigateSetProfilePicture(this.View);
+        }
+
+        public void InitView()
+        {
+            this.View.User = _localAccountService.GetAuthInfo().Account;
+            this.View.Display();
+        }
+
+        public async Task<bool> SaveAsync()
+        {
+            var validationResult = await this._validator.ValidateAsync(this.View.User).ConfigureAwait(false);
+            if (validationResult.IsValid)
+            {
+                Stream stream = null;
+                if (View.PictureChanged)
+                {
+                    stream = View.ProfilePicture.GetPictureStream();
+                }
+
+                var result = await _remoteAccountDataService.SaveAsync(this.View.User, stream)
+                    .ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    stream.Dispose();
+                    View.User = result.Data;
+                    var authInfo = this._localAccountService.GetAuthInfo();
+                    authInfo.Account = result.Data;
+                    _localAccountService.SaveAuthInfo(authInfo);
+                    this.View.ShowSuccessMessage("Profile successfully saved", () => View.Display());
+                    return true;
+                }
+                else
+                {
+                    result.ShowResultError(this.View);
+                }
+            }
+            else
+            {
+                validationResult.ShowValidationResult(this.View);
+            }
+
+            return false;
         }
     }
 }

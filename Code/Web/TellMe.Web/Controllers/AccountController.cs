@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,9 @@ using TellMe.Web.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using AutoMapper;
 using TellMe.Web.DAL.Contracts.Services;
+using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.Controllers
@@ -39,6 +42,38 @@ namespace TellMe.Web.Controllers
             return Ok(_environment.EnvironmentName);
         }
 
+        [HttpPost("")]
+        public async Task<IActionResult> SaveAsync([FromBody] AccountDTO dto)
+        {
+            if (dto != null && ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(dto.User.Id);
+                user.FullName = dto.User.FullName;
+
+                if (dto.File != null)
+                {
+                    var blobName = dto.File.GetFilename();
+                    var fileStream = await dto.File.GetFileStream();
+                    var uploadResult = await _storageService.UploadProfilePictureAsync(fileStream, blobName);
+                    user.PictureUrl = uploadResult.PictureUrl;
+                }
+                
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    var userDTO = Mapper.Map<UserDTO>(user);
+                    return Ok(userDTO);
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+            }
+
+            return BadRequest(ModelState);
+        }
+        
         [AllowAnonymous, HttpPost("signup")]
         public async Task<IActionResult> SignupAsync([FromBody] SignUpDTO dto)
         {

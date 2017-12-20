@@ -1,5 +1,6 @@
 using System;
 using TellMe.iOS.Core;
+using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.UI.Components;
@@ -8,9 +9,10 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class UploadPictureController : UIViewController, IUploadPictureView
+    public partial class UploadPictureController : UIViewController, IUploadPictureView, IProfilePictureSourceDelegate
     {
         private IUploadPictureBusinessLogic _businessLogic;
+        private ProfilePictureSource _profilePictureSource;
 
         public IPicture ProfilePicture => this.Picture;
 
@@ -22,6 +24,7 @@ namespace TellMe.iOS.Controllers
         {
             this._businessLogic = IoC.GetInstance<IUploadPictureBusinessLogic>();
             _businessLogic.View = this;
+            this._profilePictureSource = new ProfilePictureSource(this);
             View.LayoutIfNeeded();
             Picture.Layer.CornerRadius = Picture.Frame.Width / 2;
             Picture.UserInteractionEnabled = true;
@@ -42,62 +45,17 @@ namespace TellMe.iOS.Controllers
             _businessLogic.SkipButtonTouched();
         }
 
-        public void ShowPictureSourceDialog()
+        public void ShowPictureSourceDialog() => _profilePictureSource.ShowPictureSourceDialog();
+
+        public void ImageSelected(UIImage image)
         {
-            var photoSourceActionSheet = new UIActionSheet("Take a photo from");
-            photoSourceActionSheet.AddButton("Camera");
-            photoSourceActionSheet.AddButton("Photo Library");
-            photoSourceActionSheet.AddButton("Cancel");
-            photoSourceActionSheet.CancelButtonIndex = 2;
-            photoSourceActionSheet.Clicked += PhotoSouceActionSheet_Clicked;
-            photoSourceActionSheet.ShowInView(View);
-        }
-
-        private void PhotoSouceActionSheet_Clicked(object sender, UIButtonEventArgs e)
-        {
-            var imagePicker = new UIImagePickerController();
-            imagePicker.MediaTypes = new string[] {MobileCoreServices.UTType.Image};
-            if (e.ButtonIndex == 0)
-            {
-                imagePicker.SourceType = UIImagePickerControllerSourceType.Camera;
-            }
-            else if (e.ButtonIndex == 1)
-            {
-                imagePicker.SourceType = UIImagePickerControllerSourceType.PhotoLibrary;
-            }
-            else
-            {
-                return;
-            }
-
-            imagePicker.FinishedPickingMedia += Handle_FinishedPickingMediaAsync;
-            imagePicker.Canceled += Handle_Canceled;
-
-            PresentModalViewController(imagePicker, true);
-        }
-
-        private void Handle_FinishedPickingMediaAsync(object sender, UIImagePickerMediaPickedEventArgs e)
-        {
-            if (e.Info[UIImagePickerController.MediaType].ToString() != MobileCoreServices.UTType.Image)
-                return;
-
-            if (e.Info[UIImagePickerController.OriginalImage] is UIImage originalImage)
-            {
-                Picture.Image = UIImage.FromImage(originalImage.CGImage, 4, originalImage.Orientation);
-                UIView.Animate(0.2,
-                    () =>
-                    {
-                        ContinueButton.Enabled = true;
-                        ContinueButton.BackgroundColor = UIColor.Blue;
-                    }, null);
-            }
-
-            ((UIImagePickerController) sender).DismissModalViewController(true);
-        }
-
-        private void Handle_Canceled(object sender, EventArgs e)
-        {
-            ((UIImagePickerController) sender).DismissModalViewController(true);
+            Picture.Image = image;
+            UIView.Animate(0.2,
+                () =>
+                {
+                    ContinueButton.Enabled = true;
+                    ContinueButton.BackgroundColor = UIColor.Blue;
+                }, null);
         }
     }
 }
