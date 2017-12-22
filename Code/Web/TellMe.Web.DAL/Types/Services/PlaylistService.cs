@@ -34,6 +34,9 @@ namespace TellMe.Web.DAL.Types.Services
         {
             var playlist = await _playlistRepository.GetQueryable(true)
                 .Include(x => x.Users)
+                .Include(x => x.Stories)
+                .ThenInclude(x => x.Story)
+                .ThenInclude(x => x.Sender)
                 .Where(x => x.Id == playlistId && x.Users.Any(y => y.UserId == currentUserId))
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -47,6 +50,9 @@ namespace TellMe.Web.DAL.Types.Services
         {
             var playlists = await _playlistRepository.GetQueryable(true)
                 .Include(x => x.Users)
+                .Include(x => x.Stories)
+                .ThenInclude(x => x.Story)
+                .ThenInclude(x => x.Sender)
                 .Where(x => x.CreateDateUtc < olderThanUtc && x.Users.Any(y => y.UserId == currentUserId))
                 .OrderBy(x => x.CreateDateUtc)
                 .Take(20)
