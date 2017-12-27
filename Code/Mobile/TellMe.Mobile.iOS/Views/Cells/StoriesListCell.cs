@@ -96,6 +96,7 @@ namespace TellMe.iOS.Views.Cells
         private void Initialize()
         {
             this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, defaultPicture);
+            MoreButton.TintColor = UIColor.DarkGray;
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
 

@@ -9,5 +9,8 @@ namespace TellMe.Shared.Contracts.DTO
         public string FullName { get; set; }
         public string PictureUrl { get; set; }
         public virtual FriendshipStatus FriendshipStatus { get; set; }
+        public int FriendsCount { get; set; }
+        public int EventsCount { get; set; }
+        public int StoriesCount { get; set; }
     }
 }

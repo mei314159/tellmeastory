@@ -22,6 +22,8 @@ namespace TellMe.iOS.Controllers
     {
         private readonly IEditEventBusinessLogic _businessLogic;
         private CreateEventSource _dataSource;
+        private UIBarButtonItem _saveButton;
+        private UIBarButtonItem _requestButton;
 
         public EditEventController(IEditEventBusinessLogic businessLogic) : base(UITableViewStyle.Grouped, null,
             true)
@@ -46,6 +48,11 @@ namespace TellMe.iOS.Controllers
                     DateUtc = DateTime.UtcNow
                 };
             }
+
+            _saveButton = new UIBarButtonItem("Save", UIBarButtonItemStyle.Done, SaveButtonTouched);
+            _requestButton = new UIBarButtonItem("Request", UIBarButtonItemStyle.Done,
+                (x, y) => _businessLogic.NavigateCreateRequest());
+
             ToggleRightButtons(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -103,14 +110,24 @@ namespace TellMe.iOS.Controllers
         {
             InvokeOnMainThread(() =>
             {
-                this.NavigationItem.SetRightBarButtonItems(showButton
-                    ? new[]
-                    {
-                        new UIBarButtonItem("Save", UIBarButtonItemStyle.Done, SaveButtonTouched),
-                        new UIBarButtonItem("Request", UIBarButtonItemStyle.Done,
-                            (x, y) => _businessLogic.NavigateCreateRequest())
-                    }
-                    : null, true);
+                UIBarButtonItem[] buttons;
+                if (showButton)
+                    if (CreateMode)
+                        buttons = new[]
+                        {
+                            this._saveButton
+                        };
+                    else
+                        buttons = new[]
+                        {
+                            this._saveButton,
+                            this._requestButton,
+                        };
+                
+                else 
+                    buttons = new UIBarButtonItem[] { };
+                
+                this.NavigationItem.SetRightBarButtonItems(buttons, true);
             });
         }
 

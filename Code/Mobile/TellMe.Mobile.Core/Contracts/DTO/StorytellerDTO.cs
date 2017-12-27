@@ -10,6 +10,10 @@
         public string FullName { get; set; }
         public string PictureUrl { get; set; }
 
+        public int FriendsCount { get; set; }
+        public int EventsCount { get; set; }
+        public int StoriesCount { get; set; }
+        
         [SQLiteNetExtensions.Attributes.TextBlob("StatusBlobbed")]
         public FriendshipStatus FriendshipStatus { get; set; }
 

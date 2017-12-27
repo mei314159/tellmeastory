@@ -205,6 +205,9 @@
     <ImageAsset Include="Assets.xcassets\NoPlaylists.imageset\NoPlaylists%402x.png" />
     <ImageAsset Include="Assets.xcassets\NoStories.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\NoStories.imageset\NoStories%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Back.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Back.imageset\back%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Back.imageset\back%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -244,6 +247,7 @@
     <Folder Include="Assets.xcassets\NoStorytellers.imageset\" />
     <Folder Include="Assets.xcassets\NoPlaylists.imageset\" />
     <Folder Include="Assets.xcassets\NoStories.imageset\" />
+    <Folder Include="Assets.xcassets\Back.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

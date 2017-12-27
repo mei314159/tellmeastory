@@ -617,15 +617,16 @@ namespace TellMe.Web.DAL.Types.Services
         }
 
         public async Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId)
-        {
-            var playlist = await _playlistUsersRepository
-                .GetQueryable()
-                .Include(x => x.Playlist)
-                .Where(x => x.PlaylistId == playlistId && x.UserId == currentUserId)
-                .Select(x => x.Playlist)
+        {            
+            var playlist = await _playlistRepository.GetQueryable()
+                .Include(x => x.Users)
+                .Include(x => x.Stories)
+                .ThenInclude(x => x.Story)
+                .ThenInclude(x => x.Sender)
+                .Where(x => x.Id == playlistId && x.Users.Any(y => y.UserId == currentUserId))
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
-            
+
             if (playlist.Stories.All(x => x.StoryId != storyId))
             {
                 playlist.Stories.Add(new PlaylistStory

@@ -25,6 +25,7 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<Friendship, int> _friendshipRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<RefreshToken, int> _refreshTokenRepository;
+        private readonly IRepository<Event, int> _eventRepository;
         private readonly IMailSender _mailSender;
         private readonly IStringLocalizer _stringLocalizer;
         private readonly AppSettings _appSettings;
@@ -37,7 +38,7 @@ namespace TellMe.Web.DAL.Types.Services
             IRepository<TribeMember, int> tribeMemberRepository,
             IMailSender mailSender,
             IOptions<AppSettings> emailingSettings,
-            IStringLocalizer stringLocalizer)
+            IStringLocalizer stringLocalizer, IRepository<Event, int> eventRepository)
         {
             _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
@@ -46,6 +47,7 @@ namespace TellMe.Web.DAL.Types.Services
             _tribeMemberRepository = tribeMemberRepository;
             _mailSender = mailSender;
             _stringLocalizer = stringLocalizer;
+            _eventRepository = eventRepository;
             _appSettings = emailingSettings.Value;
         }
 
@@ -55,7 +57,8 @@ namespace TellMe.Web.DAL.Types.Services
             return result;
         }
 
-        public async Task<IReadOnlyCollection<SharedContactDTO>> SearchContactsAsync(string currentUserId, string fragment,
+        public async Task<IReadOnlyCollection<SharedContactDTO>> SearchContactsAsync(string currentUserId,
+            string fragment,
             ContactsMode mode, int skip)
         {
             string uppercaseFragment = null;
@@ -279,7 +282,7 @@ namespace TellMe.Web.DAL.Types.Services
                     Text = $"{friend.UserName} accepted your friendship request"
                 };
             }
-            
+
             await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return myFriendship.Status;
@@ -331,6 +334,9 @@ namespace TellMe.Web.DAL.Types.Services
         {
             var user = await _userRepository
                 .GetQueryable(true)
+                .Include(x => x.Friends)
+                .Include(x => x.HostedEvents)
+                .Include(x => x.SentStories)
                 .FirstOrDefaultAsync(x => x.Id == userId).ConfigureAwait(false);
 
             var friendship = await _friendshipRepository
@@ -343,7 +349,10 @@ namespace TellMe.Web.DAL.Types.Services
                 UserName = user.UserName,
                 FullName = user.FullName,
                 PictureUrl = user.PictureUrl,
-                FriendshipStatus = friendship?.Status ?? FriendshipStatus.None
+                FriendshipStatus = friendship?.Status ?? FriendshipStatus.None,
+                FriendsCount = user.Friends.Count(),
+                EventsCount = user.HostedEvents.Count(),
+                StoriesCount = user.SentStories.Count()
             };
 
             return result;

@@ -7,13 +7,24 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
-using TellMe.iOS.Core.UI;
 
 namespace TellMe.iOS.Controllers
 {
     [Register ("StorytellerViewController")]
     partial class StorytellerViewController
     {
+        [Outlet]
+        UIKit.UIButton BackButton { get; set; }
+
+
+        [Outlet]
+        UIKit.UILabel EventsCount { get; set; }
+
+
+        [Outlet]
+        UIKit.UILabel FriendsCount { get; set; }
+
+
         [Outlet]
         UIKit.UILabel FullName { get; set; }
 
@@ -23,7 +34,7 @@ namespace TellMe.iOS.Controllers
 
 
         [Outlet]
-        Picture ProfilePicture { get; set; }
+        TellMe.iOS.Core.UI.Picture ProfilePicture { get; set; }
 
 
         [Outlet]
@@ -31,7 +42,19 @@ namespace TellMe.iOS.Controllers
 
 
         [Outlet]
+        UIKit.UILabel StoriesCount { get; set; }
+
+
+        [Outlet]
         UIKit.UILabel UserName { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIView HeaderView { get; set; }
+
+
+        [Action ("BackButtonTouched:forEvent:")]
+        partial void BackButtonTouched (UIKit.UIButton sender, UIKit.UIEvent @event);
 
 
         [Action ("RequestStoryTouched:")]
@@ -43,9 +66,29 @@ namespace TellMe.iOS.Controllers
 
         void ReleaseDesignerOutlets ()
         {
+            if (BackButton != null) {
+                BackButton.Dispose ();
+                BackButton = null;
+            }
+
+            if (EventsCount != null) {
+                EventsCount.Dispose ();
+                EventsCount = null;
+            }
+
+            if (FriendsCount != null) {
+                FriendsCount.Dispose ();
+                FriendsCount = null;
+            }
+
             if (FullName != null) {
                 FullName.Dispose ();
                 FullName = null;
+            }
+
+            if (HeaderView != null) {
+                HeaderView.Dispose ();
+                HeaderView = null;
             }
 
             if (NavItem != null) {
@@ -61,6 +104,11 @@ namespace TellMe.iOS.Controllers
             if (Spinner != null) {
                 Spinner.Dispose ();
                 Spinner = null;
+            }
+
+            if (StoriesCount != null) {
+                StoriesCount.Dispose ();
+                StoriesCount = null;
             }
 
             if (UserName != null) {
