@@ -33,6 +33,7 @@ namespace TellMe.Web.DAL.Types.Services
             _tribeRepository = tribeRepository;
             _tribeMemberRepository = tribeMemberRepository;
         }
+
         public async Task<SharedTribeDTO> CreateAsync(string currentUserId, SharedTribeDTO dto)
         {
             DateTime now = DateTime.UtcNow;
@@ -48,10 +49,11 @@ namespace TellMe.Web.DAL.Types.Services
                 }).ToList()
             };
 
-            entity.Members.Add(new TribeMember { UserId = currentUserId, Status = TribeMemberStatus.Creator });
+            entity.Members.Add(new TribeMember {UserId = currentUserId, Status = TribeMemberStatus.Creator});
             await _tribeRepository.SaveAsync(entity, true);
 
-            var creator = await _userRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == currentUserId).ConfigureAwait(false);
+            var creator = await _userRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == currentUserId)
+                .ConfigureAwait(false);
 
             var result = new SharedTribeDTO
             {
@@ -59,7 +61,8 @@ namespace TellMe.Web.DAL.Types.Services
             };
             Mapper.Map(entity, result);
             Mapper.Map(creator, result);
-            await NotifyMembersAboutInvitationToTribeAsync(entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
+            await NotifyMembersAboutInvitationToTribeAsync(
+                entity.Members.Where(x => x.Status != TribeMemberStatus.Creator), result).ConfigureAwait(false);
             result.Members = Mapper.Map<List<SharedTribeMemberDTO>>(entity.Members);
             return result;
         }
@@ -67,11 +70,11 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task LeaveTribeAsync(string currentUserId, int tribeId)
         {
             var tribe = await _tribeRepository
-            .GetQueryable()
-            .Include(x => x.Members)
-            .ThenInclude(x => x.User)
-            .FirstOrDefaultAsync(x => x.Id == tribeId)
-            .ConfigureAwait(false);
+                .GetQueryable()
+                .Include(x => x.Members)
+                .ThenInclude(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == tribeId)
+                .ConfigureAwait(false);
 
             var tribeMember = tribe.Members.FirstOrDefault(x => x.UserId == currentUserId);
             _tribeMemberRepository.Remove(tribeMember, true);
@@ -79,17 +82,18 @@ namespace TellMe.Web.DAL.Types.Services
 
             var tribeMemberDTO = Mapper.Map<SharedTribeMemberDTO>(tribeMember);
             var notifications = tribe.Members
-            .Where(x => x.UserId != currentUserId && x.Status == TribeMemberStatus.Joined || x.Status == TribeMemberStatus.Creator)
-            .ToList()
-            .Select(x => new Notification
-            {
-                Date = DateTime.UtcNow,
-                Type = NotificationTypeEnum.LeftTribe,
-                RecipientId = x.UserId,
-                Extra = tribeMemberDTO,
-                Handled = true,
-                Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} has left the tribe"
-            }).ToArray();
+                .Where(x => x.UserId != currentUserId && x.Status == TribeMemberStatus.Joined ||
+                            x.Status == TribeMemberStatus.Creator)
+                .ToList()
+                .Select(x => new Notification
+                {
+                    Date = DateTime.UtcNow,
+                    Type = NotificationTypeEnum.LeftTribe,
+                    RecipientId = x.UserId,
+                    Extra = tribeMemberDTO,
+                    Handled = true,
+                    Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} has left the tribe"
+                }).ToArray();
 
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
@@ -97,11 +101,11 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task<TribeMemberStatus> RejectTribeInvitationAsync(string currentUserId, int tribeId)
         {
             var tribeMember = await _tribeMemberRepository
-            .GetQueryable()
-            .Include(x => x.User)
-            .Include(x => x.Tribe)
-            .FirstOrDefaultAsync(x => x.UserId == currentUserId && x.TribeId == tribeId)
-            .ConfigureAwait(false);
+                .GetQueryable()
+                .Include(x => x.User)
+                .Include(x => x.Tribe)
+                .FirstOrDefaultAsync(x => x.UserId == currentUserId && x.TribeId == tribeId)
+                .ConfigureAwait(false);
 
             tribeMember.Status = TribeMemberStatus.Rejected;
             _tribeMemberRepository.PreCommitSave();
@@ -130,11 +134,11 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task<TribeMemberStatus> AcceptTribeInvitationAsync(string currentUserId, int tribeId)
         {
             var tribe = await _tribeRepository
-            .GetQueryable()
-            .Include(x => x.Members)
-            .ThenInclude(x => x.User)
-            .FirstOrDefaultAsync(x => x.Id == tribeId)
-            .ConfigureAwait(false);
+                .GetQueryable()
+                .Include(x => x.Members)
+                .ThenInclude(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == tribeId)
+                .ConfigureAwait(false);
 
             var tribeMember = tribe.Members.FirstOrDefault(x => x.UserId == currentUserId);
             tribeMember.Status = TribeMemberStatus.Joined;
@@ -142,17 +146,18 @@ namespace TellMe.Web.DAL.Types.Services
 
             var tribeMemberDTO = Mapper.Map<SharedTribeMemberDTO>(tribeMember);
             var notifications = tribe.Members
-            .Where(x => x.UserId != currentUserId && x.Status == TribeMemberStatus.Joined || x.Status == TribeMemberStatus.Creator)
-            .ToList()
-            .Select(x => new Notification
-            {
-                Date = DateTime.UtcNow,
-                Type = NotificationTypeEnum.TribeAcceptInvite,
-                RecipientId = x.UserId,
-                Extra = tribeMemberDTO,
-                Handled = true,
-                Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} joined the tribe"
-            }).ToArray();
+                .Where(x => x.UserId != currentUserId && x.Status == TribeMemberStatus.Joined ||
+                            x.Status == TribeMemberStatus.Creator)
+                .ToList()
+                .Select(x => new Notification
+                {
+                    Date = DateTime.UtcNow,
+                    Type = NotificationTypeEnum.TribeAcceptInvite,
+                    RecipientId = x.UserId,
+                    Extra = tribeMemberDTO,
+                    Handled = true,
+                    Text = $"[{tribeMember.Tribe.Name}]: {tribeMember.User.UserName} joined the tribe"
+                }).ToArray();
 
             await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
 
@@ -162,11 +167,13 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task<SharedTribeDTO> GetAsync(string userId, int tribeId)
         {
             var tribe = await _tribeRepository.GetQueryable(true)
-            .Include(x => x.Members)
-            .ThenInclude(x => x.User)
-            .Include(x => x.Creator)
-            .FirstOrDefaultAsync(x => x.Id == tribeId)
-            .ConfigureAwait(false);
+                .Include(x => x.Members)
+                .ThenInclude(x => x.User)
+                .Include(x => x.Creator)
+                .Include(x => x.Events)
+                .Include(x => x.Stories)
+                .FirstOrDefaultAsync(x => x.Id == tribeId)
+                .ConfigureAwait(false);
 
             var result = Mapper.Map<SharedTribeDTO>(tribe, x =>
             {
@@ -179,10 +186,10 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task<SharedTribeDTO> UpdateAsync(string currentUserId, SharedTribeDTO dto)
         {
             var tribe = await _tribeRepository
-            .GetQueryable()
-            .Include(x => x.Members)
-            .FirstOrDefaultAsync(x => x.Id == dto.Id)
-            .ConfigureAwait(false);
+                .GetQueryable()
+                .Include(x => x.Members)
+                .FirstOrDefaultAsync(x => x.Id == dto.Id)
+                .ConfigureAwait(false);
             tribe.Name = dto.Name;
 
             var newMembers = dto.Members
@@ -211,13 +218,14 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task<bool> IsTribeCreatorAsync(string userId, int tribeId)
         {
             var result = await _tribeRepository
-            .GetQueryable(true)
-            .AnyAsync(x => x.Id == tribeId && x.CreatorId == userId)
-            .ConfigureAwait(false);
+                .GetQueryable(true)
+                .AnyAsync(x => x.Id == tribeId && x.CreatorId == userId)
+                .ConfigureAwait(false);
             return result;
         }
 
-        private async Task NotifyMembersAboutInvitationToTribeAsync(IEnumerable<TribeMember> members, SharedTribeDTO result)
+        private async Task NotifyMembersAboutInvitationToTribeAsync(IEnumerable<TribeMember> members,
+            SharedTribeDTO result)
         {
             var now = DateTime.UtcNow;
             var notifications = members.Select(x => new Notification

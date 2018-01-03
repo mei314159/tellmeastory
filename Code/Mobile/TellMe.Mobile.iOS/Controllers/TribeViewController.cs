@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoreGraphics;
 using Foundation;
 using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
@@ -40,12 +41,28 @@ namespace TellMe.iOS.Controllers
             base.ViewDidLoad();
         }
 
+        public override void ViewWillAppear(bool animated)
+        {
+            this.NavigationController?.SetNavigationBarHidden(true, false);
+        }
+
+        public override void ViewWillDisappear(bool animated)
+        {
+            this.NavigationController?.SetNavigationBarHidden(false, false);
+        }
+
         public void DisplayTribe(TribeDTO tribe)
         {
             InvokeOnMainThread(() =>
             {
-                //NavItem.Title = tribe.Name;
                 this.TribeName.Text = tribe.Name;
+                this.MembersCount.Text = tribe.MembersCount.ToString();
+                this.EventsCount.Text = tribe.EventsCount.ToString();
+                this.StoriesCount.Text = tribe.StoriesCount.ToString();
+                this.HeaderView.Layer.MasksToBounds = false;
+                this.HeaderView.Layer.ShadowOffset = new CGSize(0, 2);
+                this.HeaderView.Layer.ShadowRadius = 1;
+                this.HeaderView.Layer.ShadowOpacity = 0.5f;
             });
         }
 
@@ -57,6 +74,16 @@ namespace TellMe.iOS.Controllers
         partial void InfoButtonTouched(NSObject sender)
         {
             BusinessLogic.TribeInfo();
+        }
+
+        partial void RequestStoryTouched(NSObject sender)
+        {
+            BusinessLogic.RequestStory();
+        }
+
+        partial void BackButtonTouched(NSObject sender)
+        {
+            NavigationController.PopViewController(true);
         }
 
         void ITribeView.TribeLeft(TribeDTO tribe)

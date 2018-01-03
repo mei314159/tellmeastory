@@ -29,7 +29,7 @@ namespace TellMe.Web.DAL
             builder.Entity<PlaylistStory>().HasOne(x => x.Story).WithMany(x => x.Playlists)
                 .HasForeignKey(x => x.StoryId);
             builder.Entity<PlaylistStory>().HasKey(x => new {x.PlaylistId, x.StoryId});
-            
+
             builder.Entity<PlaylistUser>().HasOne(x => x.Playlist).WithMany(x => x.Users)
                 .HasForeignKey(x => x.PlaylistId);
             builder.Entity<PlaylistUser>().HasOne(x => x.User).WithMany(x => x.Playlists)
@@ -62,7 +62,7 @@ namespace TellMe.Web.DAL
             builder.Entity<StoryReceiver>().HasOne(x => x.Story).WithMany(x => x.Receivers)
                 .HasForeignKey(x => x.StoryId);
             builder.Entity<StoryReceiver>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
-            builder.Entity<StoryReceiver>().HasOne(x => x.Tribe).WithMany().HasForeignKey(x => x.TribeId);
+            builder.Entity<StoryReceiver>().HasOne(x => x.Tribe).WithMany(x => x.Stories).HasForeignKey(x => x.TribeId);
 
             builder.Entity<StoryRequest>().HasOne(x => x.Sender).WithMany().HasForeignKey(x => x.SenderId);
             builder.Entity<StoryRequest>().HasOne(x => x.Receiver).WithMany().HasForeignKey(x => x.UserId);

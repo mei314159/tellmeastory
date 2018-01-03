@@ -121,6 +121,21 @@ namespace TellMe.Web.Automapper
                     .ForAllOtherMembers(x => x.Ignore());
 
                 cfg.CreateMap<Tribe, SharedTribeDTO>()
+                    .ForMember(x => x.MembersCount, x =>
+                    {
+                        x.PreCondition(y => y.Members != null);
+                        x.MapFrom(y => y.Members.Count());
+                    })
+                    .ForMember(x => x.EventsCount, x =>
+                    {
+                        x.PreCondition(y => y.Events != null);
+                        x.MapFrom(y => y.Events.Count());
+                    })
+                    .ForMember(x => x.StoriesCount, x =>
+                    {
+                        x.PreCondition(y => y.Stories != null);
+                        x.MapFrom(y => y.Stories.Count());
+                    })
                     .ForMember(x => x.CreatorName, x =>
                     {
                         x.PreCondition(y => y.Creator != null);

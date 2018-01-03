@@ -19,6 +19,10 @@ namespace TellMe.Mobile.Core.Contracts.DTO
 
         public string CreatorPictureUrl { get; set; }
 
+        public int MembersCount { get; set; }
+        public int EventsCount { get; set; }
+        public int StoriesCount { get; set; }
+
         [SQLiteNetExtensions.Attributes.TextBlob("StatusBlobbed")]
         public TribeMemberStatus MembershipStatus { get; set; }
 

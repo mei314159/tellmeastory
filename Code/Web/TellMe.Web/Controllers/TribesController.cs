@@ -10,8 +10,8 @@ namespace TellMe.Web.Controllers
     [Route("api/tribes")]
     public class TribesController : AuthorizedController
     {
-        private ITribeService _tribeService;
-        private INotificationService _notificationService;
+        private readonly ITribeService _tribeService;
+        private readonly INotificationService _notificationService;
         public TribesController(
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,

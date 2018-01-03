@@ -124,10 +124,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                         x.User.FriendshipStatus != FriendshipStatus.None)
                     .Select(x => x.User))
                 .ConfigureAwait(false);
-            await _localTribesService
-                .SaveAllAsync(result.Data.Where(x => x.Type == ContactType.Tribe)
-                    .Select(x => x.Tribe))
-                .ConfigureAwait(false);
         }
 
         public async Task SendFriendshipRequestAsync(StorytellerDTO storyteller)
@@ -227,7 +223,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void ViewTribe(TribeDTO tribe)
         {
-            _router.NavigateTribe(View, tribe, HandleTribeLeftHandler);
+            _router.NavigateTribe(View, tribe.Id, HandleTribeLeftHandler);
         }
 
         private void HandleTribeLeftHandler(TribeDTO tribe)

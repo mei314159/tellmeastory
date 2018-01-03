@@ -104,6 +104,20 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             Router.NavigateTribeInfo(View, View.Tribe, HandleTribeLeftHandler);
         }
 
+        public void RequestStory()
+        {
+            var contacts = new[]
+            {
+                new ContactDTO
+                {
+                    Type = ContactType.Tribe,
+                    TribeId = View.Tribe.Id,
+                    Tribe = View.Tribe
+                }
+            };
+            Router.NavigatePrepareStoryRequest(this.View, contacts, (item, state) => { });
+        }
+
         private void HandleTribeLeftHandler(TribeDTO tribe)
         {
             this.View.TribeLeft(tribe);

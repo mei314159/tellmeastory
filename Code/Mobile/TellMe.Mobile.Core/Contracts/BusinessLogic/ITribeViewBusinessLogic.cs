@@ -9,5 +9,6 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         void SendStory();
         void ViewStory(StoryDTO story);
         void TribeInfo();
+        void RequestStory();
     }
 }
