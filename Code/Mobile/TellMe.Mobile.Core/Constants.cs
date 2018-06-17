@@ -6,7 +6,8 @@ namespace TellMe.Mobile.Core
     public static class Constants
     {
 #if DEBUG
-        public const string ApiHost = "http://localhost:5000";
+        public const string ApiHost = "http://tellme-server.azurewebsites.net";
+        //public const string ApiHost = "http://localhost:5000";
         //public const string ApiHost = "http://192.168.0.100:5000";
         //public const string ApiHost = "http://192.168.1.10:5000";
         //public const string ApiHost = "http://tellme-server.azurewebsites.net";

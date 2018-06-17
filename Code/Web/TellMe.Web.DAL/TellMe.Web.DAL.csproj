@@ -26,8 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\TellMe.Shared.Contracts\TellMe.Shared.Contracts.csproj">
-      <Project>{2CBC5541-BF75-4E80-B142-014E5CC228D2}</Project>
-      <Name>TellMe.Shared.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -34,13 +34,14 @@
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Distribution: Mehspot LLC (KUF3AK4246)</CodesignKey>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <CodesignProvision>TellMe distribution</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -88,42 +89,45 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\netstandard1.3\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="MonoTouch.Dialog-1" />
-    <Reference Include="SDWebImage">
-      <HintPath>..\packages\Xamarin.SDWebImage.3.7.5\lib\Xamarin.iOS\SDWebImage.dll</HintPath>
-    </Reference>
     <Reference Include="SQLiteNetStandard">
-      <HintPath>..\packages\sqlite-net-standard.1.5.1\lib\netstandard1.1\SQLiteNetStandard.dll</HintPath>
+      <HintPath>..\..\packages\sqlite-net-standard.1.5.1\lib\netstandard1.1\SQLiteNetStandard.dll</HintPath>
     </Reference>
     <Reference Include="SQLiteNetExtensions">
-      <HintPath>..\packages\SQLiteNetExtensionsCore.2.0.0\lib\netstandard1.5\SQLiteNetExtensions.dll</HintPath>
+      <HintPath>..\..\packages\SQLiteNetExtensionsCore.2.0.0\lib\netstandard1.5\SQLiteNetExtensions.dll</HintPath>
     </Reference>
     <Reference Include="SQLiteNetExtensionsAsync">
-      <HintPath>..\packages\SQLiteNetExtensionsCore.Async.2.0.0\lib\netstandard1.5\SQLiteNetExtensionsAsync.dll</HintPath>
+      <HintPath>..\..\packages\SQLiteNetExtensionsCore.Async.2.0.0\lib\netstandard1.5\SQLiteNetExtensionsAsync.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCLRaw.core.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.provider.sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+      <HintPath>..\..\packages\SQLitePCLRaw.bundle_green.1.1.8\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
     </Reference>
     <Reference Include="HockeySDK">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+      <HintPath>..\..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HockeySDK.iOSBindings">
-      <HintPath>..\packages\HockeySDK.Xamarin.5.0.0\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+      <HintPath>..\..\packages\HockeySDK.Xamarin.5.1.2\lib\Xamarin.iOS10\HockeySDK.iOSBindings.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SDWebImage">
+      <HintPath>..\..\packages\Xamarin.SDWebImage.3.7.5\lib\Xamarin.iOS\SDWebImage.dll</HintPath>
     </Reference>
     <Reference Include="SimpleInjector">
-      <HintPath>..\packages\SimpleInjector.4.0.12\lib\netstandard1.3\SimpleInjector.dll</HintPath>
+      <HintPath>..\..\packages\SimpleInjector.4.3.0\lib\netstandard1.3\SimpleInjector.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
