@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.mehspot.tellmeastory</string>
+	<string>com.storytella.app</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.46</string>
+	<string>1.0.1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
@@ -30,20 +30,18 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/AppIcon.appiconset</string>
-	<key>CFBundleName</key>
-	<string>Tell Me a Story</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Tell Me a Story need an access to your contacts to find your friends</string>
+	<string>StoryTella need an access to your contacts to find your friends</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Tell Me a Story need an access to your camera to record the stories</string>
+	<string>StoryTella need an access to your camera to record the stories</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Tell Me a Story need an access to your microphone to record the stories</string>
+	<string>StoryTella need an access to your microphone to record the stories</string>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
 	<key>kTCCServiceMediaLibrary</key>
-	<string>Tell Me a Story need an access to your media library to allow you to choose a userpic</string>
+	<string>StoryTella need an access to your media library to allow you to choose a userpic</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Tell Me a Story need an access to your photo library to allow you to choose a userpic</string>
+	<string>StoryTella need an access to your photo library to allow you to choose a userpic</string>
 	<key>UIApplicationShortcutItems</key>
 	<array>
 		<dict>
@@ -55,5 +53,7 @@
 			<string>com.mehspot.tellmeastory.recordstory</string>
 		</dict>
 	</array>
+	<key>CFBundleName</key>
+	<string>StoryTella</string>
 </dict>
 </plist>

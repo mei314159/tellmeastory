@@ -29,14 +29,14 @@ To confirm your registration click on link below:&lt;br/&gt;
 &lt;a href="{0}"&gt;Confirm Registration&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
 If you did not register just ignore this email.&lt;br/&gt;
 Thanks.&lt;br/&gt;
-&lt;a href='{1}'&gt;Tell Me a Story app&lt;/a&gt;</value>
+&lt;a href='{1}'&gt;StoryTella app&lt;/a&gt;</value>
     </data>
     <data name="RequestToJoin_MailTemplate" xml:space="preserve">
-	    <value>Hi, you have been invited to join Tell Me a Story App by {0}.&lt;br/&gt;&lt;br/&gt;
+	    <value>Hi, you have been invited to join StoryTella App by {0}.&lt;br/&gt;&lt;br/&gt;
 To continue registration click on link below:&lt;br/&gt;
 &lt;a href="{1}"&gt;Sign Up&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
 If you don't know {0} just ignore this email.&lt;br/&gt;
 Thanks.&lt;br/&gt;
-&lt;a href='{2}'&gt;Tell Me a Story app&lt;/a&gt;</value>
+&lt;a href='{2}'&gt;StoryTella app&lt;/a&gt;</value>
     </data>
 </root>
