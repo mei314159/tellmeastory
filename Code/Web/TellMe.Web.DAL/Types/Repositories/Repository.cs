@@ -52,7 +52,12 @@ namespace TellMe.Web.DAL.Types.Repositories
 
         public virtual async Task SaveAsync(TEntity entity, bool commit = false)
         {
-            await Set.AddAsync(entity).ConfigureAwait(false);
+
+            if (UnitOfWork.Context.Entry(entity).State == EntityState.Unchanged)
+            {
+                await Set.AddAsync(entity).ConfigureAwait(false);
+            }
+
             if (commit)
             {
                 await UnitOfWork.PreCommitSaveAsync().ConfigureAwait(false);

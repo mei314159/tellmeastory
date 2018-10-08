@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
-using HockeyApp.iOS;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
 using SDWebImage;
 using TellMe.iOS.Core;
@@ -62,7 +64,7 @@ namespace TellMe.iOS
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            InitializeHockeyApp();
+            InitializeAppCenter();
             InitializeSDWebImage();
             var window = new UIWindow(UIScreen.MainScreen.Bounds);
             IoC.Initialize(window);
@@ -104,14 +106,11 @@ namespace TellMe.iOS
             SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
         }
 
-        private void InitializeHockeyApp()
+        private void InitializeAppCenter()
         {
-            var manager = BITHockeyManager.SharedHockeyManager;
-            manager.Configure("1b07145a8d984619a8d66c8d4747a60f");
-            manager.CrashManager.EnableAppNotTerminatingCleanlyDetection = true;
-            manager.DebugLogEnabled = true;
-            manager.StartManager();
-            manager.Authenticator.AuthenticateInstallation();
+            AppCenter.Start("ac8e4d56-035e-41b2-b764-61ea68a34745",
+                   typeof(Analytics), typeof(Crashes));
+            AppCenter.Start("ac8e4d56-035e-41b2-b764-61ea68a34745", typeof(Analytics), typeof(Crashes));
         }
 
         public override void OnResignActivation(UIApplication application)

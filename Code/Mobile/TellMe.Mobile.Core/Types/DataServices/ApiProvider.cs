@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.DataServices;
@@ -77,6 +78,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
                 }
                 catch (WebException ex)
                 {
+                    Crashes.TrackError(ex);
                     App.Instance.LogNetworkException(ex);
                     return new Result<object>
                     {
@@ -87,6 +89,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
                 }
                 catch (HttpRequestException ex)
                 {
+                    Crashes.TrackError(ex);
                     App.Instance.LogNetworkException(ex);
                     return new Result<object>
                     {
@@ -98,6 +101,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
 
                 catch (Exception ex)
                 {
+                    Crashes.TrackError(ex);
                     App.Instance.LogNetworkException(ex);
                     return new Result<object>
                     {
@@ -205,6 +209,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
                 }
                 catch (HttpRequestException ex)
                 {
+                    Crashes.TrackError(ex);
                     App.Instance.LogNetworkException(ex);
                     return new Result<TResult, TErrorResult>
                     {
@@ -214,6 +219,7 @@ namespace TellMe.Mobile.Core.Types.DataServices
                 }
                 catch (Exception ex)
                 {
+                    Crashes.TrackError(ex);
                     App.Instance.LogNetworkException(ex);
                     return new Result<TResult, TErrorResult>
                     {
