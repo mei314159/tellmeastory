@@ -220,9 +220,9 @@
     <ImageAsset Include="Assets.xcassets\Back.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Back.imageset\back%402x.png" />
     <ImageAsset Include="Assets.xcassets\Back.imageset\back%403x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\storytella_logo_120.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\storytella_logo_180.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\storytella_logo_1024.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_1024.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
