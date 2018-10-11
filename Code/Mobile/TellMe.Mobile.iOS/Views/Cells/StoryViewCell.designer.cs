@@ -19,6 +19,10 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton MoreButton { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Core.UI.Picture Preview { get; set; }
 
         [Outlet]
@@ -58,6 +62,11 @@ namespace TellMe.iOS.Views.Cells
             if (LikeButton != null) {
                 LikeButton.Dispose ();
                 LikeButton = null;
+            }
+
+            if (MoreButton != null) {
+                MoreButton.Dispose ();
+                MoreButton = null;
             }
 
             if (Preview != null) {

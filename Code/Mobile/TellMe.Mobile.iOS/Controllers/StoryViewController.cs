@@ -10,6 +10,7 @@ using TellMe.iOS.Extensions;
 using TellMe.iOS.Views.Cells;
 using TellMe.Mobile.Core;
 using TellMe.Mobile.Core.Contracts;
+using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
@@ -19,7 +20,7 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate
+    public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate, IStoryView
     {
         private NSObject _willHideNotificationObserver;
         private NSObject _willShowNotificationObserver;
@@ -29,6 +30,7 @@ namespace TellMe.iOS.Controllers
         private IRemoteStoriesDataService _remoteStoriesService;
         private ILocalAccountService _localAccountService;
         private IRouter _router;
+        private IStoryBusinessLogic _storiesTableBusinessLogic;
         private StoryViewCell _storyView;
         private LoadMoreButtonCell _loadMoreButton;
         private CGRect _originalImageFrame;
@@ -55,6 +57,8 @@ namespace TellMe.iOS.Controllers
             _remoteStoriesService = IoC.GetInstance<IRemoteStoriesDataService>();
             _localAccountService = IoC.GetInstance<ILocalAccountService>();
             _router = IoC.GetInstance<IRouter>();
+            _storiesTableBusinessLogic = IoC.GetInstance<IStoryBusinessLogic>();
+            _storiesTableBusinessLogic.View = this;
             var swipeGestureRecognizer = new UIPanGestureRecognizer(HandleAction)
             {
                 CancelsTouchesInView = false,
@@ -375,10 +379,27 @@ namespace TellMe.iOS.Controllers
                     this.DismissViewController(true, null);
                 }
             }
-            _storyView = StoryViewCell.Create(Story);
+            _storyView = StoryViewCell.Create(Story, true);
             _storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
             _storyView.OnReceiverSelected = StoryView_OnReceiverSelected;
             _storyView.OnLikeButtonTouched = StoryView_OnLikeButtonTouched;
+            _storyView.OnMoreButtonTouched = StoryView_MoreButtonTouched;
+        }
+
+        private void StoryView_MoreButtonTouched(StoryDTO story)
+        {
+            var actionSheet = new UIActionSheet("Options");
+            actionSheet.AddButton("Add to Playlist");
+            actionSheet.AddButton("Cancel");
+            actionSheet.CancelButtonIndex = 1;
+            actionSheet.Clicked += (sender, args) =>
+            {
+                if (args.ButtonIndex == 0)
+                {
+                    _storiesTableBusinessLogic.AddToPlaylist(story);
+                }
+            };
+            actionSheet.ShowInView(View);
         }
 
         private async void StoryView_OnLikeButtonTouched(StoryDTO story)

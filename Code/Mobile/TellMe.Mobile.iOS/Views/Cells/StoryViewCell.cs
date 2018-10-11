@@ -49,13 +49,15 @@ namespace TellMe.iOS.Views.Cells
         public Action<StoryDTO> OnPreviewTouched;
         public Action<StoryDTO> OnProfilePictureTouched;
         public Action<StoryDTO> OnLikeButtonTouched;
+        public Action<StoryDTO> OnMoreButtonTouched;
         public Action<StoryReceiverDTO> OnReceiverSelected;
 
-        public static StoryViewCell Create(StoryDTO story)
+        public static StoryViewCell Create(StoryDTO story, bool hideMoreButton = false)
         {
             var arr = NSBundle.MainBundle.LoadNib("StoryViewCell", null, null);
             var v = ObjCRuntime.Runtime.GetNSObject<StoryViewCell>(arr.ValueAt(0));
             v.Story = story;
+            v.MoreButton.Hidden = hideMoreButton;
             return v;
         }
 
@@ -77,6 +79,11 @@ namespace TellMe.iOS.Views.Cells
 
             ReceiversCollection.DelaysContentTouches = false;
             ReceiversCollection.RegisterNibForCell(ReceiversListCell.Nib, ReceiversListCell.Key);
+        }
+
+        partial void MoreButton_Touched(UIButton sender)
+        {
+            this.OnMoreButtonTouched?.Invoke(Story);
         }
 
         public void Play()

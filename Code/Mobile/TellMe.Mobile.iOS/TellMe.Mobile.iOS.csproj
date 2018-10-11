@@ -207,8 +207,6 @@
     <ImageAsset Include="Assets.xcassets\Record.imageset\record%402x.png" />
     <ImageAsset Include="Assets.xcassets\Record.imageset\record%403x.png" />
     <ImageAsset Include="Assets.xcassets\Request.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\Request.imageset\request%402x.png" />
-    <ImageAsset Include="Assets.xcassets\Request.imageset\request%403x.png" />
     <ImageAsset Include="Assets.xcassets\NoEvents.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\NoEvents.imageset\NoEvents%402x.png" />
     <ImageAsset Include="Assets.xcassets\NoStorytellers.imageset\Contents.json" />
@@ -223,6 +221,8 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_120.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_180.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_1024.png" />
+    <ImageAsset Include="Assets.xcassets\Request.imageset\record%402x.png" />
+    <ImageAsset Include="Assets.xcassets\Request.imageset\record%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
