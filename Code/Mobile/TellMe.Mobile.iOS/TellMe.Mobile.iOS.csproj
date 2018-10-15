@@ -223,6 +223,8 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo_1024.png" />
     <ImageAsset Include="Assets.xcassets\Request.imageset\record%402x.png" />
     <ImageAsset Include="Assets.xcassets\Request.imageset\record%403x.png" />
+    <ImageAsset Include="Assets.xcassets\Logo.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Logo.imageset\StoryTella_color_logo_transparent_2048x2048[1857].png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -263,6 +265,7 @@
     <Folder Include="Assets.xcassets\NoPlaylists.imageset\" />
     <Folder Include="Assets.xcassets\NoStories.imageset\" />
     <Folder Include="Assets.xcassets\Back.imageset\" />
+    <Folder Include="Assets.xcassets\Logo.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />

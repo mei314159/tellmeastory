@@ -58,14 +58,15 @@ namespace TellMe.Web
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                     b => { }));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            {
-                options.User.RequireUniqueEmail = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 4;
-                options.Password.RequireLowercase = false;
-            }).AddEntityFrameworkStores<AppDbContext>();
+                {
+                    options.User.RequireUniqueEmail = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 4;
+                    options.Password.RequireLowercase = false;
+                }).AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
@@ -84,7 +85,7 @@ namespace TellMe.Web
             services.AddSingleton(x => x.GetService<IStringLocalizerFactory>()
                 .Create("TellMe.Web.DAL.TellMe", "TellMe.Web.DAL"));
             services.AddSingleton(Environment);
-            
+
             services.Configure<Audience>(Configuration.GetSection("Audience"));
             services.Configure<PushSettings>(Configuration.GetSection("Push"));
             services.Configure<AzureBlobSettings>(Configuration.GetSection("AzureBlob"));
@@ -97,10 +98,7 @@ namespace TellMe.Web
                 options.MultipartBodyLengthLimit = 1048576 * 500; //500 Megabytes
             });
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc(o =>
-            {
-                o.InputFormatters.Insert(0, new AccountDTOFormatter());
-            }).AddFluentValidation(
+            services.AddMvc(o => { o.InputFormatters.Insert(0, new AccountDTOFormatter()); }).AddFluentValidation(
                 fv => fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly()));
         }
 
@@ -113,6 +111,7 @@ namespace TellMe.Web
             {
                 //app.UseDeveloperExceptionPage();
             }
+
             app.UseHangfireServer();
             app.UseAuthentication();
             app.UseMvc();

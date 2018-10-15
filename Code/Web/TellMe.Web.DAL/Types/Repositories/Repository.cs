@@ -53,7 +53,7 @@ namespace TellMe.Web.DAL.Types.Repositories
         public virtual async Task SaveAsync(TEntity entity, bool commit = false)
         {
 
-            if (UnitOfWork.Context.Entry(entity).State == EntityState.Unchanged)
+            if (UnitOfWork.Context.Entry(entity).State == EntityState.Detached)
             {
                 await Set.AddAsync(entity).ConfigureAwait(false);
             }

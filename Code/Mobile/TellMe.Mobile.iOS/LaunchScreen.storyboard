@@ -1,7 +1,7 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -16,32 +16,17 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="StoryTella" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="266">
-                                <rect key="frame" x="0.0" y="346" width="414" height="43"/>
-                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="40"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                                <constraints>
-                                    <constraint id="1306" firstItem="266" firstAttribute="height" constant="43"/>
-                                </constraints>
-                            </label>
-                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <variation key="default">
-                            <mask key="subviews">
-                                <exclude reference="266"/>
-                            </mask>
-                        </variation>
-                        <variation key="heightClass=regular-widthClass=compact">
-                            <mask key="subviews">
-                                <include reference="266"/>
-                            </mask>
-                        </variation>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="2351" translatesAutoresizingMaskIntoConstraints="NO" image="Logo">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                            </imageView>
+                        </subviews>
                         <constraints>
-                            <constraint id="1303" firstItem="266" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
-                            <constraint id="1304" firstItem="266" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY"/>
-                            <constraint id="1305" firstItem="266" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width"/>
+                            <constraint id="2352" firstItem="2351" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX"/>
+                            <constraint id="2353" firstItem="2351" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY"/>
+                            <constraint id="2354" firstItem="2351" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width"/>
+                            <constraint id="2355" firstItem="2351" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="height"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -51,31 +36,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Contacts" width="192" height="192"/>
-        <image name="Play" width="64" height="64"/>
-        <image name="UserPic" width="36" height="36"/>
-        <image name="Bell" width="25" height="25"/>
-        <image name="Storytellers" width="25" height="25"/>
-        <image name="Account" width="25" height="25"/>
-        <image name="AddGroup" width="25" height="25"/>
-        <image name="Send" width="30" height="30"/>
-        <image name="Comment" width="30" height="30"/>
-        <image name="Replay" width="64" height="64"/>
-        <image name="Heart" width="30" height="30"/>
-        <image name="Heart-O" width="30" height="30"/>
-        <image name="Calendar" width="25" height="25"/>
-        <image name="Playlists" width="25" height="25"/>
-        <image name="Playlist" width="50" height="50"/>
-        <image name="Next" width="50" height="50"/>
-        <image name="Prev" width="50" height="50"/>
-        <image name="More" width="30" height="30"/>
-        <image name="Burger" width="25" height="25"/>
-        <image name="Record" width="25" height="25"/>
-        <image name="Request" width="25" height="25"/>
-        <image name="NoEvents" width="350" height="129.5"/>
-        <image name="NoStorytellers" width="350" height="129.5"/>
-        <image name="NoPlaylists" width="350" height="129.5"/>
-        <image name="NoStories" width="350" height="129.5"/>
-        <image name="Back" width="30" height="30"/>
+        <image name="Logo" width="11068" height="11804"/>
     </resources>
 </document>

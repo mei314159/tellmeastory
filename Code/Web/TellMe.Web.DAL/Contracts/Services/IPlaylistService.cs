@@ -12,7 +12,7 @@ namespace TellMe.Web.DAL.Contracts.Services
         
         Task<ICollection<PlaylistDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc);
         
-        Task<PlaylistDTO> SaveAsync(string currentUserId, PlaylistDTO playlistDTO);
+        Task<PlaylistDTO> SaveAsync(string currentUserId, PlaylistDTO dto);
         
         Task ShareAsync(string currentUserId, int playlistId, SharePlaylistDTO dto);
                

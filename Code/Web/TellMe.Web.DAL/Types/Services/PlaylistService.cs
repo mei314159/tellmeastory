@@ -42,7 +42,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .ConfigureAwait(false);
 
             var result = Mapper.Map<PlaylistDTO>(playlist);
-            
+
             return result;
         }
 
@@ -63,10 +63,10 @@ namespace TellMe.Web.DAL.Types.Services
             return result;
         }
 
-        public async Task<PlaylistDTO> SaveAsync(string currentUserId, PlaylistDTO playlistDTO)
+        public async Task<PlaylistDTO> SaveAsync(string currentUserId, PlaylistDTO dto)
         {
             _unitOfWork.BeginTransaction();
-            var playlist = playlistDTO.Id == default(int)
+            var playlist = dto.Id == default(int)
                 ? new Playlist
                 {
                     CreateDateUtc = DateTime.UtcNow,
@@ -79,9 +79,13 @@ namespace TellMe.Web.DAL.Types.Services
                         }
                     }
                 }
-                : await _playlistRepository.GetQueryable().FirstAsync(x => x.Id == playlistDTO.Id)
+                : await _playlistRepository
+                    .GetQueryable()
+                    .Include(x => x.Stories)
+                    .Include(x => x.Users)
+                    .FirstAsync(x => x.Id == dto.Id)
                     .ConfigureAwait(false);
-            Mapper.Map(playlistDTO, playlist);
+            Mapper.Map(dto, playlist);
             await _playlistRepository.SaveAsync(playlist).ConfigureAwait(false);
             _unitOfWork.SaveChanges();
 
@@ -92,7 +96,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .ConfigureAwait(false);
 
             var result = Mapper.Map<PlaylistDTO>(playlist);
-            
+
             return result;
         }
 

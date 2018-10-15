@@ -143,7 +143,7 @@ namespace TellMe.iOS.Controllers
 
         public override void WillDisplay(UITableView tableView, UITableViewCell cell, NSIndexPath indexPath)
         {
-            if (_itemsList.Count - indexPath.Row == 5 && _canLoadMore)
+            if (indexPath.Row >0 && _itemsList.Count - indexPath.Row == 5 && _canLoadMore)
             {
                 LoadMoreAsync();
             }
