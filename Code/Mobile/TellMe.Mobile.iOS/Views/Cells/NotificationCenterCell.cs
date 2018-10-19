@@ -1,11 +1,13 @@
 ﻿using System;
 using Foundation;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json.Linq;
 using UIKit;
 using SDWebImage;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
+using TellMe.Shared.Contracts.DTO;
 
 namespace TellMe.iOS.Views.Cells
 {
@@ -106,6 +108,28 @@ namespace TellMe.iOS.Views.Cells
                     length = tribeMemberDto.UserName.Length;
                     if (!string.IsNullOrWhiteSpace(tribeMemberDto.UserPictureUrl))
                         PictureView.SetImage(new NSUrl(tribeMemberDto.UserPictureUrl));
+                    break;
+                case NotificationTypeEnum.StoryComment:
+                case NotificationTypeEnum.StoryCommentReply:
+                    var commentDTO = ((JObject)notification.Extra).ToObject<CommentDTO>();
+                    index = Notification.Text.IndexOf(commentDTO.AuthorUserName, StringComparison.Ordinal);
+                    length = commentDTO.AuthorUserName.Length;
+                    if (!string.IsNullOrWhiteSpace(commentDTO.AuthorPictureUrl))
+                        PictureView.SetImage(new NSUrl(commentDTO.AuthorPictureUrl));
+                    break;
+                case NotificationTypeEnum.StoryLike:
+                    try
+                    {
+                        var userDTO = ((JObject)notification.Extra).ToObject<SharedUserDTO>();
+                        index = Notification.Text.IndexOf(userDTO.UserName, StringComparison.Ordinal);
+                        length = userDTO.UserName.Length;
+                        if (!string.IsNullOrWhiteSpace(userDTO.PictureUrl))
+                            PictureView.SetImage(new NSUrl(userDTO.PictureUrl));
+                    }
+                    catch (Exception e)
+                    {
+                        Crashes.TrackError(e);
+                    }
                     break;
                 default:
                     this.Text.AttributedText = text;

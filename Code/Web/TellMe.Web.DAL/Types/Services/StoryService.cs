@@ -576,19 +576,27 @@ namespace TellMe.Web.DAL.Types.Services
                 story.LikesCount++;
                 await _storyRepository.SaveAsync(story, true).ConfigureAwait(false);
 
-                var username = await _userRepository
+                var user = await _userRepository
                     .GetQueryable(true)
                     .Where(x => x.Id == currentUserId)
-                    .Select(x => x.UserName)
                     .FirstOrDefaultAsync()
                     .ConfigureAwait(false);
+                
+                var userDTO = new SharedUserDTO
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    FullName = user.FullName,
+                    PictureUrl = user.PictureUrl
+                };
+                
                 var notification = new Notification
                 {
                     Date = DateTime.UtcNow,
                     Type = NotificationTypeEnum.StoryLike,
                     RecipientId = story.Sender.Id,
-                    Extra = new object(),
-                    Text = $"{username} likes your story \"{story.Title}\""
+                    Extra = userDTO,
+                    Text = $"{user?.UserName} likes your story \"{story.Title}\""
                 };
 
                 await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);

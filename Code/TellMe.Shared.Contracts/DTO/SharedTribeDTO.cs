@@ -17,11 +17,11 @@ namespace TellMe.Shared.Contracts.DTO
         public string CreatorName { get; set; }
 
         public string CreatorPictureUrl { get; set; }
-        
+
         public int MembersCount { get; set; }
         public int EventsCount { get; set; }
         public int StoriesCount { get; set; }
-        
+
         public TribeMemberStatus MembershipStatus { get; set; }
 
         public List<SharedTribeMemberDTO> Members { get; set; }
