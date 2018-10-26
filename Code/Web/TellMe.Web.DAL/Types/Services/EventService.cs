@@ -6,7 +6,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
-using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
@@ -18,25 +17,17 @@ namespace TellMe.Web.DAL.Types.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Event, int> _eventsRepository;
-        private readonly IPushNotificationsService _pushNotificationsService;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
-        private readonly IRepository<StoryRequest, int> _storyRequestRepository;
-        private readonly IRepository<Tribe, int> _tribeRepository;
 
         public EventService(IUnitOfWork unitOfWork, IRepository<Event, int> eventsRepository,
-            IPushNotificationsService pushNotificationsService,
             IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<EventAttendee, int> eventAttendeeRepository,
-            IRepository<StoryRequest, int> storyRequestRepository, IRepository<Tribe, int> tribeRepository)
+            IRepository<EventAttendee, int> eventAttendeeRepository)
         {
             _unitOfWork = unitOfWork;
             _eventsRepository = eventsRepository;
-            _pushNotificationsService = pushNotificationsService;
             _tribeMemberRepository = tribeMemberRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
-            _storyRequestRepository = storyRequestRepository;
-            _tribeRepository = tribeRepository;
         }
 
         public async Task<EventDTO> GetAsync(string currentUserId, int eventId)
@@ -151,6 +142,9 @@ namespace TellMe.Web.DAL.Types.Services
         {
             _unitOfWork.BeginTransaction();
 
+            var eventAttendees = await _eventAttendeeRepository.GetQueryable().Where(x=>x.EventId == eventId).ToListAsync();
+             _eventAttendeeRepository.RemoveAll(eventAttendees, false);
+
             var entity = await _eventsRepository
                 .GetQueryable()
                 .FirstOrDefaultAsync(x => x.Id == eventId && x.HostId == currentUserId)
@@ -165,30 +159,6 @@ namespace TellMe.Web.DAL.Types.Services
             _unitOfWork.SaveChanges();
         }
 
-        private async Task<List<NotificationReceiver>> GetNotificationReceivers(int eventId)
-        {
-            var tribes = _tribeRepository.GetQueryable(true);
-            var attendees = _eventAttendeeRepository.GetQueryable(true)
-                .Where(x => x.EventId == eventId)
-                .Select(x => new {x.TribeId, x.UserId});
-            var tribeMembers = _tribeMemberRepository.GetQueryable(true);
-            var receivers =
-                (await (from attendee in attendees
-                    join tribeMember in tribeMembers
-                        on attendee.TribeId equals tribeMember.TribeId into atm
-                    from tm in atm.DefaultIfEmpty()
-                    join tribe in tribes on tm.TribeId equals tribe.Id into atmt
-                    from x in atmt.DefaultIfEmpty()
-                    select new NotificationReceiver
-                    {
-                        UserId = tm != null ? tm.UserId : attendee.UserId,
-                        TribeId = tm != null ? tm.TribeId : (int?) null,
-                        TribeName = x != null ? x.Name : null
-                    }).ToListAsync().ConfigureAwait(false)).GroupBy(x => x.UserId)
-                .Select(x => x.OrderBy(y => y.TribeId != null).First()).ToList();
-            return receivers;
-        }
-        
         private async Task<EventDTO> CreateEventAsync(string currentUserId, EventDTO newEventDTO, DateTime now)
         {
             var entity = Mapper.Map<Event>(newEventDTO);

@@ -291,6 +291,7 @@
     <InterfaceDefinition Include="Views\Cells\SlimStoryCell.xib" />
     <InterfaceDefinition Include="Controllers\PlaylistViewController.xib" />
     <InterfaceDefinition Include="Views\AccountPictureView.xib" />
+    <InterfaceDefinition Include="Views\Cells\NotificationCenterPlaylistCell.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -479,6 +480,10 @@
       <DependentUpon>AccountPictureView.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\UI\ProfilePictureSource.cs" />
+    <Compile Include="Views\Cells\NotificationCenterPlaylistCell.cs" />
+    <Compile Include="Views\Cells\NotificationCenterPlaylistCell.designer.cs">
+      <DependentUpon>NotificationCenterPlaylistCell.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\TellMe.Shared.Contracts\TellMe.Shared.Contracts.csproj">

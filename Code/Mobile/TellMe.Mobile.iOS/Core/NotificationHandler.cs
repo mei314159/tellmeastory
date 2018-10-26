@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using TellMe.iOS.Views;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
+using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using UIKit;
@@ -12,10 +13,12 @@ namespace TellMe.iOS.Core
     public class NotificationHandler : INotificationHandler
     {
         private readonly INotificationHandlerBusinessLogic _businessLogic;
+        private readonly IRemotePlaylistsDataService _remotePlaylistsDataService;
 
-        public NotificationHandler(INotificationHandlerBusinessLogic businessLogic)
+        public NotificationHandler(INotificationHandlerBusinessLogic businessLogic, IRemotePlaylistsDataService remotePlaylistsDataService)
         {
             _businessLogic = businessLogic;
+            _remotePlaylistsDataService = remotePlaylistsDataService;
         }
 
         public async Task<bool?> ProcessNotificationAsync(NotificationDTO notification, IView view)
@@ -94,6 +97,17 @@ namespace TellMe.iOS.Core
                     overlay.Close();
                     break;
                 }
+                case NotificationTypeEnum.SharePlaylist:
+                    {
+                        var extra = ((JObject)notification.Extra).ToObject<PlaylistDTO>();
+                        overlay = new Overlay("Wait");
+                        overlay.PopUp();
+
+                        var playlist = await _remotePlaylistsDataService.GetAsync(extra.Id).ConfigureAwait(false);
+                        result = await _businessLogic.NavigatePlaylist(notification.Id, playlist.IsSuccess ? playlist.Data ?? extra : extra, view).ConfigureAwait(false);
+                        overlay.Close();
+                        break;
+                    }
                 case NotificationTypeEnum.Event:
                     var @event = ((JObject) notification.Extra).ToObject<EventDTO>();
                     overlay = new Overlay("Wait");

@@ -19,7 +19,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public RecordVideoBusinessLogic(IRouter router)
         {
             this._router = router;
-            _recordTimer = new Timer(10);
+            _recordTimer = new Timer(180);
             _recordTimer.Elapsed += RecordTimer_Elapsed;
         }
 
@@ -94,7 +94,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             var duration = (DateTime.Now - _recordStartTime);
             View.DurationLabel = duration.ToString("ss\\:ff");
-            if (duration.TotalSeconds >= 10)
+            if (duration.TotalSeconds >= 180)
             {
                 View.StopCapture();
             }

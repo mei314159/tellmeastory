@@ -33,6 +33,7 @@ namespace TellMe.iOS.Controllers
             this.TableView.Delegate = this;
             this.TableView.RegisterNibForCellReuse(NotificationCenterCell.Nib, NotificationCenterCell.Key);
             this.TableView.RegisterNibForCellReuse(NotificationCenterStoryCell.Nib, NotificationCenterStoryCell.Key);
+            this.TableView.RegisterNibForCellReuse(NotificationCenterPlaylistCell.Nib, NotificationCenterPlaylistCell.Key);
             this.TableView.RefreshControl = new UIRefreshControl();
             this.TableView.RefreshControl.ValueChanged += (s, e) => LoadNotificationsAsync(true);
             Task.Run(() => LoadNotificationsAsync(false));
@@ -78,6 +79,10 @@ namespace TellMe.iOS.Controllers
             if (dto.Type == NotificationTypeEnum.Story)
             {
                 cell = (NotificationCenterStoryCell) tableView.DequeueReusableCell(NotificationCenterStoryCell.Key,
+                    indexPath);
+            }else if (dto.Type == NotificationTypeEnum.SharePlaylist)
+            {
+                cell = (NotificationCenterPlaylistCell)tableView.DequeueReusableCell(NotificationCenterPlaylistCell.Key,
                     indexPath);
             }
             else

@@ -22,7 +22,8 @@ namespace TellMe.Web.DAL.Extensions
         public static void MapFrom<TDto, TEntity, TId>(this ICollection<TEntity> destination, ICollection<TDto> source,
             Func<TDto, TId> dtoIdFunc,
             Func<TEntity, TId> entityIdFunc,
-            Action<TDto, TEntity> map) where TEntity : new()
+            Action<TDto, TEntity> map,
+            Func<TEntity, TDto, bool> skipFunc = null) where TEntity : new()
         {
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
@@ -31,23 +32,26 @@ namespace TellMe.Web.DAL.Extensions
                 throw new ArgumentNullException(nameof(source));
 
             var existingEntities = (from entity in destination
-                join dto in source on entityIdFunc(entity) equals dtoIdFunc(dto) into g
-                from x in g.DefaultIfEmpty()
-                select new {entity, x}).ToList();
+                                    join dto in source on entityIdFunc(entity) equals dtoIdFunc(dto) into g
+                                    from x in g.DefaultIfEmpty()
+                                    select new { entity, x }).ToList();
 
             var newEntities = (from dto in source
-                join entity in destination on dtoIdFunc(dto) equals entityIdFunc(entity) into g
-                from x in g.DefaultIfEmpty()
-                where x == null
-                select dto).ToList();
+                               join entity in destination on dtoIdFunc(dto) equals entityIdFunc(entity) into g
+                               from x in g.DefaultIfEmpty()
+                               where x == null
+                               select dto).ToList();
 
 
             foreach (var item in existingEntities)
             {
-                if (Equals(item.x, default(TDto)))
-                    destination.Remove(item.entity);
-                else
-                    map(item.x, item.entity);
+                if (skipFunc?.Invoke(item.entity, item.x) != true)
+                {
+                    if (Equals(item.x, default(TDto)))
+                        destination.Remove(item.entity);
+                    else
+                        map(item.x, item.entity);
+                }
             }
 
             foreach (var item in newEntities)

@@ -15,6 +15,7 @@
         StoryComment = 11,
         StoryLike = 12,
         StoryCommentReply = 13,
-        Event = 14
+        Event = 14,
+        SharePlaylist = 15
     }
 }

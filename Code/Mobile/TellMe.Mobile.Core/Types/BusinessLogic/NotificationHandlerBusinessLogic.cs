@@ -74,6 +74,14 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             return result.IsSuccess;
         }
 
+        public async Task<bool> NavigatePlaylist(int notificationId, PlaylistDTO playlist, IView view)
+        {
+            var result = await _remoteNotificationsDataService.HandleNotificationAsync(notificationId)
+                .ConfigureAwait(false);
+            _router.NavigateViewPlaylist(view, playlist,(item, state) => {});
+            return result.IsSuccess;
+        }
+
         public async Task<bool> NavigateEvent(int notificationId, EventDTO eventDTO, IView view)
         {
             var result = await _remoteNotificationsDataService.HandleNotificationAsync(notificationId)

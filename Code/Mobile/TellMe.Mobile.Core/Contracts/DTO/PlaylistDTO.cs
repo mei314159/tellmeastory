@@ -15,6 +15,10 @@ namespace TellMe.Mobile.Core.Contracts.DTO
 
         public string AuthorId { get; set; }
 
+        public string AuthorUserName { get; set; }
+
+        public string AuthorPictureUrl { get; set; }
+
         public DateTime CreateDateUtc { get; set; }
 
         [Ignore]

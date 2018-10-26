@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
+using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Extensions;
 using TellMe.Web.DAL.Types.Domain;
+using TellMe.Web.DAL.Types.PushNotifications;
 
 namespace TellMe.Web.DAL.Types.Services
 {
@@ -21,19 +23,22 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Playlist> _playlistRepository;
         private readonly IRepository<PlaylistUser> _playlistUsersRepository;
+        private readonly IPushNotificationsService _pushNotificationsService;
 
         public PlaylistService(IUnitOfWork unitOfWork, IRepository<Playlist> playlistRepository,
-            IRepository<PlaylistUser> playlistUsersRepository)
+            IRepository<PlaylistUser> playlistUsersRepository, IPushNotificationsService pushNotificationsService)
         {
             _unitOfWork = unitOfWork;
             _playlistRepository = playlistRepository;
             _playlistUsersRepository = playlistUsersRepository;
+            _pushNotificationsService = pushNotificationsService;
         }
 
         public async Task<PlaylistDTO> GetAsync(string currentUserId, int playlistId)
         {
             var playlist = await _playlistRepository.GetQueryable(true)
                 .Include(x => x.Users)
+                .ThenInclude(x => x.User)
                 .Include(x => x.Stories)
                 .ThenInclude(x => x.Story)
                 .ThenInclude(x => x.Sender)
@@ -50,6 +55,7 @@ namespace TellMe.Web.DAL.Types.Services
         {
             var playlists = await _playlistRepository.GetQueryable(true)
                 .Include(x => x.Users)
+                .ThenInclude(x => x.User)
                 .Include(x => x.Stories)
                 .ThenInclude(x => x.Story)
                 .ThenInclude(x => x.Sender)
@@ -91,6 +97,7 @@ namespace TellMe.Web.DAL.Types.Services
 
             playlist = await _playlistRepository.GetQueryable(true)
                 .Include(x => x.Users)
+                .ThenInclude(x => x.User)
                 .Where(x => x.Id == playlist.Id)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
@@ -105,15 +112,40 @@ namespace TellMe.Web.DAL.Types.Services
             var entity = await _playlistRepository
                 .GetQueryable()
                 .Include(x => x.Users)
-                .Where(x => x.Id == playlistId &&
-                            x.Users.Any(y => y.UserId == currentUserId && y.Type == PlaylistUserType.Author))
+                .ThenInclude(x => x.User)
+                .Where(x => x.Id == playlistId)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
 
+            var currentUser = entity.Users.FirstOrDefault(x => x.UserId == currentUserId);
+            if (currentUser == null)
+            {
+                throw new Exception("You don't have an access to requested playlist");
+            }
+
             entity.Users.MapFrom(dto.UserIds, contactDTO => contactDTO, x => x.UserId,
-                (userId, user) => { user.UserId = userId; });
+                (userId, user) => { user.UserId = userId; },
+                (e, dt)=> e.Type == PlaylistUserType.Author);
 
             await _playlistRepository.SaveAsync(entity).ConfigureAwait(false);
+
+
+            var playlistDTO = Mapper.Map<PlaylistDTO>(entity);
+
+            var notifications = entity.Users.Where(x =>
+                    dto.UserIds.Contains(x.UserId) && x.UserId != currentUserId && x.Type != PlaylistUserType.Author)
+                .ToList()
+                .Select(x => new Notification
+                {
+                    Date = DateTime.UtcNow,
+                    Type = NotificationTypeEnum.SharePlaylist,
+                    RecipientId = x.UserId,
+                    Extra = playlistDTO,
+                    Handled = true,
+                    Text = $"{currentUser.User.UserName} has shared playlist {entity.Name} with you"
+                }).ToArray();
+
+            await _pushNotificationsService.SendPushNotificationsAsync(notifications).ConfigureAwait(false);
         }
 
         public async Task DeleteAsync(string currentUserId, int playlistId)

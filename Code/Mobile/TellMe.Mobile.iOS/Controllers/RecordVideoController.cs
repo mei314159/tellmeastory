@@ -78,7 +78,7 @@ namespace TellMe.iOS.Controllers
 
             Console.WriteLine("Configuring output");
             _output = new AVCaptureMovieFileOutput();
-            long totalSeconds = 10000;
+            long totalSeconds = 180000;
             var preferredTimeScale = 30;
             CMTime maxDuration = new CMTime(totalSeconds, preferredTimeScale);
             _output.MinFreeDiskSpaceLimit = 1024 * 1024;

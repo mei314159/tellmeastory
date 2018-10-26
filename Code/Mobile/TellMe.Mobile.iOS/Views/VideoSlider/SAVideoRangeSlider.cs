@@ -429,8 +429,8 @@ namespace TellMe.iOS.Views.VideoSlider
             // time - seconds
             var min = Math.Floor(time / 60);
             var sec = Math.Floor(time - min * 60);
-            var minStr = NSString.LocalizedFormat(min >= 10 ? @"%i" : @"0%i", min);
-            var secStr = NSString.LocalizedFormat(sec >= 10 ? @"%i" : @"0%i", sec);
+            var minStr = NSString.LocalizedFormat(min >= 180 ? @"%i" : @"0%i", min);
+            var secStr = NSString.LocalizedFormat(sec >= 180 ? @"%i" : @"0%i", sec);
             return NSString.LocalizedFormat(@"%@:%@", minStr, secStr);
         }
 

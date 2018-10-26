@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
@@ -93,20 +94,24 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public async Task<bool> SaveAsync()
         {
+            if (this.View.User == null)
+                throw new ArgumentNullException(nameof(this.View.User));
+
             var validationResult = await this._validator.ValidateAsync(this.View.User).ConfigureAwait(false);
             if (validationResult.IsValid)
             {
                 Stream stream = null;
                 if (View.PictureChanged)
                 {
-                    stream = View.ProfilePicture.GetPictureStream();
+                    if (View.ProfilePicture != null)
+                        stream = View.ProfilePicture.GetPictureStream();
                 }
 
                 var result = await _remoteAccountDataService.SaveAsync(this.View.User, stream)
                     .ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    stream.Dispose();
+                    stream?.Dispose();
                     View.User = result.Data;
                     var authInfo = this._localAccountService.GetAuthInfo();
                     authInfo.Account = result.Data;

@@ -59,6 +59,10 @@ namespace TellMe.Web.Automapper
                 cfg.CreateMap<Playlist, PlaylistDTO>()
                     .ForMember(x => x.AuthorId,
                         x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).UserId))
+                    .ForMember(x => x.AuthorUserName,
+                        x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.UserName))
+                    .ForMember(x => x.AuthorPictureUrl,
+                        x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.PictureUrl))
                     .ForMember(x => x.Stories,
                         x => x.MapFrom(y => y.Stories.OrderBy(d => d.Order).Select(a => a.Story).ToList()));
 
