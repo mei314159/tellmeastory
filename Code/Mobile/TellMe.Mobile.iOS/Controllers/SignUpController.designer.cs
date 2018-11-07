@@ -44,6 +44,10 @@ namespace TellMe.iOS.Controllers
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITextView TermsAndConditionsLabel { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Core.UI.TextInput UserName { get; set; }
 
         [Action ("ContinueButton_TouchUpInside:")]
@@ -85,6 +89,11 @@ namespace TellMe.iOS.Controllers
             if (ScrollViewBottomMargin != null) {
                 ScrollViewBottomMargin.Dispose ();
                 ScrollViewBottomMargin = null;
+            }
+
+            if (TermsAndConditionsLabel != null) {
+                TermsAndConditionsLabel.Dispose ();
+                TermsAndConditionsLabel = null;
             }
 
             if (UserName != null) {

@@ -1,10 +1,13 @@
 using System;
 using CoreGraphics;
+using Foundation;
 using MonoTouch.Dialog;
+using SafariServices;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
+using TellMe.Mobile.Core;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Components;
@@ -58,22 +61,37 @@ namespace TellMe.iOS.Controllers
             _picture.BackgroundColor = UIColor.Clear;
             _picture.OnPictureTouched += this.ChangePictureButton_Touched;
             var section = new Section("Profile")
-                {
-                    new StringElement("Full Name", User.FullName),
-                    new StringElement("Username", User.UserName),
-                    new StringElement("Email", User.Email)
-                };
+            {
+                new StringElement("Full Name", User.FullName),
+                new StringElement("Username", User.UserName),
+                new StringElement("Email", User.Email),
+            };
+
             section.HeaderView = _picture;
 
             this.Root = new RootElement("Account")
             {
-                section
-                ,
+                section,
                 new Section
                 {
                     signOutElement
+                },
+                new Section
+                {
+                    new StyledStringElement("Terms and conditions", tapped: TermsAndConditionsTapped)
+                    {
+                        Alignment = UITextAlignment.Center,
+                        TextColor = UIColor.DarkGray
+                    }
                 }
             };
+        }
+
+        private void TermsAndConditionsTapped()
+        {
+            var url = new NSUrl(Constants.TermsAndConditionsLink);
+            var sfViewController = new SFSafariViewController(url);
+            PresentViewControllerAsync(sfViewController, true);
         }
 
         public void ShowSuccessMessage(string message, Action complete = null) =>
@@ -86,13 +104,14 @@ namespace TellMe.iOS.Controllers
         partial void EditButton_Touched(UIBarButtonItem sender)
         {
             this._picture.EditButtonHidden = false;
-            var readonlyFullName = (StringElement)this.Root[0][0];
+            var readonlyFullName = (StringElement) this.Root[0][0];
             this.Root[0].Remove(readonlyFullName);
 
             if (_saveButton == null)
             {
                 _saveButton = new UIBarButtonItem(UIBarButtonSystemItem.Save, SaveButton_Touched);
             }
+
             this.NavigationController.NavigationBar.TopItem.RightBarButtonItem = this._saveButton;
             this.Root[0].Insert(0,
                 new EntryElement("Full Name", "First Name and Last Name", readonlyFullName.Value));
@@ -103,7 +122,7 @@ namespace TellMe.iOS.Controllers
 
         private async void SaveButton_Touched(object sender, EventArgs eventArgs)
         {
-            var entryElement = (EntryElement)this.Root[0][0];
+            var entryElement = (EntryElement) this.Root[0][0];
             this.User.FullName = entryElement.Value;
 
             var overlay = new Overlay("Wait");
@@ -118,6 +137,7 @@ namespace TellMe.iOS.Controllers
                 this.NavigationController.NavigationBar.TopItem.RightBarButtonItem = this.EditButton;
                 this._picture.EditButtonHidden = true;
             }
+
             overlay.Close();
         }
 

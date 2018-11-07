@@ -1,9 +1,11 @@
 using System;
 using CoreGraphics;
 using Foundation;
+using SafariServices;
 using TellMe.iOS.Core;
 using TellMe.iOS.Extensions;
 using TellMe.iOS.Views;
+using TellMe.Mobile.Core;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.UI.Components;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -11,7 +13,7 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class SignUpController : UIViewController, ISignUpView
+    public partial class SignUpController : UIViewController, ISignUpView, IUITextViewDelegate
     {
         private NSObject _willHideNotificationObserver;
         private NSObject _willShowNotificationObserver;
@@ -42,8 +44,32 @@ namespace TellMe.iOS.Controllers
             FullName.ShouldReturn += TextFieldShouldReturn;
             Password.ShouldReturn += TextFieldShouldReturn;
             ConfirmPassword.ShouldReturn += TextFieldShouldReturn;
+
+
+            var attributedString = new NSMutableAttributedString(TermsAndConditionsLabel.Text);
+            var start = TermsAndConditionsLabel.Text.IndexOf("terms", StringComparison.Ordinal);
+            var length = TermsAndConditionsLabel.Text.Length - start;
+            NSRange linkRange = new NSRange(start, length); // for the word "link" in the string above
+
+            var url = new NSString(Constants.TermsAndConditionsLink);
+            attributedString.AddAttribute(UIStringAttributeKey.Link, url, linkRange);
+            attributedString.AddAttribute(UIStringAttributeKey.ForegroundColor, UIColor.Blue, linkRange);
+            attributedString.AddAttribute(UIStringAttributeKey.UnderlineStyle, NSNumber.FromInt32((int)NSUnderlineStyle.Single), linkRange);
+
+            // Assign attributedText to UILabel
+            TermsAndConditionsLabel.AttributedText = attributedString;
+            TermsAndConditionsLabel.Editable = false;
+            TermsAndConditionsLabel.Delegate = this;
             this.View.AddGestureRecognizer(new UITapGestureRecognizer(this.HideKeyboard));
             this._businessLogic.Init();
+        }
+
+        [Export("textView:shouldInteractWithURL:inRange:")]
+        public bool ShouldInteractWithUrl(UITextView textView, NSUrl URL, NSRange characterRange)
+        {
+            var sfViewController = new SFSafariViewController(URL);
+            PresentViewControllerAsync(sfViewController, true);
+            return false;
         }
 
         public override void ViewDidAppear(bool animated)
@@ -109,7 +135,7 @@ namespace TellMe.iOS.Controllers
             UIView.BeginAnimations("AnimateForKeyboard");
             UIView.SetAnimationBeginsFromCurrentState(true);
             UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
-            UIView.SetAnimationCurve((UIViewAnimationCurve) UIKeyboard.AnimationCurveFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
 
             //Pass the notification, calculating keyboard height, etc.
             var keyboardFrame = visible

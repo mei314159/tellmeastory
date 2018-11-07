@@ -14,7 +14,6 @@ using Hangfire;
 using FluentValidation.AspNetCore;
 using System.Reflection;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Localization;
 using TellMe.Web.Automapper;
 using TellMe.Web.DAL;

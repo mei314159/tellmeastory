@@ -19,15 +19,18 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<Event, int> _eventsRepository;
         private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
+        private readonly IRepository<StoryRequest, int> _storyRequestRepository;
 
         public EventService(IUnitOfWork unitOfWork, IRepository<Event, int> eventsRepository,
             IRepository<TribeMember, int> tribeMemberRepository,
-            IRepository<EventAttendee, int> eventAttendeeRepository)
+            IRepository<EventAttendee, int> eventAttendeeRepository,
+            IRepository<StoryRequest, int> storyRequestRepository)
         {
             _unitOfWork = unitOfWork;
             _eventsRepository = eventsRepository;
             _tribeMemberRepository = tribeMemberRepository;
             _eventAttendeeRepository = eventAttendeeRepository;
+            _storyRequestRepository = storyRequestRepository;
         }
 
         public async Task<EventDTO> GetAsync(string currentUserId, int eventId)
@@ -86,7 +89,7 @@ namespace TellMe.Web.DAL.Types.Services
                         on @event.Id equals attendee.Event.Id into gj
                     from st in gj.DefaultIfEmpty()
                     where @event.CreateDateUtc < olderThanUtc && (@event.HostId == currentUserId || st != null)
-                          && @event.DateUtc >= utcNow
+                                                              && @event.DateUtc >= utcNow
                     orderby @event.DateUtc
                     select @event)
                 .Distinct()
@@ -125,7 +128,7 @@ namespace TellMe.Web.DAL.Types.Services
             Mapper.Map(updateEventDTO, entity);
             await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
             _unitOfWork.SaveChanges();
-            
+
             var entityId = entity.Id;
             entity = await _eventsRepository
                 .GetQueryable(true)
@@ -142,8 +145,24 @@ namespace TellMe.Web.DAL.Types.Services
         {
             _unitOfWork.BeginTransaction();
 
-            var eventAttendees = await _eventAttendeeRepository.GetQueryable().Where(x=>x.EventId == eventId).ToListAsync();
-             _eventAttendeeRepository.RemoveAll(eventAttendees, false);
+            var eventAttendees =
+                await _eventAttendeeRepository.GetQueryable()
+                    .Include(x => x.Event)
+                    .Include(x => x.Tribe)
+                    .Include(x => x.User)
+                    .Where(x => x.EventId == eventId).ToListAsync().ConfigureAwait(false);
+            _eventAttendeeRepository.RemoveAll(eventAttendees, true);
+
+            var storyRequests =
+                await _storyRequestRepository.GetQueryable()
+                    .Include(x => x.Event)
+                    .Include(x => x.Tribe)
+                    .Include(x => x.Receiver)
+                    .Include(x => x.Sender)
+                    .Include(x => x.Statuses)
+                    .Where(x => x.EventId == eventId).ToListAsync()
+                    .ConfigureAwait(false);
+            _storyRequestRepository.RemoveAll(storyRequests, true);
 
             var entity = await _eventsRepository
                 .GetQueryable()
@@ -172,7 +191,7 @@ namespace TellMe.Web.DAL.Types.Services
                     UserId = currentUserId
                 }
             };
-            
+
             await _eventsRepository.SaveAsync(entity, true).ConfigureAwait(false);
             var entityId = entity.Id;
             entity = await _eventsRepository
@@ -181,7 +200,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .Include(x => x.Attendees)
                 .FirstOrDefaultAsync(x => x.Id == entityId)
                 .ConfigureAwait(false);
-            
+
             var eventDTO = Mapper.Map<EventDTO>(entity);
 
 

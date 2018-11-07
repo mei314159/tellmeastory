@@ -56,21 +56,30 @@ namespace TellMe.iOS.Controllers
             ToggleRightButtons(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
+            DateElement dateElement = new DateElement("Date", Event.DateUtc.GetUtcDateTime());
+            dateElement.DateSelected += DateElement_DateSelected;
             this.Root = new RootElement("Edit Event")
             {
                 new Section("Event Info")
                 {
                     new EntryElement("Title", "Event Title", Event?.Title),
                     new EntryElement("Description", "Event Description", Event?.Description),
-                    new DateElement("Date", Event.DateUtc.GetUtcDateTime()),
+                    dateElement,
                     new BooleanElement("ShareStories", Event?.ShareStories ?? false)
                 }
             };
         }
 
+        void DateElement_DateSelected(DateTimeElement dateTimeElement)
+        {
+            dateTimeElement.GetContainerTableView().ReloadRows(new[]{ NSIndexPath.FromRowSection(2, 0) }, UITableViewRowAnimation.Automatic);
+        }
+
+
         public override void ViewWillAppear(bool animated)
         {
             this.Root.Caption = CreateMode ? "Create Event" : "Edit Event";
+
             if (!CreateMode)
             {
                 this.Root.Add(new Section("Attendees"));
@@ -123,10 +132,10 @@ namespace TellMe.iOS.Controllers
                             this._saveButton,
                             this._requestButton,
                         };
-                
-                else 
+
+                else
                     buttons = new UIBarButtonItem[] { };
-                
+
                 this.NavigationItem.SetRightBarButtonItems(buttons, true);
             });
         }
@@ -153,10 +162,10 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() =>
             {
                 var root = this.Root[0];
-                ((EntryElement) root[0]).Value = eventDTO.Title;
-                ((EntryElement) root[1]).Value = eventDTO.Description;
-                ((DateElement) root[2]).DateValue = eventDTO.DateUtc.GetUtcDateTime();
-                ((BooleanElement) root[3]).Value = eventDTO.ShareStories;
+                ((EntryElement)root[0]).Value = eventDTO.Title;
+                ((EntryElement)root[1]).Value = eventDTO.Description;
+                ((DateElement)root[2]).DateValue = eventDTO.DateUtc.GetUtcDateTime();
+                ((BooleanElement)root[3]).Value = eventDTO.ShareStories;
                 if (!CreateMode && this.Root.Count == 2)
                 {
                     var deleteEventButton = new UIButton(UIButtonType.System);
@@ -197,17 +206,17 @@ namespace TellMe.iOS.Controllers
             this.HideKeyboard();
             var root = this.Root[0];
             TableView.RefreshControl.Enabled = true;
-            Event.Title = ((EntryElement) root[0]).Value;
-            Event.Description = ((EntryElement) root[1]).Value;
-            Event.DateUtc = ((DateElement) root[2]).DateValue;
-            Event.ShareStories = ((BooleanElement) root[3]).Value;
+            Event.Title = ((EntryElement)root[0]).Value;
+            Event.Description = ((EntryElement)root[1]).Value;
+            Event.DateUtc = ((DateElement)root[2]).DateValue;
+            Event.ShareStories = ((BooleanElement)root[3]).Value;
             await _businessLogic.SaveAsync().ConfigureAwait(false);
         }
 
         public void Deleted(EventDTO eventDTO)
         {
             EventStateChanged?.Invoke(eventDTO, ItemState.Deleted);
-            ((IDismissable) this).Dismiss();
+            ((IDismissable)this).Dismiss();
         }
 
         void IDismissable.Dismiss()
@@ -248,7 +257,7 @@ namespace TellMe.iOS.Controllers
                 alert.AddAction(UIAlertAction.Create("Not yet", UIAlertActionStyle.Cancel, x =>
                 {
                     EventStateChanged?.Invoke(eventDTO, CreateMode ? ItemState.Created : ItemState.Updated);
-                    ((IDismissable) this).Dismiss();
+                    ((IDismissable)this).Dismiss();
                 }));
                 alert.AddAction(UIAlertAction.Create("Yes, I do!", UIAlertActionStyle.Destructive,
                     x => _businessLogic.NavigateCreateRequest()));
@@ -271,7 +280,7 @@ namespace TellMe.iOS.Controllers
 
         public void SetData(EventDTO eventDTO)
         {
-            lock (((ICollection) _membersList).SyncRoot)
+            lock (((ICollection)_membersList).SyncRoot)
             {
                 _membersList.Clear();
                 if (eventDTO.Attendees != null)
@@ -291,7 +300,7 @@ namespace TellMe.iOS.Controllers
             if (indexPath.Section != 1)
                 return base.GetCell(tableView, indexPath);
 
-            var cell = (EventEditAttendeesListCell) tableView.DequeueReusableCell(EventEditAttendeesListCell.Key,
+            var cell = (EventEditAttendeesListCell)tableView.DequeueReusableCell(EventEditAttendeesListCell.Key,
                 indexPath);
             var index = indexPath.Row;
             cell.Attendee = _membersList.ElementAt(index);
@@ -307,7 +316,7 @@ namespace TellMe.iOS.Controllers
                 return;
             }
 
-            var cell = (EventEditAttendeesListCell) tableView.CellAt(indexPath);
+            var cell = (EventEditAttendeesListCell)tableView.CellAt(indexPath);
             OnMemberSelected?.Invoke(cell.Attendee, indexPath);
         }
     }
