@@ -17,16 +17,22 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     {
         protected readonly ILocalStoriesDataService LocalStoriesService;
         protected readonly IRemoteStoriesDataService RemoteStoriesDataService;
+        protected readonly ILocalAccountService LocalAccountService;
+        protected readonly IRemoteStorytellersDataService RemoteStorytellersDataService;
         protected readonly IRouter Router;
         protected readonly List<StoryDTO> Stories = new List<StoryDTO>();
 
         public StoriesTableBusinessLogic(
             IRemoteStoriesDataService remoteStoriesDataService,
-            IRouter router, ILocalStoriesDataService localStoriesService)
+            IRouter router, ILocalStoriesDataService localStoriesService,
+            ILocalAccountService localAccountService,
+            IRemoteStorytellersDataService remoteStorytellersDataService)
         {
             RemoteStoriesDataService = remoteStoriesDataService;
             Router = router;
             LocalStoriesService = localStoriesService;
+            LocalAccountService = localAccountService;
+            RemoteStorytellersDataService = remoteStorytellersDataService;
         }
 
         public IStoriesTableView View { get; set; }
@@ -60,7 +66,10 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void ViewStory(StoryDTO story, bool goToComments = false)
         {
-            Router.NavigateViewStory(this.View, story, goToComments);
+            if (!story.Objectionable)
+            {
+                Router.NavigateViewStory(this.View, story, goToComments);
+            }
         }
 
         public void NavigateStoryteller(string userId)
@@ -127,6 +136,51 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public virtual Task<bool> InitAsync()
         {
             return Task.FromResult(true);
+        }
+
+        public async Task UnfollowStoryTellerAsync(string senderId)
+        {
+
+            if (senderId == LocalAccountService.GetAuthInfo().UserId)
+            {
+                this.View.ShowErrorMessage("Error", "You can't unfollow yourself");
+            }
+            else
+            {
+                var result = await RemoteStorytellersDataService.UnfollowAsync(senderId).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    this.View.ShowSuccessMessage("Storyteller has been unfollowed");
+                }
+                else
+                {
+                    this.View.ShowErrorMessage("Error", result.ErrorMessage);
+                }
+            }
+        }
+
+        public async Task<bool> FlagAsObjectionable(int storyId)
+        {
+            var result = await RemoteStoriesDataService.FlagAsObjectionableAsync(storyId).ConfigureAwait(false);
+            if (!result.IsSuccess)
+            {
+                this.View.ShowErrorMessage("Error", result.ErrorMessage);
+            }
+
+            App.Instance.StoryObjectionableChanged(storyId, true);
+            return result.IsSuccess;
+        }
+
+        public async Task<bool> UnflagAsObjectionable(int storyId)
+        {
+            var result = await RemoteStoriesDataService.UnflagAsObjectionableAsync(storyId).ConfigureAwait(false);
+            if (!result.IsSuccess)
+            {
+                this.View.ShowErrorMessage("Error", result.ErrorMessage);
+            }
+            
+            App.Instance.StoryObjectionableChanged(storyId, false);
+            return result.IsSuccess;
         }
     }
 }

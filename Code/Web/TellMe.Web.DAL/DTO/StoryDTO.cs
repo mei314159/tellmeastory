@@ -17,6 +17,8 @@ namespace TellMe.Web.DAL.DTO
         public int CommentsCount { get; set; }
         public int LikesCount { get; set; }
         public bool Liked { get; set; }
+        public bool Objectionable { get; set; }
+        
         
         public List<StoryReceiverDTO> Receivers { get; set; }
     }

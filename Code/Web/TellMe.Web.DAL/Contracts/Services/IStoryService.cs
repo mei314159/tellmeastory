@@ -21,5 +21,7 @@ namespace TellMe.Web.DAL.Contracts.Services
         Task<bool> LikeAsync(string currentUserId, int storyId);
         Task<bool> DislikeAsync(string userId, int storyId);
         Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId);
+        Task FlagAsObjectionableAsync(string currentUserId, int storyId);
+        Task UnflagAsObjectionableAsync(string currentUserId, int storyId);
     }
 }

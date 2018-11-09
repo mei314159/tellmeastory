@@ -128,6 +128,20 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             return result;
         }
 
+        public async Task<Result> FlagAsObjectionableAsync(int storyId)
+        {
+            var result = await this._apiProvider.PostAsync<object>($"stories/{storyId}/flag-as-objectionable", null)
+                .ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task<Result> UnflagAsObjectionableAsync(int storyId)
+        {
+            var result = await this._apiProvider.PostAsync<object>($"stories/{storyId}/unflag-as-objectionable", null)
+                .ConfigureAwait(false);
+            return result;
+        }
+
         public async Task<Result> AddToPlaylistAsync(int storyId, int playlistId)
         {
             var result = await this._apiProvider.PostAsync<object>($"stories/{storyId}/add-to-playlist/{playlistId}", null)

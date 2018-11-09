@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DataServices.Local;
@@ -12,18 +11,21 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class StoryBusinessLogic : IStoryBusinessLogic
     {
-        protected readonly ILocalStoriesDataService LocalStoriesService;
         protected readonly IRemoteStoriesDataService RemoteStoriesDataService;
+        protected readonly ILocalAccountService LocalAccountService;
+        protected readonly IRemoteStorytellersDataService RemoteStorytellersDataService;
         protected readonly IRouter Router;
-        protected readonly List<StoryDTO> Stories = new List<StoryDTO>();
 
         public StoryBusinessLogic(
             IRemoteStoriesDataService remoteStoriesDataService,
-            IRouter router, ILocalStoriesDataService localStoriesService)
+            IRouter router,
+            ILocalAccountService localAccountService,
+            IRemoteStorytellersDataService remoteStorytellersDataService)
         {
             RemoteStoriesDataService = remoteStoriesDataService;
             Router = router;
-            LocalStoriesService = localStoriesService;
+            LocalAccountService = localAccountService;
+            RemoteStorytellersDataService = remoteStorytellersDataService;
         }
 
         public IStoryView View { get; set; }
@@ -32,6 +34,52 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             Router.NavigatePlaylists(this.View, PlaylistViewMode.SelectOne,
                 async (dismissable, playlist) => await AddToPlaylistAsync(story, dismissable, playlist).ConfigureAwait(false));
+        }
+
+        public async Task UnfollowStoryTellerAsync(string senderId)
+        {
+            if (senderId == LocalAccountService.GetAuthInfo().UserId)
+            {
+                this.View.ShowErrorMessage("Error", "You can't unfollow yourself");
+            }
+            else
+            {
+                var result = await RemoteStorytellersDataService.UnfollowAsync(senderId).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    this.View.ShowSuccessMessage("Storyteller has been unfollowed");
+                }
+                else
+                {
+                    this.View.ShowErrorMessage("Error", result.ErrorMessage);
+                }
+            }
+        }
+
+        public async Task FlagAsObjectionable(int storyId)
+        {
+            var result = await RemoteStoriesDataService.FlagAsObjectionableAsync(storyId).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this.View.ShowSuccessMessage("The story was flagged as objectionable");
+            }
+            else
+            {
+                this.View.ShowErrorMessage("Error", result.ErrorMessage);
+            }
+        }
+
+        public async Task UnflagAsObjectionable(int storyId)
+        {
+            var result = await RemoteStoriesDataService.UnflagAsObjectionableAsync(storyId).ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                this.View.ShowSuccessMessage("The story was unflagged as objectionable");
+            }
+            else
+            {
+                this.View.ShowErrorMessage("Error", result.ErrorMessage);
+            }
         }
 
         private async Task AddToPlaylistAsync(StoryDTO story, IDismissable dismissable, PlaylistDTO playlist)

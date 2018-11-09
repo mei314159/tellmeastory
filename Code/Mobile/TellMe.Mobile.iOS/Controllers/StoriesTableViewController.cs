@@ -20,7 +20,7 @@ namespace TellMe.iOS.Controllers
         private readonly List<StoryDTO> _itemsList = new List<StoryDTO>();
         private volatile bool _loadingMore;
         private volatile bool _canLoadMore;
-        private UIImageView noItemsBackground;
+        private UIImageView _noItemsBackground;
 
         protected IStoriesTableBusinessLogic BusinessLogic { get; set; }
 
@@ -33,7 +33,7 @@ namespace TellMe.iOS.Controllers
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
-            noItemsBackground = new UIImageView(UIImage.FromBundle("NoStories"))
+            _noItemsBackground = new UIImageView(UIImage.FromBundle("NoStories"))
             {
                 ContentMode = UIViewContentMode.Center
             };
@@ -45,6 +45,7 @@ namespace TellMe.iOS.Controllers
             var image = UIImage.FromBundle("NoStories");
             BusinessLogic.View = this;
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
+            App.Instance.OnStoryObjectionableChanged += OnStoryObjectionableChanged;
             this.RefreshControl = new UIRefreshControl();
             this.TableView.RegisterNibForCellReuse(StoriesListCell.Nib, StoriesListCell.Key);
             this.TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
@@ -58,7 +59,7 @@ namespace TellMe.iOS.Controllers
             SetTableBackground();
             this.NavigationController.View.BackgroundColor = UIColor.White;
             //Task.Run(() => LoadStoriesAsync(false, true));
-            
+
             var overlay = new Overlay("Loading");
             overlay.PopUp(false);
             Task.Run(async () =>
@@ -69,6 +70,18 @@ namespace TellMe.iOS.Controllers
                 {
                     LoadStoriesAsync(true);
                 }
+            });
+        }
+
+        private void OnStoryObjectionableChanged(int storyId, bool objectionable)
+        {
+            InvokeOnMainThread(() =>
+            {
+                var index = _itemsList.IndexOf(x => x.Id == storyId);
+                if (index <= -1) return;
+
+                var cell = (StoriesListCell) this.TableView.CellAt(NSIndexPath.FromRowSection(index, 0));
+                cell.UpdateObjectionableState(objectionable);
             });
         }
 
@@ -167,18 +180,36 @@ namespace TellMe.iOS.Controllers
 
         private void Cell_MoreButtonTouched(StoryDTO story)
         {
-            var actionSheet = new UIActionSheet ("Options");
-            actionSheet.AddButton ("Add to Playlist");
-            actionSheet.AddButton ("Cancel");
-            actionSheet.CancelButtonIndex = 1;
-            actionSheet.Clicked += (sender, args) =>
+            var uiAlertController = UIAlertController.Create("Options", null, UIAlertControllerStyle.ActionSheet);
+            uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
+                (obj) => BusinessLogic.AddToPlaylist(story)));
+            if (story.Objectionable)
             {
-                if (args.ButtonIndex == 0)
+                uiAlertController.AddAction(UIAlertAction.Create("Unflag as objectionable",
+                    UIAlertActionStyle.Destructive,
+                    obj =>
+                    {
+                        InvokeInBackground(async () => await BusinessLogic.UnflagAsObjectionable(story.Id));
+                    }));
+            }
+            else
+            {
+                uiAlertController.AddAction(UIAlertAction.Create("Flag as objectionable",
+                    UIAlertActionStyle.Destructive,
+                    obj =>
+                    {
+                        InvokeInBackground(async () => await BusinessLogic.FlagAsObjectionable(story.Id));
+                    }));
+            }
+
+            uiAlertController.AddAction(UIAlertAction.Create("Unfollow Story Teller", UIAlertActionStyle.Destructive,
+                (obj) =>
                 {
-                    BusinessLogic.AddToPlaylist(story);
-                }
-            };
-            actionSheet.ShowInView (View);
+                    InvokeInBackground(async () => await BusinessLogic.UnfollowStoryTellerAsync(story.SenderId));
+                }));
+
+            uiAlertController.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+            this.PresentViewController(uiAlertController, true, null);
         }
 
         private async Task LoadMoreAsync()
@@ -233,13 +264,13 @@ namespace TellMe.iOS.Controllers
                 ActivityIndicator?.Dispose();
                 ActivityIndicator = null;
             }
-            
+
             base.Dispose(disposing);
         }
 
         private void SetTableBackground()
         {
-            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : noItemsBackground;
+            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : _noItemsBackground;
         }
     }
 }

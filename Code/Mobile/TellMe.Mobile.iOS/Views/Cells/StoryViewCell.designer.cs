@@ -23,6 +23,10 @@ namespace TellMe.iOS.Views.Cells
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel ObjectionableLabel { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         TellMe.iOS.Core.UI.Picture Preview { get; set; }
 
         [Outlet]
@@ -67,6 +71,11 @@ namespace TellMe.iOS.Views.Cells
             if (MoreButton != null) {
                 MoreButton.Dispose ();
                 MoreButton = null;
+            }
+
+            if (ObjectionableLabel != null) {
+                ObjectionableLabel.Dispose ();
+                ObjectionableLabel = null;
             }
 
             if (Preview != null) {

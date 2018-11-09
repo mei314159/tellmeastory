@@ -102,8 +102,8 @@ namespace TellMe.iOS
         private void InitializeSDWebImage()
         {
             SDWebImageManager.SharedManager.ImageDownloader.MaxConcurrentDownloads = 3;
-            SDWebImageManager.SharedManager.ImageCache.ShouldCacheImagesInMemory = false;
-            SDImageCache.SharedImageCache.ShouldCacheImagesInMemory = false;
+            SDWebImageManager.SharedManager.ImageCache.Config.ShouldCacheImagesInMemory = false;
+            SDImageCache.SharedImageCache.Config.ShouldCacheImagesInMemory = false;
         }
 
         private void InitializeAppCenter()

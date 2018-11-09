@@ -59,5 +59,11 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
                 .ConfigureAwait(false);
             return result;
         }
+
+        public async Task<Result> UnfollowAsync(string id)
+        {
+            var result = await this._apiProvider.PostAsync<object>($"storytellers/{id}/unfollow", null).ConfigureAwait(false);
+            return result;
+        }
     }
 }

@@ -46,6 +46,18 @@ namespace TellMe.Web.Controllers
         {
             await _storyService.DislikeAsync(this.UserId, storyId);
         }
+        
+        [HttpPost("{storyId}/flag-as-objectionable")]
+        public async Task FlagAsObjectionableAsync(int storyId)
+        {
+            await _storyService.FlagAsObjectionableAsync(this.UserId, storyId);
+        }
+        
+        [HttpPost("{storyId}/unflag-as-objectionable")]
+        public async Task UnflagAsObjectionableAsync(int storyId)
+        {
+            await _storyService.UnflagAsObjectionableAsync(this.UserId, storyId);
+        }
 
         [HttpPost("")]
         public async Task<IActionResult> SendStoryAsync([FromBody] SendStoryDTO dto)

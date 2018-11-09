@@ -7,11 +7,11 @@ using TellMe.Web.DAL.DTO;
 
 namespace TellMe.Web.Controllers
 {
-
     [Route("api/storytellers")]
     public class StorytellersController : AuthorizedController
     {
         private readonly INotificationService _notificationService;
+
         public StorytellersController(
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,
@@ -48,6 +48,13 @@ namespace TellMe.Web.Controllers
             if (notificationId.HasValue)
                 await _notificationService.HandleNotificationAsync(this.UserId, notificationId.Value);
             return Ok(friendshipStatus);
+        }
+
+        [HttpPost("{userId}/unfollow")]
+        public async Task<IActionResult> UnfollowAsync(string userId)
+        {
+            await UserService.UnfollowAsync(this.UserId, userId);
+            return Ok();
         }
 
         [HttpPost("{userId}/reject-friendship")]

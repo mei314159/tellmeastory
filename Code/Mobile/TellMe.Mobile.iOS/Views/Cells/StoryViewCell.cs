@@ -24,9 +24,9 @@ namespace TellMe.iOS.Views.Cells
             new NSString("AVCustomEditPlayerViewControllerStatusObservationContext");
 
         private NSObject _stopPlayingNotification;
-        private bool playing;
-        private UIImage defaultPicture;
-        private StoryDTO story;
+        private bool _playing;
+        private UIImage _defaultPicture;
+        private StoryDTO _story;
 
         public static readonly NSString Key = new NSString("StoryViewCell");
         public static readonly UINib Nib;
@@ -38,10 +38,10 @@ namespace TellMe.iOS.Views.Cells
 
         public StoryDTO Story
         {
-            get { return story; }
+            get { return _story; }
             set
             {
-                story = value;
+                _story = value;
                 this.Initialize();
             }
         }
@@ -70,7 +70,7 @@ namespace TellMe.iOS.Views.Cells
         {
             base.AwakeFromNib();
 
-            this.defaultPicture = UIImage.FromBundle("UserPic");
+            this._defaultPicture = UIImage.FromBundle("UserPic");
 
             this.ProfilePicture.UserInteractionEnabled = true;
             this.ProfilePicture.AddGestureRecognizer(new UITapGestureRecognizer(this.ProfilePictureTouched));
@@ -88,7 +88,7 @@ namespace TellMe.iOS.Views.Cells
 
         public void Play()
         {
-            if (!this.playing)
+            if (!this._playing && !this.Story.Objectionable)
             {
                 AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
                 var cachedVideoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(Story.VideoUrl));
@@ -110,13 +110,13 @@ namespace TellMe.iOS.Views.Cells
                     AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
                 Spinner.Hidden = false;
                 Spinner.StartAnimating();
-                playing = true;
+                _playing = true;
             }
         }
 
         public void StopPlaying()
         {
-            if (this.playing)
+            if (this._playing)
             {
                 Spinner.StopAnimating();
                 Spinner.Hidden = true;
@@ -126,7 +126,7 @@ namespace TellMe.iOS.Views.Cells
                 _playerLayer.RemoveFromSuperLayer();
                 _player.CurrentItem.RemoveObserver(this, "status",
                     AVCustomEditPlayerViewControllerStatusObservationContext.Handle);
-                playing = false;
+                _playing = false;
             }
         }
 
@@ -236,7 +236,8 @@ namespace TellMe.iOS.Views.Cells
 
         private void Initialize()
         {
-            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, defaultPicture);
+            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, _defaultPicture);
+            this.ObjectionableLabel.Hidden = !Story.Objectionable;
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
 
@@ -264,6 +265,12 @@ namespace TellMe.iOS.Views.Cells
                 UIControlState.Normal);
             this.LikeButton.TintColor = targetStory.Liked ? UIColor.Red : UIColor.LightGray;
         }
+        
+        public void UpdateObjectionableState(bool objectionable)
+        {
+            this.ObjectionableLabel.Hidden = !objectionable;
+            this.Story.Objectionable = objectionable;
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -274,7 +281,7 @@ namespace TellMe.iOS.Views.Cells
                 _player.Dispose();
                 _playerItem?.Dispose();
                 _playerLayer?.Dispose();
-                defaultPicture.Dispose();
+                _defaultPicture.Dispose();
                 _player = null;
                 _playerItem = null;
                 _playerLayer = null;

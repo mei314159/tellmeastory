@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.1" />
@@ -16,9 +16,6 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Localization.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\..\..\..\.nuget\packages\microsoft.extensions.localization.abstractions\2.0.0\lib\netstandard2.0\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Extensions.Localization.Abstractions, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
       <HintPath>..\..\..\..\..\.nuget\packages\microsoft.extensions.localization.abstractions\2.0.1\lib\netstandard2.0\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
     </Reference>

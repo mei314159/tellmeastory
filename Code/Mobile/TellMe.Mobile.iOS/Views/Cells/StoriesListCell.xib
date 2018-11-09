@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -95,12 +91,22 @@
                                     <constraint firstAttribute="width" secondItem="dii-Qf-ejU" secondAttribute="height" multiplier="1:1" id="gBm-aU-ebH"/>
                                     <constraint firstAttribute="height" constant="24" id="vLn-e9-6gf"/>
                                 </constraints>
-                                <color key="tintColor" colorSpace="calibratedWhite" white="0.333333333333333" alpha="1"/>
+                                <color key="tintColor" white="0.33333333333333298" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" image="More"/>
                                 <connections>
                                     <action selector="MoreButton_Touched:" destination="cxk-wN-pdQ" eventType="touchUpInside" id="cHG-1T-Zhp"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You have flagged this story as objectionable" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="9283" customClass="Label" numberOfLines="2" adjustsFontForContentSizeCategory="YES">
+                                <rect key="frame" x="28" y="218" width="300" height="60"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25" weight="medium"/>
+                                <color key="textColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
+                                <nil key="highlightedColor"/>
+                                <constraints>
+                                    <constraint id="9710" firstAttribute="height" constant="60"/>
+                                    <constraint id="9764" firstAttribute="width" constant="300"/>
+                                </constraints>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -123,6 +129,8 @@
                             <constraint firstItem="2399" firstAttribute="centerY" secondItem="2396" secondAttribute="centerY" id="x5w-tE-yUX"/>
                             <constraint firstItem="2399" firstAttribute="leading" secondItem="2396" secondAttribute="trailing" constant="10" id="yEx-vM-cJH"/>
                             <constraint firstItem="7175" firstAttribute="centerY" secondItem="4826" secondAttribute="centerY" id="ygP-qc-vz1"/>
+                            <constraint id="9602" firstItem="9283" firstAttribute="centerX" secondItem="2394" secondAttribute="centerX"/>
+                            <constraint id="9656" firstItem="9283" firstAttribute="centerY" secondItem="2394" secondAttribute="centerY" constant="9"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -139,11 +147,12 @@
                 <outlet property="CommentsButton" destination="2400" id="name-outlet-2400"/>
                 <outlet property="ContentWrapper" destination="9m0-fb-khi" id="ohC-RX-lIC"/>
                 <outlet property="LikeButton" destination="7175" id="name-outlet-7175"/>
+                <outlet property="MoreButton" destination="dii-Qf-ejU" id="name-outlet-dii-Qf-ejU"/>
                 <outlet property="Preview" destination="2394" id="name-outlet-2394"/>
                 <outlet property="ProfilePicture" destination="2396" id="name-outlet-2396"/>
                 <outlet property="ReceiversCollection" destination="4826" id="name-outlet-4826"/>
                 <outlet property="Title" destination="2399" id="name-outlet-2399"/>
-                <outlet property="MoreButton" destination="dii-Qf-ejU" id="name-outlet-dii-Qf-ejU"/>
+                <outlet property="ObjectionableLabel" destination="9283" id="name-outlet-9283"/>
             </connections>
             <point key="canvasLocation" x="34.5" y="59.5"/>
         </tableViewCell>
@@ -152,27 +161,5 @@
         <image name="Comment" width="30" height="30"/>
         <image name="Heart" width="30" height="30"/>
         <image name="More" width="30" height="30"/>
-        <image name="Contacts" width="192" height="192"/>
-        <image name="Play" width="64" height="64"/>
-        <image name="UserPic" width="36" height="36"/>
-        <image name="Bell" width="25" height="25"/>
-        <image name="Storytellers" width="25" height="25"/>
-        <image name="Account" width="25" height="25"/>
-        <image name="AddGroup" width="25" height="25"/>
-        <image name="Send" width="30" height="30"/>
-        <image name="Replay" width="64" height="64"/>
-        <image name="Heart-O" width="30" height="30"/>
-        <image name="Calendar" width="25" height="25"/>
-        <image name="Playlists" width="25" height="25"/>
-        <image name="Playlist" width="50" height="50"/>
-        <image name="Next" width="50" height="50"/>
-        <image name="Prev" width="50" height="50"/>
-        <image name="Burger" width="25" height="25"/>
-        <image name="Record" width="25" height="25"/>
-        <image name="Request" width="25" height="25"/>
-        <image name="NoEvents" width="350" height="129.5"/>
-        <image name="NoStorytellers" width="350" height="129.5"/>
-        <image name="NoPlaylists" width="350" height="129.5"/>
-        <image name="NoStories" width="350" height="129.5"/>
     </resources>
 </document>

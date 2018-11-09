@@ -7,6 +7,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
+using TellMe.Web.DAL.Contracts;
 using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
@@ -31,7 +32,8 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
         private readonly IRepository<Event, int> _eventRepository;
         private readonly IRepository<Playlist, int> _playlistRepository;
-        private readonly IRepository<PlaylistUser> _playlistUsersRepository;
+        private readonly IRepository<ObjectionableStory> _objectionableStoryRepository;
+        private readonly IMailSender _mailSender;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -44,7 +46,8 @@ namespace TellMe.Web.DAL.Types.Services
             IRepository<ApplicationUser> userRepository,
             IRepository<EventAttendee, int> eventAttendeeRepository,
             IRepository<Event, int> eventRepository, IRepository<Playlist, int> playlistRepository,
-            IRepository<PlaylistUser> playlistUsersRepository)
+            IRepository<ObjectionableStory> objectionableStoryRepository,
+            IMailSender mailSender)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -57,7 +60,8 @@ namespace TellMe.Web.DAL.Types.Services
             _eventAttendeeRepository = eventAttendeeRepository;
             _eventRepository = eventRepository;
             _playlistRepository = playlistRepository;
-            _playlistUsersRepository = playlistUsersRepository;
+            _objectionableStoryRepository = objectionableStoryRepository;
+            _mailSender = mailSender;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -106,6 +110,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .Include(x => x.Event)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
 
@@ -129,6 +134,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .GetQueryable(true)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
             stories = (from story in stories
@@ -160,6 +166,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .GetQueryable(true)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe)
                 .Where(t => t.CreateDateUtc < olderThanUtc);
@@ -241,8 +248,8 @@ namespace TellMe.Web.DAL.Types.Services
                 .SelectMany(t => t.gj.DefaultIfEmpty(), (t, tb) => new {t, tb})
                 .Where(t =>
                     t.t.receiver.UserId == currentUserId ||
-                    (t.tb != null && (t.tb.Status == TribeMemberStatus.Joined ||
-                                      t.tb.Status == TribeMemberStatus.Creator)))
+                    t.tb != null && (t.tb.Status == TribeMemberStatus.Joined ||
+                                     t.tb.Status == TribeMemberStatus.Creator))
                 .Select(t => t.t.receiver);
 
             var eventAttendees = _eventAttendeeRepository.GetQueryable(true);
@@ -250,7 +257,7 @@ namespace TellMe.Web.DAL.Types.Services
                 join tribeMember in tribeMembers
                     on attendee.TribeId equals tribeMember.Tribe.Id into atm
                 from tm in atm.DefaultIfEmpty()
-                where (attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId) ||
+                where attendee.Status != EventAttendeeStatus.Rejected && attendee.UserId == currentUserId ||
                       tm.UserId == currentUserId
                 select attendee;
 
@@ -267,7 +274,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .Where(x =>
                     (x.story.SenderId == currentUserId || x.storyReceiver != null) &&
                     (x.story.Event == null || x.story.Event.HostId == currentUserId ||
-                     (x.story.Event.ShareStories && x.attendee != null)))
+                     x.story.Event.ShareStories && x.attendee != null))
                 .Select(t => t.story)
                 .Distinct()
                 .OrderByDescending(t => t.CreateDateUtc)
@@ -276,6 +283,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .Include(x => x.Event)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
 
@@ -322,6 +330,7 @@ namespace TellMe.Web.DAL.Types.Services
                 .Include(x => x.Event)
                 .Include(x => x.Sender)
                 .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
                 .Include(x => x.Receivers).ThenInclude(x => x.User)
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
 
@@ -581,7 +590,7 @@ namespace TellMe.Web.DAL.Types.Services
                     .Where(x => x.Id == currentUserId)
                     .FirstOrDefaultAsync()
                     .ConfigureAwait(false);
-                
+
                 var userDTO = new SharedUserDTO
                 {
                     Id = user.Id,
@@ -589,7 +598,7 @@ namespace TellMe.Web.DAL.Types.Services
                     FullName = user.FullName,
                     PictureUrl = user.PictureUrl
                 };
-                
+
                 var notification = new Notification
                 {
                     Date = DateTime.UtcNow,
@@ -625,7 +634,7 @@ namespace TellMe.Web.DAL.Types.Services
         }
 
         public async Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId)
-        {            
+        {
             var playlist = await _playlistRepository.GetQueryable()
                 .Include(x => x.Users)
                 .Include(x => x.Stories)
@@ -644,6 +653,34 @@ namespace TellMe.Web.DAL.Types.Services
                 });
 
                 await _playlistRepository.SaveAsync(playlist, true).ConfigureAwait(false);
+            }
+        }
+
+        public async Task FlagAsObjectionableAsync(string currentUserId, int storyId)
+        {
+            var exists = await _objectionableStoryRepository.GetQueryable(true)
+                .AnyAsync(x => x.UserId == currentUserId && x.StoryId == storyId).ConfigureAwait(false);
+            if (!exists)
+            {
+                var objectionableStory = new ObjectionableStory
+                {
+                    UserId = currentUserId,
+                    StoryId = storyId,
+                    Date = DateTime.UtcNow
+                };
+                await _objectionableStoryRepository.SaveAsync(objectionableStory, true).ConfigureAwait(false);
+                
+                //TODO _mailSender
+            }
+        }
+        
+        public async Task UnflagAsObjectionableAsync(string currentUserId, int storyId)
+        {
+            var objectionableStory = await _objectionableStoryRepository.GetQueryable()
+                .FirstOrDefaultAsync(x => x.UserId == currentUserId && x.StoryId == storyId).ConfigureAwait(false);
+            if (objectionableStory != null)
+            {
+                _objectionableStoryRepository.Remove(objectionableStory, true);
             }
         }
 

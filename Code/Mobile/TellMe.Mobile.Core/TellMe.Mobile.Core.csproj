@@ -19,13 +19,13 @@
     <Folder Include="Contracts\DataServices\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="7.2.1" />
+    <PackageReference Include="FluentValidation" Version="8.0.100" />
     <PackageReference Include="SQLiteNetExtensionsCore" Version="2.0.0" />
     <PackageReference Include="sqlite-net-standard" Version="1.5.1" />
     <PackageReference Include="SQLiteNetExtensionsCore.Async" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.9.0" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.9.0" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.10.0" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.10.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\TellMe.Shared.Contracts\TellMe.Shared.Contracts.csproj" />

@@ -82,23 +82,23 @@ namespace TellMe.Web.DAL.Types.Services
                 .Where(x => x.UserId == currentUserId);
 
             var users =
-            (from user in userQuery
-                join friend in friends on user.Id equals friend.FriendId into gj
-                from x in gj.DefaultIfEmpty()
-                select new SharedContactDTO
-                {
-                    Type = ContactType.User,
-                    Name = user.UserName,
-                    UserId = user.Id,
-                    User = new SharedStorytellerDTO
+                (from user in userQuery
+                    join friend in friends on user.Id equals friend.FriendId into gj
+                    from x in gj.DefaultIfEmpty()
+                    select new SharedContactDTO
                     {
-                        Id = user.Id,
-                        UserName = user.UserName,
-                        FullName = user.FullName,
-                        PictureUrl = user.PictureUrl,
-                        FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
-                    }
-                });
+                        Type = ContactType.User,
+                        Name = user.UserName,
+                        UserId = user.Id,
+                        User = new SharedStorytellerDTO
+                        {
+                            Id = user.Id,
+                            UserName = user.UserName,
+                            FullName = user.FullName,
+                            PictureUrl = user.PictureUrl,
+                            FriendshipStatus = x != null ? x.Status : FriendshipStatus.None
+                        }
+                    });
 
             if (string.IsNullOrWhiteSpace(fragment) || mode != ContactsMode.Normal)
             {
@@ -120,6 +120,7 @@ namespace TellMe.Web.DAL.Types.Services
                 {
                     tribeQuery = tribeQuery.Where(x => x.Tribe.Name.ToUpper().StartsWith(uppercaseFragment));
                 }
+
                 var tribes = tribeQuery.Select(x => new SharedContactDTO
                 {
                     Type = ContactType.Tribe,
@@ -236,6 +237,7 @@ namespace TellMe.Web.DAL.Types.Services
                             friendship.Status = FriendshipStatus.Accepted;
                             friendship.UpdateDate = now;
                         }
+
                         myFriendship = friendship;
                     }
 
@@ -328,6 +330,19 @@ namespace TellMe.Web.DAL.Types.Services
             await _pushNotificationsService.SendPushNotificationAsync(notification).ConfigureAwait(false);
 
             return FriendshipStatus.Rejected;
+        }
+
+        public async Task UnfollowAsync(string currentUserId, string userId)
+        {
+            var friendships = await _friendshipRepository.GetQueryable()
+                .Where(x => x.UserId == currentUserId && x.FriendId == userId).ToListAsync().ConfigureAwait(false);
+
+            foreach (var friendship in friendships)
+            {
+                _friendshipRepository.Remove(friendship);
+            }
+
+            _friendshipRepository.PreCommitSave();
         }
 
         public async Task<SharedStorytellerDTO> GetStorytellerAsync(string currentUserId, string userId)

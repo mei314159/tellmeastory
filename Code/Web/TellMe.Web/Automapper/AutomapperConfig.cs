@@ -26,11 +26,21 @@ namespace TellMe.Web.Automapper
                 cfg.CreateMap<Story, StoryDTO>()
                     .ForMember(x => x.Liked, x =>
                     {
-                        x.PreCondition((e) => e.Items.ContainsKey("UserId"));
-                        x.Condition((e) => e.Likes != null);
+                        x.PreCondition(e => e.Items.ContainsKey("UserId"));
+                        x.Condition(e => e.Likes != null);
                         x.ResolveUsing((y, a, b, c) =>
                         {
                             var result = y.Likes.Any(m => m.UserId == (string) c.Items["UserId"]);
+                            return result;
+                        });
+                    })
+                    .ForMember(x => x.Objectionable, x =>
+                    {
+                        x.PreCondition(e => e.Items.ContainsKey("UserId"));
+                        x.Condition(e => e.ObjectionableStories != null);
+                        x.ResolveUsing((y, a, b, c) =>
+                        {
+                            var result = y.ObjectionableStories.Any(m => m.UserId == (string) c.Items["UserId"]);
                             return result;
                         });
                     })
@@ -150,11 +160,11 @@ namespace TellMe.Web.Automapper
                         x.PreCondition(y => y.Creator != null);
                         x.MapFrom(y => y.Creator.PictureUrl);
                     })
-                    .ForMember(x => x.Members, x => x.PreCondition((e) => e.Items.ContainsKey("Members")))
+                    .ForMember(x => x.Members, x => x.PreCondition(e => e.Items.ContainsKey("Members")))
                     .ForMember(x => x.MembershipStatus, x =>
                     {
-                        x.PreCondition((e) => e.Items.ContainsKey("UserId"));
-                        x.Condition((e) => e.Members != null);
+                        x.PreCondition(e => e.Items.ContainsKey("UserId"));
+                        x.Condition(e => e.Members != null);
                         x.ResolveUsing((y, a, b, c) =>
                         {
                             var result = y.Members.First(m => m.UserId == (string) c.Items["UserId"]).Status;

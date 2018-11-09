@@ -20,7 +20,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public TribeViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
             ILocalStoriesDataService localStoriesService, IRemoteTribesDataService remoteTribesService,
-            ILocalTribesDataService localTribesService) : base(remoteStoriesDataService, router, localStoriesService)
+            ILocalTribesDataService localTribesService, ILocalAccountService localAccountService, IRemoteStorytellersDataService remoteStorytellersDataService) : base(remoteStoriesDataService, router, localStoriesService, localAccountService, remoteStorytellersDataService)
         {
             _remoteTribesService = remoteTribesService;
             _localTribesService = localTribesService;

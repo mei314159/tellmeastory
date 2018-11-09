@@ -28,5 +28,6 @@ namespace TellMe.Web.DAL.Contracts.Services
 
         Task<FriendshipStatus> AddToFriendsAsync(string currentUserId, string userId);
         Task<FriendshipStatus> RejectFriendshipRequestAsync(string currentUserId, string userId);
+        Task UnfollowAsync(string currentUserId, string userId);
     }
 }

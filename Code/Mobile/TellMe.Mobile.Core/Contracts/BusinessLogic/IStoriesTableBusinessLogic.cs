@@ -16,5 +16,8 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         void AddToPlaylist(StoryDTO story);
         Task LikeButtonTouchedAsync(StoryDTO story);
         Task<bool> InitAsync();
+        Task UnfollowStoryTellerAsync(string senderId);
+        Task<bool> FlagAsObjectionable(int storyId);
+        Task<bool> UnflagAsObjectionable(int storyId);
     }
 }

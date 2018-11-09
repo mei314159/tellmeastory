@@ -25,5 +25,7 @@ namespace TellMe.Web.DAL.Types.Domain
         public virtual ICollection<Event> HostedEvents { get; set; }
         
         public virtual ICollection<PlaylistUser> Playlists { get; set; }
+        
+        public virtual ICollection<ObjectionableStory> ObjectionableStories { get; set; }
     }
 }

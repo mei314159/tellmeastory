@@ -26,5 +26,7 @@ namespace TellMe.Web.DAL.Types.Domain
         public virtual ICollection<StoryLike> Likes { get; set; }
         
         public virtual ICollection<PlaylistStory> Playlists { get; set; }
+        
+        public virtual ICollection<ObjectionableStory> ObjectionableStories { get; set; }
     }
 }

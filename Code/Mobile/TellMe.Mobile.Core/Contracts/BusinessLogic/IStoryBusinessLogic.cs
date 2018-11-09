@@ -1,4 +1,5 @@
-﻿using TellMe.Mobile.Core.Contracts.DTO;
+﻿using System.Threading.Tasks;
+using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 
 namespace TellMe.Mobile.Core.Contracts.BusinessLogic
@@ -7,5 +8,8 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
     {
         IStoryView View { get; set; }
         void AddToPlaylist(StoryDTO story);
+        Task UnfollowStoryTellerAsync(string senderId);
+        Task FlagAsObjectionable(int storyId);
+        Task UnflagAsObjectionable(int storyId);
     }
 }

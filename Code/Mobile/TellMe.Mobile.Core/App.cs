@@ -22,6 +22,7 @@ namespace TellMe.Mobile.Core
         public event Action<Exception> OnNetworkException;
         public event Action<NotificationDTO> OnNotificationReceived;
         public event Action<StoryDTO> OnStoryLikeChanged;
+        public event Action<int, bool> OnStoryObjectionableChanged;
 
 
         public void NotificationReceived(NotificationDTO notification)
@@ -42,6 +43,11 @@ namespace TellMe.Mobile.Core
         public void LogNetworkException(Exception ex)
         {
             OnNetworkException?.Invoke(ex);
+        }
+
+        public void StoryObjectionableChanged(int storyId, bool objectionable)
+        {
+            this.OnStoryObjectionableChanged?.Invoke(storyId, objectionable);
         }
     }
 }

@@ -14,15 +14,13 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class StorytellerBusinessLogic : StoriesTableBusinessLogic, IStorytellerBusinessLogic
     {
-        private readonly IRemoteStorytellersDataService _remoteStorytellesDataService;
         private readonly ILocalStorytellersDataService _localStorytellesDataService;
 
         public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
             ILocalStoriesDataService localStoriesService, IRemoteStorytellersDataService remoteStorytellesDataService,
-            ILocalStorytellersDataService localStorytellesDataService) : base(remoteStoriesDataService, router,
-            localStoriesService)
+            ILocalStorytellersDataService localStorytellesDataService, ILocalAccountService localAccountService) : base(remoteStoriesDataService, router,
+            localStoriesService, localAccountService, remoteStorytellesDataService)
         {
-            _remoteStorytellesDataService = remoteStorytellesDataService;
             _localStorytellesDataService = localStorytellesDataService;
         }
 
@@ -64,7 +62,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     await _localStorytellesDataService.GetAsync(View.StorytellerId).ConfigureAwait(false);
                 if (localStoryteller.Data == null || localStoryteller.Expired)
                 {
-                    var result = await _remoteStorytellesDataService.GetByIdAsync(View.StorytellerId)
+                    var result = await RemoteStorytellersDataService.GetByIdAsync(View.StorytellerId)
                         .ConfigureAwait(false);
                     if (result.IsSuccess)
                     {

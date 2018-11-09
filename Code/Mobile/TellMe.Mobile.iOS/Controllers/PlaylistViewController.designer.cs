@@ -42,6 +42,10 @@ namespace TellMe.iOS.Controllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIActivityIndicatorView Spinner { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIView View { get; set; }
+
         [Action ("NextButton_TouchUpInside:")]
         partial void NextButton_TouchUpInside (UIKit.UIButton sender);
 
@@ -89,6 +93,11 @@ namespace TellMe.iOS.Controllers
             if (TableView != null) {
                 TableView.Dispose ();
                 TableView = null;
+            }
+
+            if (View != null) {
+                View.Dispose ();
+                View = null;
             }
         }
     }

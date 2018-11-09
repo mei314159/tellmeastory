@@ -11,8 +11,8 @@ namespace TellMe.iOS.Views.Cells
 {
     public partial class StoriesListCell : UITableViewCell, IUICollectionViewDataSource, IUICollectionViewDelegate
     {
-        private UIImage defaultPicture;
-        private StoryDTO story;
+        private UIImage _defaultPicture;
+        private StoryDTO _story;
 
         public static readonly NSString Key = new NSString("StoriesListCell");
         public static readonly UINib Nib;
@@ -44,7 +44,7 @@ namespace TellMe.iOS.Views.Cells
             this.ContentWrapper.Layer.ShadowRadius = 2;
             this.ContentWrapper.Layer.ShadowOpacity = 0.5f;
 
-            this.defaultPicture = UIImage.FromBundle("UserPic");
+            this._defaultPicture = UIImage.FromBundle("UserPic");
 
             this.AddGestureRecognizer(new UITapGestureRecognizer(UIViewTouched)
             {
@@ -57,10 +57,10 @@ namespace TellMe.iOS.Views.Cells
 
         public StoryDTO Story
         {
-            get => story;
+            get => _story;
             set
             {
-                story = value;
+                _story = value;
                 this.Initialize();
             }
         }
@@ -95,7 +95,8 @@ namespace TellMe.iOS.Views.Cells
 
         private void Initialize()
         {
-            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, defaultPicture);
+            this.ProfilePicture.SetPictureUrl(Story.SenderPictureUrl, _defaultPicture);
+            this.ObjectionableLabel.Hidden = !Story.Objectionable;
             MoreButton.TintColor = UIColor.DarkGray;
             var text = new NSMutableAttributedString();
             text.Append(new NSAttributedString($"{Story.SenderName} sent a story \""));
@@ -130,7 +131,7 @@ namespace TellMe.iOS.Views.Cells
         {
             if (disposing)
             {
-                defaultPicture.Dispose();
+                _defaultPicture.Dispose();
             }
 
             base.Dispose(disposing);
@@ -161,6 +162,12 @@ namespace TellMe.iOS.Views.Cells
         {
             Story.Receivers.RemoveAll(x => x.TribeId == tribe.Id);
             InvokeOnMainThread(() => { ReceiversCollection.ReloadData(); });
+        }
+
+        public void UpdateObjectionableState(bool objectionable)
+        {
+            this.ObjectionableLabel.Hidden = !objectionable;
+            this.Story.Objectionable = objectionable;
         }
     }
 }

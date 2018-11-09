@@ -30,6 +30,12 @@ namespace TellMe.Web.DAL
                 .HasForeignKey(x => x.StoryId);
             builder.Entity<PlaylistStory>().HasKey(x => new {x.PlaylistId, x.StoryId});
 
+            builder.Entity<ObjectionableStory>().HasOne(x => x.User).WithMany(x => x.ObjectionableStories)
+                .HasForeignKey(x => x.UserId);
+            builder.Entity<ObjectionableStory>().HasOne(x => x.Story).WithMany(x => x.ObjectionableStories)
+                .HasForeignKey(x => x.StoryId);
+            builder.Entity<ObjectionableStory>().HasKey(x => new {x.StoryId, x.UserId});
+
             builder.Entity<PlaylistUser>().HasOne(x => x.Playlist).WithMany(x => x.Users)
                 .HasForeignKey(x => x.PlaylistId);
             builder.Entity<PlaylistUser>().HasOne(x => x.User).WithMany(x => x.Playlists)

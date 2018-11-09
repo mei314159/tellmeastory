@@ -22,8 +22,9 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public EventViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
             ILocalStoriesDataService localStoriesService, IRemoteEventsDataService remoteEventsDataService,
-            ILocalEventsDataService localEventsDataService, ILocalAccountService localLocalAccountService) : base(remoteStoriesDataService, router,
-            localStoriesService)
+            ILocalEventsDataService localEventsDataService, ILocalAccountService localLocalAccountService,
+            IRemoteStorytellersDataService remoteStorytellersDataService) : base(remoteStoriesDataService, router,
+            localStoriesService, localLocalAccountService, remoteStorytellersDataService)
         {
             _remoteEventsDataService = remoteEventsDataService;
             _localEventsDataService = localEventsDataService;

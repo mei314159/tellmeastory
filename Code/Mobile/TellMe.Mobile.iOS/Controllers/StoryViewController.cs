@@ -20,7 +20,8 @@ using UIKit;
 
 namespace TellMe.iOS.Controllers
 {
-    public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate, IStoryView
+    public partial class StoryViewController : UIViewController, IView, IUITableViewDataSource, IUITableViewDelegate,
+        IStoryView
     {
         private NSObject _willHideNotificationObserver;
         private NSObject _willShowNotificationObserver;
@@ -52,6 +53,7 @@ namespace TellMe.iOS.Controllers
         {
             await Initialize();
             App.Instance.OnStoryLikeChanged += OnStoryLikeChanged;
+            App.Instance.OnStoryObjectionableChanged += OnStoryObjectionableChanged;
 
             _commentsService = IoC.GetInstance<IRemoteCommentsDataService>();
             _remoteStoriesService = IoC.GetInstance<IRemoteStoriesDataService>();
@@ -80,13 +82,14 @@ namespace TellMe.iOS.Controllers
             {
                 CancelsTouchesInView = false
             });
-            
+
             this.LoadCommentsAsync();
         }
 
         public override void ViewDidAppear(bool animated)
         {
             this._storyView.Play();
+
             RegisterForKeyboardNotifications();
         }
 
@@ -120,7 +123,7 @@ namespace TellMe.iOS.Controllers
             UIView.BeginAnimations("AnimateForKeyboard");
             UIView.SetAnimationBeginsFromCurrentState(true);
             UIView.SetAnimationDuration(UIKeyboard.AnimationDurationFromNotification(notification));
-            UIView.SetAnimationCurve((UIViewAnimationCurve)UIKeyboard.AnimationCurveFromNotification(notification));
+            UIView.SetAnimationCurve((UIViewAnimationCurve) UIKeyboard.AnimationCurveFromNotification(notification));
 
             //Pass the notification, calculating keyboard height, etc.
             var keyboardFrame = visible
@@ -230,10 +233,7 @@ namespace TellMe.iOS.Controllers
             SendButton.Enabled = true;
 
             var result = await _commentsService.AddCommentAsync(comment).ConfigureAwait(false);
-            InvokeOnMainThread(() =>
-            {
-                UpdateComments(comment, result);
-            });
+            InvokeOnMainThread(() => { UpdateComments(comment, result); });
         }
 
         partial void CancelButtonTouched(Button sender, UIEvent @event)
@@ -261,7 +261,7 @@ namespace TellMe.iOS.Controllers
                 if (index > -1)
                 {
                     _commentsList.RemoveAt(index);
-                    TableView.DeleteRows(new[] { NSIndexPath.FromRowSection(index + CommentCellOffset, 0) },
+                    TableView.DeleteRows(new[] {NSIndexPath.FromRowSection(index + CommentCellOffset, 0)},
                         UITableViewRowAnimation.Automatic);
                 }
             }
@@ -270,7 +270,8 @@ namespace TellMe.iOS.Controllers
                 var index = _commentsList.IndexOf(x => x.Id == comment.ReplyToCommentId);
                 if (index > -1)
                 {
-                    var cell = (CommentViewCell)TableView.CellAt(NSIndexPath.FromRowSection(index + CommentCellOffset, 0));
+                    var cell = (CommentViewCell) TableView.CellAt(
+                        NSIndexPath.FromRowSection(index + CommentCellOffset, 0));
                     cell.DeleteComment(comment);
                     cell.Comment.RepliesCount--;
                 }
@@ -305,9 +306,9 @@ namespace TellMe.iOS.Controllers
 
             var index = _commentsList.IndexOf(replyToComment);
             var replyRowIndexPath = NSIndexPath.FromRowSection(index + CommentCellOffset, 0);
-            var cell = (CommentViewCell)TableView.CellAt(replyRowIndexPath);
+            var cell = (CommentViewCell) TableView.CellAt(replyRowIndexPath);
             cell.AddComments(addToHead, comments);
-            TableView.ReloadRows(new[] { replyRowIndexPath }, UITableViewRowAnimation.Automatic);
+            TableView.ReloadRows(new[] {replyRowIndexPath}, UITableViewRowAnimation.Automatic);
             TableView.LayoutSubviews();
         }
 
@@ -345,7 +346,7 @@ namespace TellMe.iOS.Controllers
 
         private void NewCommentText_Changed(object sender, EventArgs e)
         {
-            var textView = (UITextView)sender;
+            var textView = (UITextView) sender;
             var frame = textView.SizeThatFits(new CGSize(textView.Frame.Width, nfloat.MaxValue));
             var newHeight = frame.Height > 100 ? 100 : frame.Height;
             var delta = newHeight - textView.Frame.Height;
@@ -358,8 +359,8 @@ namespace TellMe.iOS.Controllers
         private bool NewCommentText_ShouldChangeText(UITextView textView, NSRange range, string replacementString)
         {
             var text = textView.Text;
-            var newText = text.Substring(0, (int)range.Location) + replacementString +
-                          text.Substring((int)(range.Location + range.Length));
+            var newText = text.Substring(0, (int) range.Location) + replacementString +
+                          text.Substring((int) (range.Location + range.Length));
 
             return newText.Length <= 500; //max length
         }
@@ -379,6 +380,7 @@ namespace TellMe.iOS.Controllers
                     this.DismissViewController(true, null);
                 }
             }
+
             _storyView = StoryViewCell.Create(Story, true);
             _storyView.OnProfilePictureTouched = StoryView_OnProfilePictureTouched;
             _storyView.OnReceiverSelected = StoryView_OnReceiverSelected;
@@ -388,18 +390,36 @@ namespace TellMe.iOS.Controllers
 
         private void StoryView_MoreButtonTouched(StoryDTO story)
         {
-            var actionSheet = new UIActionSheet("Options");
-            actionSheet.AddButton("Add to Playlist");
-            actionSheet.AddButton("Cancel");
-            actionSheet.CancelButtonIndex = 1;
-            actionSheet.Clicked += (sender, args) =>
+            var uiAlertController = UIAlertController.Create("Options", null, UIAlertControllerStyle.ActionSheet);
+            uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
+                obj => _storiesTableBusinessLogic.AddToPlaylist(story)));
+            if (story.Objectionable)
             {
-                if (args.ButtonIndex == 0)
+                uiAlertController.AddAction(UIAlertAction.Create("Unflag as objectionable",
+                    UIAlertActionStyle.Destructive,
+                    obj =>
+                    {
+                        InvokeInBackground(async () => await _storiesTableBusinessLogic.UnflagAsObjectionable(story.Id));
+                    }));
+            }
+            else
+            {
+                uiAlertController.AddAction(UIAlertAction.Create("Flag as objectionable",
+                    UIAlertActionStyle.Destructive,
+                    obj =>
+                    {
+                        InvokeInBackground(async () => await _storiesTableBusinessLogic.FlagAsObjectionable(story.Id));
+                    }));
+            }
+
+            uiAlertController.AddAction(UIAlertAction.Create("Unfollow Story Teller", UIAlertActionStyle.Destructive,
+                obj =>
                 {
-                    _storiesTableBusinessLogic.AddToPlaylist(story);
-                }
-            };
-            actionSheet.ShowInView(View);
+                    InvokeInBackground(async () =>
+                        await _storiesTableBusinessLogic.UnfollowStoryTellerAsync(story.SenderId));
+                }));
+            uiAlertController.AddAction(UIAlertAction.Create("Cancel", UIAlertActionStyle.Cancel, null));
+            this.PresentViewController(uiAlertController, true, null);
         }
 
         private async void StoryView_OnLikeButtonTouched(StoryDTO story)
@@ -466,7 +486,7 @@ namespace TellMe.iOS.Controllers
                 return this._loadMoreButton;
             }
 
-            var commentCell = (CommentViewCell)TableView.DequeueReusableCell(CommentViewCell.Key, indexPath);
+            var commentCell = (CommentViewCell) TableView.DequeueReusableCell(CommentViewCell.Key, indexPath);
             commentCell.Comment = _commentsList[indexPath.Row - CommentCellOffset];
             commentCell.ReceiverSelected = CommentCell_ReceiverSelected;
             commentCell.ReplyButtonTouched = CommentCell_ReplyButtonTouched;
@@ -477,13 +497,11 @@ namespace TellMe.iOS.Controllers
         private async void CommentCell_LoadRepliesButtonTouched(CommentDTO comment)
         {
             var olderThanUtc = comment.Replies?.FirstOrDefault()?.CreateDateUtc;
-            var result = await _commentsService.GetRepliesAsync(Story.Id, comment.Id, olderThanUtc).ConfigureAwait(false);
+            var result = await _commentsService.GetRepliesAsync(Story.Id, comment.Id, olderThanUtc)
+                .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                InvokeOnMainThread(() =>
-                {
-                    DisplayReplies(false, comment, result.Data.Items);
-                });
+                InvokeOnMainThread(() => { DisplayReplies(false, comment, result.Data.Items); });
             }
         }
 
@@ -501,6 +519,12 @@ namespace TellMe.iOS.Controllers
         {
             if (this.Story.Id == story.Id)
                 _storyView.UpdateLikeButton(story);
+        }
+        
+        private void OnStoryObjectionableChanged(int storyId, bool objectionable)
+        {
+            if (this.Story.Id == storyId)
+                _storyView.UpdateObjectionableState(objectionable);
         }
 
         private void SetReplyToBlock(CommentDTO comment)

@@ -12,5 +12,6 @@ namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
         Task<Result<FriendshipStatus>> AcceptFriendshipRequestAsync(string id, int notificationId);
         Task<Result> SendRequestToJoinAsync(string email);
         Task<Result<StorytellerDTO>> GetByIdAsync(string storytellerId);
+        Task<Result> UnfollowAsync(string senderId);
     }
 }
