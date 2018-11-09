@@ -524,7 +524,7 @@ namespace TellMe.iOS.Controllers
         private void OnStoryObjectionableChanged(int storyId, bool objectionable)
         {
             if (this.Story.Id == storyId)
-                _storyView.UpdateObjectionableState(objectionable);
+                InvokeOnMainThread(() => _storyView.UpdateObjectionableState(objectionable));
         }
 
         private void SetReplyToBlock(CommentDTO comment)
