@@ -59,11 +59,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public async Task FlagAsObjectionable(int storyId)
         {
             var result = await RemoteStoriesDataService.FlagAsObjectionableAsync(storyId).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                this.View.ShowSuccessMessage("The story was flagged as objectionable");
-            }
-            else
+            if (!result.IsSuccess)
             {
                 this.View.ShowErrorMessage("Error", result.ErrorMessage);
             }
@@ -72,11 +68,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public async Task UnflagAsObjectionable(int storyId)
         {
             var result = await RemoteStoriesDataService.UnflagAsObjectionableAsync(storyId).ConfigureAwait(false);
-            if (result.IsSuccess)
-            {
-                this.View.ShowSuccessMessage("The story was unflagged as objectionable");
-            }
-            else
+            if (!result.IsSuccess)
             {
                 this.View.ShowErrorMessage("Error", result.ErrorMessage);
             }
