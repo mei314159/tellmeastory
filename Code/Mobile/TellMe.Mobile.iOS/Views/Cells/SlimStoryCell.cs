@@ -41,6 +41,11 @@ namespace TellMe.iOS.Views.Cells
         {
             Preview.SetPictureUrl(Story.PreviewUrl, DefaultPlaylistPicture);
             Title.Text = Story.Title;
+            if (Story.Objectionable){
+                Title.TextColor = UIColor.LightGray;
+                SelectionStyle = UITableViewCellSelectionStyle.None;
+            }
+
             SenderPicture.SetPictureUrl(Story.SenderPictureUrl, DefaultUserPicture);
         }
     }

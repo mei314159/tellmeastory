@@ -335,7 +335,8 @@ namespace TellMe.Web.DAL.Types.Services
         public async Task UnfollowAsync(string currentUserId, string userId)
         {
             var friendships = await _friendshipRepository.GetQueryable()
-                .Where(x => x.UserId == currentUserId && x.FriendId == userId).ToListAsync().ConfigureAwait(false);
+                .Where(x => x.UserId == currentUserId && x.FriendId == userId ||
+                            x.UserId == userId && x.FriendId == currentUserId).ToListAsync().ConfigureAwait(false);
 
             foreach (var friendship in friendships)
             {

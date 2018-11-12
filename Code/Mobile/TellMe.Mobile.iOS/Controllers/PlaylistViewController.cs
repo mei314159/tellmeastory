@@ -138,8 +138,6 @@ namespace TellMe.iOS.Controllers
             var cell = (SlimStoryCell) tableView.DequeueReusableCell(SlimStoryCell.Key);
             cell.Story = Stories.ElementAt(indexPath.Row);
             cell.ShowsReorderControl = true;
-            if (cell.Story.Objectionable)
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
             return cell;
         }
 
