@@ -76,6 +76,13 @@ namespace TellMe.Web.Controllers
 
             return Ok(result);
         }
+        
+        [HttpGet("{storyId}/remove/{confirmationToken}/{userId}")]
+        public async Task<IActionResult> RemoveAsync(int storyId, string confirmationToken, string userId)
+        {
+            await _storyService.RemoveStoryAsync(userId, storyId, confirmationToken);
+            return Ok();
+        }
 
         [HttpGet("{storyId}/receivers")]
         public async Task<IActionResult> GetStoryReceiversAsync(int storyId)

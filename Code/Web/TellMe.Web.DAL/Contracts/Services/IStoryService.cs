@@ -23,5 +23,6 @@ namespace TellMe.Web.DAL.Contracts.Services
         Task AddToPlaylistAsync(string currentUserId, int storyId, int playlistId);
         Task FlagAsObjectionableAsync(string currentUserId, int storyId);
         Task UnflagAsObjectionableAsync(string currentUserId, int storyId);
+        Task RemoveStoryAsync(string userId, int storyId, string confirmationToken);
     }
 }

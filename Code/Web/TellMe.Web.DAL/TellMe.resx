@@ -23,6 +23,13 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="ObjectionableContent_MailTemplate" xml:space="preserve">
+	    <value>User {0} marked the next story as objectionable: <a href="{1}">{1}</a>&lt;br/&gt;&lt;br/&gt;
+        To remove this story click on link below:&lt;br/&gt;
+            &lt;a href="{2}"&gt;Remove story&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+Thanks.&lt;br/&gt;
+&lt;a href='{3}'&gt;StoryTella app&lt;/a&gt;</value>
+    </data>
     <data name="RegistrationConfirmation_MailTemplate" xml:space="preserve">
 	    <value>Hi, you have been registered in our system.&lt;br/&gt;&lt;br/&gt;
 To confirm your registration click on link below:&lt;br/&gt;

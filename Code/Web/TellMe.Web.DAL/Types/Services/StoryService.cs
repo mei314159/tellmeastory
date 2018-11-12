@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts;
@@ -14,26 +16,32 @@ using TellMe.Web.DAL.Contracts.Services;
 using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Types.Domain;
 using TellMe.Web.DAL.Types.PushNotifications;
+using TellMe.Web.DAL.Types.Settings;
 using ContactType = TellMe.Shared.Contracts.Enums.ContactType;
 
 namespace TellMe.Web.DAL.Types.Services
 {
     public class StoryService : IStoryService
     {
+        private const string RemoveStoryTokenFormat = "{0}edad02cf-7026{1}-4546-a703-f99daaf2d630";
         private readonly IRepository<Story, int> _storyRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
 
         private readonly IRepository<StoryRequestStatus, int> _storyRequestStatusRepository;
         private readonly IRepository<StoryRequest, int> _storyRequestRepository;
         private readonly IRepository<StoryReceiver, int> _storyReceiverRepository;
-        private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<StoryLike> _storyLikeRepository;
+        private readonly IRepository<PlaylistStory> _playlistStoryRepository;
+        private readonly IRepository<Comment, int> _commentRepository;
+        private readonly IRepository<TribeMember, int> _tribeMemberRepository;
         private readonly IRepository<ApplicationUser> _userRepository;
         private readonly IRepository<EventAttendee, int> _eventAttendeeRepository;
         private readonly IRepository<Event, int> _eventRepository;
         private readonly IRepository<Playlist, int> _playlistRepository;
         private readonly IRepository<ObjectionableStory> _objectionableStoryRepository;
         private readonly IMailSender _mailSender;
+        private readonly IStringLocalizer _stringLocalizer;
+        private readonly AppSettings _appSettings;
 
         public StoryService(
             IRepository<Story, int> storyRepository,
@@ -47,7 +55,9 @@ namespace TellMe.Web.DAL.Types.Services
             IRepository<EventAttendee, int> eventAttendeeRepository,
             IRepository<Event, int> eventRepository, IRepository<Playlist, int> playlistRepository,
             IRepository<ObjectionableStory> objectionableStoryRepository,
-            IMailSender mailSender)
+            IMailSender mailSender, IStringLocalizer stringLocalizer,
+            IOptions<AppSettings> emailingSettings, IRepository<Comment, int> commentRepository,
+            IRepository<PlaylistStory> playlistStoryRepository)
         {
             _storyRepository = storyRepository;
             _pushNotificationsService = pushNotificationsService;
@@ -62,6 +72,10 @@ namespace TellMe.Web.DAL.Types.Services
             _playlistRepository = playlistRepository;
             _objectionableStoryRepository = objectionableStoryRepository;
             _mailSender = mailSender;
+            _stringLocalizer = stringLocalizer;
+            _commentRepository = commentRepository;
+            _playlistStoryRepository = playlistStoryRepository;
+            _appSettings = emailingSettings.Value;
         }
 
         public async Task<ICollection<StoryDTO>> GetAllAsync(string currentUserId, DateTime olderThanUtc)
@@ -662,10 +676,14 @@ namespace TellMe.Web.DAL.Types.Services
 
         public async Task FlagAsObjectionableAsync(string currentUserId, int storyId)
         {
+            var user = await _userRepository.GetQueryable().FirstOrDefaultAsync(x => x.Id == currentUserId)
+                .ConfigureAwait(false);
             var exists = await _objectionableStoryRepository.GetQueryable(true)
                 .AnyAsync(x => x.UserId == currentUserId && x.StoryId == storyId).ConfigureAwait(false);
             if (!exists)
             {
+                var story = await _storyRepository.GetQueryable(true).FirstOrDefaultAsync(x => x.Id == storyId)
+                    .ConfigureAwait(false);
                 var objectionableStory = new ObjectionableStory
                 {
                     UserId = currentUserId,
@@ -673,9 +691,53 @@ namespace TellMe.Web.DAL.Types.Services
                     Date = DateTime.UtcNow
                 };
                 await _objectionableStoryRepository.SaveAsync(objectionableStory, true).ConfigureAwait(false);
-
                 //TODO _mailSender
+                await SendMarkedObjectionableEmailAsync(user, story, _appSettings.InfoEmail).ConfigureAwait(false);
             }
+        }
+
+        public async Task RemoveStoryAsync(string userId, int storyId, string confirmationToken)
+        {
+            var story = await _storyRepository
+                .GetQueryable()
+                .Include(x => x.Comments)
+                .Include(x => x.Likes)
+                .Include(x => x.Playlists)
+                .Include(x => x.Receivers)
+                .Include(x => x.ObjectionableStories)
+                .FirstOrDefaultAsync(x => x.Id == storyId)
+                .ConfigureAwait(false);
+            var removeStoryToken = string.Format(RemoveStoryTokenFormat, storyId, story.SenderId);
+            if (!string.Equals(removeStoryToken, confirmationToken, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+
+            _commentRepository.RemoveAll(story.Comments.ToList(), false);
+            _storyLikeRepository.RemoveAll(story.Likes.ToList(), false);
+            _playlistStoryRepository.RemoveAll(story.Playlists.ToList(), false);
+            _storyReceiverRepository.RemoveAll(story.Receivers.ToList(), false);
+            _objectionableStoryRepository.RemoveAll(story.ObjectionableStories.ToList(), false);
+            
+            _storyRepository.Remove(story, true);
+        }
+
+        public async Task SendMarkedObjectionableEmailAsync(ApplicationUser user, Story story, string email)
+        {
+            var confirmationToken = string.Format(RemoveStoryTokenFormat, story.Id, story.SenderId);
+            const string displayName = "TellMeAStoryApp";
+            const string mailSubject = "Objectionable content";
+
+            var mailBody = string.Format(
+                _stringLocalizer["ObjectionableContent_MailTemplate"],
+                user.UserName,
+                story.VideoUrl,
+                $"{_appSettings.Host}/api/stories/{story.Id}/remove/{confirmationToken}/{user.Id}",
+                _appSettings.Host);
+
+            await _mailSender
+                .SendAsync(_appSettings.SupportEmail, displayName, mailSubject, mailBody, new[] {email}, true)
+                .ConfigureAwait(false);
         }
 
         public async Task UnflagAsObjectionableAsync(string currentUserId, int storyId)
