@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 
 namespace TellMe.Mobile.Core.Contracts.BusinessLogic
@@ -12,5 +14,6 @@ namespace TellMe.Mobile.Core.Contracts.BusinessLogic
         void Share();
         
         Task SaveAsync();
+        Task<List<StoryDTO>> LoadStoriesAsync(int playlistId);
     }
 }

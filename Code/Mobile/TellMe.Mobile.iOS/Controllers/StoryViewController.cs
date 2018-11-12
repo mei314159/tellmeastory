@@ -391,19 +391,21 @@ namespace TellMe.iOS.Controllers
         private void StoryView_MoreButtonTouched(StoryDTO story)
         {
             var uiAlertController = UIAlertController.Create("Options", null, UIAlertControllerStyle.ActionSheet);
-            uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
-                obj => _storiesTableBusinessLogic.AddToPlaylist(story)));
+
             if (story.Objectionable)
             {
                 uiAlertController.AddAction(UIAlertAction.Create("Unflag as objectionable",
                     UIAlertActionStyle.Destructive,
                     obj =>
                     {
-                        InvokeInBackground(async () => await _storiesTableBusinessLogic.UnflagAsObjectionable(story.Id));
+                        InvokeInBackground(async () =>
+                            await _storiesTableBusinessLogic.UnflagAsObjectionable(story.Id));
                     }));
             }
             else
             {
+                uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
+                    obj => _storiesTableBusinessLogic.AddToPlaylist(story)));
                 uiAlertController.AddAction(UIAlertAction.Create("Flag as objectionable",
                     UIAlertActionStyle.Destructive,
                     obj =>
@@ -520,7 +522,7 @@ namespace TellMe.iOS.Controllers
             if (this.Story.Id == story.Id)
                 _storyView.UpdateLikeButton(story);
         }
-        
+
         private void OnStoryObjectionableChanged(int storyId, bool objectionable)
         {
             if (this.Story.Id == storyId)

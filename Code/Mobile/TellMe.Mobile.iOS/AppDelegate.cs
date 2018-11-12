@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using SDWebImage;
 using TellMe.iOS.Core;
 using TellMe.iOS.Core.DTO;
-using TellMe.iOS.Core.UI;
 using TellMe.iOS.Extensions;
 using TellMe.Mobile.Core;
 using TellMe.Mobile.Core.Contracts;

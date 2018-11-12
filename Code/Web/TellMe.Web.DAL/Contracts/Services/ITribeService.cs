@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
-using TellMe.Web.DAL.DTO;
-using TellMe.Web.DAL.Types.Domain;
 
 namespace TellMe.Web.DAL.Contracts.Services
 {

@@ -306,7 +306,9 @@
     <InterfaceDefinition Include="Views\Cells\EventAttendeesListCell.xib" />
     <InterfaceDefinition Include="Views\Cells\PlaylistItemCell.xib" />
     <InterfaceDefinition Include="Views\Cells\SlimStoryCell.xib" />
-    <InterfaceDefinition Include="Controllers\PlaylistViewController.xib" />
+    <InterfaceDefinition Include="Controllers\PlaylistViewController.xib">
+      <DependentUpon>PlaylistViewController.cs</DependentUpon>
+    </InterfaceDefinition>
     <InterfaceDefinition Include="Views\AccountPictureView.xib" />
     <InterfaceDefinition Include="Views\Cells\NotificationCenterPlaylistCell.xib" />
   </ItemGroup>

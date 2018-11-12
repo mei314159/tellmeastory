@@ -2,7 +2,6 @@ using Foundation;
 using System;
 using UIKit;
 using System.Collections.Generic;
-using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.iOS.Views.Cells;
 using TellMe.iOS.Extensions;
@@ -122,7 +121,7 @@ namespace TellMe.iOS
 
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var cell = tableView.DequeueReusableCell(SlimStoryCell.Key, indexPath) as SlimStoryCell;
+            var cell = (SlimStoryCell) tableView.DequeueReusableCell(SlimStoryCell.Key, indexPath);
             cell.Story = this._storiesList[indexPath.Row];
             cell.TintColor = UIColor.Blue;
 

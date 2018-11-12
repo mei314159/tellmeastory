@@ -34,6 +34,14 @@ namespace TellMe.Web.Controllers
             return Ok(result);
         }
         
+        [HttpGet("{id}/stories")]
+        public async Task<IActionResult> GetStoriesAsync(int id)
+        {
+            var result = await _playlistService.GetStoriesAsync(this.UserId, id);
+
+            return Ok(result);
+        }
+        
         [HttpPost("{playlistId}/share")]
         public async Task<IActionResult> ShareAsync(int playlistId, [FromBody] SharePlaylistDTO dto)
         {

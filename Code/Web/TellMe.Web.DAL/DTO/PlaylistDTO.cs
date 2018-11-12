@@ -17,7 +17,9 @@ namespace TellMe.Web.DAL.DTO
         public string AuthorPictureUrl { get; set; }
 
         public DateTime CreateDateUtc { get; set; }
+        
+        public int StoriesCount { get; set; }
 
-        public ICollection<StoryListDTO> Stories { get; set; }
+        public ICollection<StoryOrderDTO> Stories { get; set; }
     }
 }

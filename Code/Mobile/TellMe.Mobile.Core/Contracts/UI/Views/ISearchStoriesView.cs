@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Shared.Contracts.DTO;
 

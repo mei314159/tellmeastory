@@ -29,12 +29,12 @@ namespace TellMe.iOS.Controllers
 
         public PlaylistViewMode Mode { get; set; }
         public Func<IDismissable, PlaylistDTO, Task> OnSelected;
-        private UIImageView noItemsBackground;
+        private UIImageView _noItemsBackground;
 
         public override void AwakeFromNib()
         {
             base.AwakeFromNib();
-            noItemsBackground = new UIImageView(UIImage.FromBundle("NoPlaylists"))
+            _noItemsBackground = new UIImageView(UIImage.FromBundle("NoPlaylists"))
             {
                 ContentMode = UIViewContentMode.Center
             };
@@ -226,7 +226,7 @@ namespace TellMe.iOS.Controllers
 
         private void SetTableBackground()
         {
-            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : noItemsBackground;
+            this.TableView.BackgroundView = this._itemsList.Count > 0 ? null : _noItemsBackground;
         }
     }
 }

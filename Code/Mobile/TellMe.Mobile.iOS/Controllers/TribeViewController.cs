@@ -1,18 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using TellMe.iOS.Core;
-using TellMe.iOS.Extensions;
-using TellMe.iOS.Views;
-using TellMe.iOS.Views.Cells;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
-using UIKit;
 
 namespace TellMe.iOS.Controllers
 {

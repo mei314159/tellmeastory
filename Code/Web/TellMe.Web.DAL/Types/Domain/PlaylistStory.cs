@@ -1,4 +1,3 @@
-using System;
 using TellMe.Web.DAL.Contracts.Domain;
 
 namespace TellMe.Web.DAL.Types.Domain

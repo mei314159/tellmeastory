@@ -231,7 +231,9 @@ namespace TellMe.Web.DAL.Types.Services
             ORDER BY StoryRank DESC, EventRank DESC, UserRank DESC
             OFFSET @p2 ROWS
             FETCH NEXT @p3 ROWS ONLY"), currentUserId, fragment, skip, 20)
-                .Include(x => x.Sender);
+                .Include(x => x.Sender)
+                .Include(x => x.ObjectionableStories)
+                .Where(x => x.ObjectionableStories.All(b => b.UserId != currentUserId));
             var list = await stories.ToListAsync().ConfigureAwait(false);
             var result = Mapper.Map<ICollection<StoryListDTO>>(list);
             return result;
@@ -264,6 +266,7 @@ namespace TellMe.Web.DAL.Types.Services
             IQueryable<Story> stories = _storyRepository
                 .GetQueryable(true);
             stories = stories
+                .Where(x => x.ObjectionableStories.All(b => b.UserId != currentUserId))
                 .GroupJoin(receivers, story => story.Id, receiver => receiver.Story.Id,
                     (story, receiversGroup) => new {story, receiversGroup})
                 .SelectMany(x => x.receiversGroup.DefaultIfEmpty(), (x, storyReceiver) => new {x.story, storyReceiver})
@@ -288,7 +291,8 @@ namespace TellMe.Web.DAL.Types.Services
                 .Include(x => x.Receivers).ThenInclude(x => x.Tribe);
 
 
-            var list = await stories.ToListAsync().ConfigureAwait(false);
+            var list = await stories
+                .ToListAsync().ConfigureAwait(false);
             var result = Mapper.Map<ICollection<StoryListDTO>>(list);
             return result;
         }
@@ -669,11 +673,11 @@ namespace TellMe.Web.DAL.Types.Services
                     Date = DateTime.UtcNow
                 };
                 await _objectionableStoryRepository.SaveAsync(objectionableStory, true).ConfigureAwait(false);
-                
+
                 //TODO _mailSender
             }
         }
-        
+
         public async Task UnflagAsObjectionableAsync(string currentUserId, int storyId)
         {
             var objectionableStory = await _objectionableStoryRepository.GetQueryable()

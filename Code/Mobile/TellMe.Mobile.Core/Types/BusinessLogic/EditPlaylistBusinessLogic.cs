@@ -34,25 +34,16 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public async Task LoadAsync(bool forceRefresh)
         {
             var dto = View.Playlist;
-            var localEventResult = await _localPlaylistsDataService.GetAsync(dto.Id).ConfigureAwait(false);
-            if (forceRefresh || localEventResult.Expired || localEventResult.Data.Stories == null ||
-                localEventResult.Data.Stories.Count == 0)
+            var result = await _remotePlaylistsDataService.GetAsync(dto.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                var result = await _remotePlaylistsDataService.GetAsync(dto.Id).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await _localPlaylistsDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                    dto = result.Data;
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return;
-                }
+                await _localPlaylistsDataService.SaveAsync(result.Data).ConfigureAwait(false);
+                dto = result.Data;
             }
             else
             {
-                dto = localEventResult.Data;
+                result.ShowResultError(this.View);
+                return;
             }
 
             this.View.Display(dto);
@@ -60,19 +51,24 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void ChooseStories()
         {
-            var disabledStories =
-                new HashSet<int>(View.Playlist.Stories.Select(x => x.Id));
+            var disabledStories = new HashSet<int>(View.Stories.Select(x => x.Id));
             _router.NavigateSearchStories(View, StoriesSelectedEventHandler, true, disabledStories);
         }
 
         private void StoriesSelectedEventHandler(IDismissable selectAttendeesView, ICollection<StoryListDTO> stories)
         {
-            View.Playlist.Stories.AddRange(stories);
+            View.Stories.AddRange(stories);
             View.DisplayStories();
         }
 
         public async Task SaveAsync()
         {
+            View.Playlist.Stories = View.Stories.Select((x, i) => new StoryOrderDTO
+            {
+                Id = x.Id,
+                Order = i
+            }).ToList();
+
             var validationResult = _validator.Validate(View.Playlist);
             if (validationResult.IsValid)
             {
@@ -95,6 +91,17 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             {
                 validationResult.ShowValidationResult(this.View);
             }
+        }
+
+        public async Task<List<StoryDTO>> LoadStoriesAsync(int playlistId)
+        {
+            var result = await this._remotePlaylistsDataService.GetStoriesAsync(playlistId).ConfigureAwait(false);
+            if (!result.IsSuccess)
+            {
+                result.ShowResultError(this.View);
+            }
+
+            return result.Data;
         }
 
         public void NavigateStory(int storyId)

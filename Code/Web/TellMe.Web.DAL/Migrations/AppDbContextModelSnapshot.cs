@@ -2,14 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
-using TellMe.Shared.Contracts.Enums;
-using TellMe.Web.DAL;
-using TellMe.Web.DAL.Types.Domain;
-using TellMe.Web.DAL.Types.PushNotifications;
 
 namespace TellMe.Web.DAL.Migrations
 {

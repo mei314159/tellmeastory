@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TellMe.Web.DAL.Contracts.DTO;
 using TellMe.Web.DAL.Contracts.Services;
-using TellMe.Web.DAL.DTO;
 
 namespace TellMe.Web.Controllers
 {

@@ -12,7 +12,6 @@ using TellMe.Mobile.Core.Contracts.BusinessLogic;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI.Views;
-using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
 using UIKit;
 using ContactDTO = TellMe.Mobile.Core.Contracts.DTO.ContactDTO;

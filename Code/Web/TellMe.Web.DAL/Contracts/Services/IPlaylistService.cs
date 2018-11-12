@@ -17,5 +17,7 @@ namespace TellMe.Web.DAL.Contracts.Services
         Task ShareAsync(string currentUserId, int playlistId, SharePlaylistDTO dto);
                
         Task DeleteAsync(string currentUserId, int playlistId);
+        
+        Task<ICollection<StoryDTO>> GetStoriesAsync(string currentUserId, int playlistId);
     }
 }

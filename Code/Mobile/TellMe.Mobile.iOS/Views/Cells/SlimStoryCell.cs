@@ -1,14 +1,13 @@
 ﻿using System;
 using Foundation;
-using TellMe.Mobile.Core.Contracts.DTO;
-using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO.Interfaces;
 using UIKit;
 
 namespace TellMe.iOS.Views.Cells
 {
     public partial class SlimStoryCell : UITableViewCell
     {
-        private StoryListDTO _story;
+        private IStoryDTO _story;
 
         public static readonly NSString Key = new NSString("SlimStoryCell");
         public static readonly UINib Nib;
@@ -27,7 +26,7 @@ namespace TellMe.iOS.Views.Cells
             // Note: this .ctor should not contain any initialization logic.
         }
 
-        public StoryListDTO Story
+        public IStoryDTO Story
         {
             get => _story;
 

@@ -13,7 +13,7 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI;
 using TellMe.Mobile.Core.Contracts.UI.Views;
-using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO.Interfaces;
 using UIKit;
 
 namespace TellMe.iOS.Controllers
@@ -34,17 +34,21 @@ namespace TellMe.iOS.Controllers
         public event ItemUpdateHandler<PlaylistDTO> ItemUpdated;
 
         public PlaylistDTO Playlist { get; set; }
+        public List<IStoryDTO> Stories { get; set; }
 
-        public override void ViewDidLoad()
+        public override async void ViewDidLoad()
         {
+            Stories = new List<IStoryDTO>();
             this._createItem = Playlist == null;
-            if (_createItem)
+            if (Playlist == null)
             {
-                Playlist = new PlaylistDTO
-                {
-                    Stories = new List<StoryListDTO>()
-                };
+                Playlist = new PlaylistDTO();
             }
+            else
+            {
+                Stories.AddRange(await _businessLogic.LoadStoriesAsync(Playlist.Id));
+            }
+
             ToggleRightButton(true);
             TableView.RefreshControl = new UIRefreshControl();
             TableView.RefreshControl.ValueChanged += RefreshControl_ValueChanged;
@@ -78,7 +82,8 @@ namespace TellMe.iOS.Controllers
 
         public override Source CreateSizingSource(bool unevenRows)
         {
-            _dataSource = new CreatePlaylistSource(this, Playlist);
+            _dataSource = new CreatePlaylistSource(this);
+            _dataSource.SetData(Stories);
             _dataSource.EditButtonTouched += DataSource_EditButtonTouched;
             _dataSource.OnDeleteRow += DataSource_OnDeleteRow;
             _dataSource.OnItemSelected += DataSourceOnItemSelected;
@@ -108,13 +113,13 @@ namespace TellMe.iOS.Controllers
             _businessLogic.ChooseStories();
         }
 
-        private void DataSource_OnDeleteRow(StoryListDTO deletedItem, NSIndexPath indexPath)
+        private void DataSource_OnDeleteRow(IStoryDTO deletedItem, NSIndexPath indexPath)
         {
-            Playlist.Stories.RemoveAll(x => x.Id == deletedItem.Id);
+            Stories.RemoveAll(x => x.Id == deletedItem.Id);
             TableView.DeleteRows(new[] {indexPath}, UITableViewRowAnimation.Automatic);
         }
 
-        private void DataSourceOnItemSelected(StoryListDTO storyDTO, NSIndexPath indexPath)
+        private void DataSourceOnItemSelected(IStoryDTO storyDTO, NSIndexPath indexPath)
         {
             _businessLogic.NavigateStory(storyDTO.Id);
         }
@@ -168,7 +173,7 @@ namespace TellMe.iOS.Controllers
 
         public void DisplayStories()
         {
-            _dataSource.SetData(Playlist);
+            _dataSource.SetData(Stories);
             TableView.ReloadData();
         }
 
@@ -223,36 +228,25 @@ namespace TellMe.iOS.Controllers
 
     public class CreatePlaylistSource : DialogViewController.Source
     {
-        private readonly List<StoryListDTO> _itemsList = new List<StoryListDTO>();
+        private readonly List<IStoryDTO> _itemsList = new List<IStoryDTO>();
         private UITableViewCell _addMemberCell;
 
-        public event Action<StoryListDTO, NSIndexPath> OnDeleteRow;
-        public event Action<StoryListDTO, NSIndexPath> OnItemSelected;
+        public event Action<IStoryDTO, NSIndexPath> OnDeleteRow;
+        public event Action<IStoryDTO, NSIndexPath> OnItemSelected;
         public event Action EditButtonTouched;
 
-        public CreatePlaylistSource(DialogViewController controller, PlaylistDTO dto) : base(controller)
+        public CreatePlaylistSource(DialogViewController controller) : base(controller)
         {
             controller.TableView.RegisterNibForCellReuse(SlimStoryCell.Nib,
                 SlimStoryCell.Key);
-            this.SetData(dto);
         }
 
-        public void SetData(PlaylistDTO dto)
+        public void SetData(ICollection<IStoryDTO> stories)
         {
             lock (((ICollection) _itemsList).SyncRoot)
             {
                 _itemsList.Clear();
-                if (dto.Stories != null)
-                    _itemsList.AddRange(dto.Stories.Select(x => new StoryListDTO
-                    {
-                        CreateDateUtc = x.CreateDateUtc,
-                        Id = x.Id,
-                        PreviewUrl = x.PreviewUrl,
-                        SenderId = x.SenderId,
-                        SenderName = x.SenderName,
-                        SenderPictureUrl = x.SenderPictureUrl,
-                        Title = x.Title
-                    }).OrderBy(x => x.CreateDateUtc));
+                _itemsList.AddRange(stories);
             }
         }
 
@@ -287,7 +281,6 @@ namespace TellMe.iOS.Controllers
             cell.Story = _itemsList.ElementAt(index);
             return cell;
         }
-
 
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using TellMe.Shared.Contracts.DTO.Interfaces;
 
 namespace TellMe.Mobile.Core.Contracts.DTO
 {
     [SQLite.Table("Stories")]
-    public class StoryDTO
+    public class StoryDTO : IStoryDTO
     {
-        [SQLite.PrimaryKey]
-        public int Id { get; set; }
+        [SQLite.PrimaryKey] public int Id { get; set; }
         public string Title { get; set; }
         public string VideoUrl { get; set; }
         public string PreviewUrl { get; set; }

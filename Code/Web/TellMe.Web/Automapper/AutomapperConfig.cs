@@ -51,6 +51,8 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.SenderName, x => x.MapFrom(z => z.Sender.UserName))
                     .ForMember(x => x.SenderPictureUrl, x => x.MapFrom(z => z.Sender.PictureUrl));
 
+                cfg.CreateMap<Story, StoryOrderDTO>();
+
                 cfg.CreateMap<Event, EventDTO>()
                     .ForMember(x => x.HostUserName, x => x.MapFrom(z => z.Host.UserName))
                     .ForMember(x => x.HostPictureUrl, x => x.MapFrom(z => z.Host.PictureUrl))
@@ -70,11 +72,14 @@ namespace TellMe.Web.Automapper
                     .ForMember(x => x.AuthorId,
                         x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).UserId))
                     .ForMember(x => x.AuthorUserName,
-                        x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.UserName))
+                        x => x.MapFrom(
+                            y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.UserName))
+                    .ForMember(x => x.StoriesCount,
+                        x => x.MapFrom(y => y.Stories.Count)) //TODO VERIFY
                     .ForMember(x => x.AuthorPictureUrl,
-                        x => x.MapFrom(y => y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.PictureUrl))
-                    .ForMember(x => x.Stories,
-                        x => x.MapFrom(y => y.Stories.OrderBy(d => d.Order).Select(a => a.Story).ToList()));
+                        x => x.MapFrom(y =>
+                            y.Users.FirstOrDefault(u => u.Type == PlaylistUserType.Author).User.PictureUrl))
+                    .ForMember(x => x.Stories, x => x.Ignore());
 
                 cfg.CreateMap<PlaylistDTO, Playlist>()
                     .ForMember(x => x.Id, x => x.Ignore())

@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Threading;
+using System.Linq;
+using System.Threading.Tasks;
 using AVFoundation;
 using CoreFoundation;
-using CoreGraphics;
 using Foundation;
 using SDWebImage;
 using TellMe.iOS.Core;
@@ -15,7 +17,7 @@ using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.Handlers;
 using TellMe.Mobile.Core.Contracts.UI;
 using TellMe.Mobile.Core.Contracts.UI.Views;
-using TellMe.Shared.Contracts.DTO;
+using TellMe.Shared.Contracts.DTO.Interfaces;
 using UIKit;
 using Constants = TellMe.Mobile.Core.Constants;
 using Timer = System.Timers.Timer;
@@ -57,6 +59,8 @@ namespace TellMe.iOS.Controllers
             base.ViewDidLoad();
             this._businessLogic = IoC.GetInstance<IPlaylistViewBusinessLogic>();
             this._businessLogic.View = this;
+
+            this.Stories = new List<StoryDTO>();
             TableView.Delegate = this;
             TableView.DataSource = this;
             TableView.DragInteractionEnabled = true;
@@ -82,6 +86,20 @@ namespace TellMe.iOS.Controllers
             this.TogglePlayer(false);
         }
 
+        public List<StoryDTO> Stories { get; set; }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+            
+
+            Task.Run(async () =>
+            {
+                this.Stories.AddRange(await this._businessLogic.LoadStoriesAsync(Playlist.Id).ConfigureAwait(false));
+                this.InvokeOnMainThread(() => this.TableView.ReloadData());
+            });
+        }
+
         public override void ViewWillDisappear(bool animated)
         {
             StopPlaying();
@@ -100,6 +118,7 @@ namespace TellMe.iOS.Controllers
             {
                 this.NavigationController.SetNavigationBarHidden(false, true);
             }
+
             var top = show ? 0 : this.View.Frame.Height;
             UIView.Animate(0.2,
                 () =>
@@ -117,14 +136,16 @@ namespace TellMe.iOS.Controllers
         public UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (SlimStoryCell) tableView.DequeueReusableCell(SlimStoryCell.Key);
-            cell.Story = Playlist.Stories[indexPath.Row];
+            cell.Story = Stories.ElementAt(indexPath.Row);
             cell.ShowsReorderControl = true;
+            if (cell.Story.Objectionable)
+                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
             return cell;
         }
 
         public nint RowsInSection(UITableView tableView, nint section)
         {
-            return Playlist?.Stories.Count ?? 0;
+            return Stories?.Count ?? 0;
         }
 
         [Export("tableView:canMoveRowAtIndexPath:")]
@@ -150,16 +171,19 @@ namespace TellMe.iOS.Controllers
         public void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var cell = (SlimStoryCell) tableView.CellAt(indexPath);
-            _currentItemIndex = Playlist.Stories.IndexOf(cell.Story);
-            PlayStory(cell.Story);
+            _currentItemIndex = Stories.IndexOf(x => x.Id == cell.Story.Id);
+            if (!PlayStory(cell.Story))
+            {
+                this.ShowErrorMessage("The story is objectionable");
+            }
         }
 
         [Export("tableView:moveRowAtIndexPath:toIndexPath:")]
         public void MoveRow(UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
         {
-            var movedObject = this.Playlist.Stories[sourceIndexPath.Row];
-            Playlist.Stories.RemoveAt(sourceIndexPath.Row);
-            Playlist.Stories.Insert(destinationIndexPath.Row, movedObject);
+            var movedObject = Stories.ElementAt(sourceIndexPath.Row);
+            Stories.RemoveAt(sourceIndexPath.Row);
+            Stories.Insert(destinationIndexPath.Row, movedObject);
         }
 
         public override void ObserveValue(NSString keyPath, NSObject ofObject, NSDictionary change, IntPtr context)
@@ -237,42 +261,45 @@ namespace TellMe.iOS.Controllers
             base.Dispose(disposing);
         }
 
-        partial void NextButton_TouchUpInside(UIButton sender)
-        {
-            Next();
-        }
+        // ReSharper disable once UnusedMember.Local
+        partial void NextButton_TouchUpInside(UIButton sender) => Next();
 
-        partial void PreviousButton_TouchUpInside(UIButton sender)
-        {
-            Previous();
-        }
+        // ReSharper disable once UnusedMember.Local
+        partial void PreviousButton_TouchUpInside(UIButton sender) => Previous();
 
         private void Next()
         {
-            if (Playlist.Stories.Count - 1 > _currentItemIndex)
+            while (Stories.Count - 1 > _currentItemIndex)
             {
                 _currentItemIndex++;
-                var story = Playlist.Stories[_currentItemIndex];
-                PlayStory(story);
+                var story = Stories.ElementAt(_currentItemIndex);
+                if (PlayStory(story))
+                {
+                    return;
+                }
             }
-            else
-            {
-                StopPlaying();
-            }
+
+            StopPlaying();
         }
 
         private void Previous()
         {
-            if (_currentItemIndex > 0)
+            while (_currentItemIndex > 0)
             {
                 _currentItemIndex--;
-                var story = Playlist.Stories[_currentItemIndex];
-                PlayStory(story);
+                var story = Stories.ElementAt(_currentItemIndex);
+                if (PlayStory(story))
+                {
+                    return;
+                }
             }
         }
 
-        private void PlayStory(StoryListDTO story)
+        private bool PlayStory(IStoryDTO story)
         {
+            if (story.Objectionable)
+                return false;
+            
             _playing = true;
             this.TogglePlayer(true);
             SetButtons();
@@ -297,14 +324,17 @@ namespace TellMe.iOS.Controllers
                 AvCustomEditPlayerViewControllerStatusObservationContext.Handle);
             Spinner.Hidden = false;
             Spinner.StartAnimating();
+            return true;
         }
 
 
-        private AVUrlAsset GetAsset(StoryListDTO story)
+        private AVUrlAsset GetAsset(IStoryDTO story)
         {
             NSUrl videoUrl;
 
-            var videoPath = Path.Combine(Constants.TempVideoStorage, Path.GetFileName(story.VideoUrl));
+            var fileName = Path.GetFileName(story.VideoUrl);
+            Debug.Assert(fileName != null, nameof(fileName) + " != null");
+            var videoPath = Path.Combine(Constants.TempVideoStorage, fileName);
             if (File.Exists(videoPath))
             {
                 videoUrl = NSUrl.CreateFileUrl(new[] {videoPath});
@@ -364,6 +394,7 @@ namespace TellMe.iOS.Controllers
                     Console.WriteLine(exporter.DebugDescription);
                 });
             }
+
             Next();
         }
 
@@ -414,6 +445,7 @@ namespace TellMe.iOS.Controllers
                 this.NavigationController.NavigationBar.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
                 return;
             }
+
             this.NavigationController.NavigationBar.SetBackgroundImage(null, UIBarMetrics.Default);
             this.NavigationController.NavigationBar.TopItem.LeftBarButtonItem = _closeButton;
             this.NavigationController.NavigationBar.TopItem.Title = Playlist.Name;

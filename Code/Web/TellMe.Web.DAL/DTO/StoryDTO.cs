@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using TellMe.Shared.Contracts.DTO.Interfaces;
 
 namespace TellMe.Web.DAL.DTO
 {
-    public class StoryDTO
+    public class StoryDTO : IStoryDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -18,8 +19,8 @@ namespace TellMe.Web.DAL.DTO
         public int LikesCount { get; set; }
         public bool Liked { get; set; }
         public bool Objectionable { get; set; }
-        
-        
+
+
         public List<StoryReceiverDTO> Receivers { get; set; }
     }
 }

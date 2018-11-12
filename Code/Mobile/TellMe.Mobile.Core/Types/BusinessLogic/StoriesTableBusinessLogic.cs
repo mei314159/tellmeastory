@@ -149,7 +149,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 var result = await RemoteStorytellersDataService.UnfollowAsync(senderId).ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    this.View.ShowSuccessMessage("Storyteller has been unfollowed");
+                    this.View.ShowSuccessMessage("StoryTeller has been unfollowed");
                 }
                 else
                 {

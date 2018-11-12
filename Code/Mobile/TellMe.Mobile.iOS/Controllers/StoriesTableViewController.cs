@@ -181,25 +181,20 @@ namespace TellMe.iOS.Controllers
         private void Cell_MoreButtonTouched(StoryDTO story)
         {
             var uiAlertController = UIAlertController.Create("Options", null, UIAlertControllerStyle.ActionSheet);
-            uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
-                (obj) => BusinessLogic.AddToPlaylist(story)));
+
             if (story.Objectionable)
             {
                 uiAlertController.AddAction(UIAlertAction.Create("Unflag as objectionable",
                     UIAlertActionStyle.Destructive,
-                    obj =>
-                    {
-                        InvokeInBackground(async () => await BusinessLogic.UnflagAsObjectionable(story.Id));
-                    }));
+                    obj => { InvokeInBackground(async () => await BusinessLogic.UnflagAsObjectionable(story.Id)); }));
             }
             else
             {
+                uiAlertController.AddAction(UIAlertAction.Create("Add to Playlist", UIAlertActionStyle.Default,
+                    (obj) => BusinessLogic.AddToPlaylist(story)));
                 uiAlertController.AddAction(UIAlertAction.Create("Flag as objectionable",
                     UIAlertActionStyle.Destructive,
-                    obj =>
-                    {
-                        InvokeInBackground(async () => await BusinessLogic.FlagAsObjectionable(story.Id));
-                    }));
+                    obj => { InvokeInBackground(async () => await BusinessLogic.FlagAsObjectionable(story.Id)); }));
             }
 
             uiAlertController.AddAction(UIAlertAction.Create("Unfollow Story Teller", UIAlertActionStyle.Destructive,

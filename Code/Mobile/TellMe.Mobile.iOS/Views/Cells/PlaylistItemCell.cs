@@ -35,7 +35,7 @@ namespace TellMe.iOS.Views.Cells
         private void Initialize()
         {
             this.Title.Text = Playlist.Name;
-            this.Count.Text = (Playlist.Stories?.Count ?? 0) + " Stories";
+            this.Count.Text = Playlist.StoriesCount + " Stories";
         }
     }
 }

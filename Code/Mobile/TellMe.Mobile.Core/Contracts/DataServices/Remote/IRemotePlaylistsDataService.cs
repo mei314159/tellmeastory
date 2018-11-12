@@ -11,6 +11,8 @@ namespace TellMe.Mobile.Core.Contracts.DataServices.Remote
         Task<Result<PlaylistDTO>> GetAsync(int id);
 
         Task<Result<List<PlaylistDTO>>> GetPlaylistsAsync(DateTime? olderThanUtc = null);
+        
+        Task<Result<List<StoryDTO>>> GetStoriesAsync(int playlistId);
 
         Task<Result<PlaylistDTO>> SaveAsync(PlaylistDTO dto);
         

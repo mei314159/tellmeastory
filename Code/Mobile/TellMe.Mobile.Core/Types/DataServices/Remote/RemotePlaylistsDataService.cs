@@ -33,6 +33,12 @@ namespace TellMe.Mobile.Core.Types.DataServices.Remote
             return result;
         }
 
+        public async Task<Result<List<StoryDTO>>> GetStoriesAsync(int playlistId)
+        {
+            var result = await this._apiProvider.GetAsync<List<StoryDTO>>($"playlists/{playlistId}/stories").ConfigureAwait(false);
+            return result;
+        }
+
         public async Task<Result<PlaylistDTO>> SaveAsync(PlaylistDTO dto)
         {
             var httpMethod = dto.Id == default(int) ? HttpMethod.Post : HttpMethod.Put;

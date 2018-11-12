@@ -20,8 +20,10 @@ namespace TellMe.Mobile.Core.Contracts.DTO
         public string AuthorPictureUrl { get; set; }
 
         public DateTime CreateDateUtc { get; set; }
+        
+        public int StoriesCount { get; set; }
 
         [Ignore]
-        public List<StoryListDTO> Stories { get; set; }
+        public List<StoryOrderDTO> Stories { get; set; }
     }
 }

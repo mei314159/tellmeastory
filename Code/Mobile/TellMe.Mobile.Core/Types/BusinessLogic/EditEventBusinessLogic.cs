@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
@@ -14,19 +13,16 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class EditEventBusinessLogic : IEditEventBusinessLogic
     {
-        private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteEventsDataService _remoteEventsDataService;
         private readonly ILocalEventsDataService _localEventsDataService;
         private readonly EventValidator _validator;
         private readonly IRouter _router;
 
         public EditEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router,
-            ILocalEventsDataService localEventsDataService, EventValidator validator,
-            IRemoteStoriesDataService remoteStoriesDataService)
+            ILocalEventsDataService localEventsDataService, EventValidator validator)
         {
             _localEventsDataService = localEventsDataService;
             _validator = validator;
-            _remoteStoriesDataService = remoteStoriesDataService;
             _router = router;
             _remoteEventsDataService = remoteEventsDataService;
         }

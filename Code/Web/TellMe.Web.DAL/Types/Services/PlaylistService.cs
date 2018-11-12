@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using TellMe.Shared.Contracts.DTO;
 using TellMe.Shared.Contracts.Enums;
@@ -24,14 +23,17 @@ namespace TellMe.Web.DAL.Types.Services
         private readonly IRepository<Playlist> _playlistRepository;
         private readonly IRepository<PlaylistUser> _playlistUsersRepository;
         private readonly IPushNotificationsService _pushNotificationsService;
+        private readonly IRepository<Story, int> _storyRepository;
 
         public PlaylistService(IUnitOfWork unitOfWork, IRepository<Playlist> playlistRepository,
-            IRepository<PlaylistUser> playlistUsersRepository, IPushNotificationsService pushNotificationsService)
+            IRepository<PlaylistUser> playlistUsersRepository, IPushNotificationsService pushNotificationsService,
+            IRepository<Story, int> storyRepository)
         {
             _unitOfWork = unitOfWork;
             _playlistRepository = playlistRepository;
             _playlistUsersRepository = playlistUsersRepository;
             _pushNotificationsService = pushNotificationsService;
+            _storyRepository = storyRepository;
         }
 
         public async Task<PlaylistDTO> GetAsync(string currentUserId, int playlistId)
@@ -125,7 +127,7 @@ namespace TellMe.Web.DAL.Types.Services
 
             entity.Users.MapFrom(dto.UserIds, contactDTO => contactDTO, x => x.UserId,
                 (userId, user) => { user.UserId = userId; },
-                (e, dt)=> e.Type == PlaylistUserType.Author);
+                (e, dt) => e.Type == PlaylistUserType.Author);
 
             await _playlistRepository.SaveAsync(entity).ConfigureAwait(false);
 
@@ -166,6 +168,29 @@ namespace TellMe.Web.DAL.Types.Services
 
             _playlistRepository.Remove(entity, true);
             _unitOfWork.SaveChanges();
+        }
+
+        public async Task<ICollection<StoryDTO>> GetStoriesAsync(string currentUserId, int playlistId)
+        {
+            var playlist = await _playlistRepository.GetQueryable(true).Include(x => x.Stories)
+                .FirstOrDefaultAsync(x => x.Id == playlistId)
+                .ConfigureAwait(false);
+            var stories = await _storyRepository
+                .GetQueryable(true)
+                .Include(x => x.Sender)
+                .Include(x => x.Likes)
+                .Include(x => x.ObjectionableStories)
+                .Include(x => x.Receivers).ThenInclude(x => x.User)
+                .Include(x => x.Receivers).ThenInclude(x => x.Tribe)
+                .Where(story => story.Playlists.Any(x => x.PlaylistId == playlistId)).ToListAsync()
+                .ConfigureAwait(false);
+
+            var list = playlist.Stories.OrderBy(a => a.Order)
+                .Join(stories, x => x.StoryId, x => x.Id, (story, story1) => story1).ToList();
+
+            var result = Mapper.Map<ICollection<StoryDTO>>(list, x => x.Items["UserId"] = currentUserId);
+
+            return result;
         }
     }
 }

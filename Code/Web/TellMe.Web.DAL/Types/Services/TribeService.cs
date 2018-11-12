@@ -9,7 +9,6 @@ using TellMe.Shared.Contracts.Enums;
 using TellMe.Web.DAL.Contracts.PushNotifications;
 using TellMe.Web.DAL.Contracts.Repositories;
 using TellMe.Web.DAL.Contracts.Services;
-using TellMe.Web.DAL.DTO;
 using TellMe.Web.DAL.Types.Domain;
 using TellMe.Web.DAL.Types.PushNotifications;
 

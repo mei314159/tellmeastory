@@ -413,7 +413,7 @@
                             <outlet property="delegate" destination="0wy-WT-jyn" id="C4x-xh-hSS"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Storyteller" id="0uB-7o-qUe"/>
+                    <navigationItem key="navigationItem" title="StoryTeller" id="0uB-7o-qUe"/>
                     <nil key="simulatedStatusBarMetrics"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="JvO-u4-Zo6">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -822,7 +822,7 @@
                                 </constraints>
                                 <textInputTraits key="textInputTraits" returnKeyType="search"/>
                                 <scopeButtonTitles>
-                                    <string>Storytellers</string>
+                                    <string>StoryTellers</string>
                                     <string>Tribes</string>
                                 </scopeButtonTitles>
                             </searchBar>

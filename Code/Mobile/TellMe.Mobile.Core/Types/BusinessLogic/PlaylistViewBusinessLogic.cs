@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
@@ -19,7 +18,8 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private readonly ILocalAccountService _localAccountService;
         private readonly IRemotePlaylistsDataService _remotePlaylistsDataService;
 
-        public PlaylistViewBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService, ILocalAccountService localAccountService)
+        public PlaylistViewBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService,
+            ILocalAccountService localAccountService)
         {
             _router = router;
             _remotePlaylistsDataService = remotePlaylistsDataService;
@@ -66,7 +66,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             {
                 Id = View.Playlist.Id,
                 Name = View.Playlist.Name,
-                Stories = View.Playlist.Stories.Select((x, i) => new StoryListDTO
+                Stories = View.Stories.Select((x, i) => new StoryOrderDTO
                 {
                     Id = x.Id,
                     Order = i
@@ -85,6 +85,17 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             {
                 result.ShowResultError(this.View);
             }
+        }
+
+        public async Task<List<StoryDTO>> LoadStoriesAsync(int playlistId)
+        {
+            var result = await this._remotePlaylistsDataService.GetStoriesAsync(playlistId).ConfigureAwait(false);
+            if (!result.IsSuccess)
+            {
+                result.ShowResultError(this.View);
+            }
+
+            return result.Data;
         }
     }
 }

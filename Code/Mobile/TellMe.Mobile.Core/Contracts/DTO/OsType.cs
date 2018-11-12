@@ -2,6 +2,7 @@
 {
     public enum OsType
     {
+        // ReSharper disable once InconsistentNaming
         iOS = 1,
         Android = 2
     }

@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using TellMe.Mobile.Core.Contracts.DTO;
 
 namespace TellMe.Mobile.Core

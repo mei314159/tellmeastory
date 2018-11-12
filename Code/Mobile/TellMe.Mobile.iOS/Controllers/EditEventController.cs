@@ -252,7 +252,7 @@ namespace TellMe.iOS.Controllers
             {
                 var alert = UIAlertController
                     .Create("Event Saved",
-                        "Do you want to invite Storytellers to your event?",
+                        "Do you want to invite StoryTellers to your event?",
                         UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Not yet", UIAlertActionStyle.Cancel, x =>
                 {
