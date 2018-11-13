@@ -34,10 +34,16 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public async Task LoadAsync(bool forceRefresh, string searchText)
         {
-            var result = await _remoteStorytellersService.SearchAsync(searchText, _contacts.Count, View.Mode)
+            var skip = forceRefresh ? 0 : _contacts.Count;
+            var result = await _remoteStorytellersService.SearchAsync(searchText, skip, View.Mode)
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
+                if (forceRefresh)
+                {
+                    _contacts.Clear();
+                }
+
                 if (result.Data.Count > 0)
                 {
                     _contacts.AddRange(result.Data);

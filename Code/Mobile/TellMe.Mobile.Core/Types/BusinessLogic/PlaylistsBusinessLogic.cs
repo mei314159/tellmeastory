@@ -38,7 +38,8 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .GetPlaylistsAsync(forceRefresh ? null : _events.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                _events.AddRange(result.Data);
+
+                _events.AddRange(result.Data.Except(_events).ToList());
             }
             else
             {
