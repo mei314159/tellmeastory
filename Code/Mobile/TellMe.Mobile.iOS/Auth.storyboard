@@ -260,6 +260,24 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="52886" translatesAutoresizingMaskIntoConstraints="NO" text="Your Story Told">
+                                <rect key="frame" x="129.5" y="91" width="155" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                                <constraints>
+                                    <constraint id="52888" firstAttribute="height" constant="30"/>
+                                </constraints>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Request&#xA;Record&#xA;Preserve&#xA;Share" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="52887" translatesAutoresizingMaskIntoConstraints="NO" misplaced="YES" numberOfLines="4">
+                                <rect key="frame" x="173" y="142" width="69" height="82"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                                <constraints>
+                                    <constraint id="52894" firstAttribute="height" constant="100" relation="lessThanOrEqual"/>
+                                </constraints>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -272,6 +290,12 @@
                             <constraint firstItem="28307" firstAttribute="width" secondItem="28295" secondAttribute="width" id="28376"/>
                             <constraint firstItem="28579" firstAttribute="top" secondItem="28286" secondAttribute="bottom" constant="26" id="28580"/>
                             <constraint firstItem="28579" firstAttribute="centerX" secondItem="28290" secondAttribute="centerX" id="28581"/>
+                            <constraint id="52889" firstItem="52886" firstAttribute="width" secondItem="28290" secondAttribute="width" relation="lessThanOrEqual"/>
+                            <constraint id="52890" firstItem="52886" firstAttribute="centerX" secondItem="28579" secondAttribute="centerX"/>
+                            <constraint id="52891" firstItem="52886" firstAttribute="top" secondItem="28579" secondAttribute="bottom" constant="8"/>
+                            <constraint id="52892" firstItem="52887" firstAttribute="centerX" secondItem="52886" secondAttribute="centerX"/>
+                            <constraint id="52893" firstItem="52887" firstAttribute="top" secondItem="52886" secondAttribute="bottom" constant="21"/>
+                            <constraint id="52895" firstItem="52887" firstAttribute="width" secondItem="28290" secondAttribute="width" relation="lessThanOrEqual"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Welcome" id="28576"/>

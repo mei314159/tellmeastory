@@ -15,15 +15,14 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class TribeViewBusinessLogic : StoriesTableBusinessLogic, ITribeViewBusinessLogic
     {
         private readonly IRemoteTribesDataService _remoteTribesService;
-        private readonly ILocalTribesDataService _localTribesService;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
         public TribeViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
-            ILocalStoriesDataService localStoriesService, IRemoteTribesDataService remoteTribesService,
-            ILocalTribesDataService localTribesService, ILocalAccountService localAccountService, IRemoteStorytellersDataService remoteStorytellersDataService) : base(remoteStoriesDataService, router, localStoriesService, localAccountService, remoteStorytellersDataService)
+            IRemoteTribesDataService remoteTribesService, ILocalAccountService localAccountService,
+            IRemoteStorytellersDataService remoteStorytellersDataService) : base(remoteStoriesDataService, router,
+            localAccountService, remoteStorytellersDataService)
         {
             _remoteTribesService = remoteTribesService;
-            _localTribesService = localTribesService;
         }
 
         public new ITribeView View
@@ -44,7 +43,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 _stories.AddRange(result.Data);
             }
             else
@@ -60,23 +58,15 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             if (View.Tribe == null)
             {
-                var localStoryteller = await _localTribesService.GetAsync(View.TribeId).ConfigureAwait(false);
-                if (localStoryteller.Data == null || localStoryteller.Expired)
+                var result = await _remoteTribesService.GetTribeAsync(View.TribeId).ConfigureAwait(false);
+                if (result.IsSuccess)
                 {
-                    var result = await _remoteTribesService.GetTribeAsync(View.TribeId).ConfigureAwait(false);
-                    if (result.IsSuccess)
-                    {
-                        View.Tribe = result.Data;
-                    }
-                    else
-                    {
-                        result.ShowResultError(this.View);
-                        return false;
-                    }
+                    View.Tribe = result.Data;
                 }
                 else
                 {
-                    View.Tribe = localStoryteller.Data;
+                    result.ShowResultError(this.View);
+                    return false;
                 }
             }
 

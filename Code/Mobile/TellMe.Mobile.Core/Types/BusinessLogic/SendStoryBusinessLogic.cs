@@ -17,16 +17,13 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     {
         private readonly IRouter _router;
         private readonly IRemoteStoriesDataService _remoteStoriesDataService;
-        private readonly ILocalNotificationsDataService _localNotificationsDataService;
         private readonly ILocalAccountService _localAccountService;
         private ICollection<ContactDTO> _recipients;
 
-        public SendStoryBusinessLogic(IRouter router, IRemoteStoriesDataService remoteStoriesDataService,
-            ILocalNotificationsDataService localNotificationsDataService, ILocalAccountService localAccountService)
+        public SendStoryBusinessLogic(IRouter router, IRemoteStoriesDataService remoteStoriesDataService, ILocalAccountService localAccountService)
         {
             this._router = router;
             this._remoteStoriesDataService = remoteStoriesDataService;
-            _localNotificationsDataService = localNotificationsDataService;
             _localAccountService = localAccountService;
         }
 
@@ -97,7 +94,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     if (View.RequestNotification != null)
                     {
                         View.RequestNotification.Handled = true;
-                        await _localNotificationsDataService.SaveAsync(View.RequestNotification).ConfigureAwait(false);
                     }
 
                     this.View.ShowSuccessMessage("Story successfully sent", View.Close);

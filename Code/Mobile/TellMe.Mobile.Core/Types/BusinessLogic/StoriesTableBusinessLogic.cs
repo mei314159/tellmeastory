@@ -14,7 +14,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class StoriesTableBusinessLogic : IStoriesTableBusinessLogic
     {
-        protected readonly ILocalStoriesDataService LocalStoriesService;
         protected readonly IRemoteStoriesDataService RemoteStoriesDataService;
         protected readonly ILocalAccountService LocalAccountService;
         protected readonly IRemoteStorytellersDataService RemoteStorytellersDataService;
@@ -23,13 +22,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public StoriesTableBusinessLogic(
             IRemoteStoriesDataService remoteStoriesDataService,
-            IRouter router, ILocalStoriesDataService localStoriesService,
+            IRouter router,
             ILocalAccountService localAccountService,
             IRemoteStorytellersDataService remoteStorytellersDataService)
         {
             RemoteStoriesDataService = remoteStoriesDataService;
             Router = router;
-            LocalStoriesService = localStoriesService;
             LocalAccountService = localAccountService;
             RemoteStorytellersDataService = remoteStorytellersDataService;
         }
@@ -43,15 +41,10 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 Stories.Clear();
             }
 
-            if (clearCache)
-            {
-                await LocalStoriesService.DeleteAllAsync().ConfigureAwait(false);
-            }
             var result = await RemoteStoriesDataService
                 .GetStoriesAsync(forceRefresh ? null : Stories.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 Stories.AddRange(result.Data);
             }
             else

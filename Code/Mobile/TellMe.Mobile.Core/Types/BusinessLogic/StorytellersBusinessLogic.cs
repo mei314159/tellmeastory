@@ -3,38 +3,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
-using TellMe.Mobile.Core.Contracts.DataServices;
-using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
 using TellMe.Mobile.Core.Types.Extensions;
 using TellMe.Mobile.Core.Validation;
 using TellMe.Shared.Contracts.Enums;
-using FriendshipStatus = TellMe.Mobile.Core.Contracts.DTO.FriendshipStatus;
 
 namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class StorytellersBusinessLogic : IStorytellersBusinessLogic
     {
         private readonly IRemoteStorytellersDataService _remoteStorytellersService;
-        private readonly ILocalStorytellersDataService _localStorytellersService;
         private readonly IRemoteTribesDataService _remoteTribesService;
-        private readonly ILocalTribesDataService _localTribesService;
         private readonly IRouter _router;
         private readonly EmailValidator _emailValidator;
         private readonly List<ContactDTO> _contacts = new List<ContactDTO>();
 
         public StorytellersBusinessLogic(IRemoteStorytellersDataService remoteStorytellersService,
             IRemoteTribesDataService remoteTribesService, IRouter router,
-            ILocalStorytellersDataService localStorytellersService, ILocalTribesDataService localTribesService,
             EmailValidator emailValidator)
         {
             _remoteStorytellersService = remoteStorytellersService;
             _remoteTribesService = remoteTribesService;
             _router = router;
-            _localStorytellersService = localStorytellersService;
-            _localTribesService = localTribesService;
             _emailValidator = emailValidator;
         }
 
@@ -42,88 +34,26 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public async Task LoadAsync(bool forceRefresh, string searchText)
         {
-            var useLocal = !string.IsNullOrWhiteSpace(searchText) && !forceRefresh;
-            if (useLocal)
+            var result = await _remoteStorytellersService.SearchAsync(searchText, _contacts.Count, View.Mode)
+                .ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                var storytellers = await _localStorytellersService.GetAllAsync().ConfigureAwait(false);
-                useLocal = !storytellers.Expired;
-
-                DataResult<ICollection<TribeDTO>> tribes = null;
-                if (useLocal)
+                if (result.Data.Count > 0)
                 {
-                    tribes = await _localTribesService.GetAllAsync().ConfigureAwait(false);
-                    useLocal = !tribes.Expired;
+                    _contacts.AddRange(result.Data);
                 }
-
-                if (useLocal)
+                else if (!string.IsNullOrWhiteSpace(searchText) && _contacts.Count == 0)
                 {
-                    _contacts.Clear();
-                    _contacts.AddRange(storytellers.Data
-                        .Where(x =>
-                            (View.Mode == ContactsMode.StorytellersOnly &&
-                             x.FriendshipStatus == FriendshipStatus.Accepted) ||
-                            x.FriendshipStatus != FriendshipStatus.None
-                        ).Select(x => new ContactDTO
-                        {
-                            Type = ContactType.User,
-                            UserId = x.Id,
-                            User = x
-                        }).Union(tribes.Data.Select(x => new ContactDTO
-                        {
-                            Type = ContactType.Tribe,
-                            TribeId = x.Id,
-                            Tribe = x
-                        })));
+                    this.View.ShowSendRequestPrompt();
                 }
             }
-
-            if (!useLocal)
+            else
             {
-                if (forceRefresh)
-                {
-                    _contacts.Clear();
-                    await ClearLocalDb().ConfigureAwait(false);
-                }
-
-                var result = await _remoteStorytellersService.SearchAsync(searchText, _contacts.Count, View.Mode)
-                    .ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    if (result.Data.Count > 0)
-                    {
-                        _contacts.AddRange(result.Data);
-                        await SaveContactsToLocalDb(result).ConfigureAwait(false);
-                    }
-                    else if (!string.IsNullOrWhiteSpace(searchText) && _contacts.Count == 0)
-                    {
-                        this.View.ShowSendRequestPrompt();
-                    }
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return;
-                }
+                result.ShowResultError(this.View);
+                return;
             }
 
             this.View.DisplayContacts(_contacts);
-        }
-
-        private async Task ClearLocalDb()
-        {
-            await _localStorytellersService.DeleteAllAsync().ConfigureAwait(false);
-            await _localTribesService.DeleteAllAsync().ConfigureAwait(false);
-        }
-
-        private async Task SaveContactsToLocalDb(Result<List<ContactDTO>> result)
-        {
-            await _localStorytellersService
-                .SaveAllAsync(result.Data
-                    .Where(x =>
-                        x.Type == ContactType.User &&
-                        x.User.FriendshipStatus != FriendshipStatus.None)
-                    .Select(x => x.User))
-                .ConfigureAwait(false);
         }
 
         public async Task SendFriendshipRequestAsync(StorytellerDTO storyteller)
@@ -133,7 +63,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             if (result.IsSuccess)
             {
                 storyteller.FriendshipStatus = result.Data;
-                await _localStorytellersService.SaveAsync(storyteller).ConfigureAwait(false);
                 this.View.ShowSuccessMessage("Follow request has been sent");
             }
             else
@@ -164,10 +93,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void AddTribe()
         {
-            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, false, "Choose Tribe Membes");
+            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, false,
+                "Choose Tribe Membes");
         }
 
-        private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView, ICollection<ContactDTO> selectedContacts)
+        private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView,
+            ICollection<ContactDTO> selectedContacts)
         {
             var tribeMembers = selectedContacts.Select(x => x.User).ToList();
             _router.NavigateCreateTribe(this.View, tribeMembers, TribeCreated);
@@ -197,7 +128,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             if (result.IsSuccess)
             {
                 dto.MembershipStatus = result.Data;
-                await _localTribesService.SaveAsync(dto).ConfigureAwait(false);
                 this.View.DisplayContacts(_contacts);
             }
             else
@@ -212,7 +142,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             if (result.IsSuccess)
             {
                 dto.MembershipStatus = result.Data;
-                await _localTribesService.SaveAsync(dto).ConfigureAwait(false);
                 this.View.DisplayContacts(_contacts);
             }
             else

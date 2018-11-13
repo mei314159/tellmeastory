@@ -14,22 +14,19 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private readonly IRemoteStorytellersDataService _remoteStorytellersDataService;
         private readonly IRemoteStoriesDataService _remoteStoriesDataService;
         private readonly IRemoteTribesDataService _remoteTribesDataService;
-        private readonly ILocalStorytellersDataService _localStorytellersDataService;
         private readonly IRouter _router;
 
         public NotificationHandlerBusinessLogic(IRouter router,
             IRemoteStoriesDataService remoteStoriesDataService,
             IRemoteStorytellersDataService remoteStorytellersDataService,
             IRemoteNotificationsDataService remoteNotificationsDataService,
-            IRemoteTribesDataService remoteTribesDataService,
-            ILocalStorytellersDataService localStorytellersDataService)
+            IRemoteTribesDataService remoteTribesDataService)
         {
             _router = router;
             _remoteStorytellersDataService = remoteStorytellersDataService;
             _remoteStoriesDataService = remoteStoriesDataService;
             _remoteNotificationsDataService = remoteNotificationsDataService;
             _remoteTribesDataService = remoteTribesDataService;
-            _localStorytellersDataService = localStorytellersDataService;
         }
 
         public async Task<bool> RejectFriendshipRequestAsync(int notificationId, StorytellerDTO dto)
@@ -47,7 +44,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 return result.IsSuccess;
 
             dto.FriendshipStatus = result.Data;
-            await _localStorytellersDataService.SaveAsync(dto).ConfigureAwait(false);
 
             return result.IsSuccess;
         }

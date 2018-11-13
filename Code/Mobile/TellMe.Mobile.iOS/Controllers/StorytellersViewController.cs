@@ -287,7 +287,7 @@ namespace TellMe.iOS.Controllers
             InvokeOnMainThread(() =>
             {
                 UIAlertController alert = UIAlertController
-                    .Create("Storytellers not found", "Send a request to join?", UIAlertControllerStyle.Alert);
+                    .Create("StoryTellers not found", "Send a request to join?", UIAlertControllerStyle.Alert);
                 alert.AddAction(UIAlertAction.Create("Back", UIAlertActionStyle.Cancel, null));
                 alert.AddAction(UIAlertAction.Create("Send", UIAlertActionStyle.Default,
                     (x) => this.ShowSendRequestToJoinPrompt()));
@@ -452,7 +452,7 @@ namespace TellMe.iOS.Controllers
             {
                 case ContactsMode.DisplayStorytellers:
                     TableView.SetEditing(false, true);
-                    NavItem.Title = "Storytellers";
+                    NavItem.Title = "StoryTellers";
                     TableViewTop.Constant = 44;
                     break;
                 case ContactsMode.StorytellersAndTribes:

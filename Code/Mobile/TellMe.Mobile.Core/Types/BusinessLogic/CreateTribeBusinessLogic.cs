@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
-using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -13,14 +12,11 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class CreateTribeBusinessLogic : ICreateTribeBusinessLogic
     {
         private readonly IRemoteTribesDataService _remoteTribesService;
-        private readonly ILocalTribesDataService _localTribesService;
         private readonly CreateTribeValidator _validator;
         public ICreateTribeView View { get; set; }
 
-        public CreateTribeBusinessLogic(IRemoteTribesDataService remoteTribesService,
-            ILocalTribesDataService localTribesService, CreateTribeValidator validator)
+        public CreateTribeBusinessLogic(IRemoteTribesDataService remoteTribesService, CreateTribeValidator validator)
         {
-            _localTribesService = localTribesService;
             _validator = validator;
             _remoteTribesService = remoteTribesService;
         }
@@ -40,7 +36,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     .ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    await _localTribesService.SaveAsync(result.Data).ConfigureAwait(false);
                     this.View.ShowSuccessMessage("Tribe successfully created", () => View.Close(result.Data));
                 }
                 else

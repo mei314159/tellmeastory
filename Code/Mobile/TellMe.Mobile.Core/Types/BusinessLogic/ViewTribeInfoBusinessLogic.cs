@@ -16,16 +16,14 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class ViewTribeInfoBusinessLogic : IViewTribeInfoBusinessLogic
     {
         private readonly IRemoteTribesDataService _remoteTribeDataService;
-        private readonly ILocalTribesDataService _localTribeDataService;
         private readonly ILocalAccountService _localLocalAccountService;
         private readonly CreateTribeValidator _validator;
         private readonly IRouter _router;
 
         public ViewTribeInfoBusinessLogic(IRemoteTribesDataService remoteTribeDataService, IRouter router,
-            ILocalTribesDataService localTribeDataService, CreateTribeValidator validator,
+            CreateTribeValidator validator,
             ILocalAccountService localLocalAccountService)
         {
-            _localTribeDataService = localTribeDataService;
             _validator = validator;
             _localLocalAccountService = localLocalAccountService;
             _router = router;
@@ -37,25 +35,15 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public async Task LoadAsync(bool forceRefresh)
         {
             var tribe = View.Tribe;
-            var tribeResult = await _localTribeDataService.GetAsync(tribe.Id).ConfigureAwait(false);
-            if (forceRefresh || tribeResult.Expired || tribeResult.Data.Members == null ||
-                tribeResult.Data.Members.Count == 0)
+            var result = await _remoteTribeDataService.GetTribeAsync(tribe.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                var result = await _remoteTribeDataService.GetTribeAsync(tribe.Id).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await _localTribeDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                    tribe = result.Data;
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return;
-                }
+                tribe = result.Data;
             }
             else
             {
-                tribe = tribeResult.Data;
+                result.ShowResultError(this.View);
+                return;
             }
 
             this.View.Display(tribe);
@@ -64,10 +52,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public void ChooseMembers()
         {
             var selectedItems = new HashSet<string>(View.Tribe.Members.Select(x => x.UserId));
-            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, true, "Choose Tribe Membes", selectedItems);
+            _router.NavigateChooseStorytellers(View, HandleStorytellerSelectedEventHandler, true, "Choose Tribe Membes",
+                selectedItems);
         }
 
-        private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView, ICollection<ContactDTO> selectedContacts)
+        private void HandleStorytellerSelectedEventHandler(IDismissable selectTribeMembersView,
+            ICollection<ContactDTO> selectedContacts)
         {
             foreach (var contact in selectedContacts)
             {
@@ -82,6 +72,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     Status = TribeMemberStatus.Invited
                 });
             }
+
             View.DisplayMembers();
         }
 
@@ -102,7 +93,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                     .ConfigureAwait(false);
                 if (result.IsSuccess)
                 {
-                    await _localTribeDataService.SaveAsync(result.Data).ConfigureAwait(false);
                     this.View.ShowSuccessMessage("Tribe successfully updated");
                 }
                 else
@@ -129,7 +119,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             if (result.IsSuccess)
             {
                 View.Tribe.Members.RemoveAll(x => x.UserId == _localLocalAccountService.GetAuthInfo().UserId);
-                await _localTribeDataService.DeleteAsync(View.Tribe).ConfigureAwait(false);
                 this.View.ShowSuccessMessage("You've left this tribe", () => View.Close(View.Tribe));
             }
             else

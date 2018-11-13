@@ -172,7 +172,7 @@ namespace TellMe.iOS.Controllers
             _currentItemIndex = Stories.IndexOf(x => x.Id == cell.Story.Id);
             if (!PlayStory(cell.Story))
             {
-                this.ShowErrorMessage("The story is objectionable");
+                this.ShowErrorMessage("You have flagged this story as objectionable");
             }
         }
 

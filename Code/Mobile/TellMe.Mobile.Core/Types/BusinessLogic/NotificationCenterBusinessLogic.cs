@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
-using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -15,8 +14,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     {
         private readonly IRemoteNotificationsDataService _remoteNotificationsDataService;
 
-        private readonly ILocalNotificationsDataService _localNotificationsDataService;
-
         private readonly List<NotificationDTO> _notifications = new List<NotificationDTO>();
 
         private readonly INotificationHandler _notificationHandler;
@@ -24,11 +21,9 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public INotificationsCenterView View { get; set; }
 
         public NotificationCenterBusinessLogic(INotificationHandler notificationHandler,
-            IRemoteNotificationsDataService remoteNotificationsDataService,
-            ILocalNotificationsDataService localNotificationsDataService)
+            IRemoteNotificationsDataService remoteNotificationsDataService)
         {
             _remoteNotificationsDataService = remoteNotificationsDataService;
-            _localNotificationsDataService = localNotificationsDataService;
             _notificationHandler = notificationHandler;
         }
 
@@ -46,7 +41,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .GetNotificationsAsync(_notifications.LastOrDefault()?.Date).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localNotificationsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
                 _notifications.AddRange(result.Data);
             }
             else
@@ -62,15 +56,17 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             var result = await _notificationHandler.ProcessNotificationAsync(notification, View).ConfigureAwait(false);
             if (result.HasValue)
-                await NotificationProcessed(notification.Id, result.Value).ConfigureAwait(false);
+                NotificationProcessed(notification.Id, result.Value);
         }
 
-        private async Task NotificationProcessed(int notificationId, bool success)
+        private void NotificationProcessed(int notificationId, bool success)
         {
             var notification = _notifications.FirstOrDefault(x => x.Id == notificationId);
-            notification.Handled = success;
-            await _localNotificationsDataService.SaveAsync(notification).ConfigureAwait(false);
-            View.ReloadNotification(notification);
+            if (notification != null)
+            {
+                notification.Handled = success;
+                View.ReloadNotification(notification);
+            }
         }
     }
 }

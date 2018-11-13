@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using TellMe.Mobile.Core.Contracts;
 using TellMe.Mobile.Core.Contracts.BusinessLogic;
-using TellMe.Mobile.Core.Contracts.DataServices.Local;
 using TellMe.Mobile.Core.Contracts.DataServices.Remote;
 using TellMe.Mobile.Core.Contracts.DTO;
 using TellMe.Mobile.Core.Contracts.UI.Views;
@@ -14,14 +13,11 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class EditEventBusinessLogic : IEditEventBusinessLogic
     {
         private readonly IRemoteEventsDataService _remoteEventsDataService;
-        private readonly ILocalEventsDataService _localEventsDataService;
         private readonly EventValidator _validator;
         private readonly IRouter _router;
 
-        public EditEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router,
-            ILocalEventsDataService localEventsDataService, EventValidator validator)
+        public EditEventBusinessLogic(IRemoteEventsDataService remoteEventsDataService, IRouter router, EventValidator validator)
         {
-            _localEventsDataService = localEventsDataService;
             _validator = validator;
             _router = router;
             _remoteEventsDataService = remoteEventsDataService;
@@ -32,25 +28,15 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         public async Task LoadAsync(bool forceRefresh)
         {
             var eventDTO = View.Event;
-            var localEventResult = await _localEventsDataService.GetAsync(eventDTO.Id).ConfigureAwait(false);
-            if (forceRefresh || localEventResult.Expired || localEventResult.Data.Attendees == null ||
-                localEventResult.Data.Attendees.Count == 0)
+            var result = await _remoteEventsDataService.GetEventAsync(eventDTO.Id).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                var result = await _remoteEventsDataService.GetEventAsync(eventDTO.Id).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
-                    eventDTO = result.Data;
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return;
-                }
+                eventDTO = result.Data;
             }
             else
             {
-                eventDTO = localEventResult.Data;
+                result.ShowResultError(this.View);
+                return;
             }
 
             this.View.Display(eventDTO);
@@ -58,7 +44,8 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         public void NavigateCreateRequest()
         {
-            _router.NavigateChooseStorytellersAndTribes(View, RequestStoryRecipientSelectedEventHandler, false, "Choose recipient");
+            _router.NavigateChooseStorytellersAndTribes(View, RequestStoryRecipientSelectedEventHandler, false,
+                "Choose recipient");
         }
 
         public async Task SaveAsync()
@@ -74,13 +61,12 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 this.View.EnableInput(overlay);
                 if (result.IsSuccess)
                 {
-                    await _localEventsDataService.SaveAsync(result.Data).ConfigureAwait(false);
                     this.View.Event = result.Data;
                     if (createMode)
                         this.View.PromptCreateRequest(result.Data);
                     else
                     {
-                        this.View.ShowSuccessMessage("Event successfully saved");   
+                        this.View.ShowSuccessMessage("Event successfully saved");
                     }
                 }
                 else
@@ -109,7 +95,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localEventsDataService.DeleteAsync(View.Event).ConfigureAwait(false);
                 this.View.ShowSuccessMessage($"You've deleted the event \"{View.Event.Title}\"",
                     () => View.Deleted(View.Event));
             }
@@ -128,7 +113,8 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private void RequestStoryRecipientSelectedEventHandler(IDismissable chooseRecipientsView,
             ICollection<ContactDTO> selectedContacts)
         {
-            _router.NavigatePrepareStoryRequest(this.View, selectedContacts, (item, state) => chooseRecipientsView.Dismiss(), View.Event);
+            _router.NavigatePrepareStoryRequest(this.View, selectedContacts,
+                (item, state) => chooseRecipientsView.Dismiss(), View.Event);
         }
     }
 }

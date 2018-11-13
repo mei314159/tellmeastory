@@ -14,10 +14,9 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     {
         private readonly IRemoteNotificationsDataService _remoteNotificationsService;
 
-        public StoriesBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
-            ILocalStoriesDataService localStoriesService, IRemoteNotificationsDataService remoteNotificationsService,
+        public StoriesBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router, IRemoteNotificationsDataService remoteNotificationsService,
             ILocalAccountService localAccountService, IRemoteStorytellersDataService remoteStorytellersDataService) :
-            base(remoteStoriesDataService, router, localStoriesService, localAccountService, remoteStorytellersDataService)
+            base(remoteStoriesDataService, router, localAccountService, remoteStorytellersDataService)
         {
             _remoteNotificationsService = remoteNotificationsService;
         }

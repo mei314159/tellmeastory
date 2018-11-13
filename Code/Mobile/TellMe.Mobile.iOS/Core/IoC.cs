@@ -38,7 +38,7 @@ namespace TellMe.iOS.Core
 
             RegisterAll<IRemoteDataService>(Container);
             RegisterAll<ILocalDataService>(Container);
-            Container.Register(typeof(AbstractValidator<>), new[] {typeof(AbstractValidator<>).Assembly});
+            Container.Register(typeof(AbstractValidator<>), typeof(AbstractValidator<>).Assembly);
             RegisterAll<IBusinessLogic>(Container);
             RegisterControllers();
             Container.Verify();

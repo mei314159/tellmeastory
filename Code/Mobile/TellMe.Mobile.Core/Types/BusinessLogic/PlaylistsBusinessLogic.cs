@@ -18,14 +18,11 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         private readonly List<PlaylistDTO> _events = new List<PlaylistDTO>();
         private readonly IRouter _router;
         private readonly IRemotePlaylistsDataService _remotePlaylistsDataService;
-        private readonly ILocalPlaylistsDataService _localPlaylistsDataService;
 
-        public PlaylistsBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService,
-            ILocalPlaylistsDataService localPlaylistsDataService)
+        public PlaylistsBusinessLogic(IRouter router, IRemotePlaylistsDataService remotePlaylistsDataService)
         {
             _router = router;
             _remotePlaylistsDataService = remotePlaylistsDataService;
-            _localPlaylistsDataService = localPlaylistsDataService;
         }
 
         public IPlaylistsView View { get; set; }
@@ -41,7 +38,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .GetPlaylistsAsync(forceRefresh ? null : _events.LastOrDefault()?.CreateDateUtc).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localPlaylistsDataService.SaveAllAsync(result.Data).ConfigureAwait(false);
                 _events.AddRange(result.Data);
             }
             else

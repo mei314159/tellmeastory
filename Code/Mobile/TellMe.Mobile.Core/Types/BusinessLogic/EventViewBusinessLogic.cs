@@ -16,18 +16,16 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     {
         private readonly ILocalAccountService _localLocalAccountService;
         private readonly IRemoteEventsDataService _remoteEventsDataService;
-        private readonly ILocalEventsDataService _localEventsDataService;
         private readonly List<StoryDTO> _stories = new List<StoryDTO>();
 
 
         public EventViewBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
-            ILocalStoriesDataService localStoriesService, IRemoteEventsDataService remoteEventsDataService,
-            ILocalEventsDataService localEventsDataService, ILocalAccountService localLocalAccountService,
+            IRemoteEventsDataService remoteEventsDataService,
+            ILocalAccountService localLocalAccountService,
             IRemoteStorytellersDataService remoteStorytellersDataService) : base(remoteStoriesDataService, router,
-            localStoriesService, localLocalAccountService, remoteStorytellersDataService)
+            localLocalAccountService, remoteStorytellersDataService)
         {
             _remoteEventsDataService = remoteEventsDataService;
-            _localEventsDataService = localEventsDataService;
             _localLocalAccountService = localLocalAccountService;
         }
 
@@ -50,7 +48,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 _stories.AddRange(result.Data);
             }
             else
@@ -78,26 +75,15 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 
         private async Task<bool> LoadEventAsync(int eventId, bool forceRefresh = false)
         {
-            var localEvent = await _localEventsDataService.GetAsync(eventId).ConfigureAwait(false);
-            if (forceRefresh || localEvent.Data == null || localEvent.Expired)
+            var result = await _remoteEventsDataService.GetEventAsync(eventId).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                var result = await _remoteEventsDataService.GetEventAsync(eventId).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    View.Event = result.Data;
-                }
-                else
-                {
-                    result.ShowResultError(this.View);
-                    return false;
-                }
+                View.Event = result.Data;
+                return true;
             }
-            else
-            {
-                View.Event = localEvent.Data;
-            }
-            
-            return true;
+
+            result.ShowResultError(this.View);
+            return false;
         }
 
         public void SendStory()
@@ -122,7 +108,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localEventsDataService.DeleteAsync(View.Event).ConfigureAwait(false);
                 this.View.ShowSuccessMessage("You've deleted this event", HandleEventDeleted);
             }
             else
@@ -143,7 +128,7 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 this.View.EventDeleted(item);
             }
         }
-        
+
         private void HandleEventDeleted()
         {
             View.EventDeleted(View.Event);

@@ -16,14 +16,11 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
     public class EditPlaylistBusinessLogic : IEditPlaylistBusinessLogic
     {
         private readonly IRemotePlaylistsDataService _remotePlaylistsDataService;
-        private readonly ILocalPlaylistsDataService _localPlaylistsDataService;
         private readonly PlaylistValidator _validator;
         private readonly IRouter _router;
 
-        public EditPlaylistBusinessLogic(IRemotePlaylistsDataService remotePlaylistsDataService, IRouter router,
-            ILocalPlaylistsDataService localPlaylistsDataService, PlaylistValidator validator)
+        public EditPlaylistBusinessLogic(IRemotePlaylistsDataService remotePlaylistsDataService, IRouter router, PlaylistValidator validator)
         {
-            _localPlaylistsDataService = localPlaylistsDataService;
             _validator = validator;
             _router = router;
             _remotePlaylistsDataService = remotePlaylistsDataService;
@@ -37,7 +34,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
             var result = await _remotePlaylistsDataService.GetAsync(dto.Id).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localPlaylistsDataService.SaveAsync(result.Data).ConfigureAwait(false);
                 dto = result.Data;
             }
             else
@@ -79,7 +75,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 this.View.EnableInput(overlay);
                 if (result.IsSuccess)
                 {
-                    await _localPlaylistsDataService.SaveAsync(result.Data).ConfigureAwait(false);
                     this.View.ShowSuccessMessage("Playlist successfully saved", () => this.View.Saved(result.Data));
                 }
                 else
@@ -116,7 +111,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await _localPlaylistsDataService.DeleteAsync(View.Playlist).ConfigureAwait(false);
                 this.View.ShowSuccessMessage($"You've deleted a playlist \"{View.Playlist.Name}\"",
                     () => View.Deleted(View.Playlist));
             }

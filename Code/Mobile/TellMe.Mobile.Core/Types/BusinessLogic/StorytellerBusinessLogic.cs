@@ -13,14 +13,10 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
 {
     public class StorytellerBusinessLogic : StoriesTableBusinessLogic, IStorytellerBusinessLogic
     {
-        private readonly ILocalStorytellersDataService _localStorytellesDataService;
-
         public StorytellerBusinessLogic(IRemoteStoriesDataService remoteStoriesDataService, IRouter router,
-            ILocalStoriesDataService localStoriesService, IRemoteStorytellersDataService remoteStorytellesDataService,
-            ILocalStorytellersDataService localStorytellesDataService, ILocalAccountService localAccountService) : base(remoteStoriesDataService, router,
-            localStoriesService, localAccountService, remoteStorytellesDataService)
+            IRemoteStorytellersDataService remoteStorytellesDataService, ILocalAccountService localAccountService) :
+            base(remoteStoriesDataService, router, localAccountService, remoteStorytellesDataService)
         {
-            _localStorytellesDataService = localStorytellesDataService;
         }
 
         public new IStorytellerView View
@@ -41,7 +37,6 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
                 .ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                await LocalStoriesService.SaveStoriesAsync(result.Data).ConfigureAwait(false);
                 Stories.AddRange(result.Data);
             }
             else
@@ -57,25 +52,16 @@ namespace TellMe.Mobile.Core.Types.BusinessLogic
         {
             if (View.Storyteller == null)
             {
-                var localStoryteller =
-                    await _localStorytellesDataService.GetAsync(View.StorytellerId).ConfigureAwait(false);
-                if (localStoryteller.Data == null || localStoryteller.Expired)
+                var result = await RemoteStorytellersDataService.GetByIdAsync(View.StorytellerId)
+                    .ConfigureAwait(false);
+                if (result.IsSuccess)
                 {
-                    var result = await RemoteStorytellersDataService.GetByIdAsync(View.StorytellerId)
-                        .ConfigureAwait(false);
-                    if (result.IsSuccess)
-                    {
-                        View.Storyteller = result.Data;
-                    }
-                    else
-                    {
-                        result.ShowResultError(this.View);
-                        return false;
-                    }
+                    View.Storyteller = result.Data;
                 }
                 else
                 {
-                    View.Storyteller = localStoryteller.Data;
+                    result.ShowResultError(this.View);
+                    return false;
                 }
             }
 
