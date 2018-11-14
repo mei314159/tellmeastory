@@ -197,7 +197,7 @@ namespace TellMe.iOS.Controllers
                     obj => { InvokeInBackground(async () => await BusinessLogic.FlagAsObjectionable(story.Id)); }));
             }
 
-            uiAlertController.AddAction(UIAlertAction.Create("Unfollow Story Teller", UIAlertActionStyle.Destructive,
+            uiAlertController.AddAction(UIAlertAction.Create("Unfollow StoryTeller", UIAlertActionStyle.Destructive,
                 (obj) =>
                 {
                     InvokeInBackground(async () => await BusinessLogic.UnfollowStoryTellerAsync(story.SenderId));

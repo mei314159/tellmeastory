@@ -414,7 +414,7 @@ namespace TellMe.iOS.Controllers
                     }));
             }
 
-            uiAlertController.AddAction(UIAlertAction.Create("Unfollow Story Teller", UIAlertActionStyle.Destructive,
+            uiAlertController.AddAction(UIAlertAction.Create("Unfollow StoryTeller", UIAlertActionStyle.Destructive,
                 obj =>
                 {
                     InvokeInBackground(async () =>
